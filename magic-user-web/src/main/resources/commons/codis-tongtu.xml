@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+
+       <bean id="passportJedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+              <property name="minIdle" value="5"/>
+              <property name="maxTotal" value="10"/>
+              <property name="blockWhenExhausted" value="1"/>
+              <property name="maxWaitMillis" value="500"/>
+              <property name="lifo" value="false"/>
+
+              <property name="testOnBorrow" value="false"/>
+              <property name="testOnReturn" value="false"/>
+              <property name="testWhileIdle" value="true"/>
+              <property name="numTestsPerEvictionRun" value="-2"/>
+              <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+              <property name="softMinEvictableIdleTimeMillis" value="3600000"/>
+              <property name="minEvictableIdleTimeMillis" value="-1"/>
+       </bean>
+
+       <bean id="permJedisFactory" class="com.magic.api.commons.codis.JedisFactory">
+              <constructor-arg index="0" value="${codis.passport.zk.addr}"/>
+              <constructor-arg index="1" value="${codis.passport.zk.session.timeout.ms}"/>
+              <constructor-arg index="2" value="${codis.passport.zk.proxy.dir}"/>
+              <constructor-arg index="3" ref="passportJedisPoolConfig"/>
+       </bean>
+
+       <aop:config>
+              <aop:pointcut expression="execution(public * com.magic.tongtu.*storage..*.*(..))" id="jedisAspect"/>
+              <aop:aspect ref="permJedisFactory">
+                     <aop:after method="close" pointcut-ref="jedisAspect"/>
+              </aop:aspect>
+       </aop:config>
+
+</beans>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="multipleResultSetsEnabled" value="true"/>
+        <setting name="useColumnLabel" value="true"/>
+        <setting name="useGeneratedKeys" value="false"/>
+        <setting name="autoMappingBehavior" value="PARTIAL"/>
+        <setting name="defaultExecutorType" value="SIMPLE"/><!-- SIMPLE REUSE BATCH -->
+        <!-- <setting name="defaultExecutorType" value="BATCH" /> -->
+        <setting name="defaultStatementTimeout" value="25000"/>
+        <setting name="safeRowBoundsEnabled" value="false"/>
+        <setting name="mapUnderscoreToCamelCase" value="false"/>
+        <setting name="localCacheScope" value="SESSION"/>
+        <!-- <setting name="jdbcTypeForNull" value="OTHER" /> -->
+        <setting name="jdbcTypeForNull" value="NULL"/>
+        <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
+    </settings>
+    <typeAliases>
+        <typeAlias alias="User" type="com.magic.tongtu.entity.User"/>
+        <typeAlias alias="Role" type="com.magic.tongtu.entity.Role"/>
+        <typeAlias alias="Resources" type="com.magic.tongtu.entity.Resources"/>
+        <typeAlias alias="ProcHistory" type="com.magic.tongtu.entity.ProcHistory"/>
+        <typeAlias alias="UserRole" type="com.magic.tongtu.entity.UserRole"/>
+        <typeAlias alias="ResUser" type="com.magic.tongtu.entity.ResUser"/>
+        <typeAlias alias="RoleRes" type="com.magic.tongtu.entity.RoleRes"/>
+    </typeAliases>
+
+</configuration>
