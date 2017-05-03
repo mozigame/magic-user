@@ -12,7 +12,7 @@
         <module>magic-user-service</module>
         <module>magic-user-web</module>
     </modules>
-    <packaging>pom</packaging>\
+    <packaging>pom</packaging>
 
     <parent>
         <groupId>com.magic.commons</groupId>

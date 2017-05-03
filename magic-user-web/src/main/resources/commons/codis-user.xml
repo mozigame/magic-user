@@ -31,7 +31,7 @@
        </bean>
 
        <aop:config>
-              <aop:pointcut expression="execution(public * com.magic.tongtu.*storage..*.*(..))" id="jedisAspect"/>
+              <aop:pointcut expression="execution(public * com.magic.user.*storage..*.*(..))" id="jedisAspect"/>
               <aop:aspect ref="permJedisFactory">
                      <aop:after method="close" pointcut-ref="jedisAspect"/>
               </aop:aspect>

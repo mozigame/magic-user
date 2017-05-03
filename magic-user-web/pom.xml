@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>magic-user-web</artifactId>
     <packaging>war</packaging>
-    <name>magic-user-web Maven Webapp</name>
+    <name>magic-user-web</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
@@ -26,5 +26,42 @@
     </dependencies>
     <build>
         <finalName>magic-user-web</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.3.6.v20151106</version>
+                <configuration>
+                    <webAppConfig>
+                        <contextPath>/</contextPath>
+                    </webAppConfig>
+                    <!-- 每3秒的间隔扫描一次,实现热部署 -->
+                    <scanIntervalSeconds>3</scanIntervalSeconds>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <skip>true</skip>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources/${resource.dir}</directory>
+            </resource>
+
+            <resource>
+                <directory>src/main/resources/commons</directory>
+            </resource>
+        </resources>
     </build>
+
+
+
 </project>

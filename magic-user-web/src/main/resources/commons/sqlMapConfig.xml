@@ -22,13 +22,8 @@
         <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
     </settings>
     <typeAliases>
-        <typeAlias alias="User" type="com.magic.tongtu.entity.User"/>
-        <typeAlias alias="Role" type="com.magic.tongtu.entity.Role"/>
-        <typeAlias alias="Resources" type="com.magic.tongtu.entity.Resources"/>
-        <typeAlias alias="ProcHistory" type="com.magic.tongtu.entity.ProcHistory"/>
-        <typeAlias alias="UserRole" type="com.magic.tongtu.entity.UserRole"/>
-        <typeAlias alias="ResUser" type="com.magic.tongtu.entity.ResUser"/>
-        <typeAlias alias="RoleRes" type="com.magic.tongtu.entity.RoleRes"/>
+        <typeAlias alias="User" type="com.magic.*"/>
+
     </typeAliases>
 
 </configuration>

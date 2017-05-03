@@ -14,7 +14,7 @@
 
 
     <!-- provider service -->
-    <dubbo:service interface="com.magic.tongtu.service.AuthoriseService" ref="authoriseService">
+    <dubbo:service interface="com.magic.user.**" ref="authoriseService">
         <dubbo:method name="cherUserPerm" timeout="3000"/>
     </dubbo:service>
 
