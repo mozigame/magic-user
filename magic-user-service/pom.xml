@@ -12,6 +12,13 @@
     <artifactId>magic-user-service</artifactId>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.magic.user</groupId>
+            <artifactId>magic-user-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- core -->
         <dependency>
             <groupId>com.magic.commons</groupId>
@@ -135,11 +142,11 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <!-- uuid -->
@@ -153,6 +160,12 @@
                     <groupId>*</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.4.2</version>
         </dependency>
     </dependencies>
 

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.magic.user.mapper.LoginHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.magic.user.entity.LoginHistory">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="request_ip" jdbcType="INTEGER" property="requestIp"/>
+        <result column="login_type" jdbcType="TINYINT" property="loginType"/>
+        <result column="platform" jdbcType="VARCHAR" property="platform"/>
+        <result column="ip_addr" jdbcType="VARCHAR" property="ipAddr"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, user_id, create_time, request_ip, login_type, platform, ip_addr
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_login_history
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_login_history
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.magic.user.entity.LoginHistory">
+    insert into t_login_history (id, user_id, create_time, 
+      request_ip, login_type, platform, 
+      ip_addr)
+    values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{requestIp,jdbcType=INTEGER}, #{loginType,jdbcType=TINYINT}, #{platform,jdbcType=VARCHAR}, 
+      #{ipAddr,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.magic.user.entity.LoginHistory">
+        insert into t_login_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="requestIp != null">
+                request_ip,
+            </if>
+            <if test="loginType != null">
+                login_type,
+            </if>
+            <if test="platform != null">
+                platform,
+            </if>
+            <if test="ipAddr != null">
+                ip_addr,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="requestIp != null">
+                #{requestIp,jdbcType=INTEGER},
+            </if>
+            <if test="loginType != null">
+                #{loginType,jdbcType=TINYINT},
+            </if>
+            <if test="platform != null">
+                #{platform,jdbcType=VARCHAR},
+            </if>
+            <if test="ipAddr != null">
+                #{ipAddr,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.magic.user.entity.LoginHistory">
+        update t_login_history
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="requestIp != null">
+                request_ip = #{requestIp,jdbcType=INTEGER},
+            </if>
+            <if test="loginType != null">
+                login_type = #{loginType,jdbcType=TINYINT},
+            </if>
+            <if test="platform != null">
+                platform = #{platform,jdbcType=VARCHAR},
+            </if>
+            <if test="ipAddr != null">
+                ip_addr = #{ipAddr,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.magic.user.entity.LoginHistory">
+    update t_login_history
+    set user_id = #{userId,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      request_ip = #{requestIp,jdbcType=INTEGER},
+      login_type = #{loginType,jdbcType=TINYINT},
+      platform = #{platform,jdbcType=VARCHAR},
+      ip_addr = #{ipAddr,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

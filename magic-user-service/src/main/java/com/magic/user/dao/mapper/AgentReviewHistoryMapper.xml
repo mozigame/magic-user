@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.magic.user.mapper.AgentReviewHistoryMapper">
+  <resultMap id="BaseResultMap" type="com.magic.user.entity.AgentReviewHistory">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="agent_review_id" jdbcType="BIGINT" property="agentReviewId" />
+    <result column="oper_user_id" jdbcType="BIGINT" property="operUserId" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, agent_review_id, oper_user_id, status, create_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_agent_review_history
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_agent_review_history
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.magic.user.entity.AgentReviewHistory">
+    insert into t_agent_review_history (id, agent_review_id, oper_user_id, 
+      status, create_time)
+    values (#{id,jdbcType=BIGINT}, #{agentReviewId,jdbcType=BIGINT}, #{operUserId,jdbcType=BIGINT}, 
+      #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.magic.user.entity.AgentReviewHistory">
+    insert into t_agent_review_history
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="agentReviewId != null">
+        agent_review_id,
+      </if>
+      <if test="operUserId != null">
+        oper_user_id,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="agentReviewId != null">
+        #{agentReviewId,jdbcType=BIGINT},
+      </if>
+      <if test="operUserId != null">
+        #{operUserId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.magic.user.entity.AgentReviewHistory">
+    update t_agent_review_history
+    <set>
+      <if test="agentReviewId != null">
+        agent_review_id = #{agentReviewId,jdbcType=BIGINT},
+      </if>
+      <if test="operUserId != null">
+        oper_user_id = #{operUserId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.magic.user.entity.AgentReviewHistory">
+    update t_agent_review_history
+    set agent_review_id = #{agentReviewId,jdbcType=BIGINT},
+      oper_user_id = #{operUserId,jdbcType=BIGINT},
+      status = #{status,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
