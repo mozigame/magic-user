@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * @Doc 代理审核记录表
  */
-public class AgentReviewHistory {
+public class AgentReview {
     private long id;
 
     private long agentApplyId; //代理申请id

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.magic.user.entity.AgentReview">
+    <resultMap id="BaseResultMap" type="com.magic.user.entity.AgentReview">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="agent_review_id" jdbcType="BIGINT" property="agentReviewId"/>
+        <result column="oper_user_id" jdbcType="BIGINT" property="operUserId"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+</mapper>

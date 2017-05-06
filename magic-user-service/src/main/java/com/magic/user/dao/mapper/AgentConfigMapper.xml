@@ -15,7 +15,7 @@
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, agent_id, return_scheme_id, admin_cost_id, fee_id, discount, cost, domain, temp1, 
+    id, agent_id, return_scheme_id, admin_cost_id, fee_id, discount, cost, domain, temp1,
     temp2, temp3
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -29,13 +29,13 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
     <insert id="insert" parameterType="com.magic.user.entity.AgentConfig">
-    insert into t_agent_config_info (id, agent_id, return_scheme_id, 
-      admin_cost_id, fee_id, discount, 
-      cost, domain, temp1, 
+    insert into t_agent_config_info (id, agent_id, return_scheme_id,
+      admin_cost_id, fee_id, discount,
+      cost, domain, temp1,
       temp2, temp3)
-    values (#{id,jdbcType=INTEGER}, #{agentId,jdbcType=BIGINT}, #{returnSchemeId,jdbcType=INTEGER}, 
-      #{adminCostId,jdbcType=INTEGER}, #{feeId,jdbcType=INTEGER}, #{discount,jdbcType=INTEGER}, 
-      #{cost,jdbcType=INTEGER}, #{domain,jdbcType=VARCHAR}, #{temp1,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{agentId,jdbcType=BIGINT}, #{returnSchemeId,jdbcType=INTEGER},
+      #{adminCostId,jdbcType=INTEGER}, #{feeId,jdbcType=INTEGER}, #{discount,jdbcType=INTEGER},
+      #{cost,jdbcType=INTEGER}, #{domain,jdbcType=VARCHAR}, #{temp1,jdbcType=VARCHAR},
       #{temp2,jdbcType=VARCHAR}, #{temp3,jdbcType=VARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="com.magic.user.entity.AgentConfig">

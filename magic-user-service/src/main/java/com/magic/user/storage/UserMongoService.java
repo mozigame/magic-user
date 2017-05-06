@@ -5,5 +5,5 @@ package com.magic.user.storage;
  * Date: 2017/5/4
  * Time: 22:08
  */
-public class UserMongoService {
+public interface UserMongoService {
 }
