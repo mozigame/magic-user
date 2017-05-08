@@ -1,11 +1,18 @@
 package com.magic.user.member.resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.core.auth.Access;
+import com.magic.api.commons.model.Page;
+import com.magic.user.entity.User;
+import com.magic.user.member.resource.service.MemberResourceService;
+import com.magic.user.vo.UserCondition;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
 
 /**
  * User: joey
@@ -15,6 +22,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/v1/member")
 public class MemberResource {
+
+
+    @Resource(name = "memberResourceService")
+    private MemberResourceService memberResourceService;
 
     /**
      * @param condition 检索条件
@@ -31,7 +42,16 @@ public class MemberResource {
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
-        return "";
+        UserCondition userCondition = JSONObject.parseObject(condition, UserCondition.class);
+        userCondition.setPageNo(page);
+        userCondition.setPageSize(count);
+        Page<User> userPage = memberResourceService.findByPage(userCondition);
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("page", page);
+        resultObj.put("count", count);
+        resultObj.put("total", userPage.getTotalCount());
+        resultObj.put("list", userPage.getResult());
+        return resultObj.toJSONString();
     }
 
     /**
@@ -282,6 +302,19 @@ public class MemberResource {
 //            股东ID（从RequestContext中获取股东ID）
     ) {
 
+        if (condition != null) {
+            UserCondition userCondition = JSONObject.parseObject(condition, UserCondition.class);
+            userCondition.setPageNo(page);
+            userCondition.setPageSize(count);
+            Page<User> userPage = memberResourceService.findByPage(userCondition);
+            JSONObject resultObj = new JSONObject();
+            resultObj.put("page", page);
+            resultObj.put("count", count);
+            resultObj.put("total", userPage.getTotalCount());
+            resultObj.put("list", userPage.getResult());
+            return resultObj.toJSONString();
+        }
+
         return " {\n" +
                 "            \"page\":1,\n" +
                 "                \"count\":10,\n" +
@@ -316,5 +349,24 @@ public class MemberResource {
         return "";
     }
 
+//    @Access(type = Access.AccessType.COMMON)
+//    @RequestMapping(value = "/register", method = RequestMethod.POST)
+//    @ResponseBody
+//    public String register(
+//            @RequestParam("realname") String realname,
+//            @RequestParam("username") String username,
+//            @RequestParam("telephone") String telephone,
+//            @RequestParam("bankCardNo") String bankCardNo,
+//            @RequestParam("realname") String realname,
+//            @RequestParam("realname") String realname,
+//            @RequestParam("realname") String realname,
+//            @RequestParam("realname") String realname,
+//            @RequestParam("realname") String realname,
+//            @RequestParam("realname") String realname,
+//            @RequestParam("realname") String realname,
+//
+//    ) {
+//
+//    }
 
 }

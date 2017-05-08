@@ -3,7 +3,7 @@ package com.magic.user.entity;
 /**
  * @Doc 账户与用户id映射表
  */
-public class ProAccountUser {
+public class OwnerAccountUser {
     private long id;
 
     private String assemAccount;    //聚合账号，格式：业主ID-账号名(股东或代理)

@@ -35,7 +35,7 @@ public class User {
 
     private String bankCardNo;  //银行卡号
 
-    private long proprietorId;  //业主id
+    private long ownerId;  //业主id
 
     private DeleteStatus isDelete;  //是否删除
 
@@ -151,12 +151,12 @@ public class User {
         this.bankCardNo = bankCardNo;
     }
 
-    public long getProprietorId() {
-        return proprietorId;
+    public long getOwnerId() {
+        return ownerId;
     }
 
-    public void setProprietorId(long proprietorId) {
-        this.proprietorId = proprietorId;
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public DeleteStatus getIsDelete() {

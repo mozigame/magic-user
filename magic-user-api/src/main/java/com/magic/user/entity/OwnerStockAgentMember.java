@@ -3,10 +3,10 @@ package com.magic.user.entity;
 /**
  * @Doc  业主股东代理会员数量关联表
  */
-public class PropStockAgentMember {
+public class OwnerStockAgentMember {
     private long id;
 
-    private long proprietorId;    //业主id
+    private long ownerId;    //业主id
 
     private long stockId;   //股东id
 
@@ -22,12 +22,12 @@ public class PropStockAgentMember {
         this.id = id;
     }
 
-    public long getProprietorId() {
-        return proprietorId;
+    public long getOwnerId() {
+        return ownerId;
     }
 
-    public void setProprietorId(long proprietorId) {
-        this.proprietorId = proprietorId;
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public long getStockId() {

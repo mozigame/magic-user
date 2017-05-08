@@ -22,8 +22,8 @@
         <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
     </settings>
     <typeAliases>
-        <typeAlias alias="User" type="com.magic.user.entity.User"/>
-        <typeAlias alias="LoginHistory" type="com.magic.user.entity.LoginHistory"/>
+        <typeAlias alias="User" type="com.magic.passport.po.User"/>
+        <typeAlias alias="LoginUser" type="com.magic.passport.po.LoginUser"/>
     </typeAliases>
 
 

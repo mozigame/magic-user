@@ -279,6 +279,7 @@ public class AgentResource {
                 "                    \"showStatus\":\"未审核\",\n" +
                 "                    \"source\":\"www.22431.com\",\n" +
                 "                    \"registerIp\":\"13.33.11.4\",\n" +
+                "                    \"operUserName\":\"idwu\",\n" +
                 "                    \"operaterTime\":\"2017-03-01 16:43:22\"\n" +
                 "        }]\n" +
                 "    }";

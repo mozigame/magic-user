@@ -75,7 +75,7 @@ public class MongoDbFactory {
     @Test
     public void findByPage() {
         MongoCursor<Document> cursor = collection.find().sort(new Document("userId", -1)).skip(0).limit(10).iterator();
-        MongoCursor<Document> cursor1 = collection.find().sort(new Document("userId", 1)).skip(5).limit(10).iterator();
+        MongoCursor<Document> cursor1 = collection.find().sort(new Document("userId", 1)).skip(0).limit(10).iterator();
         while (cursor.hasNext()) {
             System.out.println(cursor.next().toJson());
         }
@@ -122,6 +122,7 @@ public class MongoDbFactory {
     @Test
     public void updateOne() {
         System.out.println(collection.updateOne(eq("userId", 2017050500110033L), new Document("$set", new Document("username", "update2"))));
+        System.out.println(collection.updateMany(eq("userId", 2017050500110033L), new Document("$set", new Document("username", "update2"))));
     }
 
     @Test
@@ -152,4 +153,88 @@ public class MongoDbFactory {
         getParam(a, b, c);
     }
 
+    public static void main(String[] args) {
+        Class<?> clazz = MongoDbFactory.class;
+        ClassPool pool = ClassPool.getDefault();
+        try {
+            CtClass ctClass = pool.get(clazz.getName());
+            CtMethod ctMethod = ctClass.getDeclaredMethod("test");
+
+            // 使用javassist的反射方法的参数名
+            MethodInfo methodInfo = ctMethod.getMethodInfo();
+            CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
+            LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute
+                    .getAttribute(LocalVariableAttribute.tag);
+            if (attr != null) {
+                int len = ctMethod.getParameterTypes().length;
+                // 非静态的成员函数的第一个参数是this
+                int pos = Modifier.isStatic(ctMethod.getModifiers()) ? 0 : 1;
+                System.out.print("test : ");
+                for (int i = 0; i < len; i++) {
+                    System.out.print(attr.variableName(i + pos) + ' ');
+                }
+                System.out.println();
+            }
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void test(String param1, int param2, int parem3) {
+        System.out.println(param1 + param2 + parem3);
+    }
+
+
+    public static String[] getAllParamaterName(Method method)
+            throws NotFoundException {
+        Class<?> clazz = method.getDeclaringClass();
+        ClassPool pool = ClassPool.getDefault();
+        CtClass clz = pool.get(clazz.getName());
+        CtClass[] params = new CtClass[method.getParameterTypes().length];
+        for (int i = 0; i < method.getParameterTypes().length; i++) {
+            params[i] = pool.getCtClass(method.getParameterTypes()[i].getName());
+        }
+        CtMethod cm = clz.getDeclaredMethod(method.getName(), params);
+        MethodInfo methodInfo = cm.getMethodInfo();
+        CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
+        LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute
+                .getAttribute(LocalVariableAttribute.tag);
+        int pos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
+        String[] paramNames = new String[cm.getParameterTypes().length];
+        for (int i = 0; i < paramNames.length; i++) {
+            paramNames[i] = attr.variableName(i + pos);
+        }
+        return paramNames;
+    }
+
+    @Test
+    public void methodTest() throws Exception {
+        Method method = MongoDbFactory.class.getMethod("test", String.class, int.class, int.class);
+        String[] paramaterName = getAllParamaterName(method);
+        System.out.println(JSONObject.toJSONString(paramaterName));
+//        assertArrayEquals(paramaterName, new String[]{"name"});
+    }
+
+    /**
+     * 获取方法参数名列表
+     *
+     * @param clazz
+     * @param m
+     * @return
+     * @throws IOException
+     */
+//    public static List<String> getMethodParamNames(Class<?> clazz, Method m) throws IOException {
+//        try (InputStream in = clazz.getResourceAsStream("/" + clazz.getName().replace('.', '/') + ".class")) {
+//            return getMethodParamNames(in,m);
+//        }
+//
+//    }
+//    public static List<String> getMethodParamNames(InputStream in, Method m) throws IOException {
+//        try (InputStream ins=in) {
+//            return getParamNames(ins,
+//                    new EnclosingMetadata(m.getName(), Type.getMethodDescriptor(m), m.getParameterTypes().length));
+//        }
+//
+//    }
 }

@@ -31,9 +31,9 @@ public class Member {
 
     private String stockUsername;   //股东账号
 
-    private long proprietorId;  //业主id
+    private long ownerId;  //业主id
 
-    private String proprietorUsername; //业主账号
+    private String ownerUsername; //业主账号
 
     private String sourceUrl;   //加入来源网址
 
@@ -135,20 +135,20 @@ public class Member {
         this.stockUsername = stockUsername;
     }
 
-    public long getProprietorId() {
-        return proprietorId;
+    public long getOwnerId() {
+        return ownerId;
     }
 
-    public void setProprietorId(long proprietorId) {
-        this.proprietorId = proprietorId;
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 
-    public String getProprietorUsername() {
-        return proprietorUsername;
+    public String getOwnerUsername() {
+        return ownerUsername;
     }
 
-    public void setProprietorUsername(String proprietorUsername) {
-        this.proprietorUsername = proprietorUsername;
+    public void setOwnerUsername(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
     }
 
     public String getSourceUrl() {
