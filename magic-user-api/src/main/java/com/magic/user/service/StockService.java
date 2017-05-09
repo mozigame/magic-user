@@ -23,4 +23,6 @@ public interface StockService {
     Long add(User user);
 
     int disable(long id, int status);
+
+
 }

@@ -25,6 +25,10 @@ public class Member {
 
     private String bankCardNo;  //银行卡号
 
+    private String bank;    //银行名称
+
+    private String bankDeposit; //开户行
+
     private long agentId;   //代理id
 
     private String agentUsername; //代理账号
@@ -207,6 +211,22 @@ public class Member {
 
     public void setIsDelete(DeleteStatus isDelete) {
         this.isDelete = isDelete;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public String getBankDeposit() {
+        return bankDeposit;
+    }
+
+    public void setBankDeposit(String bankDeposit) {
+        this.bankDeposit = bankDeposit;
     }
 
     public String getTemp1() {

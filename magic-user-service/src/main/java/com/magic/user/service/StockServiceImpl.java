@@ -49,4 +49,15 @@ public class StockServiceImpl implements StockService {
     public int disable(long id, int status) {
         return stockDbService.update("updateDisable", new String[]{"id", "status"}, new Object[]{id, status});
     }
+
+    /**
+     * @param id
+     * @return
+     * @Doc 根据股东id获取业主id
+     */
+    @Override
+    public long getOwnerId(long id) {
+
+        return 0;
+    }
 }

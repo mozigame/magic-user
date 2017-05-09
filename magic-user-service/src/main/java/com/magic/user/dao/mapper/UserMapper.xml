@@ -104,6 +104,11 @@
         )
     </insert>
 
+    <!--根据股东id获取业主id-->
+    <select id="getOwnerIdByStock" resultType="java.lang.Long">
+      SELECT owner_id FROM t_user_info WHERE user_id=#{userId}
+    </select>
+
 
     <!--启用、停用用户--><!--used-->
     <update id="updateDisable">

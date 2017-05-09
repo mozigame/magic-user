@@ -16,4 +16,11 @@ public interface UserService {
     int updateUser(User user);
 
     Page<User> findByPage(UserCondition userCondition);
+
+    /**
+     * @param id
+     * @return
+     * @Doc 根据股东id获取业主id
+     */
+    long getOwnerIdByStock(long id);
 }
