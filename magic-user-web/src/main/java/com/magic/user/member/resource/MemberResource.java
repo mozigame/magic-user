@@ -1,11 +1,23 @@
 package com.magic.user.member.resource;
 
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
+import com.magic.api.commons.core.context.RequestContext;
+import com.magic.user.member.resource.service.MemberServiceResourceImpl;
+import com.magic.user.po.DownLoadFile;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  * User: joey
@@ -15,6 +27,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/v1/member")
 public class MemberResource {
+
+    @Resource
+    private MemberServiceResourceImpl memberServiceResource;
 
     /**
      * @param condition 检索条件
@@ -27,11 +42,12 @@ public class MemberResource {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public String list(
-            @RequestParam(name = "condition", required = false) String condition,
+            @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition,
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
-        return "";
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberList(rc, condition, page, count);
     }
 
     /**
@@ -42,10 +58,30 @@ public class MemberResource {
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/list/export", method = RequestMethod.GET)
     @ResponseBody
-    public String listExport(
-            @RequestParam(name = "condition", required = false) String condition
-    ) {
-        return "";
+    public void listExport(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
+    ) throws IOException {
+        RequestContext rc = RequestContext.getRequestContext();
+        DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition);
+        response.setCharacterEncoding("UTF-8");
+        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
+            String contnetDisposition = "attachment;filename=";
+            if (downLoadFile.getFilename() != null) {
+                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
+            }
+            response.setHeader("Content-Disposition", contnetDisposition);
+            ServletOutputStream outputStream = response.getOutputStream();
+            try {
+                outputStream.write(downLoadFile.getContent());
+            }catch (Exception e){
+                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
+            }finally {
+                outputStream.flush();
+                outputStream.close();
+            }
+        }
     }
 
     /**
@@ -57,57 +93,10 @@ public class MemberResource {
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @ResponseBody
     public String detail(
-            @RequestParam(name = "id") long id
+            @RequestParam(name = "id", required = true) long id
     ) {
-
-        return " {\n" +
-                "            \"baseInfo\":{\n" +
-                "            \"id\":100,\n" +
-                "                    \"account\":\"asdffasd\",\n" +
-                "                    \"agentId\":10001,\n" +
-                "                    \"agent\":\"adjh\",\n" +
-                "                    \"realname\":\"王月华\",\n" +
-                "                    \"registerTime\":\"2017-03-13 23:33:23\",\n" +
-                "                    \"telephone\":\"13430180244\",\n" +
-                "                    \"registerIp\":\"171.13.8.12\",\n" +
-                "                    \"email\":\"liyuehua001@gmail.com\",\n" +
-                "                    \"status\":1,\n" +
-                "                    \"showStatus\":\"启用\",\n" +
-                "                    \"bankCardNo\":\"622848770596789\",\n" +
-                "                    \"lastLoginIp\":\"171.13.8.12\"\n" +
-                "        },\n" +
-                "            \"preferScheme\":{\n" +
-                "            \"level\":1,\n" +
-                "                    \"showLevel\":\"未分层\",\n" +
-                "                    \"onlineDiscount\":\"100返10\",\n" +
-                "                    \"depositFee\":\"无\",\n" +
-                "                    \"withdrawFee\":\"无\",\n" +
-                "                    \"returnWater\":\"返水基本1\",\n" +
-                "                    \"depositDiscountScheme\":\"100返10\"\n" +
-                "        },\n" +
-                "            \"fundProfile\":{\n" +
-                "            \"syncTime\":\"2017-04-18 09:29:33\",\n" +
-                "                    \"info\":{\n" +
-                "                \"balance\":\"1805.50\",\n" +
-                "                        \"depositNumbers\":15,\n" +
-                "                        \"depositTotalMoney\":\"29006590\",\n" +
-                "                        \"lastDeposit\":\"1200\",\n" +
-                "                        \"withdrawNumbers\":10,\n" +
-                "                        \"withdrawTotalMoney\":\"24500120\",\n" +
-                "                        \"lastWithdraw\":\"2500\"\n" +
-                "            }\n" +
-                "        },\n" +
-                "            \"betHistory\":{\n" +
-                "            \"totalMoney\":\"29000\",\n" +
-                "                    \"effMoney\":\"28000\",\n" +
-                "                    \"gains\":\"18000\"\n" +
-                "        },\n" +
-                "            \"discountHistory\":{\n" +
-                "            \"totalMoney\":\"1350\",\n" +
-                "                    \"numbers\":98,\n" +
-                "                    \"returnWaterTotalMoney\":\"1450\"\n" +
-                "        }\n" +
-                "        }";
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberDetails(rc, id);
     }
 
     /**
@@ -120,11 +109,11 @@ public class MemberResource {
     @RequestMapping(value = "/back/password/reset", method = RequestMethod.POST)
     @ResponseBody
     public String backPasswordRest(
-            @RequestParam(name = "id") long id,
-            @RequestParam(name = "password") String password
-//            股东ID（从RequestContext中获取股东ID）
+            @RequestParam(name = "id", required = true) long id,
+            @RequestParam(name = "password", required = true) String password
     ) {
-        return "";
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.passwordReset(rc, id, password);
     }
 
     /**
@@ -137,9 +126,9 @@ public class MemberResource {
     @ResponseBody
     public String forceLogout(
             @RequestParam(name = "id") long id
-//            股东ID（从RequestContext中获取股东ID）
     ) {
-        return "";
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.logout(rc, id);
     }
 
     /**
@@ -156,15 +145,15 @@ public class MemberResource {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public String update(
-            @RequestParam(name = "id") long id,
-            @RequestParam(name = "realname", required = false) String realname,
-            @RequestParam(name = "telephone", required = false) String telephone,
-            @RequestParam(name = "email", required = false) String email,
-            @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
-            @RequestParam(name = "status", required = false) int status
-//          股东ID（从RequestContext中获取股东ID）
+            @RequestParam(name = "id", required = true) long id,
+            @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
+            @RequestParam(name = "telephone", required = false, defaultValue = "") String telephone,
+            @RequestParam(name = "email", required = false, defaultValue = "") String email,
+            @RequestParam(name = "bankCardNo", required = false, defaultValue = "") String bankCardNo,
+            @RequestParam(name = "status", required = false, defaultValue = "-1") int status
     ) {
-        return "";
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.update(rc, id, realname, telephone, email, bankCardNo, status);
     }
 
     /**
@@ -177,11 +166,11 @@ public class MemberResource {
     @RequestMapping(value = "/level/update", method = RequestMethod.POST)
     @ResponseBody
     public String levelUpdate(
-            @RequestParam(name = "id") long id,
-            @RequestParam(name = "level") int level
-//            股东ID（从RequestContext中获取股东ID）
+            @RequestParam(name = "id", required = true) long id,
+            @RequestParam(name = "level", required = true) int level
     ) {
-        return "";
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.updateLevel(rc, id, level);
     }
 
     /**
@@ -198,31 +187,9 @@ public class MemberResource {
             @RequestParam(name = "lock", required = false, defaultValue = "1") int lock,
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
-//            股东ID（从RequestContext中获取股东ID）
     ) {
-
-        return " {\n" +
-                "            \"page\":1,\n" +
-                "                \"count\":10,\n" +
-                "                \"total\":100,\n" +
-                "                \"list\":[{\n" +
-                "            \"id\":1,\n" +
-                "                    \"name\":\"VIP1\",\n" +
-                "                    \"createTime\":\"2017-03-01 16:43:22\",\n" +
-                "                    \"members\":4310,\n" +
-                "                    \"condition\":{\n" +
-                "                \"depositNumbers\":1,\n" +
-                "                        \"depositTotalMoney\":\"1\",\n" +
-                "                        \"maxDepositMoney\":\"0\",\n" +
-                "                        \"withdrawNumbers\":0,\n" +
-                "                        \"withdrawTotalMoney\":\"0\"\n" +
-                "            },\n" +
-                "            \"returnWater\":1,\n" +
-                "                    \"returnWaterName\":\"返水方案1\",\n" +
-                "                    \"discount\":1,\n" +
-                "                    \"discountName\":\"出入款优惠1\"\n" +
-                "        }]\n" +
-                "        }";
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberLevelList(rc, lock, page, count);
     }
 
     /**
@@ -233,36 +200,30 @@ public class MemberResource {
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/level/list/export", method = RequestMethod.GET)
     @ResponseBody
-    public String levelListExport(
+    public void levelListExport(
+            HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "lock", required = false, defaultValue = "1") int lock
-//            股东ID（从RequestContext中获取股东ID）
-    ) {
-        return "";
-    }
-
-    /**
-     * @param levelId            层级ID
-     * @param depositNumbers     存款次数
-     * @param depositTotalMoney  存款总额
-     * @param maxDepositMoney    最大存款数额
-     * @param withdrawNumbers    取款次数
-     * @param withdrawTotalMoney 取款总额
-     * @return
-     * @Doc 设置层级分层条件
-     */
-    @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/level/condition/update", method = RequestMethod.POST)
-    @ResponseBody
-    public String levelConditionUpdate(
-            @RequestParam(name = "level") int levelId,
-            @RequestParam(name = "depositNumbers") int depositNumbers,
-            @RequestParam(name = "depositTotalMoney") int depositTotalMoney,
-            @RequestParam(name = "maxDepositMoney") int maxDepositMoney,
-            @RequestParam(name = "withdrawNumbers") int withdrawNumbers,
-            @RequestParam(name = "withdrawTotalMoney") int withdrawTotalMoney
-//            股东ID（从RequestContext中获取股东ID）
-    ) {
-        return "";
+    ) throws IOException {
+        RequestContext rc = RequestContext.getRequestContext();
+        DownLoadFile downLoadFile = memberServiceResource.memberLevelListExport(rc, lock);
+        response.setCharacterEncoding("UTF-8");
+        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
+            String contnetDisposition = "attachment;filename=";
+            if (downLoadFile.getFilename() != null) {
+                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
+            }
+            response.setHeader("Content-Disposition", contnetDisposition);
+            ServletOutputStream outputStream = response.getOutputStream();
+            try {
+                outputStream.write(downLoadFile.getContent());
+            } catch (Exception e) {
+                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
+            } finally {
+                outputStream.flush();
+                outputStream.close();
+            }
+        }
     }
 
     /**
@@ -279,26 +240,9 @@ public class MemberResource {
             @RequestParam(name = "condition") String condition,
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
-//            股东ID（从RequestContext中获取股东ID）
     ) {
-
-        return " {\n" +
-                "            \"page\":1,\n" +
-                "                \"count\":10,\n" +
-                "                \"total\":100,\n" +
-                "                \"list\":[{\n" +
-                "            \"id\":1001,\n" +
-                "                    \"account\":\"asdffasd\",\n" +
-                "                    \"agentId\":100,\n" +
-                "                    \"agent\":\"adjh\",\n" +
-                "                    \"level\":\"未分层\",\n" +
-                "                    \"balance\":2009,\n" +
-                "                    \"registerTime\":\"2017-03-01 16:43:22\",\n" +
-                "                    \"lastLoginTime\":\"2017-04-17 18:03:22\",\n" +
-                "                    \"status\":1,\n" +
-                "                    \"showStatus\":\"未审核\"\n" +
-                "        }]\n" +
-                "        }";
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberList(rc, condition, page, count);
     }
 
     /**
@@ -309,12 +253,46 @@ public class MemberResource {
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/level/list/special/export", method = RequestMethod.GET)
     @ResponseBody
-    public String levelListSpecialExport(
+    public void levelListSpecialExport(
+            HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "condition") String condition
-//            股东ID（从RequestContext中获取股东ID）
-    ) {
-        return "";
+    ) throws IOException {
+        RequestContext rc = RequestContext.getRequestContext();
+        DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition);
+        response.setCharacterEncoding("UTF-8");
+        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
+            String contnetDisposition = "attachment;filename=";
+            if (downLoadFile.getFilename() != null) {
+                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
+            }
+            response.setHeader("Content-Disposition", contnetDisposition);
+            ServletOutputStream outputStream = response.getOutputStream();
+            try {
+                outputStream.write(downLoadFile.getContent());
+            } catch (Exception e) {
+                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
+            } finally {
+                outputStream.flush();
+                outputStream.close();
+            }
+        }
     }
 
+    /**
+     * 会员停用/启用
+     * @param id 会员id
+     * @param status 1 启用 2禁用
+     * @return
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/disable", method = RequestMethod.GET)
+    @ResponseBody
+    public String statusUpdate(
+            @RequestParam(name = "id", required = true) Long id,
+            @RequestParam(name = "status", required = true) Integer status) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberStatusUpdate(rc, id, status);
+    }
 
 }

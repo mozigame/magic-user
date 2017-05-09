@@ -21,6 +21,8 @@ public class Member {
 
     private String telephone;   //电话
 
+    private String email;//邮箱
+
     private String bankCardNo;  //银行卡号
 
     private long agentId;   //代理id
@@ -229,5 +231,13 @@ public class Member {
 
     public void setTemp3(String temp3) {
         this.temp3 = temp3;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

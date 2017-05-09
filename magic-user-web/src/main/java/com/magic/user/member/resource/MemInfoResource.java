@@ -29,7 +29,6 @@ public class MemInfoResource {
     public String detail(
             @RequestParam(name = "type", required = false) int type,
             @RequestParam(name = "account", required = false) String account
-//            股东ID（从RequestContext中获取股东ID）
     ) {
 
         return " {\n" +
