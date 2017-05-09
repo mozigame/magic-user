@@ -394,7 +394,7 @@ public class InfoResourceServiceImpl {
                 accountModifyListVo.setShowType(AccountType.getDesc(type));
                 //todo 新增业主ID 和 业主名称
                 accountModifyListVo.setOwnerId(next.getOwnerId());
-                accountModifyListVo.setOwnerName(next.OwnerName());
+                accountModifyListVo.setOwnerName(next.getOwnerName());
                 accountModifyListVo.setBefore(JSONObject.parseObject(next.getBeforeInfo()));
                 accountModifyListVo.setAfter(JSONObject.parseObject(next.getAfterInfo()));
                 accountModifyListVo.setOperatorId(next.getProcUserId());
