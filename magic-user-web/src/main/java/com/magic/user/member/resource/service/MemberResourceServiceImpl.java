@@ -211,18 +211,32 @@ public class MemberResourceServiceImpl {
         if (member == null){
             throw UserException.ILLEGAL_MEMBER;
         }
-        String username = member.getAgentUsername();
         //组装请求数据
-        JSONObject body = new JSONObject();
-        body.put("username", username);
-        body.put("password", password);
-        //TODO cmd 确认
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x00001, body.toJSONString());
+        String body = assembleReqBody(rc, member, password);
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100006, body);
         EGResp resp = EngineUtil.call(req, "account");
-        if (resp != null && resp.getCode() == 0x11111){//重置成功
+        if (resp != null && resp.getCode() == 0x4444){//重置成功
             return UserContants.EMPTY_STRING;
         }
         throw UserException.PASSWORD_RESET_FAIL;
+    }
+
+    /**
+     * 组装请求
+     * @param rc
+     * @param member
+     * @param password
+     * @return
+     */
+    private String assembleReqBody(RequestContext rc, Member member, String password) {
+        JSONObject body = new JSONObject();
+        body.put("userId", member.getId());
+        body.put("username", member.getUsername());
+        body.put("newPassword", password);
+        body.put("appId", rc.getClient().getAppId());
+        body.put("ip", rc.getIp());
+        body.put("operatorTime", System.currentTimeMillis() / 1000);
+        return body.toJSONString();
     }
 
     /**
@@ -255,10 +269,9 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_MEMBER;
         }
         //组装请求数据
-        //TODO cmd 确认
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x00001, logoutBody(rc, member));
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, logoutBody(rc, member));
         EGResp resp = EngineUtil.call(req, "account");
-        if (resp != null && resp.getCode() == 0x11111){//重置成功
+        if (resp != null && (resp.getCode() == 0x5555 || resp.getCode() == 0x1013)){//注销成功
             return UserContants.EMPTY_STRING;
         }
         throw UserException.LOGOUT_FAIL;
