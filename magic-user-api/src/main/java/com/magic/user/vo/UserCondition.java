@@ -10,30 +10,30 @@ import com.alibaba.fastjson.JSONObject;
  * @Dcoc 某层级下会员查询
  * { "currencyType":1,//币种
  * "account":{//账号
- *      "type":1,//类型
- *      "username":""//账号名
+ * "type":1,//类型
+ * "username":""//账号名
  * },
  * "status":1,//状态
  * "level":1,//层级
  * "register":{
- *      "start":1482920192812,//开始时间
- *      "end":1483920192813//结束时间
+ * "start":1482920192812,//开始时间
+ * "end":1483920192813//结束时间
  * },
  * "depositCount":{ //存款次数区间
- *      "min":100,
- *      "max":200
+ * "min":100,
+ * "max":200
  * },
  * "withdrawCount":{//取款次数区间
- *      "min":100,
- *      "max":200
+ * "min":100,
+ * "max":200
  * },
  * "depositMoney":{ //充值总额区间
- *      "min":100,
- *      "max":200
+ * "min":100,
+ * "max":200
  * },
  * "withdrawMoney":{//提款总额区间
- *      "min":100,
- *      "max":200
+ * "min":100,
+ * "max":200
  * }
  * }
  */
@@ -43,26 +43,26 @@ import com.alibaba.fastjson.JSONObject;
  * {
  * "currencyType":1,//币种
  * "account":{//账号
- *      "type":1,//类型
- *      "username":""//账号名
+ * "type":1,//类型
+ * "username":""//账号名
  * },
- *      "status":1,//状态
- *      "level":1,//层级
+ * "status":1,//状态
+ * "level":1,//层级
  * "register":{
- *      "start":1482920192812,//开始时间
- *      "end":1483920192813//结束时间
+ * "start":1482920192812,//开始时间
+ * "end":1483920192813//结束时间
  * },
  * "depositCount":{ //存款次数区间
- *      "min":100,
- *      "max":200
+ * "min":100,
+ * "max":200
  * },
  * "withdrawCount":{//取款次数区间
- *      "min":100,
- *      "max":200
+ * "min":100,
+ * "max":200
  * },
  * "sort":{ //排序
- *     "name":"",   //排序的参数名称
- *     "type":""    //排序的类型,ASC,DESC
+ * "name":"",   //排序的参数名称
+ * "type":""    //排序的类型,ASC,DESC
  * }
  * }
  */
@@ -81,6 +81,8 @@ public class UserCondition {
     private JSONObject sort;   //排序
     private int pageSize;   //每页条数
     private int pageNo; //页码
+    private int offset; //起始值
+    private int limit;  //条数
 
     public int getCurrencyType() {
         return currencyType;
@@ -176,5 +178,27 @@ public class UserCondition {
 
     public void setPageNo(int pageNo) {
         this.pageNo = pageNo;
+    }
+
+    public int getOffset() {
+        if (offset > 0) {
+            return offset;
+        }
+        return (pageNo - 1) * pageSize;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
+    public int getLimit() {
+        if (limit > 0) {
+            return limit;
+        }
+        return pageSize;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 }

@@ -26,6 +26,19 @@ public class AgentConfig {
 
     private String temp3;
 
+    public AgentConfig() {
+    }
+
+
+
+    public AgentConfig(long agentId, int returnSchemeId, int adminCostId, int feeId, String domain) {
+        this.agentId = agentId;
+        this.returnSchemeId = returnSchemeId;
+        this.adminCostId = adminCostId;
+        this.feeId = feeId;
+        this.domain = domain;
+    }
+
     public int getId() {
         return id;
     }

@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public enum CurrencyType {
 
-    CNY(1); //人民币
+    CNY(1, "人民币"); //人民币
 
 
     private static Map<Integer, CurrencyType> map = new HashMap<>();
@@ -23,13 +23,19 @@ public enum CurrencyType {
     }
 
     private int value;
+    private String desc;
 
-    CurrencyType(int value) {
+    CurrencyType(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
 
     public int value() {
         return value;
+    }
+
+    public String desc() {
+        return desc;
     }
 
     public static CurrencyType parse(int value) {

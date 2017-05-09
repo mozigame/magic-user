@@ -6,7 +6,7 @@ import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.entity.User;
 import com.magic.user.storage.UserMongoService;
 import com.magic.user.util.UserVo;
-import com.magic.user.utils.OperaSign;
+import com.magic.user.commons.OperaSign;
 import com.magic.user.vo.UserCondition;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;

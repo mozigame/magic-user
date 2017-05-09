@@ -23,7 +23,12 @@
     </settings>
     <typeAliases>
         <typeAlias alias="User" type="com.magic.user.entity.User"/>
+        <typeAlias alias="Login" type="com.magic.user.entity.Login"/>
         <typeAlias alias="LoginHistory" type="com.magic.user.entity.LoginHistory"/>
+        <typeAlias alias="AgentApply" type="com.magic.user.entity.AgentApply"/>
+        <typeAlias alias="AgentConfig" type="com.magic.user.entity.AgentConfig"/>
+        <typeAlias alias="AgentReview" type="com.magic.user.entity.AgentReview"/>
+        <typeAlias alias="Member" type="com.magic.user.entity.Member"/>
     </typeAliases>
 
 

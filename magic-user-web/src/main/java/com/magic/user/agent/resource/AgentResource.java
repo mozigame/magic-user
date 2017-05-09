@@ -1,11 +1,18 @@
 package com.magic.user.agent.resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.core.auth.Access;
+import com.magic.api.commons.core.context.RequestContext;
+import com.magic.user.agent.resource.service.AgentResourceService;
+import com.magic.user.entity.User;
+import com.magic.user.vo.UserCondition;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
 
 /**
  * User: joey
@@ -15,6 +22,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping(value = "/v1/agent")
 public class AgentResource {
+
+
+    @Resource(name = "agentResourceService")
+    private AgentResourceService agentResourceService;
 
     /**
      * @param condition 检索条件
@@ -28,9 +39,17 @@ public class AgentResource {
     @ResponseBody
     public String list(
             @RequestParam(name = "condition", required = false) String condition,
-            @RequestParam(name = "page", required = false, defaultValue = "1") String page,
-            @RequestParam(name = "count", required = false, defaultValue = "10") String count
+            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
+
+        UserCondition userCondition = JSONObject.parseObject(condition, UserCondition.class);
+        userCondition.setPageNo(page);
+        userCondition.setPageSize(count);
+        String result = agentResourceService.findByPage(userCondition);
+        if (result != null) {
+            return result;
+        }
         return "        {\n" +
                 "            \"page\":1,\n" +
                 "                \"count\":10,\n" +
@@ -104,6 +123,9 @@ public class AgentResource {
             @RequestParam(name = "discount", required = false, defaultValue = "1") int discount,
             @RequestParam(name = "cost", required = false, defaultValue = "1") int cost
     ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        agentResourceService.add(rc, holder, account, password, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
+
         return "{\n" +
                 "        \"id\":10003\n" +
                 "    }";

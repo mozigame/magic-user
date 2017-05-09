@@ -31,4 +31,21 @@ public class StringUtils {
     public static boolean isNotEmpty(final CharSequence cs) {
         return !isEmpty(cs);
     }
+
+    public static String arrayToStrSplit(String[] strings) {
+        StringBuffer sb = new StringBuffer();
+        for (String s : strings) {
+            sb.append(s).append(",");
+        }
+        String str = "";
+        if (sb.length() > 0) {
+            str = sb.substring(0, sb.length() - 1);
+        }
+        return str;
+    }
+
+    public static void main(String[] args) {
+        String[] strings = new String[]{"aaaa", "bbbb", "cccc"};
+        System.out.println(arrayToStrSplit(strings));
+    }
 }

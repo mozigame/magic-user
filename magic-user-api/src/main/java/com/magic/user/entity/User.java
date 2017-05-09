@@ -41,11 +41,40 @@ public class User {
 
     private AccountType type;   //账号类型
 
+    private String password;    //密码
+
     private String temp1;   //预留字符
 
     private String temp2;
 
     private String temp3;
+
+    public User() {
+    }
+
+    /**
+     * @param realname
+     * @param username
+     * @param telephone
+     * @param email
+     * @param registerTime
+     * @param registerIp
+     * @param generalizeCode
+     * @param status
+     * @param bankCardNo
+     * @Doc agent
+     */
+    public User(String realname, String username, String telephone, String email, Date registerTime, int registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
+        this.realname = realname;
+        this.username = username;
+        this.telephone = telephone;
+        this.email = email;
+        this.registerTime = registerTime;
+        this.registerIp = registerIp;
+        this.generalizeCode = generalizeCode;
+        this.status = status;
+        this.bankCardNo = bankCardNo;
+    }
 
     public long getId() {
         return id;
@@ -173,6 +202,14 @@ public class User {
 
     public void setType(AccountType type) {
         this.type = type;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getTemp1() {

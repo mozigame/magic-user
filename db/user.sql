@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2017/5/5 23:42:53                            */
+/* Created on:     2017/5/8 11:19:05                            */
 /*==============================================================*/
 
 
@@ -30,15 +30,15 @@ drop index uq_user_id on t_member;
 
 drop table if exists t_member;
 
-drop index uq_user_id on t_pro_account_user;
+drop index uq_user_id on t_owner_account_user;
 
-drop index uq_account on t_pro_account_user;
+drop index uq_account on t_owner_account_user;
 
-drop table if exists t_pro_account_user;
+drop table if exists t_owner_account_user;
 
-drop index uq_all_id on t_prop_stock_agent_member;
+drop index uq_all_id on t_owner_stock_agent_member;
 
-drop table if exists t_prop_stock_agent_member;
+drop table if exists t_owner_stock_agent_member;
 
 drop index uq_user_id on t_user_info;
 
@@ -209,8 +209,8 @@ create table t_member
    agent_username       varchar(30) not null,
    stock_id             bigint not null,
    stock_username       varchar(30) not null,
-   proprietor_id        bigint not null,
-   proprietor_username  varchar(30) not null,
+   owner_id             bigint not null,
+   owner_username       varchar(30) not null,
    source_url           varchar(70) not null,
    register_ip          int not null,
    register_time        datetime not null,
@@ -237,9 +237,9 @@ create unique index uq_user_id on t_member
 );
 
 /*==============================================================*/
-/* Table: t_pro_account_user                                    */
+/* Table: t_owner_account_user                                  */
 /*==============================================================*/
-create table t_pro_account_user
+create table t_owner_account_user
 (
    id                   bigint not null auto_increment,
    assem_account        varchar(50) not null comment '业主ID-账号名（股东或代理）',
@@ -250,7 +250,7 @@ create table t_pro_account_user
 /*==============================================================*/
 /* Index: uq_account                                            */
 /*==============================================================*/
-create unique index uq_account on t_pro_account_user
+create unique index uq_account on t_owner_account_user
 (
    assem_account
 );
@@ -258,18 +258,18 @@ create unique index uq_account on t_pro_account_user
 /*==============================================================*/
 /* Index: uq_user_id                                            */
 /*==============================================================*/
-create unique index uq_user_id on t_pro_account_user
+create unique index uq_user_id on t_owner_account_user
 (
    user_id
 );
 
 /*==============================================================*/
-/* Table: t_prop_stock_agent_member                             */
+/* Table: t_owner_stock_agent_member                            */
 /*==============================================================*/
-create table t_prop_stock_agent_member
+create table t_owner_stock_agent_member
 (
    id                   bigint not null auto_increment,
-   proprietor_id        bigint not null,
+   owner_id             bigint not null,
    stock_id             bigint not null,
    agent_id             bigint not null,
    mem_number           int not null,
@@ -279,9 +279,9 @@ create table t_prop_stock_agent_member
 /*==============================================================*/
 /* Index: uq_all_id                                             */
 /*==============================================================*/
-create unique index uq_all_id on t_prop_stock_agent_member
+create unique index uq_all_id on t_owner_stock_agent_member
 (
-   proprietor_id,
+   owner_id,
    stock_id,
    agent_id
 );
@@ -307,7 +307,7 @@ create table t_user_info
             2 停用',
    currency_type        tinyint,
    bank_card_no         varchar(25) not null,
-   proprietor_id        bigint not null,
+   owner_id             bigint not null,
    is_delete            tinyint not null comment '1 否
             2 是',
    type                 tinyint comment '1 业主

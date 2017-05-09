@@ -1,4 +1,4 @@
-package com.magic.user.utils;
+package com.magic.user.commons;
 
 /**
  * User: joey

@@ -9,4 +9,49 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
     </resultMap>
 
+    <!-- 新增代理审核-->
+    <insert id="add">
+      INSERT INTO t_agent_review(
+        agent_apply_id,
+        oper_user_id,
+        status,
+        create_time
+      )
+      VALUES (
+        #{agentApplyId},
+        #{operUserId},
+        #{status},
+        #{createTime}
+      )
+    </insert>
+
+    <!-- 分页查询代理审核列表-->
+    <select id="findByPage">
+        select
+            holder,
+            holderName,
+            id,
+            account,
+            realname,
+            telephone,
+            email,
+            status,
+            showStatus,
+            source,
+            registerIp,
+            operUserName,
+            operaterTime
+        from
+            t_agent_review
+    </select>
+
+
+    <!--修改审核状态-->
+    <update id="updateStatus">
+        update t_agent_review
+          SET status=#{status}
+        WHERE id=#{id}
+    </update>
+
+
 </mapper>

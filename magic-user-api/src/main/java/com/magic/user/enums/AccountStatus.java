@@ -12,10 +12,11 @@ import java.util.Map;
  */
 public enum AccountStatus {
 
-    enable(1),  //启用
-    disable(2); //停用
+    enable(1, "启用"),  //启用
+    disable(2, "停用"); //停用
 
     private int value;
+    private String desc;
 
     private static Map<Integer, AccountStatus> maps = new HashMap<>();
 
@@ -24,12 +25,17 @@ public enum AccountStatus {
             maps.put(status.value(), status);
     }
 
-    AccountStatus(int value) {
+    AccountStatus(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
 
     public int value() {
         return value;
+    }
+
+    public String desc() {
+        return desc;
     }
 
     public static AccountStatus parse(int value) {

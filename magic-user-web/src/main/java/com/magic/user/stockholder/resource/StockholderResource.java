@@ -1,11 +1,20 @@
 package com.magic.user.stockholder.resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.core.auth.Access;
+import com.magic.user.entity.User;
+import com.magic.user.enums.AccountStatus;
+import com.magic.user.enums.CurrencyType;
+import com.magic.user.enums.GeneraType;
+import com.magic.user.stockholder.resource.service.StockResourceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Generated;
+import javax.annotation.Resource;
 
 /**
  * User: joey
@@ -17,6 +26,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class StockholderResource {
 
 
+    @Resource(name = "stockResourceService")
+    private StockResourceService stockResourceService;
+
+
     /**
      * @return
      * @Doc 股东列表
@@ -25,6 +38,11 @@ public class StockholderResource {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public String list() {
+
+        JSONObject result = stockResourceService.findAllStock();
+        if (result != null) {
+            return result.toJSONString();
+        }
 
         return "{\n" +
                 "            \"list\":[{\n" +
@@ -82,6 +100,11 @@ public class StockholderResource {
     public String detail(
             @RequestParam(name = "id") long id
     ) {
+        JSONObject result = stockResourceService.getStockDetail(id);
+        if (result != null)
+            return result.toJSONString();
+
+
         return " {\n" +
                 "            \"baseInfo\":{\n" +
                 "            \"id\":1002,\n" +
@@ -124,7 +147,7 @@ public class StockholderResource {
             @RequestParam(name = "id") long id,
             @RequestParam(name = "password") String password
     ) {
-        return "";
+        return stockResourceService.updatePwd(password, id);
     }
 
     /**
@@ -146,7 +169,13 @@ public class StockholderResource {
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
             @RequestParam(name = "status", required = false) int status
     ) {
-        return "";
+        User user = new User();
+        user.setUserId(id);
+        user.setTelephone(telephone);
+        user.setEmail(email);
+        user.setBankCardNo(bankCardNo);
+        user.setStatus(AccountStatus.parse(status));
+        return stockResourceService.update(user);
     }
 
     /**
@@ -172,6 +201,42 @@ public class StockholderResource {
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "sex") int sex
     ) {
+        User user = new User();
+        user.setUsername(account);
+        user.setRealname(realname);
+        user.setPassword(password);
+        user.setTelephone(telephone);
+        user.setCurrencyType(CurrencyType.parse(currencyType));
+        user.setEmail(email);
+        user.setGender(GeneraType.parse(sex));
+
+        String result = stockResourceService.add(user);
+        if (result != null) {
+            return result;
+        }
+        return "{\n" +
+                "        \"id\":10003\n" +
+                "    }";
+    }
+
+    /**
+     * @param id     股东ID
+     * @param status 状态,1、启用，2、禁用
+     * @return
+     * @Doc 启用停用股东
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/disable", method = RequestMethod.POST)
+    @ResponseBody
+    public String disable(
+            @RequestParam(name = "id") long id,
+            @RequestParam(name = "status") int status
+    ) {
+
+        String result = stockResourceService.disable(id, status);
+        if (result != null) {
+            return result;
+        }
         return "{\n" +
                 "        \"id\":10003\n" +
                 "    }";

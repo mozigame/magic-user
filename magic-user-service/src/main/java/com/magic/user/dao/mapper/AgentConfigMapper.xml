@@ -147,18 +147,38 @@
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.magic.user.entity.AgentConfig">
-    update t_agent_config_info
-    set agent_id = #{agentId,jdbcType=BIGINT},
-      return_scheme_id = #{returnSchemeId,jdbcType=INTEGER},
-      admin_cost_id = #{adminCostId,jdbcType=INTEGER},
-      fee_id = #{feeId,jdbcType=INTEGER},
-      discount = #{discount,jdbcType=INTEGER},
-      cost = #{cost,jdbcType=INTEGER},
-      domain = #{domain,jdbcType=VARCHAR},
-      temp1 = #{temp1,jdbcType=VARCHAR},
-      temp2 = #{temp2,jdbcType=VARCHAR},
-      temp3 = #{temp3,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
+    <!--添加代理参数配置-->
+    <insert id="add" parameterType="AgentConfig">
+        insert into t_agent_config_info(agent_id,return_scheme_id,admin_cost_id,fee_id,discount,cost,domain)
+        values(
+            #{agentId},
+            #{returnSchemeId},
+            #{adminCostId},
+            #{feeId},
+            #{discount},
+            #{cost},
+            #{domain}
+        )
+    </insert>
+
+    <!-- 代理参数配置修改-->
+    <update id="update" parameterType="AgentConfig">
+        UPDATE t_agent_config_info
+        <set>
+            <if test="returnSchemeId != null">
+                return_scheme_id = #{returnSchemeId},
+            </if>
+            <if test="adminCostId != null">
+                admin_cost_id = #{adminCostId},
+            </if>
+            <if test="feeId != null">
+                fee_id = #{feeId},
+            </if>
+        </set>
+        WHERE agent_id=#{agentId}
+    </update>
+
+
+
 </mapper>

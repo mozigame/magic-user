@@ -23,4 +23,160 @@
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
     </resultMap>
 
+
+    <!-- 查询所有的股东--><!--used-->
+    <select id="findAllStock" resultMap="java.util.HashMap">
+        select
+          id,
+          realname,
+          username account,
+          currency_type currencyType,
+          register_time registerTime,
+          status
+        FROM t_user_info
+        WHERE type=2
+    </select>
+
+    <!-- 查询所有股东名称-->
+    <select id="findAllStockNames" resultMap="">
+        SELECT
+          user_id id,
+          username account
+        FROM t_user_info
+        WHERE type=2
+    </select>
+
+    <!-- 获取股东详细信息--><!--used-->
+    <select id="getStockDetail" resultType="java.util.HashMap">
+      select
+		  id,
+          username account,
+          realname,
+          telephone,
+          bank_card_no bankCardNo,
+          email,
+          register_ip registerIp,
+          register_time registerTime,
+          status,
+          (select last_login_ip from t_login_info WHERE user_id=#{id} ) as lastLoginIp,
+          (select count(1) from t_owner_stock_agent_member WHERE stock_id=#{id}) agentNumber,
+          (select SUM(mem_number) from t_owner_stock_agent_member WHERE stock_id=#{id}) members
+        from t_user_info
+        WHERE user_id=#{id};
+    </select>
+
+
+    <!--股东基础信息修改--><!--used-->
+    <update id="update">
+        UPDATE t_user_info
+        <set>
+            <if test="realname != null">
+                realname = #{realname},
+            </if>
+            <if test="telephone != null">
+                telephone = #{telephone},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="bankCardNo != null">
+                bank_card_no = #{bankCardNo},
+            </if>
+            <if test="status > 0 ">
+                status = #{status},
+            </if>
+        </set>
+        WHERE user_id=#{id}
+
+    </update>
+
+    <!--新增股东--><!--used-->
+    <insert id="addStockInfo" parameterType="User">
+        INSERT INTO t_user_info(user_id,username,realname,telephone,currency_type,email,gender)
+        VALUES(
+        #{userId},
+        #{username},
+        #{realname},
+        #{telephone},
+        #{currencyType},
+        #{email},
+        #{gender}
+        )
+    </insert>
+
+
+    <!--启用、停用用户--><!--used-->
+    <update id="updateDisable">
+        UPDATE t_user_info
+        SET status=#{status}
+        WHERE user_id=#{id}
+    </update>
+
+    <!--获取代理列表--><!--used,暂时注释掉查询条件-->
+    <select id="findAgentList">
+        select holder,
+        holder_name holderName,
+        user_id id,
+        realname,
+        username account,
+        register_time registerTime,
+        members,
+        store_members storeMembers,
+        depositTotalMoney,
+        withdrawTotalMoney,
+        promotionCode,
+        status,
+        showStatus,
+        reviewer,
+        reviewTime
+        from t_user_info
+        <!--WHERE user_id IN-->
+        <!--<foreach collection="list" item="id" open="(" close=")"-->
+        <!--separator=",">-->
+        <!--#{id}-->
+        <!--</foreach>-->
+        limit #{offset},#{limit}
+    </select>
+
+    <!--获取数量--><!--used 暂时取消查询条件-->
+    <select id="findAgentCount" resultType="java.lang.Long">
+        select count(id) from t_member
+        WHERE type=3
+    </select>
+
+    <!--新增代理-->
+    <insert id="addAgent">
+        INSERT INTO t_user_info(user_id,username,realname,telephone,bank_card_no,email)
+        VALUES(
+        #{userId},
+        #{username},
+        #{realname},
+        #{telephone},
+        #{bankCardNo},
+        #{email}
+        )
+    </insert>
+
+    <!--代理详情-->
+    <select id="agentDetail">
+        select
+          id,
+          username account,
+          status,
+          showStatus,
+          realname,
+          holder,
+          register_time registerTime,
+          register_id registerIp,
+          last_login_ip lastLoginIp,
+          promotion_code promotionCode,
+          domain,
+          telephone
+          email,
+          bank_card_no bankCardNo
+        FROM t_user_info
+          WHERE user_id=#{user_id}
+    </select>
+
+
 </mapper>
