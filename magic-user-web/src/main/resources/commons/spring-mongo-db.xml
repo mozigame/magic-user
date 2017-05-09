@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/data/mongo
+    http://www.springframework.org/schema/data/mongo/spring-mongo.xsd"
+       default-lazy-init="false">
+
+
+    <mongo:mongo-client id="mongoClient" replica-set="202.153.207.179:8999,202.153.207.181:8999,202.153.207.182:8999">
+        <!--<mongo:options connections-per-host="8"-->
+                       <!--threads-allowed-to-block-for-connection-multiplier="4"-->
+                       <!--connect-timeout="1000"-->
+                       <!--max-wait-time="1500"-->
+                       <!--auto-connect-retry="true"-->
+                       <!--socket-keep-alive="true"-->
+                       <!--socket-timeout="1500" slave-ok="true"-->
+                       <!--write-number="1"-->
+                       <!--write-timeout="0"-->
+                       <!--write-fsync="true"/>-->
+
+    </mongo:mongo-client>
+
+    <mongo:db-factory id="mongoDbFactory" dbname="test8" mongo-ref="mongoClient"/>
+
+    <!-- Spring提供的mongodb操作模板 -->
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+    </bean>
+
+    <!-- 5. 配置 SpringData -->
+    <mongo:repositories base-package="com.magic.user.dao.mongo"></mongo:repositories>
+
+    <!--<bean id="mappingContext"-->
+    <!--class="org.springframework.data.mongodb.core.mapping.MongoMappingContext"/>-->
+
+    <!--<bean id="mappingMongoConverter"-->
+    <!--class="org.springframework.data.mongodb.core.convert.MappingMongoConverter">-->
+    <!--<constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>-->
+    <!--<constructor-arg name="mappingContext" ref="mappingContext"/>-->
+    <!--<property name="typeMapper" ref="defaultMongoTypeMapper"/>-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash; 默认Mongodb类型映射 &ndash;&gt;-->
+    <!--<bean id="defaultMongoTypeMapper"-->
+    <!--class="org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper">-->
+    <!--<constructor-arg name="typeKey">-->
+    <!--&lt;!&ndash; 这里设置为空,可以把 spring data mongodb 多余保存的_class字段去掉 &ndash;&gt;-->
+    <!--<null/>-->
+    <!--</constructor-arg>-->
+    <!--</bean>-->
+
+
+</beans>

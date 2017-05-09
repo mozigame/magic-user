@@ -5,7 +5,6 @@ import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.member.resource.service.MemberServiceResourceImpl;
 import com.magic.user.po.DownLoadFile;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -294,5 +293,4 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberStatusUpdate(rc, id, status);
     }
-
 }

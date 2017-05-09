@@ -15,7 +15,7 @@
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="currency_type" jdbcType="TINYINT" property="currencyType"/>
         <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
-        <result column="proprietor_id" jdbcType="BIGINT" property="proprietorId"/>
+        <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="is_delete" jdbcType="TINYINT" property="isDelete"/>
         <result column="type" jdbcType="TINYINT" property="type"/>
         <result column="temp1" jdbcType="VARCHAR" property="temp1"/>

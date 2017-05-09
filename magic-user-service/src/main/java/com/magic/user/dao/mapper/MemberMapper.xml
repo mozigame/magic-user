@@ -12,8 +12,8 @@
     <result column="agent_username" jdbcType="VARCHAR" property="agentUsername" />
     <result column="stock_id" jdbcType="BIGINT" property="stockId" />
     <result column="stock_username" jdbcType="VARCHAR" property="stockUsername" />
-    <result column="proprietor_id" jdbcType="BIGINT" property="proprietorId" />
-    <result column="proprietor_username" jdbcType="VARCHAR" property="proprietorUsername" />
+    <result column="owner_id" jdbcType="BIGINT" property="ownerId" />
+    <result column="owner_username" jdbcType="VARCHAR" property="ownerUsername" />
     <result column="source_url" jdbcType="VARCHAR" property="sourceUrl" />
     <result column="register_ip" jdbcType="INTEGER" property="registerIp" />
     <result column="register_time" jdbcType="TIMESTAMP" property="registerTime" />
@@ -27,7 +27,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     id, member_id, realname, username, telephone, bank_card_no, agent_id, agent_username, 
-    stock_id, stock_username, proprietor_id, proprietor_username, source_url, register_ip, 
+    stock_id, stock_username, owner_id, owner_username, source_url, register_ip,
     register_time, status, gender, currency_type, is_delete, temp1, temp2, temp3
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -44,7 +44,7 @@
     insert into t_member (id, member_id, realname, 
       username, telephone, bank_card_no, 
       agent_id, agent_username, stock_id, 
-      stock_username, proprietor_id, proprietor_username, 
+      stock_username, owner_id, owner_username,
       source_url, register_ip, register_time, 
       status, gender, currency_type, 
       is_delete, temp1, temp2, 
@@ -52,7 +52,7 @@
     values (#{id,jdbcType=BIGINT}, #{memberId,jdbcType=BIGINT}, #{realname,jdbcType=VARCHAR}, 
       #{username,jdbcType=VARCHAR}, #{telephone,jdbcType=VARCHAR}, #{bankCardNo,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=BIGINT}, #{agentUsername,jdbcType=VARCHAR}, #{stockId,jdbcType=BIGINT}, 
-      #{stockUsername,jdbcType=VARCHAR}, #{proprietorId,jdbcType=BIGINT}, #{proprietorUsername,jdbcType=VARCHAR}, 
+      #{stockUsername,jdbcType=VARCHAR}, #{ownerId,jdbcType=BIGINT}, #{ownerUsername,jdbcType=VARCHAR},
       #{sourceUrl,jdbcType=VARCHAR}, #{registerIp,jdbcType=INTEGER}, #{registerTime,jdbcType=TIMESTAMP}, 
       #{status,jdbcType=TINYINT}, #{gender,jdbcType=TINYINT}, #{currencyType,jdbcType=TINYINT}, 
       #{isDelete,jdbcType=TINYINT}, #{temp1,jdbcType=VARCHAR}, #{temp2,jdbcType=VARCHAR}, 
@@ -91,11 +91,11 @@
       <if test="stockUsername != null">
         stock_username,
       </if>
-      <if test="proprietorId != null">
-        proprietor_id,
+      <if test="ownerId != null">
+        owner_id,
       </if>
-      <if test="proprietorUsername != null">
-        proprietor_username,
+      <if test="ownerUsername != null">
+        owner_username,
       </if>
       <if test="sourceUrl != null">
         source_url,
@@ -159,11 +159,11 @@
       <if test="stockUsername != null">
         #{stockUsername,jdbcType=VARCHAR},
       </if>
-      <if test="proprietorId != null">
-        #{proprietorId,jdbcType=BIGINT},
+      <if test="ownerId != null">
+        #{ownerId,jdbcType=BIGINT},
       </if>
-      <if test="proprietorUsername != null">
-        #{proprietorUsername,jdbcType=VARCHAR},
+      <if test="ownerUsername != null">
+        #{ownerUsername,jdbcType=VARCHAR},
       </if>
       <if test="sourceUrl != null">
         #{sourceUrl,jdbcType=VARCHAR},
@@ -227,11 +227,11 @@
       <if test="stockUsername != null">
         stock_username = #{stockUsername,jdbcType=VARCHAR},
       </if>
-      <if test="proprietorId != null">
-        proprietor_id = #{proprietorId,jdbcType=BIGINT},
+      <if test="ownerId != null">
+        owner_id = #{ownerId,jdbcType=BIGINT},
       </if>
-      <if test="proprietorUsername != null">
-        proprietor_username = #{proprietorUsername,jdbcType=VARCHAR},
+      <if test="ownerUsername != null">
+        owner_username = #{ownerUsername,jdbcType=VARCHAR},
       </if>
       <if test="sourceUrl != null">
         source_url = #{sourceUrl,jdbcType=VARCHAR},
@@ -277,8 +277,8 @@
       agent_username = #{agentUsername,jdbcType=VARCHAR},
       stock_id = #{stockId,jdbcType=BIGINT},
       stock_username = #{stockUsername,jdbcType=VARCHAR},
-      proprietor_id = #{proprietorId,jdbcType=BIGINT},
-      proprietor_username = #{proprietorUsername,jdbcType=VARCHAR},
+      owner_id = #{ownerId,jdbcType=BIGINT},
+      owner_username = #{ownerUsername,jdbcType=VARCHAR},
       source_url = #{sourceUrl,jdbcType=VARCHAR},
       register_ip = #{registerIp,jdbcType=INTEGER},
       register_time = #{registerTime,jdbcType=TIMESTAMP},
