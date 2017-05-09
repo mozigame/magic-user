@@ -38,24 +38,7 @@ public class StockholderResource {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public String list() {
-
-        JSONObject result = stockResourceService.findAllStock();
-        if (result != null) {
-            return result.toJSONString();
-        }
-
-        return "{\n" +
-                "            \"list\":[{\n" +
-                "            \"id\":1001,\n" +
-                "                    \"realname\":\"股东\",\n" +
-                "                    \"account\":\"seredios\",\n" +
-                "                    \"currencyType\":\"人民币\",\n" +
-                "                    \"agentNumber\":189,\n" +
-                "                    \"registerTime\":\"2017-02-16 22:00:22\",\n" +
-                "                    \"status\":1,\n" +
-                "                    \"showStatus\":\"启用\"\n" +
-                "        }]\n" +
-                "        }";
+        return stockResourceService.findAllStock();
     }
 
     /**
@@ -100,37 +83,7 @@ public class StockholderResource {
     public String detail(
             @RequestParam(name = "id") long id
     ) {
-        JSONObject result = stockResourceService.getStockDetail(id);
-        if (result != null)
-            return result.toJSONString();
-
-
-        return " {\n" +
-                "            \"baseInfo\":{\n" +
-                "            \"id\":1002,\n" +
-                "                    \"realname\":\"李月华\",\n" +
-                "                    \"telephone\":\"13430180244\",\n" +
-                "                    \"bankCardNo\":\"622848770596789\",\n" +
-                "                    \"email\":\"liyuehua0019@gmail.com\",\n" +
-                "                    \"registerIp\":\"172.13.8.12\",\n" +
-                "                    \"registerTime\":\"2017-03-13 23:33:23\",\n" +
-                "                    \"status\":1,\n" +
-                "                    \"showStatus\":\"启用\",\n" +
-                "                    \"lastLoginIp\":\"171.13.8.12\",\n" +
-                "                    \"agentNumber\":899,\n" +
-                "                    \"members\":8990000\n" +
-                "        },\n" +
-                "            \"operation\":{\n" +
-                "            \"syncTime\":\"2017-04-18 09:29:33\",\n" +
-                "                    \"info\":{\n" +
-                "                \"bets\":129000,\n" +
-                "                        \"notes\":34560000,\n" +
-                "                        \"betTotalMoney\":\"80500000\",\n" +
-                "                        \"betEffMoney\":\"78966789\",\n" +
-                "                        \"gains\":\"5800000\"\n" +
-                "            }\n" +
-                "        }\n" +
-                "        }";
+        return stockResourceService.getStockDetail(id);
     }
 
 
@@ -147,7 +100,7 @@ public class StockholderResource {
             @RequestParam(name = "id") long id,
             @RequestParam(name = "password") String password
     ) {
-        return stockResourceService.updatePwd(password, id);
+        return stockResourceService.updatePwd(id, password);
     }
 
     /**
@@ -169,13 +122,8 @@ public class StockholderResource {
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
             @RequestParam(name = "status", required = false) int status
     ) {
-        User user = new User();
-        user.setUserId(id);
-        user.setTelephone(telephone);
-        user.setEmail(email);
-        user.setBankCardNo(bankCardNo);
-        user.setStatus(AccountStatus.parse(status));
-        return stockResourceService.update(user);
+
+        return stockResourceService.update(id, telephone, email, bankCardNo, status);
     }
 
     /**
@@ -201,22 +149,9 @@ public class StockholderResource {
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "sex") int sex
     ) {
-        User user = new User();
-        user.setUsername(account);
-        user.setRealname(realname);
-        user.setPassword(password);
-        user.setTelephone(telephone);
-        user.setCurrencyType(CurrencyType.parse(currencyType));
-        user.setEmail(email);
-        user.setGender(GeneraType.parse(sex));
 
-        String result = stockResourceService.add(user);
-        if (result != null) {
-            return result;
-        }
-        return "{\n" +
-                "        \"id\":10003\n" +
-                "    }";
+
+        return stockResourceService.add(account, password, realname, telephone, currencyType, email, sex);
     }
 
     /**
@@ -233,13 +168,7 @@ public class StockholderResource {
             @RequestParam(name = "status") int status
     ) {
 
-        String result = stockResourceService.disable(id, status);
-        if (result != null) {
-            return result;
-        }
-        return "{\n" +
-                "        \"id\":10003\n" +
-                "    }";
+        return stockResourceService.disable(id, status);
     }
 
 

@@ -14,139 +14,7 @@
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    id, agent_id, return_scheme_id, admin_cost_id, fee_id, discount, cost, domain, temp1,
-    temp2, temp3
-  </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from t_agent_config_info
-        where id = #{id,jdbcType=INTEGER}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from t_agent_config_info
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
-    <insert id="insert" parameterType="com.magic.user.entity.AgentConfig">
-    insert into t_agent_config_info (id, agent_id, return_scheme_id,
-      admin_cost_id, fee_id, discount,
-      cost, domain, temp1,
-      temp2, temp3)
-    values (#{id,jdbcType=INTEGER}, #{agentId,jdbcType=BIGINT}, #{returnSchemeId,jdbcType=INTEGER},
-      #{adminCostId,jdbcType=INTEGER}, #{feeId,jdbcType=INTEGER}, #{discount,jdbcType=INTEGER},
-      #{cost,jdbcType=INTEGER}, #{domain,jdbcType=VARCHAR}, #{temp1,jdbcType=VARCHAR},
-      #{temp2,jdbcType=VARCHAR}, #{temp3,jdbcType=VARCHAR})
-  </insert>
-    <insert id="insertSelective" parameterType="com.magic.user.entity.AgentConfig">
-        insert into t_agent_config_info
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="agentId != null">
-                agent_id,
-            </if>
-            <if test="returnSchemeId != null">
-                return_scheme_id,
-            </if>
-            <if test="adminCostId != null">
-                admin_cost_id,
-            </if>
-            <if test="feeId != null">
-                fee_id,
-            </if>
-            <if test="discount != null">
-                discount,
-            </if>
-            <if test="cost != null">
-                cost,
-            </if>
-            <if test="domain != null">
-                domain,
-            </if>
-            <if test="temp1 != null">
-                temp1,
-            </if>
-            <if test="temp2 != null">
-                temp2,
-            </if>
-            <if test="temp3 != null">
-                temp3,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=INTEGER},
-            </if>
-            <if test="agentId != null">
-                #{agentId,jdbcType=BIGINT},
-            </if>
-            <if test="returnSchemeId != null">
-                #{returnSchemeId,jdbcType=INTEGER},
-            </if>
-            <if test="adminCostId != null">
-                #{adminCostId,jdbcType=INTEGER},
-            </if>
-            <if test="feeId != null">
-                #{feeId,jdbcType=INTEGER},
-            </if>
-            <if test="discount != null">
-                #{discount,jdbcType=INTEGER},
-            </if>
-            <if test="cost != null">
-                #{cost,jdbcType=INTEGER},
-            </if>
-            <if test="domain != null">
-                #{domain,jdbcType=VARCHAR},
-            </if>
-            <if test="temp1 != null">
-                #{temp1,jdbcType=VARCHAR},
-            </if>
-            <if test="temp2 != null">
-                #{temp2,jdbcType=VARCHAR},
-            </if>
-            <if test="temp3 != null">
-                #{temp3,jdbcType=VARCHAR},
-            </if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.magic.user.entity.AgentConfig">
-        update t_agent_config_info
-        <set>
-            <if test="agentId != null">
-                agent_id = #{agentId,jdbcType=BIGINT},
-            </if>
-            <if test="returnSchemeId != null">
-                return_scheme_id = #{returnSchemeId,jdbcType=INTEGER},
-            </if>
-            <if test="adminCostId != null">
-                admin_cost_id = #{adminCostId,jdbcType=INTEGER},
-            </if>
-            <if test="feeId != null">
-                fee_id = #{feeId,jdbcType=INTEGER},
-            </if>
-            <if test="discount != null">
-                discount = #{discount,jdbcType=INTEGER},
-            </if>
-            <if test="cost != null">
-                cost = #{cost,jdbcType=INTEGER},
-            </if>
-            <if test="domain != null">
-                domain = #{domain,jdbcType=VARCHAR},
-            </if>
-            <if test="temp1 != null">
-                temp1 = #{temp1,jdbcType=VARCHAR},
-            </if>
-            <if test="temp2 != null">
-                temp2 = #{temp2,jdbcType=VARCHAR},
-            </if>
-            <if test="temp3 != null">
-                temp3 = #{temp3,jdbcType=VARCHAR},
-            </if>
-        </set>
-        where id = #{id,jdbcType=INTEGER}
-    </update>
+
 
     <!--添加代理参数配置-->
     <insert id="add" parameterType="AgentConfig">
@@ -178,7 +46,14 @@
         </set>
         WHERE agent_id=#{agentId}
     </update>
-
-
+    <!--获取代理的参数配置信息--><!---->
+    <select id="findByAgentId" resultType="java.util.HashMap">
+        select agent_id agentId
+            return_scheme_id returnScheme,
+            admin_cost_id adminCost,
+            fee_id feeScheme
+         from t_agent_config_info
+          WHERE agent_id=#{agentId}
+    </select>
 
 </mapper>

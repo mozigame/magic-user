@@ -23,7 +23,31 @@
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
     </resultMap>
 
+    <!--获取用户基础信息-->
+    <select id="get" resultType="User">
+        select
+            id,
+            user_id userId,
+            realname,
+            username,
+            telephone,
+            email,
+            register_time registerTime,
+            register_ip registerIp,
+            generalize_code generalizeCode,
+            gender,
+            status,
+            currency_type	currencyType,
+            bank_card_no baknCard_no,
+            owner_id ownerId
+            is_delete isDelete,
+            type
+            from t_user_info
+        WHERE user_id=#{userId}
+    </select>
 
+
+    <!--###########   股东操作   #############-->
     <!-- 查询所有的股东--><!--used-->
     <select id="findAllStock" resultMap="java.util.HashMap">
         select
@@ -109,7 +133,10 @@
       SELECT owner_id FROM t_user_info WHERE user_id=#{userId}
     </select>
 
+    <!--###########   股东操作   #############-->
 
+
+    <!--###########   代理操作   #############-->
     <!--启用、停用用户--><!--used-->
     <update id="updateDisable">
         UPDATE t_user_info
@@ -151,18 +178,25 @@
 
     <!--新增代理-->
     <insert id="addAgent">
-        INSERT INTO t_user_info(user_id,username,realname,telephone,bank_card_no,email)
+        INSERT INTO t_user_info
+          (user_id,username,realname,telephone,bank_card_no,email,register_time,register_ip,generalize_code,status,owner_id,type)
         VALUES(
         #{userId},
         #{username},
         #{realname},
         #{telephone},
         #{bankCardNo},
-        #{email}
+        #{email},
+        #{registerTime},
+        #{registerIp},
+        #{generalizeCode},
+        #{status},
+        #{ownerId},
+        #{type}
         )
     </insert>
 
-    <!--代理详情-->
+    <!--代理详情--><!-- used -->
     <select id="agentDetail">
         select
           id,
@@ -182,6 +216,7 @@
         FROM t_user_info
           WHERE user_id=#{user_id}
     </select>
+    <!--###########   代理操作   #############-->
 
 
 </mapper>

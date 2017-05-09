@@ -29,7 +29,12 @@ public class AgentConfig {
     public AgentConfig() {
     }
 
-
+    public AgentConfig(long agentId, int returnSchemeId, int adminCostId, int feeId) {
+        this.agentId = agentId;
+        this.returnSchemeId = returnSchemeId;
+        this.adminCostId = adminCostId;
+        this.feeId = feeId;
+    }
 
     public AgentConfig(long agentId, int returnSchemeId, int adminCostId, int feeId, String domain) {
         this.agentId = agentId;

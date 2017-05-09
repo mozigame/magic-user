@@ -35,13 +35,15 @@ public class User {
 
     private String bankCardNo;  //银行卡号
 
+    private String bank;    //银行信息
+
+    private String bankDeposit; //开户行
+
     private long ownerId;  //业主id
 
     private DeleteStatus isDelete;  //是否删除
 
     private AccountType type;   //账号类型
-
-    private String password;    //密码
 
     private String temp1;   //预留字符
 
@@ -50,6 +52,24 @@ public class User {
     private String temp3;
 
     public User() {
+    }
+
+    /**
+     * @param realname
+     * @param username
+     * @param telephone
+     * @param email
+     * @param gender
+     * @param currencyType
+     * @Doc 股东
+     */
+    public User(String realname, String username, String telephone, String email, GeneraType gender, CurrencyType currencyType) {
+        this.realname = realname;
+        this.username = username;
+        this.telephone = telephone;
+        this.email = email;
+        this.gender = gender;
+        this.currencyType = currencyType;
     }
 
     /**
@@ -204,12 +224,20 @@ public class User {
         this.type = type;
     }
 
-    public String getPassword() {
-        return password;
+    public String getBank() {
+        return bank;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public String getBankDeposit() {
+        return bankDeposit;
+    }
+
+    public void setBankDeposit(String bankDeposit) {
+        this.bankDeposit = bankDeposit;
     }
 
     public String getTemp1() {

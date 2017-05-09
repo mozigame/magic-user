@@ -47,31 +47,7 @@ public class AgentResource {
         userCondition.setPageNo(page);
         userCondition.setPageSize(count);
         String result = agentResourceService.findByPage(userCondition);
-        if (result != null) {
-            return result;
-        }
-        return "        {\n" +
-                "            \"page\":1,\n" +
-                "                \"count\":10,\n" +
-                "                \"total\":100,\n" +
-                "                \"list\":[{\n" +
-                "            \"holder\":110,\n" +
-                "                    \"holderName\":\"adjh\",\n" +
-                "                    \"id\":1001,\n" +
-                "                    \"realname\":\"李月华\",\n" +
-                "                    \"account\":\"seredios\",\n" +
-                "                    \"registerTime\":\"2017-03-01 16:43:22\",\n" +
-                "                    \"members\":2009,\n" +
-                "                    \"storeMembers\":1340,\n" +
-                "                    \"depositTotalMoney\":\"134000\",\n" +
-                "                    \"withdrawTotalMoney\":\"4400\",\n" +
-                "                    \"promotionCode\":\"dawciz\",\n" +
-                "                    \"status\":1,\n" +
-                "                    \"showStatus\":\"启用\",\n" +
-                "                    \"reviewer\":\"some\",\n" +
-                "                    \"reviewTime\":\"2017-03-01 16:43:22\"\n" +
-                "        }]\n" +
-                "        }";
+        return result;
     }
 
     /**
@@ -124,11 +100,7 @@ public class AgentResource {
             @RequestParam(name = "cost", required = false, defaultValue = "1") int cost
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        agentResourceService.add(rc, holder, account, password, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
-
-        return "{\n" +
-                "        \"id\":10003\n" +
-                "    }";
+        return agentResourceService.add(rc, holder, account, password, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
     }
 
     /**
@@ -143,44 +115,7 @@ public class AgentResource {
             @RequestParam(name = "id") long id
     ) {
 
-        return "{\n" +
-                "            \"baseInfo\":{\n" +
-                "            \"id\":1001,\n" +
-                "                    \"account\":\"jkljklasd\",\n" +
-                "                    \"status\":1,\n" +
-                "                    \"showStatus\":\"启用\",\n" +
-                "                    \"realname\":\"王月华\",\n" +
-                "                    \"holder\":\"admoney\",\n" +
-                "                    \"registerTime\":\"2017-03-13 23:33:23\",\n" +
-                "                    \"registerIp\":\"171.13.8.12\",\n" +
-                "                    \"lastLoginIp\":\"171.13.8.12\",\n" +
-                "                    \"promotionCode\":\"4DEKLOSDFJA6\",\n" +
-                "                    \"domain\":\"www.xxxxxxxijk\",\n" +
-                "                    \"telephone\":\"13430180244\",\n" +
-                "                    \"email\":\"liyuehua001@gmail.com\",\n" +
-                "                    \"bankCardNo\":\"622848770596789\"\n" +
-                "        },\n" +
-                "            \"settings\":{\n" +
-                "            \"returnScheme\":1,\n" +
-                "                    \"returnSchemeName\":\"退佣方案1\",\n" +
-                "                    \"adminCost\":1,\n" +
-                "                    \"adminCostName\":\"行政成本1\",\n" +
-                "                    \"feeScheme\":1,\n" +
-                "                    \"feeSchemeName\":\"手续费1\"\n" +
-                "        },\n" +
-                "            \"fundProfile\":{\n" +
-                "            \"syncTime\":\"2017-04-18 09:29:33\",\n" +
-                "                    \"info\":{\n" +
-                "                \"members\":490,\n" +
-                "                        \"depositMembers\":410,\n" +
-                "                        \"depositTotalMoney\":\"29006590\",\n" +
-                "                        \"withdrawTotalMoney\":\"24500120\",\n" +
-                "                        \"betTotalMoney\":\"20900067\",\n" +
-                "                        \"betEffMoney\":\"19007689\",\n" +
-                "                        \"gains\":\"4908763\"\n" +
-                "            }\n" +
-                "        }\n" +
-                "        }";
+        return agentResourceService.getDetail(RequestContext.getRequestContext(), id);
     }
 
     /**
@@ -197,7 +132,7 @@ public class AgentResource {
             @RequestParam(name = "password") String password
 
     ) {
-        return "";
+        return agentResourceService.resetPwd(RequestContext.getRequestContext(), id, password);
     }
 
     /**
@@ -219,9 +154,11 @@ public class AgentResource {
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
+            @RequestParam(name = "bankCardNo", required = false) String bank,
             @RequestParam(name = "status", required = false) int status
     ) {
-        return "";
+
+        return agentResourceService.update(RequestContext.getRequestContext(), id, realname, telephone, email, bankCardNo, bank);
     }
 
     /**
@@ -237,11 +174,11 @@ public class AgentResource {
     @ResponseBody
     public String settings(
             @RequestParam(name = "id") long id,
-            @RequestParam(name = "returnScheme", required = false, defaultValue = "-1") long returnScheme,
+            @RequestParam(name = "returnScheme", required = false, defaultValue = "-1") int returnScheme,
             @RequestParam(name = "adminCost", required = false, defaultValue = "-1") int adminCost,
             @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") int feeScheme
     ) {
-        return "";
+        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme);
     }
 
     /**
@@ -265,7 +202,7 @@ public class AgentResource {
             @RequestParam(name = "email") String email,
             @RequestParam(name = "bankCardNo") String bankCardNo
     ) {
-        return "";
+        return agentResourceService.agentApply(RequestContext.getRequestContext(), account, password, realname, email, telephone, bankCardNo);
     }
 
     /**
@@ -285,26 +222,8 @@ public class AgentResource {
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
-        return "{\n" +
-                "        \"page\":1,\n" +
-                "                \"count\":10,\n" +
-                "                \"total\":100,\n" +
-                "                \"list\":[{\n" +
-                "            \"holder\":111,\n" +
-                "                    \"holderName\":\"seredios\",\n" +
-                "                    \"id\":1001,\n" +
-                "                    \"account\":\"asdffasd\",\n" +
-                "                    \"realname\":\"李月华\",\n" +
-                "                    \"telephone\":\"+86 18421233421\",\n" +
-                "                    \"email\":\"wdad@qq.com\",\n" +
-                "                    \"status\":1,\n" +
-                "                    \"showStatus\":\"未审核\",\n" +
-                "                    \"source\":\"www.22431.com\",\n" +
-                "                    \"registerIp\":\"13.33.11.4\",\n" +
-                "                    \"operUserName\":\"idwu\",\n" +
-                "                    \"operaterTime\":\"2017-03-01 16:43:22\"\n" +
-                "        }]\n" +
-                "    }";
+
+        return agentResourceService.agentApplyList(RequestContext.getRequestContext(), account, status, page, count);
     }
 
     /**
@@ -335,20 +254,11 @@ public class AgentResource {
     public String listExport(
             @RequestParam(name = "id") long id
     ) {
-        return "{\n" +
-                "            \"baseInfo\":{\n" +
-                "            \"id\":1001,\n" +
-                "                    \"account\":\"adsfsa\",\n" +
-                "                    \"realname\":\"王月华\",\n" +
-                "                    \"telephone\":\"13430180244\",\n" +
-                "                    \"email\":\"liyuehua001@gmail.com\",\n" +
-                "                    \"bankCardNo\":\"622848770596789\",\n" +
-                "        }\n" +
-                "        }";
+        return agentResourceService.agentApplyInfo(RequestContext.getRequestContext(), id);
     }
 
     /**
-     * @param id           代理审核ID
+     * @param id           代理申请ID
      * @param reviewStatus 审核结果
      * @param holder       所属股东ID
      * @param realname     真实姓名
@@ -383,8 +293,24 @@ public class AgentResource {
             @RequestParam(name = "cost", required = false, defaultValue = "1") int cost
 
     ) {
-        return "";
+        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
     }
 
+    /**
+     * @param id     代理ID
+     * @param status 状态 1 启用 2禁用
+     * @return
+     * @Doc 启用禁用代理
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/disable", method = RequestMethod.POST)
+    @ResponseBody
+    public String review(
+            @RequestParam(name = "id") long id,
+            @RequestParam(name = "status") int status
+
+    ) {
+        return agentResourceService.disable(RequestContext.getRequestContext(), id, status);
+    }
 
 }

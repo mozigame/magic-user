@@ -12,7 +12,13 @@ public class AgentApply {
 
     private String username;    //申请人账号
 
+    private String realname;    //真实姓名
+
     private long stockId;   //股东id
+
+    private String stockName;   //股东账号
+
+    private String bankCardNo;  //银行卡号
 
     private String telephone;   //电话
 
@@ -30,6 +36,21 @@ public class AgentApply {
 
     private String temp2;
 
+    public AgentApply() {
+    }
+
+    public AgentApply(String username, long stockId, String telephone, String email, ReviewStatus status, String resourceUrl, int registerIp, Date createTime) {
+        this.username = username;
+        this.stockId = stockId;
+        this.telephone = telephone;
+        this.email = email;
+        this.status = status;
+        this.resourceUrl = resourceUrl;
+        this.registerIp = registerIp;
+        this.createTime = createTime;
+    }
+
+
     public long getId() {
         return id;
     }
@@ -40,6 +61,14 @@ public class AgentApply {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getRealname() {
+        return realname;
+    }
+
+    public void setRealname(String realname) {
+        this.realname = realname;
     }
 
     public void setUsername(String username) {
@@ -100,6 +129,22 @@ public class AgentApply {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getStockName() {
+        return stockName;
+    }
+
+    public void setStockName(String stockName) {
+        this.stockName = stockName;
+    }
+
+    public String getBankCardNo() {
+        return bankCardNo;
+    }
+
+    public void setBankCardNo(String bankCardNo) {
+        this.bankCardNo = bankCardNo;
     }
 
     public String getTemp1() {

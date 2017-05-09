@@ -18,13 +18,13 @@ import java.util.Map;
  * Time: 17:08
  */
 @Service("agentDbService")
-public class AgentDbService extends BaseDbServiceImpl<AgentConfig, Long> {
+public class AgentDbService extends BaseDbServiceImpl<User, Long> {
 
     @Resource
     private AgentDao agentDao;
 
     @Override
-    public BaseDao<AgentConfig, Long> getDao() {
+    public BaseDao<User, Long> getDao() {
         return agentDao;
     }
 

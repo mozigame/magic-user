@@ -13,15 +13,15 @@ import java.util.Map;
  */
 public interface StockResourceService {
 
-    JSONObject findAllStock();
+    String findAllStock();
 
-    JSONObject getStockDetail(long id);
+    String getStockDetail(long id);
 
-    String updatePwd(String pwd, long id);
+    String updatePwd(long id, String pwd);
 
-    String update(User user);
+    String update(long id, String telephone, String email, String bankCardNo, int status);
 
-    String add(User user);
+    String add(String account, String password, String realname, String telephone, int currencyType, String email, int sex);
 
     String disable(long id, int status);
 }

@@ -3,7 +3,9 @@ package com.magic.user.service;
 import com.google.common.collect.Lists;
 import com.magic.api.commons.model.Page;
 import com.magic.api.commons.utils.StringUtils;
+import com.magic.user.entity.Member;
 import com.magic.user.entity.User;
+import com.magic.user.enums.AccountStatus;
 import com.magic.user.storage.UserMongoService;
 import com.magic.user.util.UserVo;
 import com.magic.user.commons.OperaSign;
@@ -25,6 +27,21 @@ public class MemberServiceImpl implements MemberService {
 
     @Resource(name = "userMongoService")
     private UserMongoService userMongoService;
+
+    @Override
+    public Member getMemberById(long id) {
+        return null;
+    }
+
+    @Override
+    public boolean updateMember(Member member) {
+        return false;
+    }
+
+    @Override
+    public boolean updateStatus(Long id, AccountStatus oldStatus, AccountStatus newStatus) {
+        return false;
+    }
 
     @Override
     public Page<User> findByPage(UserCondition condition) {
@@ -144,5 +161,10 @@ public class MemberServiceImpl implements MemberService {
             return pageUser;
         }
         return null;
+    }
+
+    @Override
+    public boolean updateMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
+        return false;
     }
 }
