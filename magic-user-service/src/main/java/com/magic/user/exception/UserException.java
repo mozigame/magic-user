@@ -78,4 +78,52 @@ public class UserException extends ExceptionFactor {
     public static final CommonException ILLEGAL_USER = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 9, HttpServletResponse.SC_OK, "illedge user!", "非法用户.");
 
+    /**
+     * 注册失败
+     */
+    public static final CommonException REGISTER_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 10, HttpServletResponse.SC_OK, "register fail!", "注册失败.");
+
+    /**
+     * 用户名重复
+     */
+    public static final CommonException USERNAME_EXIST = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 11, HttpServletResponse.SC_OK, "username exist!", "用户名重复.");
+
+    /**
+     * 用户名或密码非法
+     */
+    public static final CommonException ILLEDGE_USERNAME_PASSWORD = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 12, HttpServletResponse.SC_OK, "username or password illedge!", "用户名或密码非法.");
+
+    /**
+     * 验证码错误
+     */
+    public static final CommonException PROCODE_ERROR = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 13, HttpServletResponse.SC_OK, "code error!", "验证码错误.");
+
+    /**
+     * 登录失败
+     */
+    public static final CommonException MEMBER_LOGIN_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 14, HttpServletResponse.SC_OK, "member login fail!", "登录失败.");
+
+    /**
+     * 用户不存在
+     */
+    public static final CommonException USERNAME_NOT_EXIST = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 15, HttpServletResponse.SC_OK, "username not exist!", "用户名不存在.");
+
+    /**
+     * 密码错误
+     */
+    public static final CommonException PASSWORD_ERROR = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 16, HttpServletResponse.SC_OK, "password error!", "密码错误.");
+
+    /**
+     * 验证失败
+     */
+    public static final CommonException VERIFY_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 17, HttpServletResponse.SC_OK, "login verify fail!", "验证失败.");
+
 }

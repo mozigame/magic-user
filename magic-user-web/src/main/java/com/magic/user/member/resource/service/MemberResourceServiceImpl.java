@@ -2,11 +2,14 @@ package com.magic.user.member.resource.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.Page;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.model.SimpleResult;
+import com.magic.api.commons.mq.Producer;
+import com.magic.api.commons.mq.api.Topic;
 import com.magic.commons.enginegw.EngineUtil;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
@@ -24,7 +27,10 @@ import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
+import com.magic.user.po.RegisterReq;
+import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.MemberService;
+import com.magic.user.service.UserService;
 import com.magic.user.vo.MemberDetailVo;
 import com.magic.user.vo.MemberLevelListVo;
 import com.magic.user.vo.MemberListVo;
@@ -34,10 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * MemberResourceServiceImpl
@@ -50,6 +53,15 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private MemberService memberService;
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private AccountIdMappingService accountIdMappingService;
+
+    @Resource
+    private Producer producer;
 
     /**
      * 会员列表
@@ -453,5 +465,370 @@ public class MemberResourceServiceImpl {
 
     public Page<User> findByPage(UserCondition userCondition) {
         return memberService.findByPage(userCondition);
+    }
+
+    /**
+     * 会员注册
+     *
+     * @param rc RequestContext
+     * @param url 注册来源
+     * @param req 注册请求数据
+     * @return
+     */
+    public String memberRegister(RequestContext rc, String url, RegisterReq req) {
+        if (!checkRegisterParam(req)){
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        //TODO andy 根据url 获取 ownerId 和 ownerName
+        long ownerId = 0l;
+        String ownerName = "";
+        long holderId = accountIdMappingService.getUid(ownerId, ownerName);//股东id
+        if (holderId <= 0){
+            throw UserException.ILLEGAL_USER;
+        }
+        User holder = userService.getUserById(holderId);
+        if (holder == null){
+            throw UserException.ILLEGAL_USER;
+        }
+        User agent = null;//所属代理ID
+        String proCode = req.getProCode();
+        if (StringUtils.isNoneEmpty(proCode)){
+            User user = userService.getUserByCode(proCode);
+            if (agent != null && user.getOwnerId() == ownerId){
+                agent = user;
+            }
+        }
+        if (agent == null){
+            long agentId = accountIdMappingService.getUid(ownerId, ownerName + "_dl");
+            if (agentId > 0){
+                agent = userService.getUserById(agentId);
+            }
+        }
+        if (agent == null){
+            throw UserException.ILLEGAL_USER;
+        }
+        String body = assembleRegisterBody(rc, url, ownerId, agent.getId(), req);
+        EGReq egReq = assembleEGReq(CmdType.PASSPORT, 0x100001, body);
+        EGResp resp = EngineUtil.call(egReq, "account");
+        if (resp == null){
+            throw UserException.REGISTER_FAIL;
+        }
+        int code = resp.getCode();
+        if (code == 0x1004){
+            throw UserException.USERNAME_EXIST;
+        }
+        if (code != 0x1111){
+            throw UserException.REGISTER_FAIL;
+        }
+        long userId = 0l;
+        try {
+            userId = Long.parseLong(resp.getData());
+        }catch (Exception e){
+            ApiLogger.error(String.format("passport register return data error. resp: %s", JSON.toJSONString(resp)), e);
+        }
+        if (userId <= 0){
+            throw UserException.REGISTER_FAIL;
+        }
+        Member member = assembleMember(rc, req, userId, ownerId, ownerName, holder, agent);
+        boolean result = memberService.saveMember(member);
+        if (!result){
+            throw UserException.REGISTER_FAIL;
+        }
+        sendRegisterMessage(member);
+        return UserContants.EMPTY_STRING;
+    }
+
+    /**
+     * 发送注册成功消息
+     *
+     * @param member
+     * @return
+     */
+    private boolean sendRegisterMessage(Member member) {
+        try {
+            //TODO topic + 消费者
+            return producer.send(Topic.USER_LOGIN_SUCCESS, String.valueOf(member.getId()), JSON.toJSONString(member));
+        }catch (Exception e){
+            ApiLogger.error(String.format("send member register success mq message error. member: %s", JSON.toJSONString(member)), e);
+            return false;
+        }
+    }
+    /**
+     * 组装member数据
+     *
+     * @param rc
+     * @param req
+     * @param userId
+     * @param ownerId
+     * @param ownerName
+     * @param holder
+     * @param agent
+     * @return
+     */
+    private Member assembleMember(RequestContext rc, RegisterReq req, long userId, long ownerId, String ownerName, User holder, User agent) {
+        Member member = new Member();
+        //todo
+        return member;
+    }
+
+    /**
+     * 组装passport注册请求数据
+     *
+     * @param rc
+     * @param url
+     * @param ownerId
+     * @param agentId
+     * @param req
+     * @return
+     */
+    private String assembleRegisterBody(RequestContext rc, String url, long ownerId, long agentId, RegisterReq req) {
+        JSONObject object = new JSONObject();
+        object.put("username", req.getUsername());
+        object.put("password", req.getPassword());
+        object.put("ip", rc.getIp());
+        object.put("proxyId", agentId);
+        object.put("ownerId", ownerId);
+        object.put("sourceUrl", url);
+        object.put("operatorTime", System.currentTimeMillis() / 1000);
+        object.put("appId", rc.getClient().getAppId());
+        return object.toJSONString();
+    }
+
+    /**
+     * 检查注册请求数据合法性
+     *
+     * @param req
+     * @return
+     */
+    private boolean checkRegisterParam(RegisterReq req) {
+        return Optional.ofNullable(req)
+                .filter(request -> request.getUsername() != null && req.getUsername().length() >=6 && req.getUsername().length() <= 16)
+                .filter(request -> request.getPassword() != null && request.getPassword().length() == 32)
+                .isPresent();
+    }
+
+    /**
+     * 会员登陆
+     * @param rc RequestContext
+     * @param agent 浏览器数据
+     * @param url url
+     * @param username 用户名
+     * @param password 密码
+     * @param code 验证码
+     * @return
+     */
+    public String memberLogin(RequestContext rc, String agent, String url, String username, String password, String code) {
+        if (!checkLoginReq(username, password)){
+            throw UserException.ILLEDGE_USERNAME_PASSWORD;
+        }
+        //todo andy 根据url获取业主ID
+        long ownerId = 0;
+        if (ownerId <= 0){
+            throw UserException.ILLEGAL_USER;
+        }
+        //todo 从redis里面获取ownerId_username下的验证码，如果存在验证码，与code对比，如果相符，进行下一步操作
+        String proCode = "";
+        if (proCode != code){
+            throw UserException.PROCODE_ERROR;
+        }
+        String body = assembleLoginBody(rc, ownerId, username, password, agent, url);
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100002, body);
+        EGResp resp = EngineUtil.call(req, "account");
+        if (resp == null || resp.getCode() == 0x1011){
+            throw UserException.MEMBER_LOGIN_FAIL;
+        }
+        int respCode = resp.getCode();
+        if (respCode == 0x1008){
+            throw UserException.USERNAME_NOT_EXIST;
+        }
+        if (respCode == 0x1009){
+            throw UserException.PASSWORD_ERROR;
+        }
+        if (respCode != 0x2222){
+            throw UserException.MEMBER_LOGIN_FAIL;
+        }
+        return "{\" token: \"" + "\"" + resp.getData() + "\"}";
+    }
+
+    /**
+     * 组装登录passport请求body
+     *
+     * @param rc
+     * @param ownerId
+     * @param username
+     * @param password
+     * @param url
+     * @param ext
+     * @return
+     */
+    private String assembleLoginBody(RequestContext rc, long ownerId, String username, String password, String ext, String url) {
+        JSONObject object = new JSONObject();
+        object.put("ownerId", ownerId);
+        object.put("username", username);
+        object.put("password", password);
+        object.put("ip", rc.getIp());
+        object.put("appId", rc.getClient().getAppId());
+        object.put("loginUrl", url);
+        object.put("deviceId", rc.getClient().getDeviceId());
+        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("ext", ext);
+        return object.toJSONString();
+    }
+
+    /**
+     * 检查用户名和密码有效性
+     *
+     * @param username
+     * @param password
+     * @return
+     */
+    private boolean checkLoginReq(String username, String password) {
+        if (username == null || username.length() < 6 || username.length() > 16) {
+            return false;
+        }
+        if (password == null || password.length() != 32){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 密码重置
+     *
+     * @param rc RequestContext
+     * @param username 用户号
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @return
+     */
+    public String memberPasswordReset(RequestContext rc, String username, String oldPassword, String newPassword) {
+        if (!checkResetParams(username, oldPassword, newPassword)){
+            throw UserException.PASSWORD_RESET_FAIL;
+        }
+        String body = assembleResetBody(rc, username, oldPassword, newPassword);
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100004, body);
+        EGResp resp = EngineUtil.call(req, "account");
+        if (resp == null){
+            throw UserException.PASSWORD_RESET_FAIL;
+        }
+        int code = resp.getCode();
+        if (code == 0x1009){
+            throw UserException.PASSWORD_ERROR;
+        }
+        if (code != 0x4444){
+            throw UserException.PASSWORD_RESET_FAIL;
+        }
+        return UserContants.EMPTY_STRING;
+    }
+
+    /**
+     * 组装密码重置passport请求body
+     *
+     * @param rc
+     * @param username
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    private String assembleResetBody(RequestContext rc, String username, String oldPassword, String newPassword) {
+        JSONObject object = new JSONObject();
+        object.put("userId", rc.getUid());
+        object.put("username", username);
+        object.put("oldPassword", oldPassword);
+        object.put("newPassword", newPassword);
+        object.put("appId", rc.getClient().getAppId());
+        object.put("ip", rc.getIp());
+        object.put("operatorTime", System.currentTimeMillis()/1000);
+        return object.toJSONString();
+    }
+
+    /**
+     * 密码重置参数检测
+     *
+     * @param username
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    private boolean checkResetParams(String username, String oldPassword, String newPassword) {
+        if (StringUtils.isEmpty(username) || username.length() < 6 || username.length() > 16){
+            return false;
+        }
+        if (StringUtils.isEmpty(oldPassword) || oldPassword.length() != 32){
+            return false;
+        }
+        if (StringUtils.isEmpty(newPassword) || newPassword.length() != 32){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 登陆状态检测
+     *
+     * @param rc
+     * @return
+     */
+    public String memberLoginVerify(RequestContext rc) {
+        String body = assembleVerifyBody(rc);
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100003, body);
+        EGResp resp = EngineUtil.call(req, "account");
+        boolean result = Optional.ofNullable(resp).filter(response -> response.getCode() != 0x3333).isPresent();
+        if (!result){
+            throw UserException.VERIFY_FAIL;
+        }
+        return "{\" username: \"" + "\"" + resp.getData() + "\"}";
+    }
+
+    /**
+     * 组装登陆校验passport 请求body
+     *
+     * @param rc RequestContext
+     * @return
+     */
+    private String assembleVerifyBody(RequestContext rc) {
+        JSONObject object = new JSONObject();
+        object.put("userId", rc.getUid());
+        object.put("operatorTime", System.currentTimeMillis()/1000);
+        return object.toJSONString();
+    }
+
+    /**
+     * 登陆注销
+     *
+     * @param rc
+     * @param username
+     * @return
+     */
+    public String memberLogout(RequestContext rc, String username) {
+        if (username == null || username.length() < 6 || username.length() > 16){
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        String body = assembleLogoutBody(rc, username);
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        EGResp resp = EngineUtil.call(req, "account");
+        if (resp == null){
+            throw UserException.LOGOUT_FAIL;
+        }
+        int code = resp.getCode();
+        if (code != 0x5555 || code != 0x1013){
+            throw UserException.LOGOUT_FAIL;
+        }
+        return UserContants.EMPTY_STRING;
+    }
+
+    /**
+     * 组装注销passport 请求body
+     * @param rc
+     * @param username
+     * @return
+     */
+    private String assembleLogoutBody(RequestContext rc, String username) {
+        JSONObject object = new JSONObject();
+        object.put("userId", rc.getUid());
+        object.put("username", username);
+        object.put("deviceId", rc.getClient().getDeviceId());
+        object.put("operatorTime", System.currentTimeMillis()/1000);
+        return object.toJSONString();
     }
 }

@@ -43,4 +43,12 @@ public interface UserService {
      * @Doc 根据股东id获取业主id
      */
     long getOwnerIdByStock(long id);
+
+    /**
+     * 根据推广码查询代理数据
+     *
+     * @param proCode
+     * @return
+     */
+    User getUserByCode(String proCode);
 }

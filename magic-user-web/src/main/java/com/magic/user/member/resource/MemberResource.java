@@ -3,8 +3,11 @@ package com.magic.user.member.resource;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.core.tools.HeaderUtil;
 import com.magic.user.member.resource.service.MemberResourceServiceImpl;
 import com.magic.user.po.DownLoadFile;
+import com.magic.user.po.RegisterReq;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +32,164 @@ public class MemberResource {
 
     @Resource
     private MemberResourceServiceImpl memberServiceResource;
+
+    /**
+     * 会员注册
+     *
+     * @param request
+     * @param response
+     * @param proCode
+     * @param username
+     * @param password
+     * @return
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String register(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "proCode", required = false, defaultValue = "") String proCode,
+            @RequestParam(name = "username", required = true) String username,
+            @RequestParam(name = "password", required = true) String password,
+            @RequestParam(name = "paymentPassword", required = false, defaultValue = "") String paymentPassword,
+            @RequestParam(name = "telephone", required = false, defaultValue = "") String telephone,
+            @RequestParam(name = "email", required = false, defaultValue = "") String email,
+            @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
+            @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
+            @RequestParam(name = "bankCardNo", required = false, defaultValue = "") String bankCardNo,
+            @RequestParam(name = "bankReposit", required = false, defaultValue = "") String bankReposit,
+            @RequestParam(name = "province", required = false, defaultValue = "") String province,
+            @RequestParam(name = "city", required = false, defaultValue = "") String city,
+            @RequestParam(name = "weixin", required = false, defaultValue = "") String weixin,
+            @RequestParam(name = "qq", required = false, defaultValue = "") String qq
+
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        //获取域名
+        StringBuffer requestURL = request.getRequestURL();
+        String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
+        RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, realname, bankCardNo, bankReposit, province, city, weixin, qq);
+        return memberServiceResource.memberRegister(rc, url, req);
+    }
+
+    /**
+     * 组装注册请求数据
+     * @param proCode
+     * @param username
+     * @param password
+     * @param paymentPassword
+     * @param telephone
+     * @param email
+     * @param bank
+     * @param realname
+     * @param bankCardNo
+     * @param bankReposit
+     * @param province
+     * @param city
+     * @param weixin
+     * @param qq
+     * @return
+     */
+    private RegisterReq assembleRegister(String proCode, String username, String password, String paymentPassword, String telephone, String email, String bank, String realname, String bankCardNo, String bankReposit, String province, String city, String weixin, String qq) {
+        RegisterReq req = new RegisterReq();
+        req.setProCode(proCode);
+        req.setUsername(username);
+        req.setPassword(password);
+        req.setPaymentPassword(paymentPassword);
+        req.setTelephone(telephone);
+        req.setEmail(email);
+        req.setBank(bank);
+        req.setRealname(realname);
+        req.setBankCardNo(bankCardNo);
+        req.setBankReposit(bankReposit);
+        req.setProvince(province);
+        req.setCity(city);
+        req.setWeixin(weixin);
+        req.setQq(qq);
+        return req;
+    }
+
+    /**
+     * 会员登陆
+     * @param request
+     * @param response
+     * @param code
+     * @param username
+     * @param password
+     * @return
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String login(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "code", required = false, defaultValue = "") String code,
+            @RequestParam(name = "username", required = true) String username,
+            @RequestParam(name = "password", required = true) String password
+
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        //获取浏览器、操作系统名称等数据
+        String agent = request.getHeader(HeaderUtil.USER_AGENT);
+        //获取域名
+        StringBuffer requestURL = request.getRequestURL();
+        String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
+        return memberServiceResource.memberLogin(rc, agent, url, username, password, code);
+    }
+
+    /**
+     * 密码重置
+     *
+     * @param request
+     * @param response
+     * @param username
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/passport/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String reset(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "username", required = true) String username,
+            @RequestParam(name = "oldPassword", required = true) String oldPassword,
+            @RequestParam(name = "newPassword", required = true) String newPassword
+
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberPasswordReset(rc, username, oldPassword, newPassword);
+    }
+
+    /**
+     * 登陆注销
+     *
+     * @param username
+     * @return
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String logout(
+            @RequestParam(name = "username", required = true) String username
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberLogout(rc, username);
+    }
+
+    /**
+     * 登陆授权校验
+     *
+     * @return
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/game/verify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String verify(
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberLoginVerify(rc);
+    }
 
     /**
      * @param condition 检索条件

@@ -51,4 +51,10 @@ public interface MemberService {
      */
     boolean updateMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
 
+    /**
+     * 保存会员数据
+     * @param member
+     * @return
+     */
+    boolean saveMember(Member member);
 }
