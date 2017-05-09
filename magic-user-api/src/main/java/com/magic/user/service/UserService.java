@@ -1,6 +1,5 @@
 package com.magic.user.service;
 
-import com.magic.api.commons.model.Page;
 import com.magic.user.entity.User;
 import com.magic.user.vo.UserCondition;
 
@@ -35,34 +34,26 @@ public interface UserService {
     Map<String, Object> getStockDetail(long id);
 
     /**
-     * @param id
-     * @param pwd
+     * 获取用户数据
+     * @param uid
      * @return
      * @Doc 修改密码
      */
-    int updatePwd(long id, String pwd);
+    User getUserById(long uid);
 
     /**
-     * @param user
-     * @return
-     * @Doc 修改用户信息
-     */
-    int update(User user);
-
-    /**
-     * @param user
-     * @return
-     * @Doc 添加股东
-     */
-    Long addStock(User user);
-
-    /**
+     * 用户更新
      * @param id
-     * @param status
+     * @param realname
+     * @param telephone
+     * @param email
+     * @param bankCardNo
+     * @param bank
+     * @param bankDeposit
      * @return
      * @Doc 启用停用账号
      */
-    int disable(long id, int status);
+    boolean updateUser(long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
 
 
     /**
@@ -108,4 +99,34 @@ public interface UserService {
      * @Doc 查询代理详情
      */
     Map<String, Object> getAgentDetail(long id);
+
+    /**
+     * @param id
+     * @param pwd
+     * @return
+     * @Doc 修改密码
+     */
+    int updatePwd(long id, String pwd);
+
+    /**
+     * @param user
+     * @return
+     * @Doc 修改用户信息
+     */
+    int update(User user);
+
+    /**
+     * @param user
+     * @return
+     * @Doc 添加股东
+     */
+    Long addStock(User user);
+
+    /**
+     * @param id
+     * @param status
+     * @return
+     * @Doc 启用停用账号
+     */
+    int disable(long id, int status);
 }
