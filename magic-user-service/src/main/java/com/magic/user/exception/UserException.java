@@ -72,4 +72,10 @@ public class UserException extends ExceptionFactor {
     public static final CommonException MEMBER_STATUS_UPDATE_FAIL = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 8, HttpServletResponse.SC_OK, "member status update fail!", "会员状态更新失败.");
 
+    /**
+     * 非法用户
+     */
+    public static final CommonException ILLEGAL_USER = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 9, HttpServletResponse.SC_OK, "illedge user!", "非法用户.");
+
 }

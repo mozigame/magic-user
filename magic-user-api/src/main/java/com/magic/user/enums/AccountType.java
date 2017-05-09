@@ -38,4 +38,28 @@ public enum AccountType {
     public static AccountType parse(int value) {
         return maps.get(value);
     }
+
+    public static String getDesc(AccountType type){
+        String desc = "";
+        switch (type){
+            case proprietor:
+                desc = "业主";
+                break;
+            case stockholder:
+                desc = "股东";
+                break;
+            case agent:
+                desc = "代理";
+                break;
+            case worker:
+                desc = "子账号";
+                break;
+            case member:
+                desc = "会员";
+                break;
+            default:
+                break;
+        }
+        return desc;
+    }
 }

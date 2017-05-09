@@ -16,4 +16,25 @@ public interface UserService {
     int updateUser(User user);
 
     Page<User> findByPage(UserCondition userCondition);
+
+    /**
+     * 获取用户数据
+     * @param uid
+     * @return
+     */
+    User getUserById(long uid);
+
+    /**
+     * 用户更新
+     * @param id
+     * @param realname
+     * @param telephone
+     * @param email
+     * @param bankCardNo
+     * @param bank
+     * @param bankDeposit
+     * @return
+     */
+    boolean updateUser(long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
+
 }

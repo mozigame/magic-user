@@ -1,11 +1,23 @@
 package com.magic.user.member.resource;
 
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
+import com.magic.api.commons.core.context.RequestContext;
+import com.magic.user.member.resource.service.InfoResourceServiceImpl;
+import com.magic.user.po.DownLoadFile;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  * User: joey
@@ -16,6 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/info")
 public class MemInfoResource {
 
+    @Resource
+    private InfoResourceServiceImpl infoResourceService;
 
     /**
      * @param type    账号类型
@@ -24,24 +38,14 @@ public class MemInfoResource {
      * @Doc 资料查询
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/detail", method = RequestMethod.GET)
+    @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
-            @RequestParam(name = "type", required = false) int type,
-            @RequestParam(name = "account", required = false) String account
+            @RequestParam(name = "type", required = true) Integer type,
+            @RequestParam(name = "account", required = true) String account
     ) {
-
-        return " {\n" +
-                "            \"id\":1001,\n" +
-                "                \"type\":1,\n" +
-                "                \"account\":\"ssdfwda\",\n" +
-                "                \"realname\":\"李月华\",\n" +
-                "                \"telephone\":\"13430180255\",\n" +
-                "                \"email\":\"liyuehua009@gmail.com\",\n" +
-                "                \"bankCardNo\":\"622848770596789\",\n" +
-                "                \"loginPassword\":\"123456\",\n" +
-                "                \"paymentPassword\":\"123456\"\n" +
-                "        }";
+        RequestContext rc = RequestContext.getRequestContext();
+        return infoResourceService.infoDetail(rc, type, account);
     }
 
     /**
@@ -51,26 +55,30 @@ public class MemInfoResource {
      * @param telephone       手机号码
      * @param email           邮箱
      * @param bankCardNo      银行卡号
+     * @param bank            银行名称
+     * @param bankDeposit     开户行
      * @param loginPassword   登录密码
      * @param paymentPassword 支付密码
      * @return
      * @Doc 资料修改
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/modify", method = RequestMethod.POST)
+    @RequestMapping(value = "/modify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String modify(
-            @RequestParam(name = "id") long id,
-            @RequestParam(name = "type") int type,
-            @RequestParam(name = "realname", required = false) String realname,
-            @RequestParam(name = "telephone", required = false) String telephone,
-            @RequestParam(name = "email", required = false) String email,
-            @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
-            @RequestParam(name = "loginPassword", required = false) String loginPassword,
-            @RequestParam(name = "paymentPassword", required = false) String paymentPassword
-//            股东ID（从RequestContext中获取股东ID）
+            @RequestParam(name = "id", required = true) Long id,
+            @RequestParam(name = "type", required = true) Integer type,
+            @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
+            @RequestParam(name = "telephone", required = false, defaultValue = "") String telephone,
+            @RequestParam(name = "email", required = false, defaultValue = "") String email,
+            @RequestParam(name = "bankCardNo", required = false, defaultValue = "") String bankCardNo,
+            @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
+            @RequestParam(name = "bankDeposit", required = false, defaultValue = "") String bankDeposit,
+            @RequestParam(name = "loginPassword", required = false, defaultValue = "") String loginPassword,
+            @RequestParam(name = "paymentPassword", required = false, defaultValue = "") String paymentPassword
     ) {
-        return "";
+        RequestContext rc = RequestContext.getRequestContext();
+        return infoResourceService.modifyInfo(rc, id, type, realname, telephone, email, bankCardNo, bank, bankDeposit, loginPassword, paymentPassword);
     }
 
     /**
@@ -85,40 +93,13 @@ public class MemInfoResource {
     @RequestMapping(value = "/modify/list", method = RequestMethod.GET)
     @ResponseBody
     public String modifyList(
-            @RequestParam(name = "type") int type,
-            @RequestParam(name = "account", required = false) String account,
+            @RequestParam(name = "type", required = false, defaultValue = "-1") Integer type,
+            @RequestParam(name = "account", required = false, defaultValue = "") String account,
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
-
-        return "{\n" +
-                "            \"page\":1,\n" +
-                "                \"count\":10,\n" +
-                "                \"total\":100,\n" +
-                "                \"list\":[{\n" +
-                "            \"id\":153452,\n" +
-                "                    \"holder\":\"seredios\",\n" +
-                "                    \"accountId\":1001,\n" +
-                "                    \"type\":1,\n" +
-                "                    \"showType\":\"代理\",\n" +
-                "                    \"account\":\"ssdfwda\",\n" +
-                "                    \"before\":{\n" +
-                "                \"name\":\"李月华\",\n" +
-                "                        \"bankCardNo\":\"62XXXXXXX\",\n" +
-                "                        \"telephone\":\"133XXXXXX\",\n" +
-                "                        \"email\":\"xxx@xxx.com\"\n" +
-                "            },\n" +
-                "            \"after\":{\n" +
-                "                \"name\":\"李月华\",\n" +
-                "                        \"bankCardNo\":\"62XXXXXXX\",\n" +
-                "                        \"telephone\":\"133XXXXXX\",\n" +
-                "                        \"email\":\"xxx@xxx.com\"\n" +
-                "            },\n" +
-                "            \"operatorId\":1001,\n" +
-                "                    \"operatorName\":\"admin\",\n" +
-                "                    \"operatorTime\":\"2017-03-01 16:43:22\"\n" +
-                "        }]\n" +
-                "        }";
+        RequestContext rc = RequestContext.getRequestContext();
+        return infoResourceService.modifyList(rc, type, account, page, count);
     }
 
     /**
@@ -130,11 +111,31 @@ public class MemInfoResource {
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/modify/list/export", method = RequestMethod.GET)
     @ResponseBody
-    public String modifyListExport(
-            @RequestParam(name = "type") int type,
-            @RequestParam(name = "account", required = false) String account
-    ) {
-        return "";
+    public void modifyListExport(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "type", required = false, defaultValue = "-1") Integer type,
+            @RequestParam(name = "account", required = false, defaultValue = "") String account
+    ) throws IOException {
+        RequestContext rc = RequestContext.getRequestContext();
+        DownLoadFile downLoadFile = infoResourceService.modifyListExport(rc, type, account);
+        response.setCharacterEncoding("UTF-8");
+        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
+            String contnetDisposition = "attachment;filename=";
+            if (downLoadFile.getFilename() != null) {
+                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
+            }
+            response.setHeader("Content-Disposition", contnetDisposition);
+            ServletOutputStream outputStream = response.getOutputStream();
+            try {
+                outputStream.write(downLoadFile.getContent());
+            } catch (Exception e) {
+                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
+            } finally {
+                outputStream.flush();
+                outputStream.close();
+            }
+        }
     }
 
 

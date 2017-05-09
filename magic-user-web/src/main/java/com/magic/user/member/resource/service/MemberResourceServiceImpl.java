@@ -3,6 +3,7 @@ package com.magic.user.member.resource.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.model.Page;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.model.SimpleResult;
@@ -17,6 +18,7 @@ import com.magic.user.bean.RegionNumber;
 import com.magic.user.bean.Register;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Member;
+import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
@@ -26,6 +28,7 @@ import com.magic.user.service.MemberService;
 import com.magic.user.vo.MemberDetailVo;
 import com.magic.user.vo.MemberLevelListVo;
 import com.magic.user.vo.MemberListVo;
+import com.magic.user.vo.UserCondition;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -37,13 +40,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * MemberServiceResourceImpl
+ * MemberResourceServiceImpl
  *
  * @author zj
  * @date 2017/5/6
  */
 @Service("memberServiceResource")
-public class MemberServiceResourceImpl {
+public class MemberResourceServiceImpl {
 
     @Resource
     private MemberService memberService;
@@ -144,10 +147,6 @@ public class MemberServiceResourceImpl {
         result.setTotal(total);
         result.setList(list);
         return result;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(JSON.toJSONString(assemblePageBean(1, 2, 0, null)));
     }
 
     /**
@@ -437,5 +436,9 @@ public class MemberServiceResourceImpl {
             return false;
         }
         return true;
+    }
+
+    public Page<User> findByPage(UserCondition userCondition) {
+        return memberService.findByPage(userCondition);
     }
 }

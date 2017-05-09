@@ -7,5 +7,5 @@ package com.magic.user.constants;
  */
 public class UserContants {
 
-    public static final String EMPTY_STRING = new String();//空字符串
+    public static final String EMPTY_STRING = "{}";//空字符串
 }

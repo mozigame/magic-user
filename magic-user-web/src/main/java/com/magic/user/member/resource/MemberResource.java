@@ -3,7 +3,7 @@ package com.magic.user.member.resource;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.user.member.resource.service.MemberServiceResourceImpl;
+import com.magic.user.member.resource.service.MemberResourceServiceImpl;
 import com.magic.user.po.DownLoadFile;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +28,7 @@ import java.net.URLEncoder;
 public class MemberResource {
 
     @Resource
-    private MemberServiceResourceImpl memberServiceResource;
+    private MemberResourceServiceImpl memberServiceResource;
 
     /**
      * @param condition 检索条件
