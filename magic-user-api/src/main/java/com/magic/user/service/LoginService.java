@@ -1,5 +1,7 @@
 package com.magic.user.service;
 
+import com.magic.user.entity.Login;
+
 /**
  * User: joey
  * Date: 2017/5/5
@@ -7,12 +9,7 @@ package com.magic.user.service;
  */
 public interface LoginService {
 
-    /**
-     * 修改登录密码
-     *
-     * @param id 用户ID
-     * @param loginPassword 登陆密码
-     * @return
-     */
-    boolean resetPassword(long id, String loginPassword);
+    long add(Login login);
+
+    long update(Login login);
 }

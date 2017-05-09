@@ -60,7 +60,7 @@ public class StockDbService extends BaseDbServiceImpl<User, Long> {
      * @return
      * @Doc 修改密码
      */
-    public int updatePwd(String pwd, long id) {
+    public int updatePwd(long id, String pwd) {
         try {
             return loginDao.update("updatePwd", new String[]{"password", "id"}, new Object[]{pwd, id});
         } catch (Exception e) {

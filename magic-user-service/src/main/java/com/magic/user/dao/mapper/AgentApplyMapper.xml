@@ -1,25 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.magic.user.mapper.AgentReviewMapper">
-    <resultMap id="BaseResultMap" type="com.magic.user.entity.AgentApply">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="username" jdbcType="VARCHAR" property="username"/>
-        <result column="stock_id" jdbcType="BIGINT" property="stockId"/>
-        <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
-        <result column="email" jdbcType="VARCHAR" property="email"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
-        <result column="resource_url" jdbcType="VARCHAR" property="resourceUrl"/>
-        <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
-        <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
-    </resultMap>
+<mapper namespace="com.magic.user.entity.AgentReview">
+
     <sql id="Base_Column_List">
-    id, username, stock_id, telephone, email, status, resource_url, register_ip, create_time, 
+    id, username, stock_id, telephone, email, status, resource_url, register_ip, create_time,
     temp1, temp2
   </sql>
 
-    <!-- 新增代理申请-->
+    <!-- 新增代理申请--><!--used-->
     <insert id="insert" parameterType="AgentApply">
         insert into t_agent_review (
           username,
@@ -47,17 +35,37 @@
         )
     </insert>
 
-
-    <!--代理审核基础信息-->
-    <select id="get">
+    <!--代理审核信息--><!--used-->
+    <select id="get" resultType="AgentApply">
         select
         id,
-        account,
+        username,
         realname,
-        telphone,
+        stock_id stockId,
+        stock_name stockName,
+        status status,
+        resource_url resourceUrl,
+        register_ip registerIp,
+        create_time createTime,
+        telephone,
         email,
-        bank_card_no
+        bank_card_no bankCardNo
         from t_agent_apply
+        WHERE id=#{id}
+
+    </select>
+
+    <!--代理审核基础信息--><!--used-->
+    <select id="getDetail" resultType="java.util.HashMap">
+        select
+        id,
+        username account,
+        realname,
+        telephone,
+        email,
+        bank_card_no bankCardNo
+        from t_agent_apply
+        WHERE id=#{id}
 
     </select>
 
@@ -67,5 +75,36 @@
         SET status=#{status}
         WHERE id=#{id}
     </update>
+
+
+    <!--代理审核列表查询--><!--used-->
+    <select id="findByPage" resultType="java.util.HashMap">
+        select
+        a.id id,
+        a.stock_id stock,
+        a.stock_name holderName,
+        a.username account,
+        a.realname realname,
+        a.telephone telephone,
+        a.email email,
+        a.`status` status,
+        a.resource_url source,
+        a.register_ip registerIp,
+        r.oper_user_name operUserName,
+        r.create_time operaterTime
+        from t_agent_apply a
+        LEFT JOIN t_agent_review r ON(a.id=r.agent_apply_id)
+        <![CDATA[
+         WHERE a.`status` <> 1
+
+        ]]>
+        <if test="status >0 ">
+            and a.status=#{status}
+        </if>
+        <if test="account!=null ">
+            and a.username=#{account}
+        </if>
+        limit #{offset},#{limit}
+    </select>
 
 </mapper>

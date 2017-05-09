@@ -11,5 +11,5 @@ import org.springframework.stereotype.Component;
  * Time: 17:07
  */
 @Component
-public class AgentDao extends MyBatisDaoImpl<AgentConfig, Long> {
+public class AgentDao extends MyBatisDaoImpl<User, Long> {
 }

@@ -25,8 +25,22 @@ public class AccountOperHistory {
 
     private AccountType type;   //账号类型
 
+    private long ownerId;   //业主id
+
+    private String ownerName;   //业主名称
+
     private Date createTime;    //操作时间
 
+    public AccountOperHistory(String username, long userId, String beforeInfo, String afterInfo, long procUserId, String procUsername, AccountType type, Date createTime) {
+        this.username = username;
+        this.userId = userId;
+        this.beforeInfo = beforeInfo;
+        this.afterInfo = afterInfo;
+        this.procUserId = procUserId;
+        this.procUsername = procUsername;
+        this.type = type;
+        this.createTime = createTime;
+    }
 
     public long getId() {
         return id;
@@ -98,5 +112,21 @@ public class AccountOperHistory {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 }

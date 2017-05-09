@@ -13,4 +13,34 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
     </resultMap>
 
+    <insert id="add">
+        INSERT INTO
+            t_account_oper_history(username,user_id,before_info,after_info,proc_user_id,proc_username,type,create_time)
+        VALUES (
+          #{username},
+          #{userId},
+          #{beforeInfo},
+          #{afterInfo},
+          #{procUserId},
+          #{procUsername},
+          #{type},
+          #{createTime}
+          )
+    </insert>
+
+    <select id="findbyPage">
+        SELECT id,
+            holder,
+            user_id accountId,
+            type,
+            username account,
+            before_info before,
+            after_info after,
+            proc_user_id operatorId,
+            proc_username operatorName,
+            create_time operatorTime
+        from t_account_oper_history
+
+    </select>
+
 </mapper>

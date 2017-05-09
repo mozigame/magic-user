@@ -14,13 +14,26 @@ public class Login {
 
     private String username;    //账号
 
-    private String password;    //面膜
+    private String password;    //密码
 
     private Date updateTime;    //修改时间，最后登录时间
 
     private int lastLoginIp;    //最后登录ip
 
     private LoginType status; //登录等出
+
+    public Login(){}
+    public Login(long userId, String username, String password) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+    }
+
+    public Login(Date updateTime, int lastLoginIp, LoginType status) {
+        this.updateTime = updateTime;
+        this.lastLoginIp = lastLoginIp;
+        this.status = status;
+    }
 
     public long getId() {
         return id;
