@@ -17,7 +17,6 @@ import com.magic.user.po.DownLoadFile;
 import com.magic.user.service.*;
 import com.magic.user.vo.AccountModifyInfoVo;
 import com.magic.user.vo.AccountModifyListVo;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -112,8 +111,14 @@ public class InfoResourceServiceImpl {
      * @return
      */
     private AccountModifyInfoVo assembleModifyInfo(User user) {
-        //todo
-        return null;
+        AccountModifyInfoVo result = new AccountModifyInfoVo();
+        result.setId(user.getUserId());
+        result.setAccount(user.getUsername());
+        result.setRealname(user.getRealname());
+        result.setBankCardNo(user.getBankCardNo());
+        result.setTelephone(user.getTelephone());
+        result.setEmail(user.getEmail());
+        return result;
     }
 
     /**
@@ -123,8 +128,16 @@ public class InfoResourceServiceImpl {
      * @return
      */
     private AccountModifyInfoVo assembleModifyInfo(Member member) {
-        //todo
-        return null;
+        AccountModifyInfoVo result = new AccountModifyInfoVo();
+        result.setId(member.getId());
+        result.setAccount(member.getUsername());
+        result.setRealname(member.getRealname());
+        result.setBankCardNo(member.getBankCardNo());
+        result.setBank(member.getBank());
+        result.setBankDeposit(member.getBankDeposit());
+        result.setTelephone(member.getTelephone());
+        result.setEmail(member.getEmail());
+        return result;
     }
 
     /**
@@ -221,7 +234,7 @@ public class InfoResourceServiceImpl {
                 }
                 if (bankDeposit != null){
                     newMap.put("bankDeposit", bankDeposit);
-                    newMap.put("bankDeposit", member.getBankDeposit())
+                    newMap.put("bankDeposit", member.getBankDeposit());
                 }
             }
             if (loginPassword != null){
@@ -245,27 +258,19 @@ public class InfoResourceServiceImpl {
             if (result){
                 if (realname != null){
                     newMap.put("realname", realname);
-                    oldMap.put("realname", member.getRealname());
+                    oldMap.put("realname", user.getRealname());
                 }
                 if (telephone != null){
                     newMap.put("telephone", telephone);
-                    oldMap.put("telephone", member.getTelephone());
+                    oldMap.put("telephone", user.getTelephone());
                 }
                 if (email != null){
                     newMap.put("email", email);
-                    oldMap.put("email", member.getEmail());
+                    oldMap.put("email", user.getEmail());
                 }
                 if (bankCardNo != null){
                     newMap.put("bankCardNo", bankCardNo);
-                    oldMap.put("bankCardNo", member.getBankCardNo());
-                }
-                if (bank != null){
-                    newMap.put("bank", bank);
-                    oldMap.put("bank", member.getBank());
-                }
-                if (bankDeposit != null){
-                    newMap.put("bankDeposit", bankDeposit);
-                    newMap.put("bankDeposit", member.getBankDeposit())
+                    oldMap.put("bankCardNo", user.getBankCardNo());
                 }
             }
             if (loginPassword != null){
@@ -388,8 +393,8 @@ public class InfoResourceServiceImpl {
                 accountModifyListVo.setType(type.value());
                 accountModifyListVo.setShowType(AccountType.getDesc(type));
                 //todo 新增业主ID 和 业主名称
-                accountModifyListVo.setOwnerId();
-                accountModifyListVo.setOwnerName();
+                accountModifyListVo.setOwnerId(next.getOwnerId());
+                accountModifyListVo.setOwnerName(next.OwnerName());
                 accountModifyListVo.setBefore(JSONObject.parseObject(next.getBeforeInfo()));
                 accountModifyListVo.setAfter(JSONObject.parseObject(next.getAfterInfo()));
                 accountModifyListVo.setOperatorId(next.getProcUserId());

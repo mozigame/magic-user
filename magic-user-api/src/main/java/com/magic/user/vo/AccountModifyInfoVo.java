@@ -10,14 +10,15 @@ public class AccountModifyInfoVo {
 
     private Long id;//ID
     private Integer type;//账号类型
+    private String account;//账号名
     private String realname;//真实姓名
     private String bankCardNo;//银行卡号
     private String bank;//银行名称
     private String bankDeposit;//开户行
     private String email;//电子邮箱;
     private String telephone;//手机号码
-    private String loginPassword;//登录密码
-    private String paymentPassword;//支付密码
+    private String loginPassword = "*******";//登录密码
+    private String paymentPassword = "*******";//支付密码
 
     public Long getId() {
         return id;
@@ -33,6 +34,14 @@ public class AccountModifyInfoVo {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
     }
 
     public String getRealname() {
