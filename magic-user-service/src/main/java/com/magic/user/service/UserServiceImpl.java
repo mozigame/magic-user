@@ -40,4 +40,9 @@ public class UserServiceImpl implements UserService {
     public Page<User> findByPage(UserCondition condition) {
         return null;
     }
+
+    @Override
+    public long getOwnerIdByStock(long id) {
+        return (long) userDbService.get("getOwnerIdByStock", null, new Object[]{id});
+    }
 }

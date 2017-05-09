@@ -1,15 +1,20 @@
 package com.magic.user.agent.resource.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.agent.resource.AgentResource;
 import com.magic.user.agent.resource.service.AgentResourceService;
 import com.magic.user.entity.AgentConfig;
+import com.magic.user.entity.OwnerStockAgentMember;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
+import com.magic.user.service.AgentConfigService;
 import com.magic.user.service.AgentService;
+import com.magic.user.service.OwnerStockAgentService;
+import com.magic.user.service.UserService;
 import com.magic.user.vo.UserCondition;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +33,13 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
     @Resource(name = "agentService")
     private AgentService agentService;
+    @Resource(name = "agentConfigService")
+    private AgentConfigService agentConfigService;
+    @Resource(name = "ownerStockAgentService")
+    private OwnerStockAgentService ownerStockAgentService;
+    @Resource(name = "")
+    private UserService userService;
+
 
     @Override
     public String findByPage(UserCondition userCondition) {
@@ -54,6 +66,13 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         long userId = agentService.add(user);
         if (userId > 0) {
             AgentConfig agentConfig = new AgentConfig(userId, returnScheme, adminCost, feeScheme, com.magic.user.utils.StringUtils.arrayToStrSplit(domain));
+            if (agentConfigService.add(agentConfig) <= 0) {
+                ApiLogger.warn("add agentConfig failed,agentId:" + userId);
+            }
+            long ownerId = userService.getOwnerIdByStock(holder);
+            OwnerStockAgentMember ownerStockAgentMember = new OwnerStockAgentMember(ownerId, holder, userId);
+            if (ownerStockAgentService.add(ownerStockAgentMember) <= 0)
+                ApiLogger.warn(String.format("add agentConfig failed,ownerId:%d,stockId:%d,agentId:%d", ownerId, holder, userId));
             JSONObject result = new JSONObject();
             result.put("id", userId);
             return result.toJSONString();

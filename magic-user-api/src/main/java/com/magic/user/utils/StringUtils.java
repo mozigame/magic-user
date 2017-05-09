@@ -32,6 +32,11 @@ public class StringUtils {
         return !isEmpty(cs);
     }
 
+    /**
+     * @param strings
+     * @return
+     * @Doc String[] 转成String,eg：new String[]{"aaa","bbb","ccc"} 转成aaa,bbb,ccc
+     */
     public static String arrayToStrSplit(String[] strings) {
         StringBuffer sb = new StringBuffer();
         for (String s : strings) {
@@ -44,8 +49,4 @@ public class StringUtils {
         return str;
     }
 
-    public static void main(String[] args) {
-        String[] strings = new String[]{"aaaa", "bbbb", "cccc"};
-        System.out.println(arrayToStrSplit(strings));
-    }
 }

@@ -37,4 +37,10 @@ public interface UserService {
      */
     boolean updateUser(long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
 
+    /**
+     * @param id
+     * @return
+     * @Doc 根据股东id获取业主id
+     */
+    long getOwnerIdByStock(long id);
 }
