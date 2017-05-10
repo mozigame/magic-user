@@ -10,6 +10,7 @@ import com.magic.service.java.UuidService;
 import com.magic.user.agent.resource.service.AgentResourceService;
 import com.magic.user.entity.*;
 import com.magic.user.enums.AccountStatus;
+import com.magic.user.enums.AccountType;
 import com.magic.user.enums.ReviewStatus;
 import com.magic.user.service.*;
 import com.magic.user.vo.UserCondition;
@@ -48,6 +49,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     public String findByPage(UserCondition userCondition) {
         List<Map<String, Object>> list = userService.findAgentByPage(userCondition);
         if (list != null && list.size() > 0) {
+            for (Map<String, Object> map : list) {
+                map.put("showStatus", AccountStatus.parse((Integer) map.get("status")).desc());
+            }
             long count = userService.getAgentCount(userCondition);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("page", userCondition.getPageNo());
@@ -65,7 +69,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
         String generalizeCode = UUIDUtil.getCode();
         long userId = uuidService.assignUid();
-        User user = new User(userId, realname, account, telephone, email, new Date(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
+        User user = new User(userId, realname, account, telephone, email, AccountType.agent, new Date(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
         long count = userService.addAgent(user);
         if (count > 0) {
             Login login = new Login(userId, account, password);
@@ -73,7 +77,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             if (loginService.add(login) <= 0) {
                 ApiLogger.error("add user login failed,userId:" + userId);
             }
-            AgentConfig agentConfig = new AgentConfig(userId, returnScheme, adminCost, feeScheme, com.magic.user.utils.StringUtils.arrayToStrSplit(domain));
+            String domainSpit = com.magic.user.utils.StringUtils.arrayToStrSplit(domain);
+            AgentConfig agentConfig = new AgentConfig(userId, returnScheme, adminCost, feeScheme, domainSpit);
             if (agentConfigService.add(agentConfig) <= 0) {
                 ApiLogger.error("add agentConfig failed,agentId:" + userId);
             }
@@ -92,30 +97,34 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     public String getDetail(RequestContext rc, long id) {
         JSONObject result = new JSONObject();
         Map<String, Object> agentInfo = userService.getAgentDetail(id);
+        if (agentInfo != null) {
+            agentInfo.put("showStatus", AccountStatus.parse((Integer) agentInfo.get("showStatus")).desc());
+        }
+        //todo 代理参数配置获取中文通过调用接口
         Map<String, Object> agentConfig = agentConfigService.findByAgentId(id);
         result.put("baseInfo", agentInfo);
         result.put("settings", agentConfig);
         //TODO 本期资金状况
         String fundProfile = "{\n" +
-                "            \"syncTime\":\"2017-04-18 09:29:33\",\n" +
-                "            \"info\":{\n" +
-                "                \"members\":490,\n" +
-                "                \"depositMembers\":410,\n" +
-                "                \"depositTotalMoney\":\"29006590\",\n" +
-                "                \"withdrawTotalMoney\":\"24500120\",\n" +
-                "                \"betTotalMoney\":\"20900067\",\n" +
-                "                \"betEffMoney\":\"19007689\",\n" +
-                "                \"gains\":\"4908763\"\n" +
-                "            }\n" +
-                "        }";
-        result.put("fundProfile", fundProfile);
+                "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
+                "    \"info\": {\n" +
+                "        \"members\": 490,\n" +
+                "        \"depositMembers\": 410,\n" +
+                "        \"depositTotalMoney\": \"29006590\",\n" +
+                "        \"withdrawTotalMoney\": \"24500120\",\n" +
+                "        \"betTotalMoney\": \"20900067\",\n" +
+                "        \"betEffMoney\": \"19007689\",\n" +
+                "        \"gains\": \"4908763\"\n" +
+                "    }\n" +
+                "}";
+        result.put("fundProfile", JSONObject.parseObject(fundProfile));
         return result.toJSONString();
     }
 
     @Override
     public String resetPwd(RequestContext rc, long id, String password) {
-        int count = userService.updatePwd(id, password);
-        if (count <= 0)
+        boolean flag = loginService.resetPassword(id, password);
+        if (!flag)
             ApiLogger.error("update agent password failed,userId:" + id);
         return "";
     }
@@ -150,7 +159,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (count <= 0) {
             //TODO throw
         }
-        return null;
+        return "";
     }
 
     @Override
@@ -160,12 +169,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         //TODO 获取加入来源
         String resourceUrl = "";
         int ip = IPUtil.ipToInt(rc.getIp());
-        AgentApply agentApply = new AgentApply(account, stockId, telephone, email, ReviewStatus.noReview, resourceUrl, ip, new Date());
+        AgentApply agentApply = new AgentApply(account, realname, password, stockId, telephone, email, ReviewStatus.noReview, resourceUrl, ip, new Date());
         long count = agentApplyService.add(agentApply);
         if (count <= 0) {
             //Todo throw
         }
-        return null;
+        return "";
     }
 
     @Override
@@ -208,8 +217,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         } else if (reviewStatus == ReviewStatus.pass.value()) {//2、通过，修改申请状态，添加历史记录，添加代理信息
             int count = agentApplyService.updateStatus(id, reviewStatus);
             User procUser = userService.get(rc.getUid());
-            AgentReview agentReview = new AgentReview(id, realname, rc.getUid(), procUser.getUsername(), ReviewStatus.parse(reviewStatus), new Date());
-            //添加历史记录
+            //todo
+            String procUserName="aaa";
+            AgentReview agentReview = new AgentReview(id, realname, rc.getUid(), procUserName, ReviewStatus.parse(reviewStatus), new Date());
+            //添加审核历史记录
             if (agentReviewService.add(agentReview) <= 0) {
                 //TOdo
             }
@@ -218,7 +229,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 AgentApply agentApply = agentApplyService.get(id);
                 String generalizeCode = UUIDUtil.getCode();
                 long userId = uuidService.assignUid();
-                User userAgent = new User(userId, realname, agentApply.getUsername(), agentApply.getTelephone(), agentApply.getEmail(), agentApply.getCreateTime(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, agentApply.getBankCardNo());
+                User userAgent = new User(userId, realname, agentApply.getUsername(), agentApply.getTelephone(), agentApply.getEmail(), AccountType.agent, agentApply.getCreateTime(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, agentApply.getBankCardNo());
                 long addAgentCount = userService.addAgent(userAgent);
                 if (addAgentCount <= 0) {
                     //todo
@@ -234,7 +245,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (count <= 0) {
             //todo
         }
-        return null;
+        return "";
     }
 
 

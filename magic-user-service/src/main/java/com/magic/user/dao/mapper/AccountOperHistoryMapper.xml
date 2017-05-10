@@ -2,20 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.magic.user.entity.AccountOperHistory">
     <resultMap id="BaseResultMap" type="com.magic.user.entity.AccountOperHistory">
-        <id column="id" jdbcType="BIGINT" property="id" />
-        <result column="username" jdbcType="VARCHAR" property="username" />
-        <result column="user_id" jdbcType="BIGINT" property="userId" />
-        <result column="before_info" jdbcType="VARCHAR" property="beforeInfo" />
-        <result column="after_info" jdbcType="VARCHAR" property="afterInfo" />
-        <result column="proc_user_id" jdbcType="BIGINT" property="procUserId" />
-        <result column="proc_username" jdbcType="VARCHAR" property="procUsername" />
-        <result column="type" jdbcType="TINYINT" property="type" />
-        <result column="owner_id" jdbcType="BIGINT" property="ownerId" />
-        <result column="owner_name" jdbcType="VARCHAR" property="ownerName" />
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="before_info" jdbcType="VARCHAR" property="beforeInfo"/>
+        <result column="after_info" jdbcType="VARCHAR" property="afterInfo"/>
+        <result column="proc_user_id" jdbcType="BIGINT" property="procUserId"/>
+        <result column="proc_username" jdbcType="VARCHAR" property="procUsername"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
+        <result column="owner_name" jdbcType="VARCHAR" property="ownerName"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
     </resultMap>
 
-    <insert id="add">
+    <insert id="insert">
         INSERT INTO
             t_account_oper_history(username,user_id,before_info,after_info,proc_user_id,proc_username,type,create_time)
         VALUES (
@@ -30,7 +30,7 @@
           )
     </insert>
 
-    <select id="findbyPage">
+    <select id="findbyPage" resultType="java.util.HashMap">
         SELECT id,
             holder,
             user_id accountId,

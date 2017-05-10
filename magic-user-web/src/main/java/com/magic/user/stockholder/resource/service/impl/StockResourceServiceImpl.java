@@ -6,12 +6,14 @@ import com.magic.service.java.UuidService;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
+import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.enums.GeneraType;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.UserService;
 import com.magic.user.stockholder.resource.service.StockResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,6 +35,8 @@ public class StockResourceServiceImpl implements StockResourceService {
     private LoginService loginService;
     @Resource
     private UuidService uuidService;
+    @Value(value = "${init_user_id:10000}")
+    private long USER_ID;
 
     @Override
     public String findAllStock() {
@@ -54,35 +58,36 @@ public class StockResourceServiceImpl implements StockResourceService {
         jsonObject.put("baseInfo", map);
         //TODO go 获取当期运营概况
         String operation = "{\n" +
-                "            \"syncTime\":\"2017-04-18 09:29:33\",\n" +
-                "            \"info\":{\n" +
-                "                \"bets\":129000,\n" +
-                "                \"notes\":34560000,\n" +
-                "                \"betTotalMoney\":\"80500000\",\n" +
-                "                \"betEffMoney\":\"78966789\",\n" +
-                "                \"gains\":\"5800000\"\n" +
-                "            }\n" +
-                "        }";
-        jsonObject.put("operation", operation);
+                "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
+                "    \"info\": {\n" +
+                "        \"bets\": 129000,\n" +
+                "        \"notes\": 34560000,\n" +
+                "        \"betTotalMoney\": \"80500000\",\n" +
+                "        \"betEffMoney\": \"78966789\",\n" +
+                "        \"gains\": \"5800000\"\n" +
+                "    }\n" +
+                "}";
+        jsonObject.put("operation", JSONObject.parseObject(operation));
         return jsonObject.toJSONString();
     }
 
     @Override
     public String updatePwd(long id, String pwd) {
-        int count = userService.updatePwd(id, pwd);
-        if (count <= 0)
+        boolean flag = loginService.resetPassword(id, pwd);
+        if (!flag)
             //todo throw
             ApiLogger.error("update password error,userId:" + id);
         return "";
     }
 
     @Override
-    public String update(long id, String telephone, String email, String bankCardNo, int status) {
+    public String update(long id, String telephone, String email, String bankCardNo, String bank, int status) {
         User user = new User();
         user.setUserId(id);
         user.setTelephone(telephone);
         user.setEmail(email);
         user.setBankCardNo(bankCardNo);
+        user.setBank(bank);
         user.setStatus(AccountStatus.parse(status));
 
         int count = userService.update(user);
@@ -95,8 +100,10 @@ public class StockResourceServiceImpl implements StockResourceService {
     @Override
     public String add(String account, String password, String realname, String telephone,
                       int currencyType, String email, int sex) {
+        //todo 等待codes可用后开启
         long userId = uuidService.assignUid();
-        User user = new User(userId, realname, account, telephone, email, GeneraType.parse(sex), CurrencyType.parse(currencyType), new Date());
+//        long userId = (USER_ID += 1);
+        User user = new User(userId, realname, account, telephone, email, AccountType.stockholder, GeneraType.parse(sex), CurrencyType.parse(currencyType), new Date());
         long id = userService.addStock(user);
         if (id <= 1) {
         }
@@ -106,13 +113,16 @@ public class StockResourceServiceImpl implements StockResourceService {
             //todo
         }
         JSONObject result = new JSONObject();
-        result.put("id", id);
+        result.put("id", userId);
         return result.toJSONString();
     }
 
     @Override
     public String disable(long id, int status) {
         int count = userService.disable(id, status);
+        if (count <= 0) {
+            //todo 如果失败，逻辑处理
+        }
         return "";
     }
 }

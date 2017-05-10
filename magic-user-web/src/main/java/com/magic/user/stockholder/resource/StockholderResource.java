@@ -120,10 +120,11 @@ public class StockholderResource {
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
+            @RequestParam(name = "bank", required = false) String bank,
             @RequestParam(name = "status", required = false) int status
     ) {
 
-        return stockResourceService.update(id, telephone, email, bankCardNo, status);
+        return stockResourceService.update(id, telephone, email, bankCardNo, bank, status);
     }
 
     /**

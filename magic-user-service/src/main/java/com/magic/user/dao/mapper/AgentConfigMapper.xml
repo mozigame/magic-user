@@ -17,7 +17,7 @@
 
 
     <!--添加代理参数配置-->
-    <insert id="add" parameterType="AgentConfig">
+    <insert id="insert" parameterType="AgentConfig">
         insert into t_agent_config_info(agent_id,return_scheme_id,admin_cost_id,fee_id,discount,cost,domain)
         values(
             #{agentId},
@@ -34,13 +34,13 @@
     <update id="update" parameterType="AgentConfig">
         UPDATE t_agent_config_info
         <set>
-            <if test="returnSchemeId != null">
+            <if test="returnSchemeId > 0">
                 return_scheme_id = #{returnSchemeId},
             </if>
-            <if test="adminCostId != null">
+            <if test="adminCostId > 0">
                 admin_cost_id = #{adminCostId},
             </if>
-            <if test="feeId != null">
+            <if test="feeId > 0">
                 fee_id = #{feeId},
             </if>
         </set>
@@ -48,7 +48,7 @@
     </update>
     <!--获取代理的参数配置信息--><!---->
     <select id="findByAgentId" resultType="java.util.HashMap">
-        select agent_id agentId
+        select agent_id agentId,
             return_scheme_id returnScheme,
             admin_cost_id adminCost,
             fee_id feeScheme

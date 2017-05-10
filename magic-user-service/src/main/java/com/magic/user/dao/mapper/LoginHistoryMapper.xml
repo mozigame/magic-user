@@ -4,7 +4,7 @@
     <resultMap id="BaseResultMap" type="com.magic.user.entity.LoginHistory">
         <id column="id" jdbcType="BIGINT" property="id" />
         <result column="user_id" jdbcType="BIGINT" property="userId" />
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="create_time" jdbcType="BIGINT" property="createTime" />
         <result column="request_ip" jdbcType="INTEGER" property="requestIp" />
         <result column="login_type" jdbcType="TINYINT" property="loginType" />
         <result column="platform" jdbcType="VARCHAR" property="platform" />
@@ -12,7 +12,7 @@
     </resultMap>
 
     <!--添加登录历史-->
-    <insert id="add">
+    <insert id="insert">
         INSERT INTO t_login_history(user_id,create_time,request_ip,login_type,platform,ip_addr)
         VALUES (
           #{userId},
@@ -24,7 +24,7 @@
     </insert>
 
     <!--根据用户ip查询登录历史-->
-    <select id="findByUserId">
+    <select id="findByUserId" resultType="java.util.HashMap">
         SELECT
           id,
           user_id userId,

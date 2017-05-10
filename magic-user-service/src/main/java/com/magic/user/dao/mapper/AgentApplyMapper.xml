@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.magic.user.entity.AgentReview">
+<mapper namespace="com.magic.user.entity.AgentApply">
+
+    <resultMap id="baseResultMap" type="com.magic.user.entity.AgentApply">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="realname" jdbcType="VARCHAR" property="realname" />
+        <result column="password" jdbcType="VARCHAR" property="password" />
+        <result column="stock_id" jdbcType="BIGINT" property="stockId" />
+        <result column="stock_name" jdbcType="VARCHAR" property="stockName" />
+        <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo" />
+        <result column="telephone" jdbcType="VARCHAR" property="telephone" />
+        <result column="email" jdbcType="VARCHAR" property="email" />
+        <result column="status" jdbcType="TINYINT" property="status" typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="resource_url" jdbcType="VARCHAR" property="resourceUrl" />
+        <result column="register_ip" jdbcType="INTEGER" property="registerIp" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="temp1" jdbcType="VARCHAR" property="temp1" />
+        <result column="temp2" jdbcType="VARCHAR" property="temp2" />
+    </resultMap>
+
 
     <sql id="Base_Column_List">
     id, username, stock_id, telephone, email, status, resource_url, register_ip, create_time,
@@ -9,7 +28,7 @@
 
     <!-- 新增代理申请--><!--used-->
     <insert id="insert" parameterType="AgentApply">
-        insert into t_agent_review (
+        insert into t_agent_apply (
           username,
           stock_id,
           password,
@@ -28,7 +47,7 @@
           #{realname},
           #{telephone},
           #{email},
-          #{status},
+          #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
           #{resourceUrl},
           #{registerIp},
           #{createTime}
@@ -36,7 +55,7 @@
     </insert>
 
     <!--代理审核信息--><!--used-->
-    <select id="get" resultType="AgentApply">
+    <select id="get" resultMap="baseResultMap">
         select
         id,
         username,
@@ -72,7 +91,7 @@
     <!--修改申请信息的状态-->
     <update id="updateStatus">
         update t_agent_apply
-        SET status=#{status}
+        SET status=#{status,}
         WHERE id=#{id}
     </update>
 
@@ -98,7 +117,7 @@
          WHERE a.`status` <> 1
 
         ]]>
-        <if test="status >0 ">
+        <if test="status > 0 ">
             and a.status=#{status}
         </if>
         <if test="account!=null ">
@@ -107,4 +126,18 @@
         limit #{offset},#{limit}
     </select>
 
+
+    <select id="findCount" resultType="java.lang.Long">
+        select count(id) from t_agent_review
+        <![CDATA[
+         WHERE `status` <> 1
+
+        ]]>
+        <if test="status > 0 ">
+            and status=#{status}
+        </if>
+        <if test="account!=null ">
+            and username=#{account}
+        </if>
+    </select>
 </mapper>

@@ -1,7 +1,9 @@
 package com.magic.user.storage.base;
 
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.atlas.core.BaseDao;
 import com.magic.api.commons.model.Page;
+import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +21,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().insert(entity);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return null;
     }
@@ -29,7 +31,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().insert(id, entity);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return null;
     }
@@ -38,6 +40,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().insert(entitys);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -46,6 +49,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().insert(ql, paramNames, values);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -54,7 +58,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().delete(entity);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return 0;
     }
@@ -63,7 +67,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().delete(entitys);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return 0;
     }
@@ -72,7 +76,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().delete(ql, paramNames, values);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return 0;
     }
@@ -81,7 +85,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().update(entity);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return 0;
     }
@@ -98,6 +102,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().update(ql, paramNames, values);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return 0;
     }
@@ -106,6 +111,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().get(id);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -114,6 +120,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().get(ql, paramNames, values);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -122,6 +129,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().find(entity);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -130,6 +138,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().findCount(entity);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return 0;
     }
@@ -138,6 +147,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().find(ql, paramNames, values);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -146,6 +156,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().findCount(ql, paramNames, values);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return 0;
     }
@@ -154,6 +165,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().find(page, entity);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -162,6 +174,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().find(page, ql, paramNames, values);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

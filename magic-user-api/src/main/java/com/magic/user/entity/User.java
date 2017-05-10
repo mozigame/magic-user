@@ -63,12 +63,13 @@ public class User {
      * @param currencyType
      * @Doc 股东
      */
-    public User(long userId, String realname, String username, String telephone, String email, GeneraType gender, CurrencyType currencyType, Date registerTime) {
+    public User(long userId, String realname, String username, String telephone, String email, AccountType type, GeneraType gender, CurrencyType currencyType, Date registerTime) {
         this.userId = userId;
         this.realname = realname;
         this.username = username;
         this.telephone = telephone;
         this.email = email;
+        this.type = type;
         this.gender = gender;
         this.currencyType = currencyType;
         this.registerTime = registerTime;
@@ -87,12 +88,13 @@ public class User {
      * @param bankCardNo
      * @Doc agent
      */
-    public User(long userId, String realname, String username, String telephone, String email, Date registerTime, int registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
+    public User(long userId, String realname, String username, String telephone, String email, AccountType type, Date registerTime, int registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
         this.userId = userId;
         this.realname = realname;
         this.username = username;
         this.telephone = telephone;
         this.email = email;
+        this.type = type;
         this.registerTime = registerTime;
         this.registerIp = registerIp;
         this.generalizeCode = generalizeCode;

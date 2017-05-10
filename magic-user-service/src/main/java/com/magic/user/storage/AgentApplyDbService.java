@@ -33,7 +33,7 @@ public class AgentApplyDbService extends BaseDbServiceImpl<AgentApply, Long> {
     public Page<Map<String, Object>> findByPage(AgentApply agentApply, Page page) {
         try {
             List<Map<String, Object>> list = agentApplyDao.find("findByPage", new String[]{"offset", "limit", "status", "account"}, new Object[]{page.getPageNo(), page.getPageSize(), agentApply.getStatus().value(), agentApply.getUsername()});
-            long count = agentApplyDao.findCount("findCount", null, new Object[]{agentApply});
+            long count = agentApplyDao.findCount("findCount", new String[]{"status", "account"}, new Object[]{agentApply.getStatus().value(), agentApply.getUsername()});
             page.setResult(list);
             page.setTotalCount(count);
             return page;

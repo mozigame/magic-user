@@ -13,8 +13,8 @@ import java.util.Map;
 public enum ReviewStatus implements IEnum {
 
     noReview(1, "未审核"),    //未审核
-    noPass(2, "拒绝"),  //已拒绝
-    pass(3, "通过");    //已通过
+    pass(2, "通过"),    //已通过
+    noPass(3, "拒绝");  //已拒绝
 
 
     private static Map<Integer, ReviewStatus> maps = new HashMap<>();

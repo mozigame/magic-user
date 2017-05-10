@@ -19,7 +19,7 @@ public interface StockResourceService {
 
     String updatePwd(long id, String pwd);
 
-    String update(long id, String telephone, String email, String bankCardNo, int status);
+    String update(long id, String telephone, String email, String bankCardNo, String bank, int status);
 
     String add(String account, String password, String realname, String telephone, int currencyType, String email, int sex);
 

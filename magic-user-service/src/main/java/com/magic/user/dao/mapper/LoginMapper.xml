@@ -2,18 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.magic.user.entity.Login">
     <resultMap id="BaseResultMap" type="com.magic.user.entity.Login">
-        <id column="id" jdbcType="BIGINT" property="id" />
-        <result column="user_id" jdbcType="BIGINT" property="userId" />
-        <result column="username" jdbcType="VARCHAR" property="username" />
-        <result column="password" jdbcType="VARCHAR" property="password" />
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-        <result column="last_login_ip" jdbcType="INTEGER" property="lastLoginIp" />
-        <result column="status" jdbcType="TINYINT" property="status" />
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="last_login_ip" jdbcType="INTEGER" property="lastLoginIp"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
     </resultMap>
 
 
     <!--新增登录信息-->
-    <insert id="add">
+    <insert id="insert">
         INSERT INTO t_login_info(user_id,username,password)
         VALUES (
         #{userId},

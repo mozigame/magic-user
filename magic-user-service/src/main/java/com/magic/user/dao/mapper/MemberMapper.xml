@@ -88,7 +88,7 @@
     </update>
 
     <!--添加会员-->
-    <insert id="add">
+    <insert id="insert">
 
     </insert>
 </mapper>

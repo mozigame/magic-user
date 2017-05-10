@@ -31,7 +31,7 @@ public class AgentApplyServiceImpl implements AgentApplyService {
 
     @Override
     public Map<String, Object> agentReviewInfo(long applyId) {
-        return (Map<String, Object>) agentApplyDbService.get(applyId);
+        return (Map<String, Object>) agentApplyDbService.get("getDetail", null, applyId);
     }
 
     @Override

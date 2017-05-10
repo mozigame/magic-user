@@ -38,6 +38,9 @@ public class StringUtils {
      * @Doc String[] 转成String,eg：new String[]{"aaa","bbb","ccc"} 转成aaa,bbb,ccc
      */
     public static String arrayToStrSplit(String[] strings) {
+        if (strings == null || strings.length <= 0) {
+            return "";
+        }
         StringBuffer sb = new StringBuffer();
         for (String s : strings) {
             sb.append(s).append(",");

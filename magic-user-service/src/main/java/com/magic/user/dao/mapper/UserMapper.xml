@@ -42,13 +42,119 @@
             status,
             currency_type	currencyType,
             bank_card_no baknCardNo,
-            owner_id ownerId
+            owner_id ownerId,
             is_delete isDelete,
             type
             from t_user_info
         WHERE user_id=#{userId}
     </select>
 
+    <!--新增用户--><!--used-->
+    <insert id="insert" parameterType="User">
+        INSERT INTO t_user_info(
+        <if test="username != null ">
+            username,
+        </if>
+        <if test="realname != null">
+            realname,
+        </if>
+        <if test="telephone != null">
+            telephone,
+        </if>
+        <if test="currencyType != null">
+            currency_type,
+        </if>
+        <if test="email != null">
+            email,
+        </if>
+        <if test="registerTime != null">
+            register_time,
+        </if>
+        <if test="registerIp > 0 ">
+            register_ip,
+        </if>
+        <if test="generalizeCode != null ">
+            generalize_code,
+        </if>
+        <if test="gender != null">
+            gender,
+        </if>
+        <if test="status != null ">
+            status,
+        </if>
+        <if test="bankCardNo != null">
+            bank_card_no,
+        </if>
+        <if test="bank != null">
+            bank,
+        </if>
+        <if test="bankDeposit != null">
+            bank_deposit,
+        </if>
+        <if test="ownerId > 0">
+            owner_id,
+        </if>
+        <if test="isDelete != null ">
+            is_delete,
+        </if>
+        <if test="type != null ">
+            type,
+        </if>
+        user_id
+        )
+        VALUES(
+        <if test="username != null ">
+            #{username},
+        </if>
+        <if test="realname != null">
+            #{realname},
+        </if>
+        <if test="telephone != null">
+            #{telephone},
+        </if>
+        <if test="currencyType != null">
+            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="email != null">
+            #{email},
+        </if>
+        <if test="registerTime != null">
+            #{registerTime},
+        </if>
+        <if test="registerIp >0 ">
+            #{registerIp},
+        </if>
+        <if test="generalizeCode != null ">
+            #{generalizeCode},
+        </if>
+        <if test="gender != null">
+            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="status != null ">
+            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="bankCardNo != null">
+            #{bankCardNo},
+        </if>
+        <if test="bank != null">
+            #{bank},
+        </if>
+        <if test="bankDeposit != null">
+            #{bankDeposit},
+        </if>
+        <if test="ownerId > 0">
+            #{ownerId},
+        </if>
+        <if test="isDelete != null ">
+            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="type != null">
+            #{type,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        #{userId}
+
+        )
+    </insert>
 
     <!--###########   股东操作   #############-->
     <!-- 查询所有的股东--><!--used-->
@@ -65,7 +171,7 @@
     </select>
 
     <!-- 查询所有股东名称-->
-    <select id="findAllStockNames">
+    <select id="findAllStockNames" resultType="java.util.HashMap">
         SELECT
           user_id id,
           username account
@@ -89,7 +195,7 @@
           (select count(1) from t_owner_stock_agent_member WHERE stock_id=#{id}) agentNumber,
           (select SUM(mem_number) from t_owner_stock_agent_member WHERE stock_id=#{id}) members
         from t_user_info
-        WHERE user_id=#{id};
+        WHERE user_id=#{id}
     </select>
 
 
@@ -109,28 +215,17 @@
             <if test="bankCardNo != null">
                 bank_card_no = #{bankCardNo},
             </if>
-            <if test="status > 0 ">
+            <if test="bank != null">
+                bank = #{bank},
+            </if>
+            <if test="status != null ">
                 status = #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
             </if>
         </set>
-        WHERE user_id=#{id}
+        WHERE user_id=#{userId}
 
     </update>
 
-    <!--新增股东--><!--used-->
-    <insert id="addStockInfo" parameterType="User">
-        INSERT INTO t_user_info(user_id,username,realname,telephone,currency_type,email,gender,register_time)
-        VALUES(
-        #{userId},
-        #{username},
-        #{realname},
-        #{telephone},
-        #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
-        #{email},
-        #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
-        #{registerTime}
-        )
-    </insert>
 
     <!--根据股东id获取业主id-->
     <select id="getOwnerIdByStock" resultType="java.lang.Long">
@@ -149,34 +244,28 @@
     </update>
 
     <!--获取代理列表--><!--used,暂时注释掉查询条件-->
-    <select id="findAgentList">
-        select holder,
-        holder_name holderName,
-        user_id id,
-        realname,
-        username account,
-        register_time registerTime,
-        members,
-        store_members storeMembers,
-        depositTotalMoney,
-        withdrawTotalMoney,
-        promotionCode,
-        status,
-        showStatus,
-        reviewer,
-        reviewTime
-        from t_user_info
-        <!--WHERE user_id IN-->
-        <!--<foreach collection="list" item="id" open="(" close=")"-->
-        <!--separator=",">-->
-        <!--#{id}-->
-        <!--</foreach>-->
+    <select id="findAgentList" resultType="java.util.HashMap">
+       select
+            os.stock_id holder,
+            (select username from t_user_info where user_id=os.stock_id) holderName,
+            u.user_id id,
+            u.realname realname,
+            u.username account,
+            u.register_time registerTime,
+            u.generalize_code promotionCode,
+            u.`status` status,
+            ar.oper_user_name reviewer,
+            ar.create_time reviewTime
+         from t_user_info u LEFT JOIN t_owner_stock_agent_member os
+        on(u.user_id = os.agent_id)
+        LEFT JOIN t_agent_review ar
+        on (u.user_id=ar.oper_user_id)
         limit #{offset},#{limit}
     </select>
 
     <!--获取数量--><!--used 暂时取消查询条件-->
     <select id="findAgentCount" resultType="java.lang.Long">
-        select count(id) from t_member
+        select count(id) from t_user_info
         WHERE type=3
     </select>
 
@@ -201,24 +290,30 @@
     </insert>
 
     <!--代理详情--><!-- used -->
-    <select id="agentDetail">
-        select
-          id,
-          username account,
-          status,
-          showStatus,
-          realname,
-          holder,
-          register_time registerTime,
-          register_id registerIp,
-          last_login_ip lastLoginIp,
-          promotion_code promotionCode,
-          domain,
-          telephone
-          email,
-          bank_card_no bankCardNo
-        FROM t_user_info
-          WHERE user_id=#{user_id}
+    <select id="agentDetail" resultType="java.util.HashMap">
+        SELECT
+            u.user_id id,
+            u.username account,
+            u.`status` status,
+            u.realname realname,
+            (SELECT username from t_user_info where user_id=os.stock_id) holder,
+            u.register_time registerTime,
+            u.register_ip registerIp,
+            l.update_time lastLoginIp,
+            u.generalize_code promotionCode,
+            ac.domain domain,
+            u.telephone telephone,
+            u.email email,
+            u.bank_card_no bankCardNo,
+            u.bank bank
+          from t_user_info u
+          LEFT JOIN t_owner_stock_agent_member os
+          on(u.user_id = os.agent_id)
+          LEFT JOIN t_login_info l
+          on(u.user_id=l.user_id)
+          LEFT JOIN t_agent_config_info ac
+          on(u.user_id=ac.agent_id)
+        WHERE u.user_id=#{userId}
     </select>
     <!--###########   代理操作   #############-->
 

@@ -1,13 +1,9 @@
 package com.magic.user.service;
 
-import com.magic.api.commons.model.Page;
-import com.magic.user.dao.AgentDao;
 import com.magic.user.entity.User;
 import com.magic.user.storage.AgentDbService;
 import com.magic.user.storage.StockDbService;
 import com.magic.user.storage.UserDbService;
-import com.magic.user.storage.UserMongoService;
-import com.magic.user.util.UserVo;
 import com.magic.user.vo.UserCondition;
 import org.springframework.stereotype.Service;
 
@@ -47,18 +43,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int updatePwd(long id, String pwd) {
-        return stockDbService.updatePwd(id, pwd);
-    }
-
-    @Override
     public int update(User user) {
         return stockDbService.update(user);
     }
 
     @Override
     public long addStock(User user) {
-        return (Long) stockDbService.insert("addStockInfo", null, user);
+        return stockDbService.insert(user);
     }
 
     @Override
@@ -79,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public long addAgent(User user) {
-        return (long) agentDbService.insert("addAgent", null, user);
+        return agentDbService.insert(user);
     }
 
     @Override

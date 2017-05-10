@@ -154,7 +154,7 @@ public class AgentResource {
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
-            @RequestParam(name = "bankCardNo", required = false) String bank,
+            @RequestParam(name = "bank", required = false) String bank,
             @RequestParam(name = "status", required = false) int status
     ) {
 
@@ -259,7 +259,7 @@ public class AgentResource {
 
     /**
      * @param id           代理申请ID
-     * @param reviewStatus 审核结果
+     * @param reviewStatus 审核结果 2：通过 3拒绝，如果审核通过，则需要填写后续字段
      * @param holder       所属股东ID
      * @param realname     真实姓名
      * @param telephone    手机号码

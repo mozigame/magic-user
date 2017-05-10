@@ -14,6 +14,8 @@ public class AgentApply {
 
     private String realname;    //真实姓名
 
+    private String password;    //  密码
+
     private long stockId;   //股东id
 
     private String stockName;   //股东账号
@@ -39,8 +41,10 @@ public class AgentApply {
     public AgentApply() {
     }
 
-    public AgentApply(String username, long stockId, String telephone, String email, ReviewStatus status, String resourceUrl, int registerIp, Date createTime) {
+    public AgentApply(String username, String realname, String password, long stockId, String telephone, String email, ReviewStatus status, String resourceUrl, int registerIp, Date createTime) {
         this.username = username;
+        this.realname = realname;
+        this.password = password;
         this.stockId = stockId;
         this.telephone = telephone;
         this.email = email;
@@ -65,6 +69,14 @@ public class AgentApply {
 
     public String getRealname() {
         return realname;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setRealname(String realname) {

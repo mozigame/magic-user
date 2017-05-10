@@ -35,7 +35,7 @@ public class MemberService {
         user.setStatus(AccountStatus.enable);
         user.setEmail("ccaa@qq.com");
 
-        System.out.println(userService.addUser(user));
+//        System.out.println(userService.addUser(user));
     }
 
     @Test
@@ -50,6 +50,6 @@ public class MemberService {
         user.setStatus(AccountStatus.enable);
         user.setEmail("ccaa@qq.com-------");
 
-        System.out.println(userService.updateUser(user));
+//        System.out.println(userService.updateUser(user));
     }
 }

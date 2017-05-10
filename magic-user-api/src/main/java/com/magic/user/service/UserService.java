@@ -102,14 +102,6 @@ public interface UserService {
 
 
     /**
-     * @param id
-     * @param pwd
-     * @return
-     * @Doc 修改密码
-     */
-    int updatePwd(long id, String pwd);
-
-    /**
      * @param user
      * @return
      * @Doc 修改用户信息
