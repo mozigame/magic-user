@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2017/5/8 11:19:05                            */
+/* Created on:     2017/5/9 19:51:32                            */
 /*==============================================================*/
 
 
@@ -61,6 +61,8 @@ create table t_account_oper_history
             3 代理
             4 子账号/工作人员
             5 会员',
+   owner_id             bigint not null,
+   owner_name           varchar(20) not null,
    create_time          datetime not null,
    primary key (id)
 );
@@ -80,7 +82,10 @@ create table t_agent_apply
 (
    id                   bigint not null auto_increment,
    username             varchar(19) not null,
+   realname             varchar(20) not null,
    stock_id             bigint not null,
+   stock_name           varchar(20) not null,
+   bank_card_no         varchar(25) not null,
    telephone            varchar(25) not null,
    email                varchar(50) not null,
    status               tinyint not null comment '1 未审核
@@ -138,7 +143,9 @@ create table t_agent_review
 (
    id                   bigint not null auto_increment,
    agent_apply_id       bigint not null,
+   agent_name           varchar(20) not null,
    oper_user_id         bigint not null,
+   oper_user_name       varchar(20) not null,
    status               tinyint not null comment '1 未审核
             2 已拒绝
             3 已审核',
@@ -205,6 +212,8 @@ create table t_member
    username             varchar(19) not null,
    telephone            varchar(25) not null,
    bank_card_no         varchar(19) not null,
+   bank                 varchar(20) not null,
+   bank_deposit         varchar(40) not null,
    agent_id             bigint not null,
    agent_username       varchar(30) not null,
    stock_id             bigint not null,
@@ -212,6 +221,7 @@ create table t_member
    owner_id             bigint not null,
    owner_username       varchar(30) not null,
    source_url           varchar(70) not null,
+   email                varchar(30) not null,
    register_ip          int not null,
    register_time        datetime not null,
    status               tinyint not null default 2 comment '1 启用
@@ -305,12 +315,14 @@ create table t_user_info
             2 女',
    status               tinyint not null default 2 comment '1 启用
             2 停用',
-   currency_type        tinyint,
+   currency_type        tinyint not null,
    bank_card_no         varchar(25) not null,
+   bank                 varchar(20) not null,
+   bank_deposit         varchar(50) not null,
    owner_id             bigint not null,
    is_delete            tinyint not null comment '1 否
             2 是',
-   type                 tinyint comment '1 业主
+   type                 tinyint not null comment '1 业主
             2 股东
             3 代理
             4 子账号/工作人员',

@@ -10,10 +10,10 @@ import java.util.Map;
  *
  * @Doc 登录类型
  */
-public enum LoginType {
+public enum LoginType implements IEnum {
 
-    logout(1),  //退出
-    login(2);   //登录
+    logout(1, "退出"),  //退出
+    login(2, "登录");   //登录
 
 
     private static Map<Integer, LoginType> maps = new HashMap<>();
@@ -24,13 +24,27 @@ public enum LoginType {
     }
 
     private int value;
+    private String desc;
 
-    LoginType(int value) {
+    LoginType(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
 
     public int value() {
         return value;
+    }
+
+    public String desc() {
+        return desc;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public static LoginType parse(int value) {

@@ -2,11 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.magic.user.entity.AgentReview">
     <resultMap id="BaseResultMap" type="com.magic.user.entity.AgentReview">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="agent_review_id" jdbcType="BIGINT" property="agentReviewId"/>
-        <result column="oper_user_id" jdbcType="BIGINT" property="operUserId"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="agent_apply_id" jdbcType="BIGINT" property="agentApplyId" />
+        <result column="agent_name" jdbcType="VARCHAR" property="agentName" />
+        <result column="oper_user_id" jdbcType="BIGINT" property="operUserId" />
+        <result column="oper_user_name" jdbcType="VARCHAR" property="operUserName" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     </resultMap>
 
     <!-- 新增代理审核记录-->
@@ -28,14 +30,5 @@
         #{createTime}
       )
     </insert>
-
-
-    <!--修改审核状态-->
-    <update id="updateStatus">
-        update t_agent_review
-          SET status=#{status}
-        WHERE id=#{id}
-    </update>
-
 
 </mapper>

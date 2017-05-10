@@ -10,11 +10,11 @@ import java.util.Map;
  *
  * @Doc 账号审核状态
  */
-public enum ReviewStatus {
+public enum ReviewStatus implements IEnum {
 
-    noReview(1),    //未审核
-    noPass(2),  //已拒绝
-    pass(3);    //已通过
+    noReview(1, "未审核"),    //未审核
+    noPass(2, "拒绝"),  //已拒绝
+    pass(3, "通过");    //已通过
 
 
     private static Map<Integer, ReviewStatus> maps = new HashMap<>();
@@ -25,13 +25,27 @@ public enum ReviewStatus {
     }
 
     private int value;
+    private String desc;
 
-    ReviewStatus(int value) {
+    ReviewStatus(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
 
     public int value() {
         return value;
+    }
+
+    public String desc() {
+        return desc;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public static ReviewStatus parse(int value) {

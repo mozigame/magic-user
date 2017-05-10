@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.magic.user.mapper.UserMapper">
+<mapper namespace="com.magic.user.entity.User">
     <resultMap id="BaseResultMap" type="com.magic.user.entity.User">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
@@ -12,12 +12,15 @@
         <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
         <result column="generalize_code" jdbcType="VARCHAR" property="generalizeCode"/>
         <result column="gender" jdbcType="TINYINT" property="gender"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="status" jdbcType="TINYINT" property="status"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="currency_type" jdbcType="TINYINT" property="currencyType"/>
         <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
+        <result column="bank" jdbcType="VARCHAR" property="bank"/>
+        <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit"/>
         <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="is_delete" jdbcType="TINYINT" property="isDelete"/>
-        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="type" jdbcType="TINYINT" property="type" typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
@@ -38,7 +41,7 @@
             gender,
             status,
             currency_type	currencyType,
-            bank_card_no baknCard_no,
+            bank_card_no baknCardNo,
             owner_id ownerId
             is_delete isDelete,
             type
@@ -49,7 +52,7 @@
 
     <!--###########   股东操作   #############-->
     <!-- 查询所有的股东--><!--used-->
-    <select id="findAllStock" resultMap="java.util.HashMap">
+    <select id="findAllStock" resultType="java.util.HashMap">
         select
           id,
           realname,
@@ -62,7 +65,7 @@
     </select>
 
     <!-- 查询所有股东名称-->
-    <select id="findAllStockNames" resultMap="">
+    <select id="findAllStockNames">
         SELECT
           user_id id,
           username account
@@ -90,8 +93,8 @@
     </select>
 
 
-    <!--股东基础信息修改--><!--used-->
-    <update id="update">
+    <!--基础信息修改--><!--used-->
+    <update id="update" parameterType="User">
         UPDATE t_user_info
         <set>
             <if test="realname != null">
@@ -107,7 +110,7 @@
                 bank_card_no = #{bankCardNo},
             </if>
             <if test="status > 0 ">
-                status = #{status},
+                status = #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
             </if>
         </set>
         WHERE user_id=#{id}
@@ -116,15 +119,16 @@
 
     <!--新增股东--><!--used-->
     <insert id="addStockInfo" parameterType="User">
-        INSERT INTO t_user_info(user_id,username,realname,telephone,currency_type,email,gender)
+        INSERT INTO t_user_info(user_id,username,realname,telephone,currency_type,email,gender,register_time)
         VALUES(
         #{userId},
         #{username},
         #{realname},
         #{telephone},
-        #{currencyType},
+        #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
         #{email},
-        #{gender}
+        #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        #{registerTime}
         )
     </insert>
 
@@ -177,7 +181,7 @@
     </select>
 
     <!--新增代理-->
-    <insert id="addAgent">
+    <insert id="addAgent" parameterType="User">
         INSERT INTO t_user_info
           (user_id,username,realname,telephone,bank_card_no,email,register_time,register_ip,generalize_code,status,owner_id,type)
         VALUES(
@@ -190,9 +194,9 @@
         #{registerTime},
         #{registerIp},
         #{generalizeCode},
-        #{status},
+        #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
         #{ownerId},
-        #{type}
+        #{type,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler}
         )
     </insert>
 

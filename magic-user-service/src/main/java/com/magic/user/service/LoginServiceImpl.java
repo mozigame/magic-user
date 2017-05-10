@@ -12,7 +12,7 @@ import javax.annotation.Resource;
  * Time: 19:42
  */
 @Service("loginService")
-public class loginServiceImpl implements LoginService {
+public class LoginServiceImpl implements LoginService {
 
     @Resource(name = "loginDbService")
     private LoginDbService loginDbService;
@@ -25,5 +25,10 @@ public class loginServiceImpl implements LoginService {
     @Override
     public long update(Login login) {
         return loginDbService.update("updatePwd", null, login);
+    }
+
+    @Override
+    public boolean resetPassword(long id, String loginPassword) {
+        return loginDbService.update("updatePwd", new String[]{"id", "password"}, new Object[]{id, loginPassword}) > 0;
     }
 }

@@ -10,10 +10,10 @@ import java.util.Map;
  *
  * @Doc 删除状态
  */
-public enum DeleteStatus {
+public enum DeleteStatus implements IEnum<DeleteStatus> {
 
-    noDel(1),   //未删除
-    del(2); //删除
+    noDel(1, "未删除"),   //未删除
+    del(2, "删除"); //删除
 
 
     private static Map<Integer, DeleteStatus> maps = new HashMap<>();
@@ -25,13 +25,22 @@ public enum DeleteStatus {
 
     private int value;
 
-    DeleteStatus(int value) {
+    private String desc;
+
+    DeleteStatus(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
+
 
     public int value() {
         return value;
     }
+
+    public String desc() {
+        return desc;
+    }
+
 
     public static DeleteStatus parse(int value) {
         return maps.get(value);

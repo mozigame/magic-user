@@ -25,7 +25,7 @@ import java.util.List;
 @Service("memberService")
 public class MemberServiceImpl implements MemberService {
 
-    @Resource(name = "userMongoService")
+//    @Resource(name = "userMongoService")
     private UserMongoService userMongoService;
 
     @Override
@@ -165,6 +165,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public boolean updateMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
+        return false;
+    }
+
+    @Override
+    public boolean saveMember(Member member) {
         return false;
     }
 }

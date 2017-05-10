@@ -25,8 +25,6 @@ public class UserServiceImpl implements UserService {
 
     @Resource(name = "userDbService")
     private UserDbService userDbService;
-    @Resource(name = "userMongoService")
-    private UserMongoService userMongoService;
     @Resource(name = "stockDbService")
     private StockDbService stockDbService;
     @Resource(name = "agentDbService")
@@ -59,8 +57,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long addStock(User user) {
-        return (Long) stockDbService.insert("addAgent", null, user);
+    public long addStock(User user) {
+        return (Long) stockDbService.insert("addStockInfo", null, user);
     }
 
     @Override
@@ -90,7 +88,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByCode(String proCode) {
+        return null;
+    }
+
+    @Override
     public Map<String, Object> getAgentDetail(long id) {
         return (Map<String, Object>) userDbService.get("agentDetail", null, id);
+    }
+
+    @Override
+    public User getUserById(long uid) {
+        return userDbService.get(uid);
+    }
+
+    @Override
+    public boolean updateUser(long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
+        return false;
     }
 }

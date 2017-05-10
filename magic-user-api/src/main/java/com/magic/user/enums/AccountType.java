@@ -10,13 +10,13 @@ import java.util.Map;
  *
  * @Doc 账户类型
  */
-public enum AccountType {
+public enum AccountType implements IEnum<AccountType> {
 
-    proprietor(1),  //业主
-    stockholder(2), //股东
-    agent(3),   //代理
-    worker(4),  //子账号/工作人员
-    member(5);  //会员
+    proprietor(1, "业主"),  //业主
+    stockholder(2, "股东"), //股东
+    agent(3, "代理"),   //代理
+    worker(4, "子账号"),  //子账号/工作人员
+    member(5, "会员");  //会员
 
     private static Map<Integer, AccountType> maps = new HashMap<>();
 
@@ -26,22 +26,29 @@ public enum AccountType {
     }
 
     private int value;
+    private String desc;
 
-    AccountType(int value) {
+    AccountType(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
+
 
     public int value() {
         return value;
+    }
+
+    public String desc() {
+        return desc;
     }
 
     public static AccountType parse(int value) {
         return maps.get(value);
     }
 
-    public static String getDesc(AccountType type){
+    public static String getDesc(AccountType type) {
         String desc = "";
-        switch (type){
+        switch (type) {
             case proprietor:
                 desc = "业主";
                 break;

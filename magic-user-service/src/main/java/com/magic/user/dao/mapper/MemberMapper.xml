@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.magic.user.mapper.MemberMapper">
+<mapper namespace="com.magic.user.entity.Member">
     <resultMap id="BaseResultMap" type="com.magic.user.entity.Member">
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="member_id" jdbcType="BIGINT" property="memberId"/>
-        <result column="realname" jdbcType="VARCHAR" property="realname"/>
-        <result column="username" jdbcType="VARCHAR" property="username"/>
-        <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
-        <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
-        <result column="bank" jdbcType="VARCHAR" property="bank"/>
-        <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit"/>
-        <result column="agent_id" jdbcType="BIGINT" property="agentId"/>
-        <result column="agent_username" jdbcType="VARCHAR" property="agentUsername"/>
-        <result column="stock_id" jdbcType="BIGINT" property="stockId"/>
-        <result column="stock_username" jdbcType="VARCHAR" property="stockUsername"/>
-        <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
-        <result column="owner_username" jdbcType="VARCHAR" property="ownerUsername"/>
-        <result column="email" jdbcType="VARCHAR" property="email"/>
-        <result column="source_url" jdbcType="VARCHAR" property="sourceUrl"/>
-        <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
-        <result column="register_time" jdbcType="TIMESTAMP" property="registerTime"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
-        <result column="gender" jdbcType="TINYINT" property="gender"/>
-        <result column="currency_type" jdbcType="TINYINT" property="currencyType"/>
-        <result column="is_delete" jdbcType="TINYINT" property="isDelete"/>
-        <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
-        <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
-        <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="member_id" jdbcType="BIGINT" property="memberId" />
+        <result column="realname" jdbcType="VARCHAR" property="realname" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="telephone" jdbcType="VARCHAR" property="telephone" />
+        <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo" />
+        <result column="bank" jdbcType="VARCHAR" property="bank" />
+        <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit" />
+        <result column="agent_id" jdbcType="BIGINT" property="agentId" />
+        <result column="agent_username" jdbcType="VARCHAR" property="agentUsername" />
+        <result column="stock_id" jdbcType="BIGINT" property="stockId" />
+        <result column="stock_username" jdbcType="VARCHAR" property="stockUsername" />
+        <result column="owner_id" jdbcType="BIGINT" property="ownerId" />
+        <result column="owner_username" jdbcType="VARCHAR" property="ownerUsername" />
+        <result column="source_url" jdbcType="VARCHAR" property="sourceUrl" />
+        <result column="email" jdbcType="VARCHAR" property="email" />
+        <result column="register_ip" jdbcType="INTEGER" property="registerIp" />
+        <result column="register_time" jdbcType="TIMESTAMP" property="registerTime" />
+        <result column="status" jdbcType="TINYINT" property="status" />
+        <result column="gender" jdbcType="TINYINT" property="gender" />
+        <result column="currency_type" jdbcType="TINYINT" property="currencyType" />
+        <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+        <result column="temp1" jdbcType="VARCHAR" property="temp1" />
+        <result column="temp2" jdbcType="VARCHAR" property="temp2" />
+        <result column="temp3" jdbcType="VARCHAR" property="temp3" />
     </resultMap>
 
     <!--查询会员列表-->

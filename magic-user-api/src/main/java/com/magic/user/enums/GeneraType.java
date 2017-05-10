@@ -8,10 +8,10 @@ import java.util.Map;
  * Date: 2017/5/5
  * Time: 15:32
  */
-public enum GeneraType {
+public enum GeneraType implements IEnum {
 
-    male(1),
-    female(2);
+    male(1, "男"),
+    female(2, "女");
 
 
     private static Map<Integer, GeneraType> maps = new HashMap<>();
@@ -22,14 +22,27 @@ public enum GeneraType {
     }
 
     private int value;
+    private String desc;
 
-
-    GeneraType(int value) {
+    GeneraType(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
 
     public int value() {
         return value;
+    }
+
+    public String desc() {
+        return desc;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public static GeneraType parse(int value) {

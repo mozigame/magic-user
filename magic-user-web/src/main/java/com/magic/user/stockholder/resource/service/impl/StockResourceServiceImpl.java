@@ -2,6 +2,7 @@ package com.magic.user.stockholder.resource.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
+import com.magic.service.java.UuidService;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
@@ -10,9 +11,11 @@ import com.magic.user.enums.GeneraType;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.UserService;
 import com.magic.user.stockholder.resource.service.StockResourceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +31,8 @@ public class StockResourceServiceImpl implements StockResourceService {
     private UserService userService;
     @Resource(name = "loginService")
     private LoginService loginService;
+    @Resource
+    private UuidService uuidService;
 
     @Override
     public String findAllStock() {
@@ -47,7 +52,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         map.put("showStatus", AccountStatus.parse((Integer) map.get("status")).desc());
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("baseInfo", map);
-        //TODO 获取档期运营概况
+        //TODO go 获取当期运营概况
         String operation = "{\n" +
                 "            \"syncTime\":\"2017-04-18 09:29:33\",\n" +
                 "            \"info\":{\n" +
@@ -66,6 +71,7 @@ public class StockResourceServiceImpl implements StockResourceService {
     public String updatePwd(long id, String pwd) {
         int count = userService.updatePwd(id, pwd);
         if (count <= 0)
+            //todo throw
             ApiLogger.error("update password error,userId:" + id);
         return "";
     }
@@ -89,11 +95,12 @@ public class StockResourceServiceImpl implements StockResourceService {
     @Override
     public String add(String account, String password, String realname, String telephone,
                       int currencyType, String email, int sex) {
-        User user = new User(realname, account, telephone, email, GeneraType.parse(sex), CurrencyType.parse(currencyType));
-        Long id = userService.addStock(user);
+        long userId = uuidService.assignUid();
+        User user = new User(userId, realname, account, telephone, email, GeneraType.parse(sex), CurrencyType.parse(currencyType), new Date());
+        long id = userService.addStock(user);
         if (id <= 1) {
         }
-        Login login = new Login(id, account, password);
+        Login login = new Login(userId, account, password);
         long count = loginService.add(login);
         if (count <= 0) {
             //todo

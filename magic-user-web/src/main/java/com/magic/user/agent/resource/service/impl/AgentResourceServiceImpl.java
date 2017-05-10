@@ -5,6 +5,8 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.Page;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.tools.UUIDUtil;
+import com.magic.service.java.UuidService;
 import com.magic.user.agent.resource.service.AgentResourceService;
 import com.magic.user.entity.*;
 import com.magic.user.enums.AccountStatus;
@@ -38,6 +40,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private AgentApplyService agentApplyService;
     @Resource(name = "agentReviewService")
     private AgentReviewService agentReviewService;
+    @Resource
+    private UuidService uuidService;
 
 
     @Override
@@ -59,11 +63,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     public String add(RequestContext rc, long holder, String account, String password, String realname, String telephone, String bankCardNo, String email, int returnScheme,
                       int adminCost, int feeScheme, String[] domain, int discount, int cost) {
 
-        //TODO
-        String generalizeCode = "";
-        User user = new User(realname, account, telephone, email, new Date(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
-        long userId = userService.addAgent(user);
-        if (userId > 0) {
+        String generalizeCode = UUIDUtil.getCode();
+        long userId = uuidService.assignUid();
+        User user = new User(userId, realname, account, telephone, email, new Date(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
+        long count = userService.addAgent(user);
+        if (count > 0) {
             Login login = new Login(userId, account, password);
             //TODO 此处插入失败如何处理
             if (loginService.add(login) <= 0) {
@@ -203,8 +207,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
         } else if (reviewStatus == ReviewStatus.pass.value()) {//2、通过，修改申请状态，添加历史记录，添加代理信息
             int count = agentApplyService.updateStatus(id, reviewStatus);
-            User user = userService.get(rc.getUid());
-            AgentReview agentReview = new AgentReview(id, realname, rc.getUid(), user.getUsername(), ReviewStatus.parse(reviewStatus), new Date());
+            User procUser = userService.get(rc.getUid());
+            AgentReview agentReview = new AgentReview(id, realname, rc.getUid(), procUser.getUsername(), ReviewStatus.parse(reviewStatus), new Date());
             //添加历史记录
             if (agentReviewService.add(agentReview) <= 0) {
                 //TOdo
@@ -212,10 +216,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             //添加用户
             if (count > 0) {
                 AgentApply agentApply = agentApplyService.get(id);
-                //todo 代理邀请码
-                String generalizeCode = "";
-                User userAgent = new User(realname, agentApply.getUsername(), agentApply.getTelephone(), agentApply.getEmail(), agentApply.getCreateTime(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, agentApply.getBankCardNo());
-                long addAgentCount = userService.addAgent(user);
+                String generalizeCode = UUIDUtil.getCode();
+                long userId = uuidService.assignUid();
+                User userAgent = new User(userId, realname, agentApply.getUsername(), agentApply.getTelephone(), agentApply.getEmail(), agentApply.getCreateTime(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, agentApply.getBankCardNo());
+                long addAgentCount = userService.addAgent(userAgent);
                 if (addAgentCount <= 0) {
                     //todo
                 }

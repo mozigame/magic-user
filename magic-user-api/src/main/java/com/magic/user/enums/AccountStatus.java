@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @Doc 账号使用状态
  */
-public enum AccountStatus {
+public enum AccountStatus implements IEnum<AccountStatus> {
 
     enable(1, "启用"),  //启用
     disable(2, "停用"); //停用
@@ -36,6 +36,14 @@ public enum AccountStatus {
 
     public String desc() {
         return desc;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public static AccountStatus parse(int value) {

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.magic.user.mapper.AgentConfigMapper">
+<mapper namespace="com.magic.user.entity.AgentConfig">
     <resultMap id="BaseResultMap" type="com.magic.user.entity.AgentConfig">
-        <id column="id" jdbcType="INTEGER" property="id"/>
-        <result column="agent_id" jdbcType="BIGINT" property="agentId"/>
-        <result column="return_scheme_id" jdbcType="INTEGER" property="returnSchemeId"/>
-        <result column="admin_cost_id" jdbcType="INTEGER" property="adminCostId"/>
-        <result column="fee_id" jdbcType="INTEGER" property="feeId"/>
-        <result column="discount" jdbcType="INTEGER" property="discount"/>
-        <result column="cost" jdbcType="INTEGER" property="cost"/>
-        <result column="domain" jdbcType="VARCHAR" property="domain"/>
-        <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
-        <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
-        <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="agent_id" jdbcType="BIGINT" property="agentId" />
+        <result column="return_scheme_id" jdbcType="INTEGER" property="returnSchemeId" />
+        <result column="admin_cost_id" jdbcType="INTEGER" property="adminCostId" />
+        <result column="fee_id" jdbcType="INTEGER" property="feeId" />
+        <result column="discount" jdbcType="INTEGER" property="discount" />
+        <result column="cost" jdbcType="INTEGER" property="cost" />
+        <result column="domain" jdbcType="VARCHAR" property="domain" />
+        <result column="temp1" jdbcType="VARCHAR" property="temp1" />
+        <result column="temp2" jdbcType="VARCHAR" property="temp2" />
+        <result column="temp3" jdbcType="VARCHAR" property="temp3" />
     </resultMap>
 
 

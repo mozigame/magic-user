@@ -37,16 +37,16 @@ public class InfoResourceServiceImpl {
     @Resource
     private UserService userService;
 
-    @Resource
+//    @Resource
     private AccountIdMappingService accountIdMappingService;
 
     @Resource
     private LoginService loginService;
 
-    @Resource
+//    @Resource
     private AccountOperHistoryService accountOperHistoryService;
 
-    @Resource
+//    @Resource
     private Producer producer;
 
     private static HashSet<AccountType> sets = new HashSet<>();

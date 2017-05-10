@@ -49,30 +49,17 @@
     </bean>
     <!-- dataSource_0-->
 
-    <!-- dataSource_1-->
-    <bean id="userDataSource_1" parent="baseDataSource">
-        <property name="url">
-            <value>jdbc:mysql://${mysql.magic.db1.serverport}/${mysql.magic.db1.database}?useUnicode=true&amp;characterEncoding=utf-8&amp;autoReconnect=true</value>
-        </property>
-        <property name="username">
-            <value>${mysql.magic.db0.user}</value>
-        </property>
-        <property name="password">
-            <value>${mysql.magic.db0.password}</value>
-        </property>
-    </bean>
-    <!-- dataSource_1-->
 
 
     <!-- sql sessionTemplate_0 -->
     <bean id="mySqlSessionFactory_0" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="userDataSource_0"/>
         <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
-        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/*Mapper.xml"/>
+        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/*.xml"/>
     </bean>
 
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.magic.passport.dao"/>
+        <property name="basePackage" value="com.magic.user.dao"/>
         <property name="sqlSessionFactoryBeanName" value="mySqlSessionFactory_0"/>
     </bean>
 
@@ -81,28 +68,9 @@
     </bean>
     <!-- sql sessionTemplate_0 -->
 
-    <!-- sql sessionTemplate_1 -->
-    <bean id="mySqlSessionFactory_1" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="userDataSource_1"/>
-        <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
-        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/*Mapper.xml"/>
-    </bean>
-
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.magic.passport.dao"/>
-        <property name="sqlSessionFactoryBeanName" value="mySqlSessionFactory_1"/>
-    </bean>
-
-    <bean id="mySqlSessionTemplate_1" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
-        <constructor-arg index="0" ref="mySqlSessionFactory_1"/>
-    </bean>
-    <!-- sql sessionTemplate_1 -->
-
-
     <!--id取余范围配置-->
     <util:map id="idShardRange" map-class="java.util.TreeMap">
-        <entry key="0" value="512"/>
-        <entry key="513" value="1024"/>
+        <entry key="0" value="1024"/>
     </util:map>
 
 
@@ -111,7 +79,6 @@
         <property name="sourceMap">
             <map>
                 <entry key="0" value-ref="mySqlSessionTemplate_0"/>
-                <entry key="513" value-ref="mySqlSessionTemplate_1"/>
             </map>
         </property>
     </bean>

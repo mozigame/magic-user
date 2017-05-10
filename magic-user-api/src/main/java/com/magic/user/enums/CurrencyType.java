@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @Doc 币种
  */
-public enum CurrencyType {
+public enum CurrencyType implements IEnum<CurrencyType> {
 
     CNY(1, "人民币"); //人民币
 
@@ -29,6 +29,7 @@ public enum CurrencyType {
         this.value = value;
         this.desc = desc;
     }
+
 
     public int value() {
         return value;
