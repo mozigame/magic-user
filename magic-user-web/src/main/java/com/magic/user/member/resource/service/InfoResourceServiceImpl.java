@@ -287,7 +287,7 @@ public class InfoResourceServiceImpl {
             object.put("before", oldMap);
             object.put("operator", operator);
             //todo 修改topic,并增加消费者
-            producer.send(Topic.USER_LOGIN_SUCCESS, String.valueOf(uid), object.toJSONString());
+            producer.send(Topic.USER_INFO_MODIFY_SUCCESS, String.valueOf(uid), object.toJSONString());
         }
         return UserContants.EMPTY_STRING;
     }

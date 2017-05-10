@@ -7,7 +7,6 @@ import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.Page;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
-import com.magic.api.commons.model.SimpleResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.commons.enginegw.EngineUtil;
@@ -35,7 +34,6 @@ import com.magic.user.vo.MemberDetailVo;
 import com.magic.user.vo.MemberLevelListVo;
 import com.magic.user.vo.MemberListVo;
 import com.magic.user.vo.UserCondition;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -547,7 +545,7 @@ public class MemberResourceServiceImpl {
     private boolean sendRegisterMessage(Member member) {
         try {
             //TODO topic + 消费者
-            return producer.send(Topic.USER_LOGIN_SUCCESS, String.valueOf(member.getId()), JSON.toJSONString(member));
+            return producer.send(Topic.MEMBER_REGISTER_SUCCESS, String.valueOf(member.getId()), JSON.toJSONString(member));
         }catch (Exception e){
             ApiLogger.error(String.format("send member register success mq message error. member: %s", JSON.toJSONString(member)), e);
             return false;
@@ -642,12 +640,38 @@ public class MemberResourceServiceImpl {
             throw UserException.USERNAME_NOT_EXIST;
         }
         if (respCode == 0x1009){
+            //todo 记录ownerId_username输入密码错误数，如果错误数超过3次，则生成code，并返回
             throw UserException.PASSWORD_ERROR;
         }
         if (respCode != 0x2222){
             throw UserException.MEMBER_LOGIN_FAIL;
         }
+        JSONObject object = JSONObject.parseObject(resp.getData());
+        long uid = object.getLongValue("uid");
+        String token = object.getString("token");
+        sendLoginMessage(ownerId, uid);
+        //todo 组装返回数据（需参考前端页面）
         return "{\" token: \"" + "\"" + resp.getData() + "\"}";
+    }
+
+    /**
+     * 发送登陆成功消息
+     *
+     * @param ownerId
+     * @param memberId
+     * @return
+     */
+    private boolean sendLoginMessage(long ownerId, long memberId) {
+        try {
+            //TODO topic + 消费者
+            HashMap<String, Long> map = new HashMap<>();
+            map.put("ownerId", ownerId);
+            map.put("memberId", memberId);
+            return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), JSON.toJSONString(map));
+        }catch (Exception e){
+            ApiLogger.error(String.format("send member login success mq message error. ownerId: %d, memberId: %d", ownerId, memberId), e);
+            return false;
+        }
     }
 
     /**
@@ -814,7 +838,24 @@ public class MemberResourceServiceImpl {
         if (code != 0x5555 || code != 0x1013){
             throw UserException.LOGOUT_FAIL;
         }
+        //消息发送
+        sendLogoutMessage(rc.getUid());
         return UserContants.EMPTY_STRING;
+    }
+
+    /**
+     * 发送注销成功消息
+     *
+     * @param memberId
+     * @return
+     */
+    private boolean sendLogoutMessage(long memberId) {
+        try {
+            return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), String.valueOf(memberId));
+        }catch (Exception e){
+            ApiLogger.error(String.format("send member logout success mq message error. memberId: %d", memberId), e);
+            return false;
+        }
     }
 
     /**
