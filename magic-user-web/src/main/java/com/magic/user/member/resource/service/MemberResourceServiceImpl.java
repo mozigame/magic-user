@@ -28,6 +28,7 @@ import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.po.RegisterReq;
 import com.magic.user.service.AccountIdMappingService;
+import com.magic.user.service.MemberMongoService;
 import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
 import com.magic.user.vo.*;
@@ -54,6 +55,9 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private AccountIdMappingService accountIdMappingService;
+
+    @Resource
+    private MemberMongoService memberMongoService;
 
     @Resource
     private Producer producer;
@@ -890,11 +894,11 @@ public class MemberResourceServiceImpl {
             return JSON.toJSONString(assemblePage(page, count, 0, null));
         }
         OnlineMemberConditon memberCondition = parseContion(condition, user);
-        long total = memberService.getOnlineMemberCount(memberCondition);
+        long total = memberMongoService.getOnlineMemberCount(memberCondition);
         if (total <= 0){
             return JSON.toJSONString(assemblePage(page, count, 0, null));
         }
-        List<OnLineMember> list = memberService.getOnlineMembers(memberCondition, page, count);
+        List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, page, count);
         return JSON.toJSONString(assemblePage(page, count, 0, assembleOnlineMemberVo(list)));
     }
 
@@ -931,10 +935,12 @@ public class MemberResourceServiceImpl {
      */
     private OnlineMemberConditon parseContion(String condition, User user) {
         OnlineMemberConditon memberCondition = null;
-        try {
-            memberCondition = JSON.parseObject(condition, OnlineMemberConditon.class);
-        }catch (Exception e){
-            ApiLogger.error(String.format("parse online condition error. condition: %s, msg: %s", condition, e.getMessage()));
+        if (condition != null) {
+            try {
+                memberCondition = JSON.parseObject(condition, OnlineMemberConditon.class);
+            } catch (Exception e) {
+                ApiLogger.error(String.format("parse online condition error. condition: %s, msg: %s", condition, e.getMessage()));
+            }
         }
         if (memberCondition == null){
             memberCondition = new OnlineMemberConditon();
@@ -969,5 +975,21 @@ public class MemberResourceServiceImpl {
         result.setTotal(total);
         result.setList(list);
         return result;
+    }
+
+    /**
+     * 在线会员数
+     * @param rc
+     * @return
+     */
+    public String onlineCount(RequestContext rc) {
+        long uid = rc.getUid();
+        User user = userService.getUserById(uid);
+        if (user == null){
+            throw UserException.ILLEGAL_USER;
+        }
+        OnlineMemberConditon conditon = parseContion(null, user);
+        long count = memberMongoService.getOnlineMemberCount(conditon);
+        return "{\" count: \"" + count + "}";
     }
 }

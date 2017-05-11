@@ -61,20 +61,4 @@ public interface MemberService {
      * @return
      */
     boolean saveMember(Member member);
-
-    /**
-     * 统计在线人数
-     * @param memberCondition
-     * @return
-     */
-    long getOnlineMemberCount(OnlineMemberConditon memberCondition);
-
-    /**
-     * 在线会员列表
-     * @param memberCondition
-     * @param page
-     * @param count
-     * @return
-     */
-    List<OnLineMember> getOnlineMembers(OnlineMemberConditon memberCondition, Integer page, Integer count);
 }

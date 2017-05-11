@@ -460,7 +460,7 @@ public class MemberResource {
      * @param page      当前页
      * @param count     每页数据量
      * @return
-     * @Doc 某层级下会员列表
+     * @Doc 在线会员列表
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/online/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -472,5 +472,18 @@ public class MemberResource {
     ) {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.onlineList(rc, condition, page, count);
+    }
+
+    /**
+     * @return
+     * @Doc 某层级下会员列表
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/online/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String online(
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.onlineCount(rc);
     }
 }

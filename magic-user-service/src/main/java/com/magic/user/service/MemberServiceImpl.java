@@ -30,9 +30,6 @@ public class MemberServiceImpl implements MemberService {
 //    @Resource(name = "userMongoService")
     private UserMongoService userMongoService;
 
-    @Resource
-    private MemberMongoService memberMongoService;
-
     @Override
     public Member getMemberById(long id) {
         return null;
@@ -178,19 +175,4 @@ public class MemberServiceImpl implements MemberService {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getOnlineMemberCount(OnlineMemberConditon memberCondition) {
-        return memberMongoService.getOnlineMemberCount(memberCondition);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<OnLineMember> getOnlineMembers(OnlineMemberConditon memberCondition, Integer page, Integer count) {
-        return memberMongoService.getOnlineMembers(memberCondition, page, count);
-    }
 }
