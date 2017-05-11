@@ -12,16 +12,18 @@
 
     <bean id="producer" class="com.magic.api.commons.mq.RocketProducer">
         <constructor-arg index="0" value="v1UserProducer"/>
-        <constructor-arg index="1" value="${mq.passport.producer.nameserver}"/>
+        <constructor-arg index="1" value="${mq.user.producer.nameserver}"/>
     </bean>
 
-   <!--<bean id="consumerMQMain" class="com.magic.api.commons.mq.ConsumerMain">-->
-        <!--<constructor-arg index="0">-->
-            <!--<list>-->
-                <!--<ref bean="loginConsumer"></ref>-->
-            <!--</list>-->
-        <!--</constructor-arg>-->
-        <!--<constructor-arg index="1" value="${mq.all.consumer.nameserver}"/>-->
-    <!--</bean>-->
+   <bean id="consumerMQMain" class="com.magic.api.commons.mq.ConsumerMain">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="memberRegisterSucessMongoConsumer"></ref>
+                <ref bean="memberLoginSucessMongoConsumer"></ref>
+                <ref bean="memberLogoutSucessMongoConsumer"></ref>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" value="${mq.all.consumer.nameserver}"/>
+    </bean>
 
 </beans>

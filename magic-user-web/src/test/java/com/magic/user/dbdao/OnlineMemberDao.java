@@ -7,4 +7,11 @@ package com.magic.user.dbdao;
  * @date 2017/5/10
  */
 public interface OnlineMemberDao {
+
+    /**
+     * 查询
+     * @param memberId
+     * @return
+     */
+    OnLineMember findById(long memberId);
 }

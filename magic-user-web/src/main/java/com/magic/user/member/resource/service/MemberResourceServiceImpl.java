@@ -9,31 +9,28 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
+import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.commons.enginegw.EngineUtil;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
-import com.magic.user.bean.Account;
-import com.magic.user.bean.MemberCondition;
-import com.magic.user.bean.RegionNumber;
-import com.magic.user.bean.Register;
+import com.magic.user.bean.*;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Member;
+import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
+import com.magic.user.po.OnLineMember;
 import com.magic.user.po.RegisterReq;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
-import com.magic.user.vo.MemberDetailVo;
-import com.magic.user.vo.MemberLevelListVo;
-import com.magic.user.vo.MemberListVo;
-import com.magic.user.vo.UserCondition;
+import com.magic.user.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -649,7 +646,7 @@ public class MemberResourceServiceImpl {
         JSONObject object = JSONObject.parseObject(resp.getData());
         long uid = object.getLongValue("uid");
         String token = object.getString("token");
-        sendLoginMessage(ownerId, uid);
+        sendLoginMessage(ownerId, uid, rc.getIp());
         //todo 组装返回数据（需参考前端页面）
         return "{\" token: \"" + "\"" + resp.getData() + "\"}";
     }
@@ -659,14 +656,16 @@ public class MemberResourceServiceImpl {
      *
      * @param ownerId
      * @param memberId
+     * @param ip
      * @return
      */
-    private boolean sendLoginMessage(long ownerId, long memberId) {
+    private boolean sendLoginMessage(long ownerId, long memberId, String ip) {
         try {
-            //TODO topic + 消费者
             HashMap<String, Long> map = new HashMap<>();
             map.put("ownerId", ownerId);
             map.put("memberId", memberId);
+            map.put("ip", memberId);
+            map.put("loginTime", System.currentTimeMillis());
             return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), JSON.toJSONString(map));
         }catch (Exception e){
             ApiLogger.error(String.format("send member login success mq message error. ownerId: %d, memberId: %d", ownerId, memberId), e);
@@ -813,7 +812,7 @@ public class MemberResourceServiceImpl {
     private String assembleVerifyBody(RequestContext rc) {
         JSONObject object = new JSONObject();
         object.put("userId", rc.getUid());
-        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("operatorTime", System.currentTimeMillis() / 1000);
         return object.toJSONString();
     }
 
@@ -851,7 +850,7 @@ public class MemberResourceServiceImpl {
      */
     private boolean sendLogoutMessage(long memberId) {
         try {
-            return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), String.valueOf(memberId));
+            return producer.send(Topic.MEMBER_LOGOUT_SUCCESS, String.valueOf(memberId), String.valueOf(memberId));
         }catch (Exception e){
             ApiLogger.error(String.format("send member logout success mq message error. memberId: %d", memberId), e);
             return false;
@@ -871,5 +870,104 @@ public class MemberResourceServiceImpl {
         object.put("deviceId", rc.getClient().getDeviceId());
         object.put("operatorTime", System.currentTimeMillis()/1000);
         return object.toJSONString();
+    }
+
+    /**
+     * 在线会员列表
+     *
+     * @param rc RequestContext
+     * @param condition 检索条件
+     * @param page 翻页
+     * @param count 总数
+     * @return
+     */
+    public String onlineList(RequestContext rc, String condition, Integer page, Integer count) {
+        long uid = rc.getUid();
+        User user = userService.getUserById(uid);
+        if (page == null && page <= 0)page = 1;
+        if (count == null && count <= 0)count = 10;
+        if (user == null){
+            return JSON.toJSONString(assemblePage(page, count, 0, null));
+        }
+        OnlineMemberConditon memberCondition = parseContion(condition, user);
+        long total = memberService.getOnlineMemberCount(memberCondition);
+        if (total <= 0){
+            return JSON.toJSONString(assemblePage(page, count, 0, null));
+        }
+        List<OnLineMember> list = memberService.getOnlineMembers(memberCondition, page, count);
+        return JSON.toJSONString(assemblePage(page, count, 0, assembleOnlineMemberVo(list)));
+    }
+
+    /**
+     * 组装在线会员列表
+     *
+     * @param list
+     * @return
+     */
+    private Collection<OnLineMemberVo> assembleOnlineMemberVo(List<OnLineMember> list) {
+        List<OnLineMemberVo> members = new ArrayList<>();
+        Iterator<OnLineMember> iterator = list.iterator();
+        while (iterator.hasNext()){
+            OnLineMember next = iterator.next();
+            if (next != null){
+                OnLineMemberVo onLineMemberVo = new OnLineMemberVo();
+                onLineMemberVo.setMemberId(next.getMemberId());
+                onLineMemberVo.setAccount(next.getAccount());
+                onLineMemberVo.setLoginTime(CommonDateParseUtil.date2string(new Date(next.getLoginTime()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+                onLineMemberVo.setRegisterTime(CommonDateParseUtil.date2string(new Date(next.getRegisterTime()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+                onLineMemberVo.setLoginIp(next.getLoginIp());
+                onLineMemberVo.setRegisterIp(next.getRegisterIp());
+                members.add(onLineMemberVo);
+            }
+        }
+        return members;
+    }
+
+    /**
+     * 解析
+     * @param condition
+     * @param user
+     * @return
+     */
+    private OnlineMemberConditon parseContion(String condition, User user) {
+        OnlineMemberConditon memberCondition = null;
+        try {
+            memberCondition = JSON.parseObject(condition, OnlineMemberConditon.class);
+        }catch (Exception e){
+            ApiLogger.error(String.format("parse online condition error. condition: %s, msg: %s", condition, e.getMessage()));
+        }
+        if (memberCondition == null){
+            memberCondition = new OnlineMemberConditon();
+        }
+        long uid = user.getUserId();
+        AccountType type = user.getType();
+        if (type == AccountType.proprietor){
+            memberCondition.setOwnerId(uid);
+        }else if (type == AccountType.stockholder){
+            memberCondition.setHolderId(uid);
+        }else if (type == AccountType.agent){
+            memberCondition.setAgentId(uid);
+        }else {
+            memberCondition.setOwnerId(uid);
+        }
+        return memberCondition;
+    }
+
+    /**
+     * 组装翻页数据
+     *
+     * @param page 页码
+     * @param count 当页条数
+     * @param total 总条数
+     * @param list 详细列表数据
+     * @return
+     */
+    private static PageBean<OnLineMemberVo> assemblePage(int page, int count, long total, Collection<OnLineMemberVo> list){
+        PageBean<OnLineMemberVo> result = new PageBean<>();
+        result.setPage(page);
+        result.setCount(count);
+        result.setTotal(total);
+        result.setList(list);
+        return result;
     }
 }

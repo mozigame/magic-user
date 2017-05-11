@@ -454,4 +454,23 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberStatusUpdate(rc, id, status);
     }
+
+    /**
+     * @param condition 检索条件
+     * @param page      当前页
+     * @param count     每页数据量
+     * @return
+     * @Doc 某层级下会员列表
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/online/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String onlineList(
+            @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition,
+            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "count", required = false, defaultValue = "10") int count
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.onlineList(rc, condition, page, count);
+    }
 }

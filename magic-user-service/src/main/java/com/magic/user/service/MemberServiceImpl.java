@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import com.magic.api.commons.model.Page;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.entity.Member;
+import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
+import com.magic.user.po.OnLineMember;
 import com.magic.user.storage.UserMongoService;
 import com.magic.user.util.UserVo;
 import com.magic.user.commons.OperaSign;
@@ -27,6 +29,9 @@ public class MemberServiceImpl implements MemberService {
 
 //    @Resource(name = "userMongoService")
     private UserMongoService userMongoService;
+
+    @Resource
+    private MemberMongoService memberMongoService;
 
     @Override
     public Member getMemberById(long id) {
@@ -171,5 +176,21 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean saveMember(Member member) {
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getOnlineMemberCount(OnlineMemberConditon memberCondition) {
+        return memberMongoService.getOnlineMemberCount(memberCondition);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<OnLineMember> getOnlineMembers(OnlineMemberConditon memberCondition, Integer page, Integer count) {
+        return memberMongoService.getOnlineMembers(memberCondition, page, count);
     }
 }
