@@ -11,4 +11,7 @@
     <!-- 在此配置consumer的信息 -->
     <dubbo:reference id="uuidService" interface="com.magic.service.java.UuidService" init="true" timeout="15000"
                      retries="0" check="false"/>
+    <!-- 配置passport dubbo -->
+    <dubbo:reference id="passportDubboService" interface="com.magic.passport.service.dubbo.PassportDubboService" init="true" timeout="15000"
+                     retries="0" check="false"/>
 </beans>

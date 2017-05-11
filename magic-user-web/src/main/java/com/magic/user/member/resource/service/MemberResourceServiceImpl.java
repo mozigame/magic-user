@@ -685,10 +685,10 @@ public class MemberResourceServiceImpl {
      * @param username
      * @param password
      * @param url
-     * @param ext
+     * @param agent
      * @return
      */
-    private String assembleLoginBody(RequestContext rc, long ownerId, String username, String password, String ext, String url) {
+    private String assembleLoginBody(RequestContext rc, long ownerId, String username, String password, String agent, String url) {
         JSONObject object = new JSONObject();
         object.put("ownerId", ownerId);
         object.put("username", username);
@@ -698,7 +698,7 @@ public class MemberResourceServiceImpl {
         object.put("loginUrl", url);
         object.put("deviceId", rc.getClient().getDeviceId());
         object.put("operatorTime", System.currentTimeMillis()/1000);
-        object.put("ext", ext);
+        object.put("ext", new JSONObject().put("user-agent", agent).toString());
         return object.toJSONString();
     }
 
