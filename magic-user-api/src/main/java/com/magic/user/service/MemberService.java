@@ -1,10 +1,14 @@
 package com.magic.user.service;
 
 import com.magic.user.entity.Member;
+import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.enums.AccountStatus;
 import com.magic.api.commons.model.Page;
 import com.magic.user.entity.User;
+import com.magic.user.po.OnLineMember;
 import com.magic.user.vo.UserCondition;
+
+import java.util.List;
 
 /**
  * User: joey

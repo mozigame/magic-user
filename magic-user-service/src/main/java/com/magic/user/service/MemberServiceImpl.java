@@ -4,9 +4,11 @@ import com.google.common.collect.Lists;
 import com.magic.api.commons.model.Page;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.entity.Member;
+import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.storage.MemberDbService;
+import com.magic.user.po.OnLineMember;
 import com.magic.user.storage.UserMongoService;
 import com.magic.user.util.UserVo;
 import com.magic.user.commons.OperaSign;
@@ -26,7 +28,7 @@ import java.util.List;
 @Service("memberService")
 public class MemberServiceImpl implements MemberService {
 
-    //    @Resource(name = "userMongoService")
+//    @Resource(name = "userMongoService")
     private UserMongoService userMongoService;
     @Resource(name = "memberDbService")
     private MemberDbService memberDbService;
