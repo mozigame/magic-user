@@ -9,6 +9,8 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
+import com.magic.api.commons.tools.DateUtil;
+import com.magic.api.commons.tools.IPUtil;
 import com.magic.commons.enginegw.EngineUtil;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
@@ -30,10 +32,7 @@ import com.magic.user.po.RegisterReq;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
-import com.magic.user.vo.MemberDetailVo;
-import com.magic.user.vo.MemberLevelListVo;
-import com.magic.user.vo.MemberListVo;
-import com.magic.user.vo.UserCondition;
+import com.magic.user.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +60,8 @@ public class MemberResourceServiceImpl {
     @Resource
     private Producer producer;
 
+    private int userId = 10000;
+
     /**
      * 会员列表
      *
@@ -72,13 +73,13 @@ public class MemberResourceServiceImpl {
      */
     public String memberList(RequestContext rc, String condition, int page, int count) {
         MemberCondition memberCondition = MemberCondition.valueOf(condition);
-        if (!checkCondition(memberCondition)){
+        if (!checkCondition(memberCondition)) {
             return JSON.toJSONString(assemblePageBean(page, count, 0, null));
         }
         long uid = rc.getUid(); //业主ID、股东或代理ID
         //TODO mongo 检索满足条件的数据记录数
         long total = 0;
-        if (total <= 0){
+        if (total <= 0) {
             return JSON.toJSONString(assemblePageBean(page, count, 0, null));
         }
         //TODO mongo 检索满足条件的数据列表
@@ -107,35 +108,36 @@ public class MemberResourceServiceImpl {
 
     /**
      * 检查请求参数
+     *
      * @param condition
      * @return
      */
     private boolean checkCondition(MemberCondition condition) {
         Integer currencyType = condition.getCurrencyType();
-        if (currencyType != null && CurrencyType.parse(currencyType) == null){
+        if (currencyType != null && CurrencyType.parse(currencyType) == null) {
             return false;
         }
         Account account = condition.getAccount();
-        if (account != null && StringUtils.isNoneEmpty(account.getName())){
+        if (account != null && StringUtils.isNoneEmpty(account.getName())) {
             Integer type = account.getType();
             if (type == null || AccountType.parse(type) == null) {
                 return false;
             }
         }
         RegionNumber region = condition.getDepositNumber();
-        if (region != null && region.getMin() != null && region.getMax() != null && region.getMin() > region.getMax()){
+        if (region != null && region.getMin() != null && region.getMax() != null && region.getMin() > region.getMax()) {
             return false;
         }
         Register register = condition.getRegister();
-        if (register != null && register.getStart() != null && register.getEnd() != null && register.getStart() > register.getEnd()){
+        if (register != null && register.getStart() != null && register.getEnd() != null && register.getStart() > register.getEnd()) {
             return false;
         }
         region = condition.getWithdrawNumber();
-        if (region != null && region.getMin() != null && region.getMax() != null && region.getMin() > region.getMax()){
+        if (region != null && region.getMin() != null && region.getMax() != null && region.getMin() > region.getMax()) {
             return false;
         }
         Integer status = condition.getStatus();
-        if (status != null && AccountStatus.parse(status) == null){
+        if (status != null && AccountStatus.parse(status) == null) {
             return false;
         }
         return true;
@@ -144,13 +146,13 @@ public class MemberResourceServiceImpl {
     /**
      * 组装翻页数据
      *
-     * @param page 页码
+     * @param page  页码
      * @param count 当页条数
      * @param total 总条数
-     * @param list 详细列表数据
+     * @param list  详细列表数据
      * @return
      */
-    private static PageBean<MemberListVo> assemblePageBean(int page, int count, long total, Collection<MemberListVo> list){
+    private static PageBean<MemberListVo> assemblePageBean(int page, int count, long total, Collection<MemberListVo> list) {
         PageBean<MemberListVo> result = new PageBean<>();
         result.setPage(page);
         result.setCount(count);
@@ -162,13 +164,13 @@ public class MemberResourceServiceImpl {
     /**
      * 会员列表导出
      *
-     * @param rc RequestContext
+     * @param rc        RequestContext
      * @param condition 检索条件
      * @return
      */
     public DownLoadFile memberListExport(RequestContext rc, String condition) {
         MemberCondition memberCondition = MemberCondition.valueOf(condition);
-        if (!checkCondition(memberCondition)){
+        if (!checkCondition(memberCondition)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         long uid = rc.getUid(); //业主ID、股东或代理ID
@@ -190,27 +192,94 @@ public class MemberResourceServiceImpl {
      */
     public String memberDetails(RequestContext rc, long id) {
         Member member = memberService.getMemberById(id);
-        if (member == null){
+        if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
         //TODO 1.jason 根据会员ID查询会员优惠方案
         //TODO 2.jason 根据会员ID查询会员资金概括
         //TODO 3.jason 根据会员ID查询投注记录
         //TODO 4.jason 根据会员ID查询优惠记录
-        MemberDetailVo detail = assembleMemberDetail();
+        MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
     }
 
     /**
      * 组装会员详情 //TODO
+     *
      * @return
      */
-    private MemberDetailVo assembleMemberDetail() {
-        return null;
+    private MemberDetailVo assembleMemberDetail(Member member) {
+        MemberDetailVo vo = new MemberDetailVo();
+        ////会员基础信息
+        vo.setBaseInfo(assembleMemberInfo(member));
+        //会员优惠方案
+        String preferScheme = "{\n" +
+                "    \"level\": 1,\n" +
+                "    \"showLevel\": \"未分层\",\n" +
+                "    \"onlineDiscount\": \"100返10\",\n" +
+                "    \"depositFee\": \"无\",\n" +
+                "    \"withdrawFee\": \"无\",\n" +
+                "    \"returnWater\": \"返水基本1\",\n" +
+                "    \"depositDiscountScheme\": \"100返10\"\n" +
+                "}";
+        MemberPreferScheme memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
+        vo.setPreferScheme(memberPreferScheme);
+        ///会员资金概况
+        String memberFundInfo = "{\n" +
+                "    \"balance\": \"1805.50\",\n" +
+                "    \"depositNumbers\": 15,\n" +
+                "    \"depositTotalMoney\": \"29006590\",\n" +
+                "    \"lastDeposit\": \"1200\",\n" +
+                "    \"withdrawNumbers\": 10,\n" +
+                "    \"withdrawTotalMoney\": \"24500120\",\n" +
+                "    \"lastWithdraw\": \"2500\"\n" +
+                "}";
+
+        MemberFundInfo memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
+        FundProfile fundProfile = new FundProfile();
+        fundProfile.setInfo(memberFundInfoObj);
+        fundProfile.setSyncTime(DateUtil.formatDateTime(new Date(), DateUtil.formatDefaultTimestamp));
+        vo.setFundProfile(fundProfile);
+        //投注记录
+        String memberBetHistory = "{\n" +
+                "    \"totalMoney\": \"29000\",\n" +
+                "    \"effMoney\": \"28000\",\n" +
+                "    \"gains\": \"18000\"\n" +
+                "}";
+        MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
+        vo.setBetHistory(memberBetHistoryObj);
+        //优惠记录
+        String memberDiscountHistory = "{\n" +
+                "    \"totalMoney\": \"1350\",\n" +
+                "    \"numbers\": 98,\n" +
+                "    \"returnWaterTotalMoney\": \"1450\"\n" +
+                "}";
+        MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
+        vo.setDiscountHistory(memberDiscountHistoryObj);
+        return vo;
+    }
+
+    private MemberInfo assembleMemberInfo(Member member) {
+        MemberInfo info = new MemberInfo();
+        info.setId(member.getMemberId());
+        info.setAccount(member.getUsername());
+        info.setAgentId(member.getAgentId());
+        info.setAgent(member.getAgentUsername());
+        info.setRealname(member.getRealname());
+        info.setRegisterTime(DateUtil.formatDateTime(member.getRegisterTime(), DateUtil.formatDefaultTimestamp));
+        info.setRegisterIp(IPUtil.intToIp(member.getRegisterIp()));
+        info.setEmail(member.getEmail());
+        info.setStatus(member.getStatus().value());
+        info.setShowStatus(member.getStatus().desc());
+        info.setBankCardNo(member.getBankCardNo());
+        //todo lastloginip 在passport中获取
+        info.setLastLoginIp("0:0:0:0:0:0");
+        return info;
     }
 
     /**
      * 密码重置 -- 后台
+     *
      * @param rc
      * @param id
      * @param password
@@ -218,14 +287,14 @@ public class MemberResourceServiceImpl {
      */
     public String passwordReset(RequestContext rc, long id, String password) {
         Member member = memberService.getMemberById(id);
-        if (member == null){
+        if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
         //组装请求数据
         String body = assembleReqBody(rc, member, password);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100006, body);
         EGResp resp = EngineUtil.call(req, "account");
-        if (resp != null && resp.getCode() == 0x4444){//重置成功
+        if (resp != null && resp.getCode() == 0x4444) {//重置成功
             return UserContants.EMPTY_STRING;
         }
         throw UserException.PASSWORD_RESET_FAIL;
@@ -233,6 +302,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 组装请求
+     *
      * @param rc
      * @param member
      * @param password
@@ -251,6 +321,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 组装请求对象
+     *
      * @param cmdType
      * @param cmd
      * @param body
@@ -275,13 +346,13 @@ public class MemberResourceServiceImpl {
      */
     public String logout(RequestContext rc, long id) {
         Member member = memberService.getMemberById(id);
-        if (member == null){
+        if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
         //组装请求数据
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, logoutBody(rc, member));
         EGResp resp = EngineUtil.call(req, "account");
-        if (resp != null && (resp.getCode() == 0x5555 || resp.getCode() == 0x1013)){//注销成功
+        if (resp != null && (resp.getCode() == 0x5555 || resp.getCode() == 0x1013)) {//注销成功
             return UserContants.EMPTY_STRING;
         }
         throw UserException.LOGOUT_FAIL;
@@ -305,6 +376,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 更新会员基础信息
+     *
      * @param rc
      * @param id
      * @param realname
@@ -317,7 +389,7 @@ public class MemberResourceServiceImpl {
     public String update(RequestContext rc, long id, String realname, String telephone, String email, String bankCardNo, int status) {
         Member member = assembleMember(id, realname, telephone, email, bankCardNo, status);
         boolean result = memberService.updateMember(member);
-        if (!result){
+        if (!result) {
             throw UserException.MEMBER_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
@@ -325,6 +397,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 组装会员数据
+     *
      * @param id
      * @param realname
      * @param telephone
@@ -354,12 +427,12 @@ public class MemberResourceServiceImpl {
      */
     public String updateLevel(RequestContext rc, long id, int level) {
         Member member = memberService.getMemberById(id);
-        if (member == null){
+        if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
         //TODO andy dubbo
         boolean result = false;
-        if (!result){
+        if (!result) {
             throw UserException.MEMBER_LEVEL_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
@@ -368,9 +441,9 @@ public class MemberResourceServiceImpl {
     /**
      * 会员层级列表
      *
-     * @param rc RequestContext
-     * @param lock 是否锁定 1：非锁定 2锁定
-     * @param page 页码
+     * @param rc    RequestContext
+     * @param lock  是否锁定 1：非锁定 2锁定
+     * @param page  页码
      * @param count 每页数据量
      * @return
      */
@@ -385,7 +458,7 @@ public class MemberResourceServiceImpl {
     /**
      * 会员层级列表导出
      *
-     * @param rc RequestContext
+     * @param rc   RequestContext
      * @param lock 是否锁定 1：非锁定 2锁定
      * @return
      */
@@ -420,22 +493,22 @@ public class MemberResourceServiceImpl {
     /**
      * 状态变更
      *
-     * @param rc RequestContext
-     * @param id 会员ID
+     * @param rc     RequestContext
+     * @param id     会员ID
      * @param status 1 启用 2禁用
      * @return
      */
     public String memberStatusUpdate(RequestContext rc, Long id, Integer status) {
-        if (!checkParams(id, status)){
+        if (!checkParams(id, status)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         AccountStatus newStatus = AccountStatus.parse(status);
         AccountStatus oldStatus = AccountStatus.enable;
-        if (newStatus == AccountStatus.enable){
+        if (newStatus == AccountStatus.enable) {
             oldStatus = AccountStatus.disable;
         }
         boolean result = memberService.updateStatus(id, oldStatus, newStatus);
-        if (!result){
+        if (!result) {
             throw UserException.MEMBER_STATUS_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
@@ -443,19 +516,20 @@ public class MemberResourceServiceImpl {
 
     /**
      * 参数检查
+     *
      * @param id
      * @param status
      * @return
      */
     private boolean checkParams(Long id, Integer status) {
-        if (id == null || id <= 0){
+        if (id == null || id <= 0) {
             return false;
         }
-        if (status == null){
+        if (status == null) {
             return false;
         }
         AccountStatus accountStatus = AccountStatus.parse(status);
-        if (accountStatus != AccountStatus.disable || accountStatus != AccountStatus.enable){
+        if (accountStatus != AccountStatus.disable || accountStatus != AccountStatus.enable) {
             return false;
         }
         return true;
@@ -468,71 +542,78 @@ public class MemberResourceServiceImpl {
     /**
      * 会员注册
      *
-     * @param rc RequestContext
+     * @param rc  RequestContext
      * @param url 注册来源
      * @param req 注册请求数据
      * @return
      */
     public String memberRegister(RequestContext rc, String url, RegisterReq req) {
-        if (!checkRegisterParam(req)){
+        if (!checkRegisterParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         //TODO andy 根据url 获取 ownerId 和 ownerName
-        long ownerId = 0l;
+        long ownerId = 14;
         String ownerName = "";
-        long holderId = accountIdMappingService.getUid(ownerId, ownerName);//股东id
-        if (holderId <= 0){
+        //todo holderId暂时注释掉
+//        long holderId = accountIdMappingService.getUid(ownerId, ownerName);//股东id
+        long holderId = 105094;//股东id
+        if (holderId <= 0) {
             throw UserException.ILLEGAL_USER;
         }
         User holder = userService.getUserById(holderId);
-        if (holder == null){
+        if (holder == null) {
             throw UserException.ILLEGAL_USER;
         }
         User agent = null;//所属代理ID
         String proCode = req.getProCode();
-        if (StringUtils.isNoneEmpty(proCode)){
+        if (StringUtils.isNoneEmpty(proCode)) {
             User user = userService.getUserByCode(proCode);
-            if (agent != null && user.getOwnerId() == ownerId){
+            if (user != null && user.getOwnerId() == ownerId) {
                 agent = user;
             }
         }
-        if (agent == null){
+        if (agent == null) {
             long agentId = accountIdMappingService.getUid(ownerId, ownerName + "_dl");
-            if (agentId > 0){
+            if (agentId > 0) {
                 agent = userService.getUserById(agentId);
             }
         }
-        if (agent == null){
+        if (agent == null) {
             throw UserException.ILLEGAL_USER;
         }
         String body = assembleRegisterBody(rc, url, ownerId, agent.getId(), req);
         EGReq egReq = assembleEGReq(CmdType.PASSPORT, 0x100001, body);
-        EGResp resp = EngineUtil.call(egReq, "account");
-        if (resp == null){
+
+        //todo 暂时注释调用引擎网关的逻辑
+        /*EGResp resp = EngineUtil.call(egReq, "account");
+        if (resp == null) {
             throw UserException.REGISTER_FAIL;
         }
         int code = resp.getCode();
-        if (code == 0x1004){
+        if (code == 0x1004) {
             throw UserException.USERNAME_EXIST;
         }
-        if (code != 0x1111){
+        if (code != 0x1111) {
             throw UserException.REGISTER_FAIL;
-        }
-        long userId = 0l;
-        try {
+        }*/
+        //todo
+//        long userId = 0l;
+        long userId = this.userId += 1;
+        /*try {
             userId = Long.parseLong(resp.getData());
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("passport register return data error. resp: %s", JSON.toJSONString(resp)), e);
-        }
-        if (userId <= 0){
+        }*/
+        if (userId <= 0) {
             throw UserException.REGISTER_FAIL;
         }
-        Member member = assembleMember(rc, req, userId, ownerId, ownerName, holder, agent);
+        Member member = assembleMember(rc, req, userId, ownerId, ownerName, holder, agent, url);
         boolean result = memberService.saveMember(member);
-        if (!result){
+        if (!result) {
             throw UserException.REGISTER_FAIL;
         }
-        sendRegisterMessage(member);
+        //todo 发送注册成功的消息暂时注释掉
+//        sendRegisterMessage(member);
         return UserContants.EMPTY_STRING;
     }
 
@@ -546,11 +627,12 @@ public class MemberResourceServiceImpl {
         try {
             //TODO topic + 消费者
             return producer.send(Topic.MEMBER_REGISTER_SUCCESS, String.valueOf(member.getId()), JSON.toJSONString(member));
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("send member register success mq message error. member: %s", JSON.toJSONString(member)), e);
             return false;
         }
     }
+
     /**
      * 组装member数据
      *
@@ -563,9 +645,29 @@ public class MemberResourceServiceImpl {
      * @param agent
      * @return
      */
-    private Member assembleMember(RequestContext rc, RegisterReq req, long userId, long ownerId, String ownerName, User holder, User agent) {
+    private Member assembleMember(RequestContext rc, RegisterReq req, long userId, long ownerId, String ownerName, User holder, User agent, String url) {
         Member member = new Member();
         //todo
+        member.setUsername(req.getUsername());
+        member.setRealname(req.getRealname());
+        member.setTelephone(req.getTelephone());
+        member.setEmail(req.getEmail());
+        member.setBank(req.getBank());
+        member.setBankCardNo(req.getBankCardNo());
+        member.setBankDeposit(req.getBankReposit());
+        member.setBank(req.getBank());
+        member.setMemberId(userId);
+        member.setOwnerId(ownerId);
+        member.setOwnerUsername(ownerName);
+        member.setStockId(holder.getId());
+        member.setStockUsername(holder.getUsername());
+        member.setOwnerId(ownerId);
+        member.setOwnerUsername(ownerName);
+        member.setAgentId(agent.getUserId());
+        member.setAgentUsername(agent.getUsername());
+        member.setSourceUrl(url);
+        member.setRegisterIp(IPUtil.ipToInt(rc.getIp()));
+        member.setRegisterTime(new Date());
         return member;
     }
 
@@ -600,50 +702,51 @@ public class MemberResourceServiceImpl {
      */
     private boolean checkRegisterParam(RegisterReq req) {
         return Optional.ofNullable(req)
-                .filter(request -> request.getUsername() != null && req.getUsername().length() >=6 && req.getUsername().length() <= 16)
+                .filter(request -> request.getUsername() != null && req.getUsername().length() >= 6 && req.getUsername().length() <= 16)
                 .filter(request -> request.getPassword() != null && request.getPassword().length() == 32)
                 .isPresent();
     }
 
     /**
      * 会员登陆
-     * @param rc RequestContext
-     * @param agent 浏览器数据
-     * @param url url
+     *
+     * @param rc       RequestContext
+     * @param agent    浏览器数据
+     * @param url      url
      * @param username 用户名
      * @param password 密码
-     * @param code 验证码
+     * @param code     验证码
      * @return
      */
     public String memberLogin(RequestContext rc, String agent, String url, String username, String password, String code) {
-        if (!checkLoginReq(username, password)){
+        if (!checkLoginReq(username, password)) {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
         //todo andy 根据url获取业主ID
         long ownerId = 0;
-        if (ownerId <= 0){
+        if (ownerId <= 0) {
             throw UserException.ILLEGAL_USER;
         }
         //todo 从redis里面获取ownerId_username下的验证码，如果存在验证码，与code对比，如果相符，进行下一步操作
         String proCode = "";
-        if (proCode != code){
+        if (proCode != code) {
             throw UserException.PROCODE_ERROR;
         }
         String body = assembleLoginBody(rc, ownerId, username, password, agent, url);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100002, body);
         EGResp resp = EngineUtil.call(req, "account");
-        if (resp == null || resp.getCode() == 0x1011){
+        if (resp == null || resp.getCode() == 0x1011) {
             throw UserException.MEMBER_LOGIN_FAIL;
         }
         int respCode = resp.getCode();
-        if (respCode == 0x1008){
+        if (respCode == 0x1008) {
             throw UserException.USERNAME_NOT_EXIST;
         }
-        if (respCode == 0x1009){
+        if (respCode == 0x1009) {
             //todo 记录ownerId_username输入密码错误数，如果错误数超过3次，则生成code，并返回
             throw UserException.PASSWORD_ERROR;
         }
-        if (respCode != 0x2222){
+        if (respCode != 0x2222) {
             throw UserException.MEMBER_LOGIN_FAIL;
         }
         JSONObject object = JSONObject.parseObject(resp.getData());
@@ -668,7 +771,7 @@ public class MemberResourceServiceImpl {
             map.put("ownerId", ownerId);
             map.put("memberId", memberId);
             return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), JSON.toJSONString(map));
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("send member login success mq message error. ownerId: %d, memberId: %d", ownerId, memberId), e);
             return false;
         }
@@ -694,7 +797,7 @@ public class MemberResourceServiceImpl {
         object.put("appId", rc.getClient().getAppId());
         object.put("loginUrl", url);
         object.put("deviceId", rc.getClient().getDeviceId());
-        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("operatorTime", System.currentTimeMillis() / 1000);
         object.put("ext", ext);
         return object.toJSONString();
     }
@@ -710,7 +813,7 @@ public class MemberResourceServiceImpl {
         if (username == null || username.length() < 6 || username.length() > 16) {
             return false;
         }
-        if (password == null || password.length() != 32){
+        if (password == null || password.length() != 32) {
             return false;
         }
         return true;
@@ -719,27 +822,27 @@ public class MemberResourceServiceImpl {
     /**
      * 密码重置
      *
-     * @param rc RequestContext
-     * @param username 用户号
+     * @param rc          RequestContext
+     * @param username    用户号
      * @param oldPassword 旧密码
      * @param newPassword 新密码
      * @return
      */
     public String memberPasswordReset(RequestContext rc, String username, String oldPassword, String newPassword) {
-        if (!checkResetParams(username, oldPassword, newPassword)){
+        if (!checkResetParams(username, oldPassword, newPassword)) {
             throw UserException.PASSWORD_RESET_FAIL;
         }
         String body = assembleResetBody(rc, username, oldPassword, newPassword);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100004, body);
         EGResp resp = EngineUtil.call(req, "account");
-        if (resp == null){
+        if (resp == null) {
             throw UserException.PASSWORD_RESET_FAIL;
         }
         int code = resp.getCode();
-        if (code == 0x1009){
+        if (code == 0x1009) {
             throw UserException.PASSWORD_ERROR;
         }
-        if (code != 0x4444){
+        if (code != 0x4444) {
             throw UserException.PASSWORD_RESET_FAIL;
         }
         return UserContants.EMPTY_STRING;
@@ -762,7 +865,7 @@ public class MemberResourceServiceImpl {
         object.put("newPassword", newPassword);
         object.put("appId", rc.getClient().getAppId());
         object.put("ip", rc.getIp());
-        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("operatorTime", System.currentTimeMillis() / 1000);
         return object.toJSONString();
     }
 
@@ -775,13 +878,13 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private boolean checkResetParams(String username, String oldPassword, String newPassword) {
-        if (StringUtils.isEmpty(username) || username.length() < 6 || username.length() > 16){
+        if (StringUtils.isEmpty(username) || username.length() < 6 || username.length() > 16) {
             return false;
         }
-        if (StringUtils.isEmpty(oldPassword) || oldPassword.length() != 32){
+        if (StringUtils.isEmpty(oldPassword) || oldPassword.length() != 32) {
             return false;
         }
-        if (StringUtils.isEmpty(newPassword) || newPassword.length() != 32){
+        if (StringUtils.isEmpty(newPassword) || newPassword.length() != 32) {
             return false;
         }
         return true;
@@ -798,7 +901,7 @@ public class MemberResourceServiceImpl {
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100003, body);
         EGResp resp = EngineUtil.call(req, "account");
         boolean result = Optional.ofNullable(resp).filter(response -> response.getCode() != 0x3333).isPresent();
-        if (!result){
+        if (!result) {
             throw UserException.VERIFY_FAIL;
         }
         return "{\" username: \"" + "\"" + resp.getData() + "\"}";
@@ -813,7 +916,7 @@ public class MemberResourceServiceImpl {
     private String assembleVerifyBody(RequestContext rc) {
         JSONObject object = new JSONObject();
         object.put("userId", rc.getUid());
-        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("operatorTime", System.currentTimeMillis() / 1000);
         return object.toJSONString();
     }
 
@@ -825,17 +928,17 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberLogout(RequestContext rc, String username) {
-        if (username == null || username.length() < 6 || username.length() > 16){
+        if (username == null || username.length() < 6 || username.length() > 16) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         String body = assembleLogoutBody(rc, username);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
         EGResp resp = EngineUtil.call(req, "account");
-        if (resp == null){
+        if (resp == null) {
             throw UserException.LOGOUT_FAIL;
         }
         int code = resp.getCode();
-        if (code != 0x5555 || code != 0x1013){
+        if (code != 0x5555 || code != 0x1013) {
             throw UserException.LOGOUT_FAIL;
         }
         //消息发送
@@ -852,7 +955,7 @@ public class MemberResourceServiceImpl {
     private boolean sendLogoutMessage(long memberId) {
         try {
             return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), String.valueOf(memberId));
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("send member logout success mq message error. memberId: %d", memberId), e);
             return false;
         }
@@ -860,6 +963,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 组装注销passport 请求body
+     *
      * @param rc
      * @param username
      * @return
@@ -869,7 +973,7 @@ public class MemberResourceServiceImpl {
         object.put("userId", rc.getUid());
         object.put("username", username);
         object.put("deviceId", rc.getClient().getDeviceId());
-        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("operatorTime", System.currentTimeMillis() / 1000);
         return object.toJSONString();
     }
 }

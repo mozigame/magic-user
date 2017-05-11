@@ -80,7 +80,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByCode(String proCode) {
-        return null;
+        List<User> list = userDbService.find("findAgentByProCode", null, proCode);
+        return list == null ? null : list.get(0);
     }
 
     @Override

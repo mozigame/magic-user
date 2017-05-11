@@ -14,8 +14,7 @@ import java.sql.SQLException;
  * Date: 2017/5/9
  * Time: 20:20
  */
-public class EnumKeyTypeHandler<E extends Enum<E> & IEnum<E>> extends
-        BaseTypeHandler<IEnum> {
+public class EnumKeyTypeHandler extends BaseTypeHandler<IEnum> {
 
     private Class<IEnum> type;
 
