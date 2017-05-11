@@ -34,13 +34,13 @@
     <update id="update" parameterType="AgentConfig">
         UPDATE t_agent_config_info
         <set>
-            <if test="returnSchemeId > 0">
+            <if test="returnSchemeId != null">
                 return_scheme_id = #{returnSchemeId},
             </if>
-            <if test="adminCostId > 0">
+            <if test="adminCostId != null">
                 admin_cost_id = #{adminCostId},
             </if>
-            <if test="feeId > 0">
+            <if test="feeId != null">
                 fee_id = #{feeId},
             </if>
         </set>

@@ -6,51 +6,31 @@
         <result column="assem_account" jdbcType="VARCHAR" property="assemAccount"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
     </resultMap>
+
     <sql id="Base_Column_List">
-    id, assem_account, user_id
-  </sql>
+        id, assem_account, user_id
+      </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from t_owner_account_user
         where id = #{id,jdbcType=BIGINT}
     </select>
+
+    <select id="getUid" resultType="java.lang.Long">
+        SELECT user_id from t_owner_account_user
+        where assem_account=#{account}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from t_owner_account_user
-    where id = #{id,jdbcType=BIGINT}
-  </delete>
-    <insert id="insert" parameterType="com.magic.user.entity.OwnerAccountUser">
-    insert into t_owner_account_user (id, assem_account, user_id
-      )
-    values (#{id,jdbcType=BIGINT}, #{assemAccount,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT}
-      )
-  </insert>
-    <insert id="insertSelective" parameterType="com.magic.user.entity.OwnerAccountUser">
-        insert into t_owner_account_user
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="assemAccount != null">
-                assem_account,
-            </if>
-            <if test="userId != null">
-                user_id,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
-            </if>
-            <if test="assemAccount != null">
-                #{assemAccount,jdbcType=VARCHAR},
-            </if>
-            <if test="userId != null">
-                #{userId,jdbcType=BIGINT},
-            </if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.magic.user.entity.OwnerAccountUser">
+        delete from t_owner_account_user
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="OwnerAccountUser">
+        insert into t_owner_account_user (assem_account, user_id )
+        values ( #{assemAccount,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT}
+          )
+      </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="OwnerAccountUser">
         update t_owner_account_user
         <set>
             <if test="assemAccount != null">
@@ -62,10 +42,5 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.magic.user.entity.OwnerAccountUser">
-    update t_owner_account_user
-    set assem_account = #{assemAccount,jdbcType=VARCHAR},
-      user_id = #{userId,jdbcType=BIGINT}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+
 </mapper>

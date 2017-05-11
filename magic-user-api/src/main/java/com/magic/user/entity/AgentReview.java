@@ -2,31 +2,29 @@ package com.magic.user.entity;
 
 import com.magic.user.enums.ReviewStatus;
 
-import java.util.Date;
-
 /**
  * @Doc 代理审核记录表
  */
 public class AgentReview {
-    private long id;
+    private Long id;
 
-    private long agentApplyId; //代理申请id
+    private Long agentApplyId; //代理申请id
 
     private String agentName;   //代理账号
 
-    private long operUserId;    //操作用户id
+    private Long operUserId;    //操作用户id
 
     private String operUserName;    //操作人账号
 
     private ReviewStatus status; //审核状态
 
-    private Date createTime;    //操作时间
+    private Long createTime;    //操作时间
 
     public AgentReview() {
 
     }
 
-    public AgentReview(long agentApplyId, String agentName, long operUserId, String operUserName, ReviewStatus status, Date createTime) {
+    public AgentReview(Long agentApplyId, String agentName, Long operUserId, String operUserName, ReviewStatus status, Long createTime) {
         this.agentApplyId = agentApplyId;
         this.agentName = agentName;
         this.operUserId = operUserId;
@@ -35,27 +33,27 @@ public class AgentReview {
         this.createTime = createTime;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getAgentApplyId() {
+    public Long getAgentApplyId() {
         return agentApplyId;
     }
 
-    public void setAgentApplyId(long agentApplyId) {
+    public void setAgentApplyId(Long agentApplyId) {
         this.agentApplyId = agentApplyId;
     }
 
-    public long getOperUserId() {
+    public Long getOperUserId() {
         return operUserId;
     }
 
-    public void setOperUserId(long operUserId) {
+    public void setOperUserId(Long operUserId) {
         this.operUserId = operUserId;
     }
 
@@ -67,11 +65,11 @@ public class AgentReview {
         this.status = status;
     }
 
-    public Date getCreateTime() {
+    public Long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(Long createTime) {
         this.createTime = createTime;
     }
 

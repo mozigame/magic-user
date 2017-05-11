@@ -4,17 +4,24 @@ package com.magic.user.entity;
  * @Doc 账户与用户id映射表
  */
 public class OwnerAccountUser {
-    private long id;
+    private Long id;
 
     private String assemAccount;    //聚合账号，格式：业主ID-账号名(股东或代理)
 
-    private long userId;    //用户id
+    private Long userId;    //用户id
 
-    public long getId() {
+    public OwnerAccountUser(){}
+
+    public OwnerAccountUser(String assemAccount, Long userId) {
+        this.assemAccount = assemAccount;
+        this.userId = userId;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -26,11 +33,11 @@ public class OwnerAccountUser {
         this.assemAccount = assemAccount == null ? null : assemAccount.trim();
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 }

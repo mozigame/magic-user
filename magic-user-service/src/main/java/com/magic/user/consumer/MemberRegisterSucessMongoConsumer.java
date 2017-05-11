@@ -52,7 +52,7 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
         lineMember.setOwnerId(member.getOwnerId());
         lineMember.setHolderId(member.getStockId());
         lineMember.setAgentId(member.getAgentId());
-        lineMember.setRegisterTime(member.getRegisterTime().getTime());
+        lineMember.setRegisterTime(member.getRegisterTime());
         lineMember.setRegisterIp(IPUtil.intToIp(member.getRegisterIp()));
         lineMember.setStatus(1);//注销
         return lineMember;

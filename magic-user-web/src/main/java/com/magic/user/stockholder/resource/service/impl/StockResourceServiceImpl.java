@@ -2,13 +2,18 @@ package com.magic.user.stockholder.resource.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.tools.IPUtil;
 import com.magic.service.java.UuidService;
+import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
+import com.magic.user.entity.OwnerAccountUser;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.enums.GeneraType;
+import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.UserService;
 import com.magic.user.stockholder.resource.service.StockResourceService;
@@ -35,8 +40,8 @@ public class StockResourceServiceImpl implements StockResourceService {
     private LoginService loginService;
     @Resource
     private UuidService uuidService;
-    @Value(value = "${init_user_id:10000}")
-    private long USER_ID;
+    @Resource(name = "accountIdMappingService")
+    private AccountIdMappingService accountIdMappingService;
 
     @Override
     public String findAllStock() {
@@ -51,7 +56,12 @@ public class StockResourceServiceImpl implements StockResourceService {
     }
 
     @Override
-    public String getStockDetail(long id) {
+    public String simpleList() {
+        return null;
+    }
+
+    @Override
+    public String getStockDetail(Long id) {
         Map<String, Object> map = userService.getStockDetail(id);
         map.put("showStatus", AccountStatus.parse((Integer) map.get("status")).desc());
         JSONObject jsonObject = new JSONObject();
@@ -72,16 +82,16 @@ public class StockResourceServiceImpl implements StockResourceService {
     }
 
     @Override
-    public String updatePwd(long id, String pwd) {
+    public String updatePwd(Long id, String pwd) {
         boolean flag = loginService.resetPassword(id, pwd);
         if (!flag)
             //todo throw
             ApiLogger.error("update password error,userId:" + id);
-        return "";
+        return UserContants.EMPTY_STRING;
     }
 
     @Override
-    public String update(long id, String telephone, String email, String bankCardNo, String bank, int status) {
+    public String update(Long id, String telephone, String email, String bankCardNo, String bank, Integer status) {
         User user = new User();
         user.setUserId(id);
         user.setTelephone(telephone);
@@ -94,22 +104,31 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (count <= 0) {
             //todo
         }
-        return "";
+        return UserContants.EMPTY_STRING;
     }
 
     @Override
-    public String add(String account, String password, String realname, String telephone,
-                      int currencyType, String email, int sex) {
-        //todo 等待codes可用后开启
+    public String add(RequestContext rc, String account, String password, String realname, String telephone,
+                      Integer currencyType, String email, Integer sex) {
+        //todo 获取业主id
+        long ownerId = 10;
         long userId = uuidService.assignUid();
-//        long userId = (USER_ID += 1);
-        User user = new User(userId, realname, account, telephone, email, AccountType.stockholder, GeneraType.parse(sex), CurrencyType.parse(currencyType), new Date());
+        User user = assembleStock(userId, realname, account, telephone, email, AccountType.stockholder, GeneraType.parse(sex), CurrencyType.parse(currencyType), IPUtil.ipToInt(rc.getIp()), System.currentTimeMillis(), ownerId);
+        //1、添加用户
         long id = userService.addStock(user);
         if (id <= 1) {
+            //todo
         }
+        //2、添加登录信息
         Login login = new Login(userId, account, password);
         long count = loginService.add(login);
         if (count <= 0) {
+            //todo
+        }
+        //3、添加业主与账号id映射
+        OwnerAccountUser ownerAccountUser = new OwnerAccountUser(ownerId + UserContants.SPLIT_LINE + account, userId);
+        long addMapping = accountIdMappingService.add(ownerAccountUser);
+        if (addMapping <= 0) {
             //todo
         }
         JSONObject result = new JSONObject();
@@ -117,12 +136,30 @@ public class StockResourceServiceImpl implements StockResourceService {
         return result.toJSONString();
     }
 
+    private User assembleStock(Long userId, String realname, String username, String telephone, String email,
+                               AccountType type, GeneraType gender, CurrencyType currencyType, Integer registerIp, Long registerTime, Long ownerId) {
+        User user = new User();
+        user.setUserId(userId);
+        user.setRealname(realname);
+        user.setUsername(username);
+        user.setTelephone(telephone);
+        user.setEmail(email);
+        user.setType(type);
+        user.setGender(gender);
+        user.setCurrencyType(currencyType);
+        user.setRegisterIp(registerIp);
+        user.setRegisterTime(registerTime);
+        user.setOwnerId(ownerId);
+        return user;
+    }
+
+
     @Override
-    public String disable(long id, int status) {
+    public String disable(Long id, Integer status) {
         int count = userService.disable(id, status);
         if (count <= 0) {
             //todo 如果失败，逻辑处理
         }
-        return "";
+        return UserContants.EMPTY_STRING;
     }
 }

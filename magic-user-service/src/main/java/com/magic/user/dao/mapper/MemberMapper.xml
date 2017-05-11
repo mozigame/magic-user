@@ -19,7 +19,7 @@
         <result column="source_url" jdbcType="VARCHAR" property="sourceUrl"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
-        <result column="register_time" jdbcType="TIMESTAMP" property="registerTime"/>
+        <result column="register_time" jdbcType="BIGINT" property="registerTime"/>
         <result column="status" jdbcType="TINYINT" property="status"
                 typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="gender" jdbcType="TINYINT" property="gender"
@@ -34,7 +34,7 @@
     </resultMap>
 
     <!--查询会员列表-->
-    <select id="findList">
+    <select id="findList" >
         SELECT
         id,
         member_id,
@@ -51,7 +51,7 @@
     </select>
 
     <!--会员详情信息-->
-    <select id="get">
+    <select id="get" resultMap="BaseResultMap">
         SELECT
             member_id,
             realname,
@@ -132,19 +132,19 @@
                 register_time=#{registerTime},
             </if>
             <if test="status != null ">
-                status=#{status},
+                status=#{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
             </if>
             <if test="gender != null ">
-                gender=#{gender},
+                gender=#{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
             </if>
             <if test="currencyType != null ">
-                currency_type=#{currencyType},
+                currency_type=#{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
             </if>
             <if test="isDelete != null ">
-                is_delete=#{isDelete},
+                is_delete=#{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
             </if>
         </set>
-        WHERE member_id=#{id}
+        WHERE member_id=#{memberId}
     </update>
 
     <!--添加会员-->

@@ -24,7 +24,7 @@ public class OnlineMemberRedisStorageServiceImpl implements OnlineMemberRedisSto
      * {@inheritDoc}
      */
     @Override
-    public boolean addOnlineMember(long ownerId, long memberId) {
+    public boolean addOnlineMember(Long ownerId, Long memberId) {
         try {
             Jedis instance = jedisFactory.getInstance();
             String key = RedisConstants.assembleOwnerMembersList(ownerId);

@@ -2,9 +2,7 @@ package com.magic.user.service;
 
 import com.magic.api.commons.model.Page;
 import com.magic.user.entity.AgentApply;
-import com.magic.user.entity.AgentConfig;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,9 +16,9 @@ public interface AgentApplyService {
 
     Page<Map<String, Object>> findByPage(AgentApply agentApply, Page page);
 
-    Map<String, Object> agentReviewInfo(long applyId);
+    Map<String, Object> agentReviewInfo(Long applyId);
 
-    int updateStatus(long applyId, int status);
+    int updateStatus(Long applyId, Integer status);
 
-    AgentApply get(long id);
+    AgentApply get(Long id);
 }

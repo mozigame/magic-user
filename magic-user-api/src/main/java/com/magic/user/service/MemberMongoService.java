@@ -41,12 +41,12 @@ public interface MemberMongoService {
      * @param loginTime
      * @return
      */
-    boolean updateLogin(long memberId, String ip, long loginTime);
+    boolean updateLogin(Long memberId, String ip, Long loginTime);
 
     /**
      * 注销，修改会员状态
      * @param memberId
      * @return
      */
-    boolean updateLogout(long memberId);
+    boolean updateLogout(Long memberId);
 }

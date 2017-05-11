@@ -4,19 +4,19 @@ package com.magic.user.entity;
  * @Doc 代理参数配置
  */
 public class AgentConfig {
-    private int id;
+    private Integer id;
 
-    private long agentId;  //代理id
+    private Long agentId;  //代理id
 
-    private int returnSchemeId; //退佣方案id
+    private Integer returnSchemeId; //退佣方案id
 
-    private int adminCostId;    //行政成本方案id
+    private Integer adminCostId;    //行政成本方案id
 
-    private int feeId;  //手续费方案id
+    private Integer feeId;  //手续费方案id
 
-    private int discount;   //优惠扣除
+    private Integer discount;   //优惠扣除
 
-    private int cost;   //返水成本
+    private Integer cost;   //返水成本
 
     private String domain;  //域名
 
@@ -29,14 +29,14 @@ public class AgentConfig {
     public AgentConfig() {
     }
 
-    public AgentConfig(long agentId, int returnSchemeId, int adminCostId, int feeId) {
+    public AgentConfig(Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId) {
         this.agentId = agentId;
         this.returnSchemeId = returnSchemeId;
         this.adminCostId = adminCostId;
         this.feeId = feeId;
     }
 
-    public AgentConfig(long agentId, int returnSchemeId, int adminCostId, int feeId, String domain) {
+    public AgentConfig(Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain) {
         this.agentId = agentId;
         this.returnSchemeId = returnSchemeId;
         this.adminCostId = adminCostId;
@@ -44,59 +44,59 @@ public class AgentConfig {
         this.domain = domain;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public long getAgentId() {
+    public Long getAgentId() {
         return agentId;
     }
 
-    public void setAgentId(long agentId) {
+    public void setAgentId(Long agentId) {
         this.agentId = agentId;
     }
 
-    public int getReturnSchemeId() {
+    public Integer getReturnSchemeId() {
         return returnSchemeId;
     }
 
-    public void setReturnSchemeId(int returnSchemeId) {
+    public void setReturnSchemeId(Integer returnSchemeId) {
         this.returnSchemeId = returnSchemeId;
     }
 
-    public int getAdminCostId() {
+    public Integer getAdminCostId() {
         return adminCostId;
     }
 
-    public void setAdminCostId(int adminCostId) {
+    public void setAdminCostId(Integer adminCostId) {
         this.adminCostId = adminCostId;
     }
 
-    public int getFeeId() {
+    public Integer getFeeId() {
         return feeId;
     }
 
-    public void setFeeId(int feeId) {
+    public void setFeeId(Integer feeId) {
         this.feeId = feeId;
     }
 
-    public int getDiscount() {
+    public Integer getDiscount() {
         return discount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(Integer discount) {
         this.discount = discount;
     }
 
-    public int getCost() {
+    public Integer getCost() {
         return cost;
     }
 
-    public void setCost(int cost) {
+    public void setCost(Integer cost) {
         this.cost = cost;
     }
 

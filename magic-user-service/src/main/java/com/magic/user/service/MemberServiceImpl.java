@@ -28,19 +28,19 @@ import java.util.List;
 @Service("memberService")
 public class MemberServiceImpl implements MemberService {
 
-//    @Resource(name = "userMongoService")
+    //    @Resource(name = "userMongoService")
     private UserMongoService userMongoService;
     @Resource(name = "memberDbService")
     private MemberDbService memberDbService;
 
     @Override
-    public Member getMemberById(long id) {
+    public Member getMemberById(Long id) {
         return memberDbService.get(id);
     }
 
     @Override
     public boolean updateMember(Member member) {
-        return false;
+        return memberDbService.update(member) > 0;
     }
 
     @Override

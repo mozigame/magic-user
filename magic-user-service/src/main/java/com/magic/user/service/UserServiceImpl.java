@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User get(long userId) {
+    public User get(Long userId) {
         return stockDbService.get(userId);
     }
 
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> getStockDetail(long id) {
+    public Map<String, Object> getStockDetail(Long id) {
         return stockDbService.getDetail(id);
     }
 
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int disable(long id, int status) {
+    public int disable(Long id, Integer status) {
         return stockDbService.update("updateDisable", new String[]{"id", "status"}, new Object[]{id, status});
     }
 
@@ -74,8 +74,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public long getOwnerIdByStock(long id) {
-        return (long) userDbService.get("getOwnerIdByStock", null, id);
+    public long getOwnerIdByStock(Long id) {
+        return (Long) userDbService.get("getOwnerIdByStock", null, id);
     }
 
     @Override
@@ -85,17 +85,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> getAgentDetail(long id) {
+    public Map<String, Object> getAgentDetail(Long id) {
         return (Map<String, Object>) userDbService.get("agentDetail", null, id);
     }
 
     @Override
-    public User getUserById(long uid) {
+    public User getUserById(Long uid) {
         return userDbService.get(uid);
     }
 
     @Override
-    public boolean updateUser(long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
+    public boolean updateUser(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
         return false;
     }
 }

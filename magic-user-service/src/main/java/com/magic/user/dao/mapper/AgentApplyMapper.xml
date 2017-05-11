@@ -16,7 +16,7 @@
                 typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="resource_url" jdbcType="VARCHAR" property="resourceUrl" />
         <result column="register_ip" jdbcType="INTEGER" property="registerIp" />
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="create_time" jdbcType="BIGINT" property="createTime" />
         <result column="temp1" jdbcType="VARCHAR" property="temp1" />
         <result column="temp2" jdbcType="VARCHAR" property="temp2" />
     </resultMap>
@@ -118,7 +118,7 @@
          WHERE a.`status` <> 1
 
         ]]>
-        <if test="status > 0 ">
+        <if test="status != null ">
             and a.status=#{status}
         </if>
         <if test="account!=null ">
@@ -134,7 +134,7 @@
          WHERE `status` <> 1
 
         ]]>
-        <if test="status > 0 ">
+        <if test="status != null ">
             and status=#{status}
         </if>
         <if test="account!=null ">

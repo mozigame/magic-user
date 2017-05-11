@@ -47,7 +47,7 @@ public class StockDbService extends BaseDbServiceImpl<User, Long> {
      * @return
      * @Doc 根据id查询股东详细信息
      */
-    public Map<String, Object> getDetail(long id) {
+    public Map<String, Object> getDetail(Long id) {
         try {
             return (Map<String, Object>) stockDao.get("getStockDetail", null, new Object[]{id});
         } catch (Exception e) {

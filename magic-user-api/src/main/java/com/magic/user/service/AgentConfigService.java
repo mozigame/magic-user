@@ -13,9 +13,9 @@ public interface AgentConfigService {
 
     long add(AgentConfig agentConfig);
 
-    Map<String, Object> get(long id);
+    Map<String, Object> get(Long id);
 
-    Map<String, Object> findByAgentId(long agentId);
+    Map<String, Object> findByAgentId(Long agentId);
 
     int update(AgentConfig agentConfig);
 }

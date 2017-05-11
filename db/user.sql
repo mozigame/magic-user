@@ -63,7 +63,7 @@ create table t_account_oper_history
             5 会员',
    owner_id             bigint not null,
    owner_name           varchar(20) not null,
-   create_time          datetime not null,
+   create_time          bigint not null,
    primary key (id)
 );
 
@@ -94,7 +94,7 @@ create table t_agent_apply
             ',
    resource_url         varchar(50) not null,
    register_ip          int not null,
-   create_time          datetime not null,
+   create_time          bigint not null,
    temp1                varchar(128) not null,
    temp2                varchar(256) not null,
    primary key (id)
@@ -149,7 +149,7 @@ create table t_agent_review
    status               tinyint not null comment '1 未审核
             2 已拒绝
             3 已审核',
-   create_time          datetime not null,
+   create_time          bigint not null,
    primary key (id)
 );
 
@@ -160,7 +160,7 @@ create table t_login_history
 (
    id                   bigint not null auto_increment,
    user_id              bigint not null,
-   create_time          datetime not null,
+   create_time          bigint not null,
    request_ip           int not null,
    login_type           tinyint not null comment '1 退出
             2 登录',
@@ -186,7 +186,7 @@ create table t_login_info
    user_id              bigint not null,
    username             varchar(16) not null,
    password             varchar(32) not null,
-   update_time          datetime not null,
+   update_time          bigint not null,
    last_login_ip        int not null,
    status               tinyint not null comment '1 退出
             2 登录',
@@ -223,7 +223,7 @@ create table t_member
    source_url           varchar(70) not null,
    email                varchar(30) not null,
    register_ip          int not null,
-   register_time        datetime not null,
+   register_time        bigint not null,
    status               tinyint not null default 2 comment '1 启用
             2 停用',
    gender               tinyint not null default 1 comment '1 男
@@ -308,7 +308,7 @@ create table t_user_info
    telephone            varchar(25) not null,
    email                varchar(50) not null comment '
             ',
-   register_time        datetime not null,
+   register_time        bigint not null,
    register_ip          int not null,
    generalize_code      varchar(20) not null,
    gender               tinyint not null default 1 comment '1 男

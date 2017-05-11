@@ -9,7 +9,7 @@
         <result column="after_info" jdbcType="VARCHAR" property="afterInfo"/>
         <result column="proc_user_id" jdbcType="BIGINT" property="procUserId"/>
         <result column="proc_username" jdbcType="VARCHAR" property="procUsername"/>
-        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="type" jdbcType="TINYINT" property="type" typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="owner_name" jdbcType="VARCHAR" property="ownerName"/>
         <result column="create_time" jdbcType="BIGINT" property="createTime"/>
@@ -17,7 +17,7 @@
 
     <insert id="insert">
         INSERT INTO
-            t_account_oper_history(username,user_id,before_info,after_info,proc_user_id,proc_username,type,create_time)
+            t_account_oper_history(username,user_id,before_info,after_info,proc_user_id,proc_username,type,owner_id,owner_name,create_time)
         VALUES (
           #{username},
           #{userId},
@@ -25,24 +25,58 @@
           #{afterInfo},
           #{procUserId},
           #{procUsername},
-          #{type},
+          #{type,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+          #{ownerId},
+          #{ownerName},
           #{createTime}
           )
     </insert>
 
-    <select id="findbyPage" resultType="java.util.HashMap">
+    <select id="findbyPage" resultMap="BaseResultMap">
         SELECT id,
-            holder,
-            user_id accountId,
-            type,
-            username account,
-            before_info before,
-            after_info after,
-            proc_user_id operatorId,
-            proc_username operatorName,
-            create_time operatorTime
+        username,
+        user_id,
+        before_info,
+        after_info,
+        proc_user_id,
+        proc_username,
+        type,
+        owner_id,
+        owner_name,
+        create_time
         from t_account_oper_history
+        <where>
+            <if test="type > 0">
+                type = #{type}
+            </if>
+            <if test="account != null and account != ''">
+                and username = #{account}
+            </if>
+            <if test="procUserId != null">
+                and proc_user_id = #{procUserId}
+            </if>
+        </where>
+        <if test="offset != null">
+            limit #{offset},#{limit}
+        </if>
 
+    </select>
+
+    <!-- 获取修改历史列表-->
+    <select id="getCount" resultType="java.lang.Long">
+        SELECT count(id)
+        FROM t_account_oper_history
+        <where>
+            <if test="type > 0">
+                type = #{type}
+            </if>
+            <if test="account != null and account != ''">
+                and username = #{account}
+            </if>
+            <if test="procUserId != null">
+                and proc_user_id = #{procUserId}
+            </if>
+        </where>
     </select>
 
 </mapper>

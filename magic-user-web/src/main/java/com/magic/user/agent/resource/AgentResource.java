@@ -39,8 +39,8 @@ public class AgentResource {
     @ResponseBody
     public String list(
             @RequestParam(name = "condition", required = false) String condition,
-            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(name = "count", required = false, defaultValue = "10") int count
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
 
         UserCondition userCondition = JSONObject.parseObject(condition, UserCondition.class);
@@ -85,19 +85,19 @@ public class AgentResource {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @ResponseBody
     public String add(
-            @RequestParam(name = "holder") long holder,
+            @RequestParam(name = "holder") Long holder,
             @RequestParam(name = "account") String account,
             @RequestParam(name = "password") String password,
             @RequestParam(name = "realname") String realname,
             @RequestParam(name = "telephone") String telephone,
             @RequestParam(name = "bankCardNo") String bankCardNo,
             @RequestParam(name = "email") String email,
-            @RequestParam(name = "returnScheme") int returnScheme,
-            @RequestParam(name = "adminCost") int adminCost,
-            @RequestParam(name = "feeScheme") int feeScheme,
+            @RequestParam(name = "returnScheme") Integer returnScheme,
+            @RequestParam(name = "adminCost") Integer adminCost,
+            @RequestParam(name = "feeScheme") Integer feeScheme,
             @RequestParam(name = "domain", required = false) String[] domain,
-            @RequestParam(name = "discount", required = false, defaultValue = "1") int discount,
-            @RequestParam(name = "cost", required = false, defaultValue = "1") int cost
+            @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
+            @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
     ) {
         RequestContext rc = RequestContext.getRequestContext();
         return agentResourceService.add(rc, holder, account, password, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
@@ -112,7 +112,7 @@ public class AgentResource {
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @ResponseBody
     public String detail(
-            @RequestParam(name = "id") long id
+            @RequestParam(name = "id") Long id
     ) {
 
         return agentResourceService.getDetail(RequestContext.getRequestContext(), id);
@@ -128,7 +128,7 @@ public class AgentResource {
     @RequestMapping(value = "/password/reset", method = RequestMethod.POST)
     @ResponseBody
     public String passwordRest(
-            @RequestParam(name = "id") long id,
+            @RequestParam(name = "id") Long id,
             @RequestParam(name = "password") String password
 
     ) {
@@ -149,13 +149,13 @@ public class AgentResource {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public String update(
-            @RequestParam(name = "id") long id,
+            @RequestParam(name = "id") Long id,
             @RequestParam(name = "realname", required = false) String realname,
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
             @RequestParam(name = "bank", required = false) String bank,
-            @RequestParam(name = "status", required = false) int status
+            @RequestParam(name = "status", required = false) Integer status
     ) {
 
         return agentResourceService.update(RequestContext.getRequestContext(), id, realname, telephone, email, bankCardNo, bank);
@@ -173,10 +173,10 @@ public class AgentResource {
     @RequestMapping(value = "/settings", method = RequestMethod.POST)
     @ResponseBody
     public String settings(
-            @RequestParam(name = "id") long id,
-            @RequestParam(name = "returnScheme", required = false, defaultValue = "-1") int returnScheme,
-            @RequestParam(name = "adminCost", required = false, defaultValue = "-1") int adminCost,
-            @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") int feeScheme
+            @RequestParam(name = "id") Long id,
+            @RequestParam(name = "returnScheme", required = false, defaultValue = "-1") Integer returnScheme,
+            @RequestParam(name = "adminCost", required = false, defaultValue = "-1") Integer adminCost,
+            @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme
     ) {
         return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme);
     }
@@ -218,9 +218,9 @@ public class AgentResource {
     @ResponseBody
     public String reviewList(
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false) int status,
-            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(name = "count", required = false, defaultValue = "10") int count
+            @RequestParam(name = "status", required = false) Integer status,
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
 
         return agentResourceService.agentApplyList(RequestContext.getRequestContext(), account, status, page, count);
@@ -237,7 +237,7 @@ public class AgentResource {
     @ResponseBody
     public String reviewListExport(
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false) int status
+            @RequestParam(name = "status", required = false) Integer status
 //            股东ID（从RequestContext中获取股东ID）
     ) {
         return "";
@@ -252,7 +252,7 @@ public class AgentResource {
     @RequestMapping(value = "/detail/simple", method = RequestMethod.GET)
     @ResponseBody
     public String listExport(
-            @RequestParam(name = "id") long id
+            @RequestParam(name = "id") Long id
     ) {
         return agentResourceService.agentApplyInfo(RequestContext.getRequestContext(), id);
     }
@@ -278,19 +278,19 @@ public class AgentResource {
     @RequestMapping(value = "/review", method = RequestMethod.POST)
     @ResponseBody
     public String review(
-            @RequestParam(name = "id") long id,
-            @RequestParam(name = "reviewStatus") int reviewStatus,
-            @RequestParam(name = "holder", required = false) long holder,
+            @RequestParam(name = "id") Long id,
+            @RequestParam(name = "reviewStatus") Integer reviewStatus,
+            @RequestParam(name = "holder", required = false) Long holder,
             @RequestParam(name = "realname", required = false) String realname,
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
             @RequestParam(name = "email", required = false) String email,
-            @RequestParam(name = "returnScheme", required = false) int returnScheme,
-            @RequestParam(name = "adminCost", required = false) int adminCost,
-            @RequestParam(name = "feeScheme", required = false) int feeScheme,
+            @RequestParam(name = "returnScheme", required = false) Integer returnScheme,
+            @RequestParam(name = "adminCost", required = false) Integer adminCost,
+            @RequestParam(name = "feeScheme", required = false) Integer feeScheme,
             @RequestParam(name = "domain", required = false) String[] domain,
-            @RequestParam(name = "discount", required = false, defaultValue = "1") int discount,
-            @RequestParam(name = "cost", required = false, defaultValue = "1") int cost
+            @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
+            @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
 
     ) {
         return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
@@ -306,8 +306,8 @@ public class AgentResource {
     @RequestMapping(value = "/disable", method = RequestMethod.POST)
     @ResponseBody
     public String review(
-            @RequestParam(name = "id") long id,
-            @RequestParam(name = "status") int status
+            @RequestParam(name = "id") Long id,
+            @RequestParam(name = "status") Integer status
 
     ) {
         return agentResourceService.disable(RequestContext.getRequestContext(), id, status);

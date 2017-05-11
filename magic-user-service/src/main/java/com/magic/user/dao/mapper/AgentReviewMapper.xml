@@ -8,7 +8,7 @@
         <result column="oper_user_id" jdbcType="BIGINT" property="operUserId"/>
         <result column="oper_user_name" jdbcType="VARCHAR" property="operUserName"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
     </resultMap>
 
     <!-- 新增代理审核记录-->

@@ -1,5 +1,6 @@
 package com.magic.user.service;
 
+import com.magic.user.entity.Login;
 import com.magic.user.entity.User;
 import com.magic.user.vo.UserCondition;
 

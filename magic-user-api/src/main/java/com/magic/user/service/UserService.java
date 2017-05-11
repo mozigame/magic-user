@@ -19,7 +19,7 @@ public interface UserService {
      * @param id
      * @return
      */
-    User get(long id);
+    User get(Long id);
 
     /**
      * @return
@@ -32,7 +32,7 @@ public interface UserService {
      * @return
      * @Doc 获取股东详情
      */
-    Map<String, Object> getStockDetail(long id);
+    Map<String, Object> getStockDetail(Long id);
 
     /**
      * @param userCondition
@@ -61,7 +61,7 @@ public interface UserService {
      * @return
      * @Doc 根据股东id获取业主id
      */
-    long getOwnerIdByStock(long id);
+    long getOwnerIdByStock(Long id);
 
     /**
      * 根据推广码查询代理数据
@@ -76,7 +76,7 @@ public interface UserService {
      * @return
      * @Doc 查询代理详情
      */
-    Map<String, Object> getAgentDetail(long id);
+    Map<String, Object> getAgentDetail(Long id);
 
     /**
      * 获取用户数据
@@ -84,7 +84,7 @@ public interface UserService {
      * @param uid
      * @return
      */
-    User getUserById(long uid);
+    User getUserById(Long uid);
 
     /**
      * 用户更新
@@ -98,7 +98,7 @@ public interface UserService {
      * @param bankDeposit
      * @return
      */
-    boolean updateUser(long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
+    boolean updateUser(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
 
 
     /**
@@ -121,5 +121,5 @@ public interface UserService {
      * @return
      * @Doc 启用停用账号
      */
-    int disable(long id, int status);
+    int disable(Long id, Integer status);
 }

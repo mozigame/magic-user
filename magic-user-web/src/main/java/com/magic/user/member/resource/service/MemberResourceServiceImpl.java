@@ -269,7 +269,7 @@ public class MemberResourceServiceImpl {
         info.setAgentId(member.getAgentId());
         info.setAgent(member.getAgentUsername());
         info.setRealname(member.getRealname());
-        info.setRegisterTime(DateUtil.formatDateTime(member.getRegisterTime(), DateUtil.formatDefaultTimestamp));
+        info.setRegisterTime(DateUtil.formatDateTime(new Date(member.getRegisterTime()), DateUtil.formatDefaultTimestamp));
         info.setRegisterIp(IPUtil.intToIp(member.getRegisterIp()));
         info.setEmail(member.getEmail());
         info.setStatus(member.getStatus().value());
@@ -406,7 +406,7 @@ public class MemberResourceServiceImpl {
      */
     private Member assembleMember(long id, String realname, String telephone, String email, String bankCardNo, int status) {
         Member member = new Member();
-        member.setId(id);
+        member.setMemberId(id);
         member.setRealname(realname);
         member.setTelephone(telephone);
         member.setEmail(email);
@@ -565,7 +565,7 @@ public class MemberResourceServiceImpl {
         String proCode = req.getProCode();
         if (StringUtils.isNoneEmpty(proCode)){
             User user = userService.getUserByCode(proCode);
-            if (agent != null && user.getOwnerId() == ownerId){
+            if (user.getOwnerId() == ownerId) {
                 agent = user;
             }
         }
@@ -654,7 +654,7 @@ public class MemberResourceServiceImpl {
         member.setMemberId(userId);
         member.setOwnerId(ownerId);
         member.setOwnerUsername(ownerName);
-        member.setStockId(holder.getId());
+        member.setStockId(holder.getUserId());
         member.setStockUsername(holder.getUsername());
         member.setOwnerId(ownerId);
         member.setOwnerUsername(ownerName);
@@ -662,7 +662,7 @@ public class MemberResourceServiceImpl {
         member.setAgentUsername(agent.getUsername());
         member.setSourceUrl(url);
         member.setRegisterIp(IPUtil.ipToInt(rc.getIp()));
-        member.setRegisterTime(new Date());
+        member.setRegisterTime(System.currentTimeMillis());
         return member;
     }
 
@@ -761,10 +761,10 @@ public class MemberResourceServiceImpl {
      */
     private boolean sendLoginMessage(long ownerId, long memberId, String ip) {
         try {
-            HashMap<String, Long> map = new HashMap<>();
+            HashMap<String, Object> map = new HashMap<>();
             map.put("ownerId", ownerId);
             map.put("memberId", memberId);
-            map.put("ip", memberId);
+            map.put("ip", ip);
             map.put("loginTime", System.currentTimeMillis());
             return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), JSON.toJSONString(map));
         }catch (Exception e){

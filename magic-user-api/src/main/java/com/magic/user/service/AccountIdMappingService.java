@@ -1,5 +1,7 @@
 package com.magic.user.service;
 
+import com.magic.user.entity.OwnerAccountUser;
+
 /**
  * AccountIdMappingService
  *
@@ -14,5 +16,12 @@ public interface AccountIdMappingService {
      * @param account 股东/代理账号名
      * @return
      */
-    long getUid(long ownerId, String account);
+    long getUid(Long ownerId, String account);
+
+    /**
+     * 添加
+     * @param ownerAccountUser
+     * @return
+     */
+    long add(OwnerAccountUser ownerAccountUser);
 }

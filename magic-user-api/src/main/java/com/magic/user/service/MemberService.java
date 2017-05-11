@@ -21,7 +21,7 @@ public interface MemberService {
      * @param id 会员ID
      * @return
      */
-    Member getMemberById(long id);
+    Member getMemberById(Long id);
 
     /**
      * 更新会员数据

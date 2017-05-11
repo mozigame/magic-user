@@ -24,12 +24,12 @@ public class AgentConfigServiceImpl implements AgentConfigService {
     }
 
     @Override
-    public Map<String, Object> get(long id) {
+    public Map<String, Object> get(Long id) {
         return (Map<String, Object>) agentConfigDbService.get(id);
     }
 
     @Override
-    public Map<String, Object> findByAgentId(long agentId) {
+    public Map<String, Object> findByAgentId(Long agentId) {
         return (Map<String, Object>) agentConfigDbService.get("findByAgentId", null, agentId);
     }
 

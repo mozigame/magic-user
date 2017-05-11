@@ -1,10 +1,6 @@
 package com.magic.user.service;
 
-import com.magic.api.commons.model.Page;
-import com.magic.user.entity.AgentApply;
 import com.magic.user.entity.AgentReview;
-
-import java.util.Map;
 
 /**
  * User: joey

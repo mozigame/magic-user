@@ -2,6 +2,7 @@ package com.magic.user.stockholder.resource;
 
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.core.auth.Access;
+import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.CurrencyType;
@@ -61,7 +62,7 @@ public class StockholderResource {
     @RequestMapping(value = "/list/simple", method = RequestMethod.GET)
     @ResponseBody
     public String listSimple(
-            @RequestParam(name = "ids") long[] ids
+            @RequestParam(name = "ids") Long[] ids
     ) {
 
         return "{\n" +
@@ -81,7 +82,7 @@ public class StockholderResource {
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @ResponseBody
     public String detail(
-            @RequestParam(name = "id") long id
+            @RequestParam(name = "id") Long id
     ) {
         return stockResourceService.getStockDetail(id);
     }
@@ -97,7 +98,7 @@ public class StockholderResource {
     @RequestMapping(value = "/password/reset", method = RequestMethod.POST)
     @ResponseBody
     public String passwordReset(
-            @RequestParam(name = "id") long id,
+            @RequestParam(name = "id") Long id,
             @RequestParam(name = "password") String password
     ) {
         return stockResourceService.updatePwd(id, password);
@@ -116,12 +117,12 @@ public class StockholderResource {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public String update(
-            @RequestParam(name = "id") long id,
+            @RequestParam(name = "id") Long id,
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
             @RequestParam(name = "bank", required = false) String bank,
-            @RequestParam(name = "status", required = false) int status
+            @RequestParam(name = "status", required = false) Integer status
     ) {
 
         return stockResourceService.update(id, telephone, email, bankCardNo, bank, status);
@@ -146,13 +147,13 @@ public class StockholderResource {
             @RequestParam(name = "password") String password,
             @RequestParam(name = "realname") String realname,
             @RequestParam(name = "telephone") String telephone,
-            @RequestParam(name = "currencyType") int currencyType,
+            @RequestParam(name = "currencyType") Integer currencyType,
             @RequestParam(name = "email", required = false) String email,
-            @RequestParam(name = "sex") int sex
+            @RequestParam(name = "sex") Integer sex
     ) {
 
 
-        return stockResourceService.add(account, password, realname, telephone, currencyType, email, sex);
+        return stockResourceService.add(RequestContext.getRequestContext(), account, password, realname, telephone, currencyType, email, sex);
     }
 
     /**
@@ -165,8 +166,8 @@ public class StockholderResource {
     @RequestMapping(value = "/disable", method = RequestMethod.POST)
     @ResponseBody
     public String disable(
-            @RequestParam(name = "id") long id,
-            @RequestParam(name = "status") int status
+            @RequestParam(name = "id") Long id,
+            @RequestParam(name = "status") Integer status
     ) {
 
         return stockResourceService.disable(id, status);

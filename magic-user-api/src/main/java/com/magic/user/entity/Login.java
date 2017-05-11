@@ -2,52 +2,50 @@ package com.magic.user.entity;
 
 import com.magic.user.enums.LoginType;
 
-import java.util.Date;
-
 /**
  * @Doc 登录基础信息
  */
 public class Login {
-    private long id;
+    private Long id;
 
-    private long userId;    //用户id
+    private Long userId;    //用户id
 
     private String username;    //账号
 
     private String password;    //密码
 
-    private Date updateTime;    //修改时间，最后登录时间
+    private Long upLongTime;    //修改时间，最后登录时间
 
-    private int lastLoginIp;    //最后登录ip
+    private Integer lastLoginIp;    //最后登录ip
 
     private LoginType status; //登录等出
 
     public Login(){}
-    public Login(long userId, String username, String password) {
+    public Login(Long userId, String username, String password) {
         this.userId = userId;
         this.username = username;
         this.password = password;
     }
 
-    public Login(Date updateTime, int lastLoginIp, LoginType status) {
-        this.updateTime = updateTime;
+    public Login(Long upLongTime, Integer lastLoginIp, LoginType status) {
+        this.upLongTime = upLongTime;
         this.lastLoginIp = lastLoginIp;
         this.status = status;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -67,19 +65,19 @@ public class Login {
         this.password = password;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public Long getUpLongTime() {
+        return upLongTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    public void setUpLongTime(Long upLongTime) {
+        this.upLongTime = upLongTime;
     }
 
-    public int getLastLoginIp() {
+    public Integer getLastLoginIp() {
         return lastLoginIp;
     }
 
-    public void setLastLoginIp(int lastLoginIp) {
+    public void setLastLoginIp(Integer lastLoginIp) {
         this.lastLoginIp = lastLoginIp;
     }
 

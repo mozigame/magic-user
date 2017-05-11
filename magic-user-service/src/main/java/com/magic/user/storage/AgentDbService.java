@@ -43,7 +43,7 @@ public class AgentDbService extends BaseDbServiceImpl<User, Long> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return 0;
+        return 0L;
     }
 
 }

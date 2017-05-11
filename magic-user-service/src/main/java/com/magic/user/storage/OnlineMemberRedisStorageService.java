@@ -13,5 +13,5 @@ public interface OnlineMemberRedisStorageService {
      * @param memberId
      * @return
      */
-    boolean addOnlineMember(long ownerId, long memberId);
+    boolean addOnlineMember(Long ownerId, Long memberId);
 }
