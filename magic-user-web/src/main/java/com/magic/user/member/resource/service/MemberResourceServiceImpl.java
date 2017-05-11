@@ -202,7 +202,7 @@ public class MemberResourceServiceImpl {
         //TODO 2.jason 根据会员ID查询会员资金概括
         //TODO 3.jason 根据会员ID查询投注记录
         //TODO 4.jason 根据会员ID查询优惠记录
-        MemberDetailVo detail = assembleMemberDetail();
+        MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
     }
 
