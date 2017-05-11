@@ -10,6 +10,8 @@ import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
+import com.magic.api.commons.tools.DateUtil;
+import com.magic.api.commons.tools.IPUtil;
 import com.magic.commons.enginegw.EngineUtil;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
@@ -61,6 +63,8 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private Producer producer;
+
+    private int userId = 10000;
 
     /**
      * 会员列表
@@ -198,16 +202,82 @@ public class MemberResourceServiceImpl {
         //TODO 2.jason 根据会员ID查询会员资金概括
         //TODO 3.jason 根据会员ID查询投注记录
         //TODO 4.jason 根据会员ID查询优惠记录
-        MemberDetailVo detail = assembleMemberDetail();
+        MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
     }
 
     /**
      * 组装会员详情 //TODO
+     *
      * @return
      */
-    private MemberDetailVo assembleMemberDetail() {
-        return null;
+    private MemberDetailVo assembleMemberDetail(Member member) {
+        MemberDetailVo vo = new MemberDetailVo();
+        ////会员基础信息
+        vo.setBaseInfo(assembleMemberInfo(member));
+        //会员优惠方案
+        String preferScheme = "{\n" +
+                "    \"level\": 1,\n" +
+                "    \"showLevel\": \"未分层\",\n" +
+                "    \"onlineDiscount\": \"100返10\",\n" +
+                "    \"depositFee\": \"无\",\n" +
+                "    \"withdrawFee\": \"无\",\n" +
+                "    \"returnWater\": \"返水基本1\",\n" +
+                "    \"depositDiscountScheme\": \"100返10\"\n" +
+                "}";
+        MemberPreferScheme memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
+        vo.setPreferScheme(memberPreferScheme);
+        ///会员资金概况
+        String memberFundInfo = "{\n" +
+                "    \"balance\": \"1805.50\",\n" +
+                "    \"depositNumbers\": 15,\n" +
+                "    \"depositTotalMoney\": \"29006590\",\n" +
+                "    \"lastDeposit\": \"1200\",\n" +
+                "    \"withdrawNumbers\": 10,\n" +
+                "    \"withdrawTotalMoney\": \"24500120\",\n" +
+                "    \"lastWithdraw\": \"2500\"\n" +
+                "}";
+
+        MemberFundInfo memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
+        FundProfile fundProfile = new FundProfile();
+        fundProfile.setInfo(memberFundInfoObj);
+        fundProfile.setSyncTime(DateUtil.formatDateTime(new Date(), DateUtil.formatDefaultTimestamp));
+        vo.setFundProfile(fundProfile);
+        //投注记录
+        String memberBetHistory = "{\n" +
+                "    \"totalMoney\": \"29000\",\n" +
+                "    \"effMoney\": \"28000\",\n" +
+                "    \"gains\": \"18000\"\n" +
+                "}";
+        MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
+        vo.setBetHistory(memberBetHistoryObj);
+        //优惠记录
+        String memberDiscountHistory = "{\n" +
+                "    \"totalMoney\": \"1350\",\n" +
+                "    \"numbers\": 98,\n" +
+                "    \"returnWaterTotalMoney\": \"1450\"\n" +
+                "}";
+        MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
+        vo.setDiscountHistory(memberDiscountHistoryObj);
+        return vo;
+    }
+
+    private MemberInfo assembleMemberInfo(Member member) {
+        MemberInfo info = new MemberInfo();
+        info.setId(member.getMemberId());
+        info.setAccount(member.getUsername());
+        info.setAgentId(member.getAgentId());
+        info.setAgent(member.getAgentUsername());
+        info.setRealname(member.getRealname());
+        info.setRegisterTime(DateUtil.formatDateTime(member.getRegisterTime(), DateUtil.formatDefaultTimestamp));
+        info.setRegisterIp(IPUtil.intToIp(member.getRegisterIp()));
+        info.setEmail(member.getEmail());
+        info.setStatus(member.getStatus().value());
+        info.setShowStatus(member.getStatus().desc());
+        info.setBankCardNo(member.getBankCardNo());
+        //todo lastloginip 在passport中获取
+        info.setLastLoginIp("0:0:0:0:0:0");
+        return info;
     }
 
     /**
@@ -475,18 +545,20 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberRegister(RequestContext rc, String url, RegisterReq req) {
-        if (!checkRegisterParam(req)){
+        if (!checkRegisterParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         //TODO andy 根据url 获取 ownerId 和 ownerName
-        long ownerId = 0l;
+        long ownerId = 14;
         String ownerName = "";
-        long holderId = accountIdMappingService.getUid(ownerId, ownerName);//股东id
-        if (holderId <= 0){
+        //todo holderId暂时注释掉
+//        long holderId = accountIdMappingService.getUid(ownerId, ownerName);//股东id
+        long holderId = 105094;//股东id
+        if (holderId <= 0) {
             throw UserException.ILLEGAL_USER;
         }
         User holder = userService.getUserById(holderId);
-        if (holder == null){
+        if (holder == null) {
             throw UserException.ILLEGAL_USER;
         }
         User agent = null;//所属代理ID
@@ -508,27 +580,31 @@ public class MemberResourceServiceImpl {
         }
         String body = assembleRegisterBody(rc, url, ownerId, agent.getId(), req);
         EGReq egReq = assembleEGReq(CmdType.PASSPORT, 0x100001, body);
-        EGResp resp = EngineUtil.call(egReq, "account");
-        if (resp == null){
+
+        //todo 暂时注释调用引擎网关的逻辑
+        /*EGResp resp = EngineUtil.call(egReq, "account");
+        if (resp == null) {
             throw UserException.REGISTER_FAIL;
         }
         int code = resp.getCode();
-        if (code == 0x1004){
+        if (code == 0x1004) {
             throw UserException.USERNAME_EXIST;
         }
-        if (code != 0x1111){
+        if (code != 0x1111) {
             throw UserException.REGISTER_FAIL;
-        }
-        long userId = 0l;
-        try {
+        }*/
+        //todo
+//        long userId = 0l;
+        long userId = this.userId += 1;
+        /*try {
             userId = Long.parseLong(resp.getData());
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("passport register return data error. resp: %s", JSON.toJSONString(resp)), e);
-        }
-        if (userId <= 0){
+        }*/
+        if (userId <= 0) {
             throw UserException.REGISTER_FAIL;
         }
-        Member member = assembleMember(rc, req, userId, ownerId, ownerName, holder, agent);
+        Member member = assembleMember(rc, req, userId, ownerId, ownerName, holder, agent, url);
         boolean result = memberService.saveMember(member);
         if (!result){
             throw UserException.REGISTER_FAIL;
@@ -564,9 +640,29 @@ public class MemberResourceServiceImpl {
      * @param agent
      * @return
      */
-    private Member assembleMember(RequestContext rc, RegisterReq req, long userId, long ownerId, String ownerName, User holder, User agent) {
+    private Member assembleMember(RequestContext rc, RegisterReq req, long userId, long ownerId, String ownerName, User holder, User agent, String url) {
         Member member = new Member();
         //todo
+        member.setUsername(req.getUsername());
+        member.setRealname(req.getRealname());
+        member.setTelephone(req.getTelephone());
+        member.setEmail(req.getEmail());
+        member.setBank(req.getBank());
+        member.setBankCardNo(req.getBankCardNo());
+        member.setBankDeposit(req.getBankReposit());
+        member.setBank(req.getBank());
+        member.setMemberId(userId);
+        member.setOwnerId(ownerId);
+        member.setOwnerUsername(ownerName);
+        member.setStockId(holder.getId());
+        member.setStockUsername(holder.getUsername());
+        member.setOwnerId(ownerId);
+        member.setOwnerUsername(ownerName);
+        member.setAgentId(agent.getUserId());
+        member.setAgentUsername(agent.getUsername());
+        member.setSourceUrl(url);
+        member.setRegisterIp(IPUtil.ipToInt(rc.getIp()));
+        member.setRegisterTime(new Date());
         return member;
     }
 
@@ -801,7 +897,7 @@ public class MemberResourceServiceImpl {
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100003, body);
         EGResp resp = EngineUtil.call(req, "account");
         boolean result = Optional.ofNullable(resp).filter(response -> response.getCode() != 0x3333).isPresent();
-        if (!result){
+        if (!result) {
             throw UserException.VERIFY_FAIL;
         }
         return "{\" username: \"" + "\"" + resp.getData() + "\"}";
@@ -863,6 +959,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 组装注销passport 请求body
+     *
      * @param rc
      * @param username
      * @return
@@ -872,7 +969,7 @@ public class MemberResourceServiceImpl {
         object.put("userId", rc.getUid());
         object.put("username", username);
         object.put("deviceId", rc.getClient().getDeviceId());
-        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("operatorTime", System.currentTimeMillis() / 1000);
         return object.toJSONString();
     }
 

@@ -2,31 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.magic.user.entity.Member">
     <resultMap id="BaseResultMap" type="com.magic.user.entity.Member">
-        <id column="id" jdbcType="BIGINT" property="id" />
-        <result column="member_id" jdbcType="BIGINT" property="memberId" />
-        <result column="realname" jdbcType="VARCHAR" property="realname" />
-        <result column="username" jdbcType="VARCHAR" property="username" />
-        <result column="telephone" jdbcType="VARCHAR" property="telephone" />
-        <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo" />
-        <result column="bank" jdbcType="VARCHAR" property="bank" />
-        <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit" />
-        <result column="agent_id" jdbcType="BIGINT" property="agentId" />
-        <result column="agent_username" jdbcType="VARCHAR" property="agentUsername" />
-        <result column="stock_id" jdbcType="BIGINT" property="stockId" />
-        <result column="stock_username" jdbcType="VARCHAR" property="stockUsername" />
-        <result column="owner_id" jdbcType="BIGINT" property="ownerId" />
-        <result column="owner_username" jdbcType="VARCHAR" property="ownerUsername" />
-        <result column="source_url" jdbcType="VARCHAR" property="sourceUrl" />
-        <result column="email" jdbcType="VARCHAR" property="email" />
-        <result column="register_ip" jdbcType="INTEGER" property="registerIp" />
-        <result column="register_time" jdbcType="TIMESTAMP" property="registerTime" />
-        <result column="status" jdbcType="TINYINT" property="status" />
-        <result column="gender" jdbcType="TINYINT" property="gender" />
-        <result column="currency_type" jdbcType="TINYINT" property="currencyType" />
-        <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
-        <result column="temp1" jdbcType="VARCHAR" property="temp1" />
-        <result column="temp2" jdbcType="VARCHAR" property="temp2" />
-        <result column="temp3" jdbcType="VARCHAR" property="temp3" />
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="member_id" jdbcType="BIGINT" property="memberId"/>
+        <result column="realname" jdbcType="VARCHAR" property="realname"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
+        <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
+        <result column="bank" jdbcType="VARCHAR" property="bank"/>
+        <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit"/>
+        <result column="agent_id" jdbcType="BIGINT" property="agentId"/>
+        <result column="agent_username" jdbcType="VARCHAR" property="agentUsername"/>
+        <result column="stock_id" jdbcType="BIGINT" property="stockId"/>
+        <result column="stock_username" jdbcType="VARCHAR" property="stockUsername"/>
+        <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
+        <result column="owner_username" jdbcType="VARCHAR" property="ownerUsername"/>
+        <result column="source_url" jdbcType="VARCHAR" property="sourceUrl"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
+        <result column="register_time" jdbcType="TIMESTAMP" property="registerTime"/>
+        <result column="status" jdbcType="TINYINT" property="status"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="gender" jdbcType="TINYINT" property="gender"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="currency_type" jdbcType="TINYINT" property="currencyType"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="is_delete" jdbcType="TINYINT" property="isDelete"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
+        <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
+        <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
     </resultMap>
 
     <!--查询会员列表-->
@@ -49,18 +53,28 @@
     <!--会员详情信息-->
     <select id="get">
         SELECT
-          member_id memberId,
-          username username,
-          agent_id agentId,
-          agent_username agent_username,
-          realname realname,
-          register_time registerTime,
-          telephone,
-          register_ip registerIp,
-          email,
-          status,
-          bank_card_no bankCardNo,
-          last_login_ip lastLoginIp
+            member_id,
+            realname,
+            username,
+            telephone,
+            bank_card_no,
+            bank,
+            bank_deposit,
+            agent_id,
+            agent_username,
+            stock_id,
+            stock_username,
+            stock_username,
+            owner_id,
+            owner_username,
+            source_url,
+            email,
+            register_ip,
+            register_time,
+            status,
+            gender,
+            currency_type,
+            is_delete
         FROM t_member
           WHERE member_id=#{memberId}
     </select>
@@ -69,26 +83,197 @@
     <update id="update">
         UPDATE t_member
         <set>
-            <if test="realname != null">
-                realname = #{realname},
+            <if test="realname != null ">
+                realname=#{realname},
             </if>
-            <if test="telephone != null">
-                telephone = #{telephone},
+            <if test="username != null ">
+                username=#{username},
             </if>
-            <if test="email != null">
-                email = #{email},
+            <if test="telephone != null ">
+                telephone=#{telephone},
             </if>
-            <if test="bankCardNo != null">
-                bank_card_no = #{bankCardNo},
+            <if test="bankCardNo != null ">
+                bank_card_no=#{bankCardNo},
             </if>
-            <if test="status > 0 ">
-                status = #{status},
+            <if test="bank != null ">
+                bank=#{bank},
+            </if>
+            <if test="bankDeposit != null ">
+                bank_deposit=#{bankDeposit},
+            </if>
+            <if test="agentId != null ">
+                agent_id=#{agentId},
+            </if>
+            <if test="agentUsername != null ">
+                agent_username=#{agentUsername},
+            </if>
+            <if test="stockId != null ">
+                stock_id=#{stockId},
+            </if>
+            <if test="stockUsername != null ">
+                stock_username=#{stockUsername},
+            </if>
+            <if test="ownerId != null ">
+                owner_id=#{ownerId},
+            </if>
+            <if test="ownerUsername != null ">
+                owner_username=#{ownerUsername},
+            </if>
+            <if test="sourceUrl != null ">
+                source_url=#{sourceUrl},
+            </if>
+            <if test="email != null ">
+                email=#{email},
+            </if>
+            <if test="registerIp != null ">
+                register_ip=#{registerIp},
+            </if>
+            <if test="registerTime != null ">
+                register_time=#{registerTime},
+            </if>
+            <if test="status != null ">
+                status=#{status},
+            </if>
+            <if test="gender != null ">
+                gender=#{gender},
+            </if>
+            <if test="currencyType != null ">
+                currency_type=#{currencyType},
+            </if>
+            <if test="isDelete != null ">
+                is_delete=#{isDelete},
             </if>
         </set>
+        WHERE member_id=#{id}
     </update>
 
     <!--添加会员-->
     <insert id="insert">
-
+        INSERT INTO t_member(
+        <if test="realname != null ">
+            realname,
+        </if>
+        <if test="username != null ">
+            username,
+        </if>
+        <if test="telephone != null ">
+            telephone,
+        </if>
+        <if test="bankCardNo != null ">
+            bank_card_no,
+        </if>
+        <if test="bank != null ">
+            bank,
+        </if>
+        <if test="bankDeposit != null ">
+            bank_deposit,
+        </if>
+        <if test="agentId != null ">
+            agent_id,
+        </if>
+        <if test="agentUsername != null ">
+            agent_username,
+        </if>
+        <if test="stockId != null ">
+            stock_id,
+        </if>
+        <if test="stockUsername != null ">
+            stock_username,
+        </if>
+        <if test="ownerId != null ">
+            owner_id,
+        </if>
+        <if test="ownerUsername != null ">
+            owner_username,
+        </if>
+        <if test="sourceUrl != null ">
+            source_url,
+        </if>
+        <if test="email != null ">
+            email,
+        </if>
+        <if test="registerIp != null ">
+            register_ip,
+        </if>
+        <if test="registerTime != null ">
+            register_time,
+        </if>
+        <if test="status != null ">
+            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="gender != null ">
+            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="currencyType != null ">
+            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="isDelete != null ">
+            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        member_id
+        )
+        VALUES(
+        <if test="realname != null ">
+            #{realname},
+        </if>
+        <if test="username != null ">
+            #{username},
+        </if>
+        <if test="telephone != null ">
+            #{telephone},
+        </if>
+        <if test="bankCardNo != null ">
+            #{bankCardNo},
+        </if>
+        <if test="bank != null ">
+            #{bank},
+        </if>
+        <if test="bankDeposit != null ">
+            #{bankDeposit},
+        </if>
+        <if test="agentId != null ">
+            #{agentId},
+        </if>
+        <if test="agentUsername != null ">
+            #{agentUsername},
+        </if>
+        <if test="stockId != null ">
+            #{stockId},
+        </if>
+        <if test="stockUsername != null ">
+            #{stockUsername},
+        </if>
+        <if test="ownerId != null ">
+            #{ownerId},
+        </if>
+        <if test="ownerUsername != null ">
+            #{ownerUsername},
+        </if>
+        <if test="sourceUrl != null ">
+            #{sourceUrl},
+        </if>
+        <if test="email != null ">
+            #{email},
+        </if>
+        <if test="registerIp != null ">
+            #{registerIp},
+        </if>
+        <if test="registerTime != null ">
+            #{registerTime},
+        </if>
+        <if test="status != null ">
+            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="gender != null ">
+            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="currencyType != null ">
+            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        <if test="isDelete != null ">
+            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        </if>
+        #{memberId}
+        )
     </insert>
 </mapper>

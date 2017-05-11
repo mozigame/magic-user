@@ -7,6 +7,7 @@ import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
+import com.magic.user.storage.MemberDbService;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.storage.UserMongoService;
 import com.magic.user.util.UserVo;
@@ -29,10 +30,12 @@ public class MemberServiceImpl implements MemberService {
 
 //    @Resource(name = "userMongoService")
     private UserMongoService userMongoService;
+    @Resource(name = "memberDbService")
+    private MemberDbService memberDbService;
 
     @Override
     public Member getMemberById(long id) {
-        return null;
+        return memberDbService.get(id);
     }
 
     @Override
@@ -172,7 +175,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public boolean saveMember(Member member) {
-        return false;
+        return memberDbService.insert(member) > 0;
     }
 
 }

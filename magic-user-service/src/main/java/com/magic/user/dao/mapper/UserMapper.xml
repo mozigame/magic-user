@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.magic.user.entity.User">
-    <resultMap id="BaseResultMap" type="com.magic.user.entity.User">
+
+    <resultMap id="baseResultMap" type="User">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="realname" jdbcType="VARCHAR" property="realname"/>
@@ -11,39 +12,43 @@
         <result column="register_time" jdbcType="TIMESTAMP" property="registerTime"/>
         <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
         <result column="generalize_code" jdbcType="VARCHAR" property="generalizeCode"/>
-        <result column="gender" jdbcType="TINYINT" property="gender"/>
+        <result column="gender" jdbcType="TINYINT" property="gender"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="status" jdbcType="TINYINT" property="status"
                 typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
-        <result column="currency_type" jdbcType="TINYINT" property="currencyType"/>
+        <result column="currency_type" jdbcType="TINYINT" property="currencyType"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
         <result column="bank" jdbcType="VARCHAR" property="bank"/>
         <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit"/>
         <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
-        <result column="is_delete" jdbcType="TINYINT" property="isDelete"/>
-        <result column="type" jdbcType="TINYINT" property="type" typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="is_delete" jdbcType="TINYINT" property="isDelete"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="type" jdbcType="TINYINT" property="type"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
     </resultMap>
 
     <!--获取用户基础信息-->
-    <select id="get" resultType="User">
+    <select id="get" resultMap="baseResultMap">
         select
             id,
-            user_id userId,
+            user_id,
             realname,
             username,
             telephone,
             email,
-            register_time registerTime,
-            register_ip registerIp,
-            generalize_code generalizeCode,
+            register_time,
+            register_ip,
+            generalize_code,
             gender,
             status,
-            currency_type	currencyType,
-            bank_card_no baknCardNo,
-            owner_id ownerId,
-            is_delete isDelete,
+            currency_type,
+            bank_card_no,
+            owner_id,
+            is_delete,
             type
             from t_user_info
         WHERE user_id=#{userId}
@@ -314,6 +319,29 @@
           LEFT JOIN t_agent_config_info ac
           on(u.user_id=ac.agent_id)
         WHERE u.user_id=#{userId}
+    </select>
+
+    <!--根据推广码获取代理信息--><!-- used -->
+    <select id="findAgentByProCode" resultMap="baseResultMap">
+        SELECT
+            id,
+            user_id,
+            realname,
+            username,
+            telephone,
+            email,
+            register_time,
+            register_ip,
+            generalize_code,
+            gender,
+            status,
+            currency_type,
+            bank_card_no,
+            owner_id,
+            is_delete,
+            type
+            from t_user_info
+        WHERE generalize_code=#{proCode}
     </select>
     <!--###########   代理操作   #############-->
 

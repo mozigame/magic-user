@@ -1,5 +1,7 @@
 package com.magic.user.dbdao;
 
+import com.magic.user.po.OnLineMember;
+
 /**
  * OnlineMemberDao
  *
