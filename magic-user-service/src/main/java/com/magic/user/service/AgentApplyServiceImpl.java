@@ -3,9 +3,11 @@ package com.magic.user.service;
 import com.magic.api.commons.model.Page;
 import com.magic.user.entity.AgentApply;
 import com.magic.user.storage.AgentApplyDbService;
+import com.magic.user.vo.AgentApplyVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,13 +27,18 @@ public class AgentApplyServiceImpl implements AgentApplyService {
     }
 
     @Override
-    public Page<Map<String, Object>> findByPage(AgentApply agentApply, Page page) {
-        return agentApplyDbService.findByPage(agentApply, page);
+    public List<AgentApplyVo> findByPage(String account, Integer status, Integer page, Integer count) {
+        return agentApplyDbService.findByPage(account, status, page, count);
     }
 
     @Override
-    public Map<String, Object> agentReviewInfo(Long applyId) {
-        return (Map<String, Object>) agentApplyDbService.get("getDetail", null, applyId);
+    public long getCount(String account, Integer status) {
+        return agentApplyDbService.getCount(account, status);
+    }
+
+    @Override
+    public AgentApplyVo agentReviewInfo(Long applyId) {
+        return (AgentApplyVo) agentApplyDbService.get("getDetail", null, applyId);
     }
 
     @Override

@@ -1,11 +1,10 @@
 package com.magic.user.service;
 
-import com.magic.api.commons.model.Page;
 import com.magic.user.entity.User;
-import com.magic.user.vo.UserCondition;
+import com.magic.user.vo.AgentInfoVo;
+import com.magic.user.vo.StockInfoVo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: joey
@@ -16,6 +15,7 @@ public interface UserService {
 
     /**
      * 根据用户id获取用户信息
+     *
      * @param id
      * @return
      */
@@ -25,28 +25,21 @@ public interface UserService {
      * @return
      * @Doc 获取所有股东
      */
-    List<Map<String, Object>> findAllStock();
+    List<StockInfoVo> findAllStock();
 
     /**
      * @param id
      * @return
      * @Doc 获取股东详情
      */
-    Map<String, Object> getStockDetail(Long id);
+    StockInfoVo getStockDetail(Long id);
 
     /**
-     * @param userCondition
+     * @param ids
      * @return
-     * @Doc 分页查询代理信息
+     * @Doc 根据多个id获取代理信息
      */
-    List<Map<String, Object>> findAgentByPage(UserCondition userCondition);
-
-    /**
-     * @param userCondition
-     * @return
-     * @Doc 获取代理条数
-     */
-    long getAgentCount(UserCondition userCondition);
+    List<AgentInfoVo> findAgents(List<Long> ids);
 
     /**
      * 添加代理
@@ -76,7 +69,7 @@ public interface UserService {
      * @return
      * @Doc 查询代理详情
      */
-    Map<String, Object> getAgentDetail(Long id);
+    AgentInfoVo getAgentDetail(Long id);
 
     /**
      * 获取用户数据

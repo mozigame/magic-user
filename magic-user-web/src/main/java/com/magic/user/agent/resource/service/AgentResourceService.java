@@ -1,7 +1,18 @@
 package com.magic.user.agent.resource.service;
 
+import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.user.vo.UserCondition;
+import com.magic.api.commons.core.tools.HeaderUtil;
+import com.magic.user.bean.UserCondition;
+import com.magic.user.po.DownLoadFile;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * User: joey
@@ -15,7 +26,16 @@ public interface AgentResourceService {
      * @return
      * @Doc 分页查询
      */
-    String findByPage(UserCondition userCondition);
+    String findByPage(UserCondition userCondition, int page, int count);
+
+    /**
+     * 会员层级列表导出
+     *
+     * @param rc        RequestContext
+     * @param condition 查询条件
+     * @return
+     */
+    DownLoadFile agentListExport(RequestContext rc, String condition);
 
     /**
      * @param rc
@@ -35,7 +55,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 添加
      */
-    String add(RequestContext rc, Long holder, String account, String password, String realname, String telephone, String bankCardNo, String email, Integer returnScheme,
+    String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone, String bankCardNo, String email, Integer returnScheme,
                Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost);
 
     /**
@@ -89,7 +109,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 添加代理申请
      */
-    String agentApply(RequestContext rc, String account, String password, String realname, String telephone, String email, String bankCardNo);
+    String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo);
 
     /**
      * @param rc
@@ -132,5 +152,24 @@ public interface AgentResourceService {
                        String bankCardNo, String email, Integer returnScheme,
                        Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost);
 
-    String disable(RequestContext rc,Long agentId,Integer status);
+    /**
+     * @param rc
+     * @param agentId
+     * @param status
+     * @return
+     * @Doc 修改代理可用状态
+     */
+    String disable(RequestContext rc, Long agentId, Integer status);
+
+    /**
+     * @Doc 用户登录
+     * @param rc
+     * @param agent
+     * @param url
+     * @param username
+     * @param password
+     * @param code
+     * @return
+     */
+    String login(RequestContext rc, String agent, String url, String username, String password, String code);
 }

@@ -4,10 +4,8 @@ import com.magic.api.commons.atlas.core.BaseDao;
 import com.magic.api.commons.model.Page;
 import com.magic.user.dao.AgentApplyDao;
 import com.magic.user.entity.AgentApply;
-import com.magic.user.entity.User;
 import com.magic.user.storage.base.BaseDbServiceImpl;
-import com.magic.user.vo.UserCondition;
-import org.apache.ibatis.session.RowBounds;
+import com.magic.user.vo.AgentApplyVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,17 +28,24 @@ public class AgentApplyDbService extends BaseDbServiceImpl<AgentApply, Long> {
         return agentApplyDao;
     }
 
-    public Page<Map<String, Object>> findByPage(AgentApply agentApply, Page page) {
+    public List<AgentApplyVo> findByPage(String account, Integer status, Integer page, Integer count) {
         try {
-            List<Map<String, Object>> list = agentApplyDao.find("findByPage", new String[]{"offset", "limit", "status", "account"}, new Object[]{page.getPageNo(), page.getPageSize(), agentApply.getStatus().value(), agentApply.getUsername()});
-            long count = agentApplyDao.findCount("findCount", new String[]{"status", "account"}, new Object[]{agentApply.getStatus().value(), agentApply.getUsername()});
-            page.setResult(list);
-            page.setTotalCount(count);
-            return page;
+            int offset = (page - 1) * count;
+            List<AgentApplyVo> list = agentApplyDao.find("findByPage", new String[]{"offset", "limit", "status", "account"}, new Object[]{offset, count, status, account});
+            return list;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    public long getCount(String account, Integer status) {
+        try {
+            return agentApplyDao.findCount("findCount", new String[]{"status", "account"}, new Object[]{status, account});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+
+    }
 }

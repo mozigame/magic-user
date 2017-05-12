@@ -14,17 +14,17 @@ import java.util.Map;
  */
 public interface StockResourceService {
 
-    String findAllStock();
+    String findAllStock(RequestContext rc);
 
-    String simpleList();
+    String simpleList(RequestContext rc );
 
-    String getStockDetail(Long id);
+    String getStockDetail(RequestContext rc,Long id);
 
-    String updatePwd(Long id, String pwd);
+    String updatePwd(RequestContext rc,Long id, String pwd);
 
-    String update(Long id, String telephone, String email, String bankCardNo, String bank, Integer status);
+    String update(RequestContext rc, Long id, String telephone, String email, String bankCardNo, String bank, Integer status);
 
     String add(RequestContext rc, String account, String password, String realname, String telephone, Integer currencyType, String email, Integer sex);
 
-    String disable(Long id, Integer status);
+    String disable(RequestContext rc, Long id, Integer status);
 }

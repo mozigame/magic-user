@@ -20,7 +20,8 @@ public class AccountIdMappingServiceImpl implements AccountIdMappingService {
 
     @Override
     public long getUid(Long ownerId, String account) {
-        return (long) ownerAccountUserDbService.get("getUid", null, ownerId + UserContants.SPLIT_LINE + account);
+        Long uid = (Long) ownerAccountUserDbService.get("getUid", null, ownerId + UserContants.SPLIT_LINE + account);
+        return uid == null ? 0 : uid;
     }
 
     @Override

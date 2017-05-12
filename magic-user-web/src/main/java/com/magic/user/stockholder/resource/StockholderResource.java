@@ -39,7 +39,7 @@ public class StockholderResource {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public String list() {
-        return stockResourceService.findAllStock();
+        return stockResourceService.findAllStock(RequestContext.getRequestContext());
     }
 
     /**
@@ -61,16 +61,9 @@ public class StockholderResource {
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/list/simple", method = RequestMethod.GET)
     @ResponseBody
-    public String listSimple(
-            @RequestParam(name = "ids") Long[] ids
-    ) {
-
-        return "{\n" +
-                "            \"list\":[{\n" +
-                "            \"id\":1001,\n" +
-                "                    \"account\":\"seredios\"\n" +
-                "        }]\n" +
-                "        }";
+    public String listSimple() {
+        RequestContext rc = RequestContext.getRequestContext();
+        return stockResourceService.simpleList(rc);
     }
 
     /**
@@ -84,7 +77,8 @@ public class StockholderResource {
     public String detail(
             @RequestParam(name = "id") Long id
     ) {
-        return stockResourceService.getStockDetail(id);
+        RequestContext rc = RequestContext.getRequestContext();
+        return stockResourceService.getStockDetail(rc, id);
     }
 
 
@@ -101,7 +95,8 @@ public class StockholderResource {
             @RequestParam(name = "id") Long id,
             @RequestParam(name = "password") String password
     ) {
-        return stockResourceService.updatePwd(id, password);
+        RequestContext rc = RequestContext.getRequestContext();
+        return stockResourceService.updatePwd(rc, id, password);
     }
 
     /**
@@ -124,8 +119,8 @@ public class StockholderResource {
             @RequestParam(name = "bank", required = false) String bank,
             @RequestParam(name = "status", required = false) Integer status
     ) {
-
-        return stockResourceService.update(id, telephone, email, bankCardNo, bank, status);
+        RequestContext rc = RequestContext.getRequestContext();
+        return stockResourceService.update(rc, id, telephone, email, bankCardNo, bank, status);
     }
 
     /**
@@ -169,8 +164,8 @@ public class StockholderResource {
             @RequestParam(name = "id") Long id,
             @RequestParam(name = "status") Integer status
     ) {
-
-        return stockResourceService.disable(id, status);
+        RequestContext rc = RequestContext.getRequestContext();
+        return stockResourceService.disable(rc, id, status);
     }
 
 

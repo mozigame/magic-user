@@ -2,6 +2,7 @@ package com.magic.user.service;
 
 import com.magic.user.entity.AgentConfig;
 import com.magic.user.storage.AgentConfigDbService;
+import com.magic.user.vo.AgentConfigVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,13 +25,13 @@ public class AgentConfigServiceImpl implements AgentConfigService {
     }
 
     @Override
-    public Map<String, Object> get(Long id) {
-        return (Map<String, Object>) agentConfigDbService.get(id);
+    public AgentConfig get(Long id) {
+        return agentConfigDbService.get(id);
     }
 
     @Override
-    public Map<String, Object> findByAgentId(Long agentId) {
-        return (Map<String, Object>) agentConfigDbService.get("findByAgentId", null, agentId);
+    public AgentConfigVo findByAgentId(Long agentId) {
+        return (AgentConfigVo) agentConfigDbService.get("findByAgentId", null, agentId);
     }
 
     @Override

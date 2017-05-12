@@ -4,12 +4,12 @@ import com.magic.user.entity.User;
 import com.magic.user.storage.AgentDbService;
 import com.magic.user.storage.StockDbService;
 import com.magic.user.storage.UserDbService;
-import com.magic.user.vo.UserCondition;
+import com.magic.user.vo.AgentInfoVo;
+import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: joey
@@ -33,12 +33,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Map<String, Object>> findAllStock() {
+    public List<StockInfoVo> findAllStock() {
         return stockDbService.findAll();
     }
 
     @Override
-    public Map<String, Object> getStockDetail(Long id) {
+    public StockInfoVo getStockDetail(Long id) {
         return stockDbService.getDetail(id);
     }
 
@@ -59,13 +59,8 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<Map<String, Object>> findAgentByPage(UserCondition userCondition) {
-        return agentDbService.findByPage(userCondition);
-    }
-
-    @Override
-    public long getAgentCount(UserCondition userCondition) {
-        return agentDbService.getCount(userCondition);
+    public List<AgentInfoVo> findAgents(List<Long> ids) {
+        return agentDbService.findCustom("findAgentByIds", new String[]{"ids"}, ids);
     }
 
     @Override
@@ -81,12 +76,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByCode(String proCode) {
         List<User> list = userDbService.find("findAgentByProCode", null, proCode);
-        return list == null ? null : list.get(0);
+        return (list != null && list.size() > 0) ? list.get(0) : null;
     }
 
     @Override
-    public Map<String, Object> getAgentDetail(Long id) {
-        return (Map<String, Object>) userDbService.get("agentDetail", null, id);
+    public AgentInfoVo getAgentDetail(Long id) {
+        return (AgentInfoVo) userDbService.get("agentDetail", null, id);
     }
 
     @Override

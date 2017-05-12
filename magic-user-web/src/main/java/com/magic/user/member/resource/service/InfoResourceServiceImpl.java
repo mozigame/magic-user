@@ -324,19 +324,6 @@ public class InfoResourceServiceImpl {
         return user;
     }
 
-    private AccountOperHistory assembleAccountOper(String username, Long userId, String beforeInfo, String afterInfo, Long procUserId, String procUsername, AccountType type) {
-        AccountOperHistory history = new AccountOperHistory();
-        history.setUsername(username);
-        history.setUserId(userId);
-        history.setBeforeInfo(beforeInfo);
-        history.setAfterInfo(afterInfo);
-        history.setProcUserId(procUserId);
-        history.setProcUsername(procUsername);
-        history.setType(type);
-        history.setCreateTime(System.currentTimeMillis());
-        return history;
-    }
-
     /**
      * 参数检查
      *

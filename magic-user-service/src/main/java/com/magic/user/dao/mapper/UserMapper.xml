@@ -171,7 +171,7 @@
 
     <!--###########   股东操作   #############-->
     <!-- 查询所有的股东--><!--used-->
-    <select id="findAllStock" resultType="java.util.HashMap">
+    <select id="findAllStock" resultType="com.magic.user.vo.StockInfoVo">
         select
           id,
           realname,
@@ -193,7 +193,7 @@
     </select>
 
     <!-- 获取股东详细信息--><!--used-->
-    <select id="getStockDetail" resultType="java.util.HashMap">
+    <select id="getStockDetail" resultType="com.magic.user.vo.StockInfoVo">
       select
 		  id,
           username account,
@@ -257,7 +257,7 @@
     </update>
 
     <!--获取代理列表--><!--used,暂时注释掉查询条件-->
-    <select id="findAgentList" resultType="java.util.HashMap">
+    <select id="findAgentList" resultType="com.magic.user.vo.AgentInfoVo">
        select
             os.stock_id holder,
             (select username from t_user_info where user_id=os.stock_id) holderName,
@@ -274,6 +274,41 @@
         LEFT JOIN t_agent_review ar
         on (u.user_id=ar.oper_user_id)
         limit #{offset},#{limit}
+    </select>
+
+
+    <!--根据多个代理id查询代理列表-->
+    <select id="findAgentByIds" resultType="com.magic.user.vo.AgentInfoVo">
+        select
+        os.stock_id holder,
+        (select username from t_user_info where user_id=os.stock_id) holderName,
+        u.user_id id,
+        u.realname realname,
+        u.username account,
+        u.register_time registerTime,
+        u.generalize_code promotionCode,
+        u.`status` status,
+        ar.oper_user_name reviewer,
+        ar.create_time reviewTime
+        from t_user_info u LEFT JOIN t_owner_stock_agent_member os
+        on(u.user_id = os.agent_id)
+        LEFT JOIN t_agent_review ar
+        on (u.user_id=ar.oper_user_id)
+
+        <choose>
+            <when test="list != null and list.size > 0">
+                WHERE u.user_id in
+                <foreach collection="list" item="id" open="(" close=")"
+                         separator=",">
+                    #{id}
+                </foreach>
+            </when>
+            <otherwise>
+                WHERE u.type=3
+            </otherwise>
+        </choose>
+
+
     </select>
 
     <!--获取数量--><!--used 暂时取消查询条件-->
@@ -304,13 +339,13 @@
     </insert>
 
     <!--代理详情--><!-- used -->
-    <select id="agentDetail" resultType="java.util.HashMap">
+    <select id="agentDetail" resultType="com.magic.user.vo.AgentInfoVo">
         SELECT
             u.user_id id,
             u.username account,
             u.`status` status,
             u.realname realname,
-            (SELECT username from t_user_info where user_id=os.stock_id) holder,
+            (SELECT username from t_user_info where user_id=os.stock_id) holderName,
             u.register_time registerTime,
             u.register_ip registerIp,
             l.update_time lastLoginIp,

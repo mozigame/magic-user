@@ -20,12 +20,11 @@
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 
     <import resource="classpath:spring-mvc.xml"/>
-    <import resource="classpath:spring-mongo-db.xml"/>
     <import resource="classpath:db-user.xml"/>
     <import resource="classpath:dubbo-consumer.xml"/>
     <import resource="classpath:mq-user.xml"/>
     <import resource="classpath*:spring/spring-core.xml"/>
     <import resource="classpath:codis-user.xml"/>
-    <import resource="mongo-db-user.xml"/>
+    <import resource="classpath:mongo-db-user.xml"/>
 
 </beans>

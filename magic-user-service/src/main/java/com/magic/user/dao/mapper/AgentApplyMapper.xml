@@ -3,22 +3,22 @@
 <mapper namespace="com.magic.user.entity.AgentApply">
 
     <resultMap id="baseResultMap" type="com.magic.user.entity.AgentApply">
-        <id column="id" jdbcType="BIGINT" property="id" />
-        <result column="username" jdbcType="VARCHAR" property="username" />
-        <result column="realname" jdbcType="VARCHAR" property="realname" />
-        <result column="password" jdbcType="VARCHAR" property="password" />
-        <result column="stock_id" jdbcType="BIGINT" property="stockId" />
-        <result column="stock_name" jdbcType="VARCHAR" property="stockName" />
-        <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo" />
-        <result column="telephone" jdbcType="VARCHAR" property="telephone" />
-        <result column="email" jdbcType="VARCHAR" property="email" />
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="realname" jdbcType="VARCHAR" property="realname"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="stock_id" jdbcType="BIGINT" property="stockId"/>
+        <result column="stock_name" jdbcType="VARCHAR" property="stockName"/>
+        <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
+        <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="status" jdbcType="TINYINT" property="status"
                 typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
-        <result column="resource_url" jdbcType="VARCHAR" property="resourceUrl" />
-        <result column="register_ip" jdbcType="INTEGER" property="registerIp" />
-        <result column="create_time" jdbcType="BIGINT" property="createTime" />
-        <result column="temp1" jdbcType="VARCHAR" property="temp1" />
-        <result column="temp2" jdbcType="VARCHAR" property="temp2" />
+        <result column="resource_url" jdbcType="VARCHAR" property="resourceUrl"/>
+        <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
+        <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
     </resultMap>
 
 
@@ -61,6 +61,7 @@
         id,
         username,
         realname,
+        password,
         stock_id stockId,
         stock_name stockName,
         status status,
@@ -76,7 +77,7 @@
     </select>
 
     <!--代理审核基础信息--><!--used-->
-    <select id="getDetail" resultType="java.util.HashMap">
+    <select id="getDetail" resultType="com.magic.user.vo.AgentApplyVo">
         select
         id,
         username account,
@@ -98,10 +99,10 @@
 
 
     <!--代理审核列表查询--><!--used-->
-    <select id="findByPage" resultType="java.util.HashMap">
+    <select id="findByPage" resultType="com.magic.user.vo.AgentApplyVo">
         select
         a.id id,
-        a.stock_id stock,
+        a.stock_id holder,
         a.stock_name holderName,
         a.username account,
         a.realname realname,
@@ -111,11 +112,11 @@
         a.resource_url source,
         a.register_ip registerIp,
         r.oper_user_name operUserName,
-        r.create_time operaterTime
+        r.create_time operatorTime
         from t_agent_apply a
         LEFT JOIN t_agent_review r ON(a.id=r.agent_apply_id)
         <![CDATA[
-         WHERE a.`status` <> 1
+         WHERE a.`status` <> 2
 
         ]]>
         <if test="status != null ">

@@ -47,7 +47,7 @@
         WHERE agent_id=#{agentId}
     </update>
     <!--获取代理的参数配置信息--><!---->
-    <select id="findByAgentId" resultType="java.util.HashMap">
+    <select id="findByAgentId" resultType="com.magic.user.vo.AgentConfigVo">
         select agent_id agentId,
             return_scheme_id returnScheme,
             admin_cost_id adminCost,
