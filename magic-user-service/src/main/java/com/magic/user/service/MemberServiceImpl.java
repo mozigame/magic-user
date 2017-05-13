@@ -3,7 +3,6 @@ package com.magic.user.service;
 import com.magic.user.entity.Member;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.storage.MemberDbService;
-import com.magic.user.storage.UserMongoService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -16,8 +15,6 @@ import javax.annotation.Resource;
 @Service("memberService")
 public class MemberServiceImpl implements MemberService {
 
-    //    @Resource(name = "userMongoService")
-    private UserMongoService userMongoService;
     @Resource(name = "memberDbService")
     private MemberDbService memberDbService;
 

@@ -1,4 +1,4 @@
-package com.magic.user.utils;
+package com.magic.user.util;
 
 import com.magic.user.enums.IEnum;
 import org.apache.ibatis.type.BaseTypeHandler;

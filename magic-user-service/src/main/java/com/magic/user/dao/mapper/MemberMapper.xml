@@ -21,13 +21,13 @@
         <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
         <result column="register_time" jdbcType="BIGINT" property="registerTime"/>
         <result column="status" jdbcType="TINYINT" property="status"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="gender" jdbcType="TINYINT" property="gender"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="currency_type" jdbcType="TINYINT" property="currencyType"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="is_delete" jdbcType="TINYINT" property="isDelete"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
@@ -132,16 +132,16 @@
                 register_time=#{registerTime},
             </if>
             <if test="status != null ">
-                status=#{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+                status=#{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
             </if>
             <if test="gender != null ">
-                gender=#{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+                gender=#{gender,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
             </if>
             <if test="currencyType != null ">
-                currency_type=#{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+                currency_type=#{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
             </if>
             <if test="isDelete != null ">
-                is_delete=#{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+                is_delete=#{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
             </if>
         </set>
         WHERE member_id=#{memberId}
@@ -199,16 +199,16 @@
             register_time,
         </if>
         <if test="status != null ">
-            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="gender != null ">
-            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="currencyType != null ">
-            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="isDelete != null ">
-            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         member_id
         )
@@ -262,16 +262,16 @@
             #{registerTime},
         </if>
         <if test="status != null ">
-            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="gender != null ">
-            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="currencyType != null ">
-            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="isDelete != null ">
-            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         #{memberId}
         )

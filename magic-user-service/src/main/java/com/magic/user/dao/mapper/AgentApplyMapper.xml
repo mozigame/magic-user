@@ -13,7 +13,7 @@
         <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="status" jdbcType="TINYINT" property="status"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="resource_url" jdbcType="VARCHAR" property="resourceUrl"/>
         <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
         <result column="create_time" jdbcType="BIGINT" property="createTime"/>
@@ -48,7 +48,7 @@
           #{realname},
           #{telephone},
           #{email},
-          #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+          #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
           #{resourceUrl},
           #{registerIp},
           #{createTime}

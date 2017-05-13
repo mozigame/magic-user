@@ -10,8 +10,8 @@ import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.UUIDUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.service.java.UuidService;
-import com.magic.user.resource.service.AgentResourceService;
 import com.magic.user.bean.UserCondition;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.*;
@@ -19,6 +19,7 @@ import com.magic.user.enums.*;
 import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.RegisterReq;
+import com.magic.user.resource.service.AgentResourceService;
 import com.magic.user.service.*;
 import com.magic.user.vo.AgentApplyVo;
 import com.magic.user.vo.AgentConfigVo;
@@ -169,7 +170,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             ApiLogger.error("add agent info failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
         }
-        String domainSpit = com.magic.user.utils.StringUtils.arrayToStrSplit(domain);
+        String domainSpit = StringUtils.arrayToStrSplit(domain);
         //mq 处理 4、添加代理配置
         AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
         sendAgentConfigMq(agentConfig);
@@ -482,7 +483,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 ApiLogger.error("add agent info failed,userId:" + userId);
                 throw UserException.REGISTER_FAIL;
             }
-            String domainSpit = com.magic.user.utils.StringUtils.arrayToStrSplit(domain);
+            String domainSpit = StringUtils.arrayToStrSplit(domain);
             //mq 处理 4、添加代理配置
             AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
             sendAgentConfigMq(agentConfig);

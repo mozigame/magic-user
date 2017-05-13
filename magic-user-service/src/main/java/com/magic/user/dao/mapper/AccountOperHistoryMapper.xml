@@ -9,7 +9,7 @@
         <result column="after_info" jdbcType="VARCHAR" property="afterInfo"/>
         <result column="proc_user_id" jdbcType="BIGINT" property="procUserId"/>
         <result column="proc_username" jdbcType="VARCHAR" property="procUsername"/>
-        <result column="type" jdbcType="TINYINT" property="type" typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="type" jdbcType="TINYINT" property="type" typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="owner_name" jdbcType="VARCHAR" property="ownerName"/>
         <result column="create_time" jdbcType="BIGINT" property="createTime"/>
@@ -25,7 +25,7 @@
           #{afterInfo},
           #{procUserId},
           #{procUsername},
-          #{type,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+          #{type,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
           #{ownerId},
           #{ownerName},
           #{createTime}

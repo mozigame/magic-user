@@ -6,7 +6,7 @@
         <result column="user_id" jdbcType="BIGINT" property="userId" />
         <result column="create_time" jdbcType="BIGINT" property="createTime" />
         <result column="request_ip" jdbcType="INTEGER" property="requestIp" />
-        <result column="login_type" jdbcType="TINYINT" property="loginType" typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+        <result column="login_type" jdbcType="TINYINT" property="loginType" typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="platform" jdbcType="VARCHAR" property="platform" />
         <result column="ip_addr" jdbcType="VARCHAR" property="ipAddr" />
     </resultMap>
@@ -18,7 +18,7 @@
           #{userId},
           #{createTime},
           #{requestIp},
-          #{loginType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+          #{loginType,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
           #{platform}
         )
     </insert>

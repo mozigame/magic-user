@@ -9,7 +9,7 @@
         <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
         <result column="last_login_ip" jdbcType="INTEGER" property="lastLoginIp"/>
         <result column="status" jdbcType="TINYINT" property="status"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
     </resultMap>
 
     <select id="get" resultMap="BaseResultMap">

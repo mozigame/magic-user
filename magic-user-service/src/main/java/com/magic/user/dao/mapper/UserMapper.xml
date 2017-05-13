@@ -13,20 +13,20 @@
         <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
         <result column="generalize_code" jdbcType="VARCHAR" property="generalizeCode"/>
         <result column="gender" jdbcType="TINYINT" property="gender"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="status" jdbcType="TINYINT" property="status"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="currency_type" jdbcType="TINYINT" property="currencyType"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
         <result column="bank" jdbcType="VARCHAR" property="bank"/>
         <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit"/>
         <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="owner_name" jdbcType="VARCHAR" property="ownerName"/>
         <result column="is_delete" jdbcType="TINYINT" property="isDelete"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="type" jdbcType="TINYINT" property="type"
-                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
+                typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
@@ -123,7 +123,7 @@
             #{telephone},
         </if>
         <if test="currencyType != null">
-            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="email != null">
             #{email},
@@ -138,10 +138,10 @@
             #{generalizeCode},
         </if>
         <if test="gender != null">
-            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{gender,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="status != null ">
-            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="bankCardNo != null">
             #{bankCardNo},
@@ -159,10 +159,10 @@
             #{ownerName},
         </if>
         <if test="isDelete != null ">
-            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         <if test="type != null">
-            #{type,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+            #{type,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
         #{userId}
 
@@ -232,7 +232,7 @@
                 bank = #{bank},
             </if>
             <if test="status != null ">
-                status = #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+                status = #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
             </if>
         </set>
         WHERE user_id=#{userId}
@@ -331,10 +331,10 @@
         #{registerTime},
         #{registerIp},
         #{generalizeCode},
-        #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         #{ownerId},
         #{ownerName},
-        #{type,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler}
+        #{type,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler}
         )
     </insert>
 

@@ -26,7 +26,7 @@
         #{agentName},
         #{operUserId},
         #{operUserName},
-        #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+        #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         #{createTime}
       )
     </insert>
