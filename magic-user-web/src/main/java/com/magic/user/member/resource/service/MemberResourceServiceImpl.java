@@ -316,7 +316,7 @@ public class MemberResourceServiceImpl {
         body.put("newPassword", password);
         body.put("appId", rc.getClient().getAppId());
         body.put("ip", rc.getIp());
-        body.put("operatorTime", System.currentTimeMillis() / 1000);
+        body.put("operatorTime", System.currentTimeMillis());
         return body.toJSONString();
     }
 
@@ -370,7 +370,7 @@ public class MemberResourceServiceImpl {
         body.put("userId", member.getId());
         body.put("username", member.getUsername());
         body.put("deviceId", rc.getClient().getDeviceId());
-        body.put("operatorTime", System.currentTimeMillis() / 1000);
+        body.put("operatorTime", System.currentTimeMillis());
         return body.toJSONString();
     }
 
@@ -684,7 +684,7 @@ public class MemberResourceServiceImpl {
         object.put("proxyId", agentId);
         object.put("ownerId", ownerId);
         object.put("sourceUrl", url);
-        object.put("operatorTime", System.currentTimeMillis() / 1000);
+        object.put("operatorTime", System.currentTimeMillis());
         object.put("appId", rc.getClient().getAppId());
         return object.toJSONString();
     }
@@ -733,7 +733,7 @@ public class MemberResourceServiceImpl {
             throw UserException.MEMBER_LOGIN_FAIL;
         }
         int respCode = resp.getCode();
-        if (respCode == 0x1008){
+        if (respCode == 0x1007){
             throw UserException.USERNAME_NOT_EXIST;
         }
         if (respCode == 0x1009){
@@ -793,7 +793,7 @@ public class MemberResourceServiceImpl {
         object.put("appId", rc.getClient().getAppId());
         object.put("loginUrl", url);
         object.put("deviceId", rc.getClient().getDeviceId());
-        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("operatorTime", System.currentTimeMillis());
         object.put("ext", new JSONObject().put("user-agent", agent).toString());
         return object.toJSONString();
     }
@@ -861,7 +861,7 @@ public class MemberResourceServiceImpl {
         object.put("newPassword", newPassword);
         object.put("appId", rc.getClient().getAppId());
         object.put("ip", rc.getIp());
-        object.put("operatorTime", System.currentTimeMillis()/1000);
+        object.put("operatorTime", System.currentTimeMillis());
         return object.toJSONString();
     }
 
@@ -912,7 +912,7 @@ public class MemberResourceServiceImpl {
     private String assembleVerifyBody(RequestContext rc) {
         JSONObject object = new JSONObject();
         object.put("userId", rc.getUid());
-        object.put("operatorTime", System.currentTimeMillis() / 1000);
+        object.put("operatorTime", System.currentTimeMillis());
         return object.toJSONString();
     }
 
@@ -969,7 +969,7 @@ public class MemberResourceServiceImpl {
         object.put("userId", rc.getUid());
         object.put("username", username);
         object.put("deviceId", rc.getClient().getDeviceId());
-        object.put("operatorTime", System.currentTimeMillis() / 1000);
+        object.put("operatorTime", System.currentTimeMillis());
         return object.toJSONString();
     }
 
