@@ -16,6 +16,8 @@ import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
+import com.magic.passport.po.SubAccount;
+import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.service.java.UuidService;
 import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
@@ -69,6 +71,8 @@ public class MemberResourceServiceImpl {
     private Producer producer;
     @Resource
     private UuidService uuidService;
+    @Resource
+    private PassportDubboService passportDubboService;
 
     /**
      * 会员列表
@@ -200,6 +204,8 @@ public class MemberResourceServiceImpl {
      */
     public String memberDetails(RequestContext rc, long id) {
         Member member = memberService.getMemberById(id);
+        SubAccount subAccount = passportDubboService.getSubLoginById(member.getMemberId());
+
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
@@ -220,6 +226,7 @@ public class MemberResourceServiceImpl {
         MemberDetailVo vo = new MemberDetailVo();
         ////会员基础信息
         vo.setBaseInfo(assembleMemberInfo(member));
+        //todo 会员优惠、资金概况等信息去 jason 那边拿取
         //会员优惠方案
         String preferScheme = "{\n" +
                 "    \"level\": 1,\n" +
@@ -280,8 +287,8 @@ public class MemberResourceServiceImpl {
         info.setStatus(member.getStatus().value());
         info.setShowStatus(member.getStatus().desc());
         info.setBankCardNo(member.getBankCardNo());
-        //todo lastloginip 在passport中获取
-        info.setLastLoginIp("0:0:0:0:0:0");
+        SubAccount subAccount = passportDubboService.getSubLoginById(member.getMemberId());
+        info.setLastLoginIp(IPUtil.intToIp(subAccount.getLastIp()));
         return info;
     }
 
@@ -741,11 +748,7 @@ public class MemberResourceServiceImpl {
             throw UserException.MEMBER_LOGIN_FAIL;
         }
         int respCode = resp.getCode();
-<<<<<<< HEAD
-        if (respCode == 0x1007){
-=======
         if (respCode == 0x1008) {
->>>>>>> 5e55e789c627217486f3652e43000c13ff3506e1
             throw UserException.USERNAME_NOT_EXIST;
         }
         if (respCode == 0x1009) {
@@ -805,13 +808,10 @@ public class MemberResourceServiceImpl {
         object.put("appId", rc.getClient().getAppId());
         object.put("loginUrl", url);
         object.put("deviceId", rc.getClient().getDeviceId());
-<<<<<<< HEAD
-        object.put("operatorTime", System.currentTimeMillis());
         object.put("ext", new JSONObject().put("user-agent", agent).toString());
-=======
         object.put("operatorTime", System.currentTimeMillis() / 1000);
-        object.put("ext", ext);
->>>>>>> 5e55e789c627217486f3652e43000c13ff3506e1
+
+
         return object.toJSONString();
     }
 
@@ -878,11 +878,7 @@ public class MemberResourceServiceImpl {
         object.put("newPassword", newPassword);
         object.put("appId", rc.getClient().getAppId());
         object.put("ip", rc.getIp());
-<<<<<<< HEAD
         object.put("operatorTime", System.currentTimeMillis());
-=======
-        object.put("operatorTime", System.currentTimeMillis() / 1000);
->>>>>>> 5e55e789c627217486f3652e43000c13ff3506e1
         return object.toJSONString();
     }
 
