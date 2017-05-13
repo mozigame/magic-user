@@ -1,4 +1,4 @@
-package com.magic.user.stockholder.resource.service.impl;
+package com.magic.user.resource.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
@@ -18,7 +18,7 @@ import com.magic.user.exception.UserException;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.UserService;
-import com.magic.user.stockholder.resource.service.StockResourceService;
+import com.magic.user.resource.service.StockResourceService;
 import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 

@@ -55,10 +55,10 @@
             <value>jdbc:mysql://${mysql.magic.db1.serverport}/${mysql.magic.db1.database}?useUnicode=true&amp;characterEncoding=utf-8&amp;autoReconnect=true</value>
         </property>
         <property name="username">
-            <value>${mysql.magic.db0.user}</value>
+            <value>${mysql.magic.db1.user}</value>
         </property>
         <property name="password">
-            <value>${mysql.magic.db0.password}</value>
+            <value>${mysql.magic.db1.password}</value>
         </property>
     </bean>
     <!-- dataSource_1-->
@@ -68,7 +68,7 @@
     <bean id="mySqlSessionFactory_0" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="userDataSource_0"/>
         <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
-        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/*.xml"/>
+        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/AgentReviewMapper.xml"/>
     </bean>
 
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
@@ -85,7 +85,7 @@
     <bean id="mySqlSessionFactory_1" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="userDataSource_1"/>
         <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
-        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/*.xml"/>
+        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/AgentReviewMapper.xml"/>
     </bean>
 
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">

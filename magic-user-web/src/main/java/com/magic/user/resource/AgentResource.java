@@ -1,14 +1,12 @@
-package com.magic.user.agent.resource;
+package com.magic.user.resource;
 
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.api.commons.core.tools.HeaderUtil;
-import com.magic.user.agent.resource.service.AgentResourceService;
 import com.magic.user.bean.UserCondition;
 import com.magic.user.po.DownLoadFile;
-import org.springframework.http.MediaType;
+import com.magic.user.resource.service.AgentResourceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -343,34 +341,5 @@ public class AgentResource {
         return agentResourceService.disable(RequestContext.getRequestContext(), id, status);
     }
 
-
-    /**
-     * 会员登陆
-     *
-     * @param request
-     * @param response
-     * @param code
-     * @param username
-     * @param password
-     * @return
-     */
-    @Access(type = Access.AccessType.PUBLIC)
-    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public String login(
-            HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(name = "code", required = false, defaultValue = "") String code,
-            @RequestParam(name = "username", required = true) String username,
-            @RequestParam(name = "password", required = true) String password
-
-    ) {
-        RequestContext rc = RequestContext.getRequestContext();
-        //获取浏览器、操作系统名称等数据
-        String agent = request.getHeader(HeaderUtil.USER_AGENT);
-        //获取域名
-        StringBuffer requestURL = request.getRequestURL();
-        String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
-        return agentResourceService.login(rc, agent, url, username, password, code);
-    }
 
 }

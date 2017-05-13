@@ -6,20 +6,20 @@
         <result column="user_id" jdbcType="BIGINT" property="userId" />
         <result column="create_time" jdbcType="BIGINT" property="createTime" />
         <result column="request_ip" jdbcType="INTEGER" property="requestIp" />
-        <result column="login_type" jdbcType="TINYINT" property="loginType" />
+        <result column="login_type" jdbcType="TINYINT" property="loginType" typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="platform" jdbcType="VARCHAR" property="platform" />
         <result column="ip_addr" jdbcType="VARCHAR" property="ipAddr" />
     </resultMap>
 
     <!--添加登录历史-->
-    <insert id="insert">
-        INSERT INTO t_login_history(user_id,create_time,request_ip,login_type,platform,ip_addr)
+    <insert id="insert" parameterType="LoginHistory">
+        INSERT INTO t_login_history(user_id,create_time,request_ip,login_type,platform)
         VALUES (
           #{userId},
           #{createTime},
-          #{loginType},
-          #{platform},
-          #{ipAddr}
+          #{requestIp},
+          #{loginType,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
+          #{platform}
         )
     </insert>
 

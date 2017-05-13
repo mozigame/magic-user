@@ -1,18 +1,10 @@
-package com.magic.user.agent.resource.service;
+package com.magic.user.resource.service;
 
-import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.api.commons.core.tools.HeaderUtil;
 import com.magic.user.bean.UserCondition;
 import com.magic.user.po.DownLoadFile;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * User: joey
@@ -162,7 +154,6 @@ public interface AgentResourceService {
     String disable(RequestContext rc, Long agentId, Integer status);
 
     /**
-     * @Doc 用户登录
      * @param rc
      * @param agent
      * @param url
@@ -170,6 +161,15 @@ public interface AgentResourceService {
      * @param password
      * @param code
      * @return
+     * @Doc 用户登录
      */
     String login(RequestContext rc, String agent, String url, String username, String password, String code);
+
+    /**
+     * @param rc
+     * @param username
+     * @return
+     * @Doc 用户注销
+     */
+    String logout(RequestContext rc, String agent, String username);
 }

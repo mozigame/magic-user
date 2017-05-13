@@ -1,20 +1,14 @@
-package com.magic.user.stockholder.resource;
+package com.magic.user.resource;
 
-import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.user.entity.User;
-import com.magic.user.enums.AccountStatus;
-import com.magic.user.enums.CurrencyType;
-import com.magic.user.enums.GeneraType;
-import com.magic.user.stockholder.resource.service.StockResourceService;
+import com.magic.user.resource.service.StockResourceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Generated;
 import javax.annotation.Resource;
 
 /**

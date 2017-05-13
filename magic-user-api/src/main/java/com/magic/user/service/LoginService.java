@@ -16,9 +16,27 @@ public interface LoginService {
     /**
      * 修改登录密码
      *
-     * @param id 用户ID
+     * @param id            用户ID
      * @param loginPassword 登陆密码
      * @return
      */
     boolean resetPassword(Long id, String loginPassword);
+
+    /**
+     * 根据用户id获取用户的登录信息
+     *
+     * @param id
+     * @return
+     */
+    Login get(Long id);
+
+    /**
+     * @Doc 修改登陆状态
+     * @param userId
+     * @param lastLoginTime
+     * @param lastLoginIp
+     * @param status
+     * @return
+     */
+    boolean updateLoginStatus(Long userId, Long lastLoginTime, Integer lastLoginIp, Integer status);
 }

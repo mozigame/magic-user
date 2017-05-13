@@ -20,6 +20,7 @@ public class LoginHistory {
 
     private String ipAddr;  //ip所属地
 
+
     public Long getId() {
         return id;
     }

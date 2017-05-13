@@ -1,4 +1,4 @@
-package com.magic.user.stockholder.resource.service;
+package com.magic.user.resource.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.core.context.RequestContext;

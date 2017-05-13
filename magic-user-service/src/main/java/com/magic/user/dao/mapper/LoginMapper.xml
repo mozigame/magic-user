@@ -8,9 +8,14 @@
         <result column="password" jdbcType="VARCHAR" property="password"/>
         <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
         <result column="last_login_ip" jdbcType="INTEGER" property="lastLoginIp"/>
-        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="status" jdbcType="TINYINT" property="status"
+                typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
     </resultMap>
 
+    <select id="get" resultMap="BaseResultMap">
+        select * from t_login_info
+        WHERE user_id=#{id}
+    </select>
 
     <!--新增登录信息-->
     <insert id="insert">
@@ -27,6 +32,23 @@
         UPDATE t_login_info
         SET password =#{password}
         WHERE user_id=#{id}
+    </update>
+
+    <!--修改用户登录状态-->
+    <update id="updateLoginStatus">
+        UPDATE t_login_info
+        <set>
+            <if test="lastLoginTime != null">
+                update_time=#{lastLoginTime},
+            </if>
+            <if test="lastLoginIp != null">
+                last_login_ip=#{lastLoginIp},
+            </if>
+            <if test="status != null">
+                status=#{status},
+            </if>
+        </set>
+        WHERE user_id=#{userId}
     </update>
 
 </mapper>

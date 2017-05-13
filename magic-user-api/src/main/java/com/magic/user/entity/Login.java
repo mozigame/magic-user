@@ -14,7 +14,7 @@ public class Login {
 
     private String password;    //密码
 
-    private Long upLongTime;    //修改时间，最后登录时间
+    private Long updateTime;    //修改时间，最后登录时间
 
     private Integer lastLoginIp;    //最后登录ip
 
@@ -27,8 +27,8 @@ public class Login {
         this.password = password;
     }
 
-    public Login(Long upLongTime, Integer lastLoginIp, LoginType status) {
-        this.upLongTime = upLongTime;
+    public Login(Long updateTime, Integer lastLoginIp, LoginType status) {
+        this.updateTime = updateTime;
         this.lastLoginIp = lastLoginIp;
         this.status = status;
     }
@@ -65,12 +65,12 @@ public class Login {
         this.password = password;
     }
 
-    public Long getUpLongTime() {
-        return upLongTime;
+    public Long getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpLongTime(Long upLongTime) {
-        this.upLongTime = upLongTime;
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
     }
 
     public Integer getLastLoginIp() {

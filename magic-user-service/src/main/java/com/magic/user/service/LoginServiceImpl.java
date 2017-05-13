@@ -31,4 +31,14 @@ public class LoginServiceImpl implements LoginService {
     public boolean resetPassword(Long id, String loginPassword) {
         return loginDbService.update("updatePwd", new String[]{"id", "password"}, new Object[]{id, loginPassword}) > 0;
     }
+
+    @Override
+    public Login get(Long id) {
+        return loginDbService.get(id);
+    }
+
+    @Override
+    public boolean updateLoginStatus(Long userId, Long lastLoginTime, Integer lastLoginIp, Integer status) {
+        return loginDbService.update("updateLoginStatus", new String[]{"userId", "lastLoginTime", "lastLoginIp", "status"}, new Object[]{userId, lastLoginTime, lastLoginIp, status}) > 0;
+    }
 }
