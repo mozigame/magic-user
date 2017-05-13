@@ -1,6 +1,7 @@
 package com.magic.user.service;
 
 import com.magic.user.entity.AgentConfig;
+import com.magic.user.vo.AgentConfigVo;
 
 import java.util.Map;
 
@@ -13,9 +14,9 @@ public interface AgentConfigService {
 
     long add(AgentConfig agentConfig);
 
-    Map<String, Object> get(long id);
+    AgentConfig get(Long id);
 
-    Map<String, Object> findByAgentId(long agentId);
+    AgentConfigVo findByAgentId(Long agentId);
 
     int update(AgentConfig agentConfig);
 }

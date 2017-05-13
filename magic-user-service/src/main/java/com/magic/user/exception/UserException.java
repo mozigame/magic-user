@@ -109,7 +109,7 @@ public class UserException extends ExceptionFactor {
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 14, HttpServletResponse.SC_OK, "member login fail!", "登录失败.");
 
     /**
-     * 用户不存在
+     * 用户名不存在
      */
     public static final CommonException USERNAME_NOT_EXIST = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 15, HttpServletResponse.SC_OK, "username not exist!", "用户名不存在.");
@@ -125,5 +125,44 @@ public class UserException extends ExceptionFactor {
      */
     public static final CommonException VERIFY_FAIL = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 17, HttpServletResponse.SC_OK, "login verify fail!", "验证失败.");
+
+    /**
+     * 用户信息更新失败
+     */
+    public static final CommonException USER_UPDATE_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 18, HttpServletResponse.SC_OK, "user info update fail!", "用户信息更新失败.");
+
+    /**
+     * 用户状态更新失败
+     */
+    public static final CommonException USER_STATUS_UPDATE_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 19, HttpServletResponse.SC_OK, "user status update fail!", "用户状态更新失败.");
+
+
+    /**
+     * 代理参数更新失败
+     */
+    public static final CommonException AGENT_CONFIG_UPDATE_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 20, HttpServletResponse.SC_OK, "agent config update fail!", "代理参数更新失败.");
+
+
+    /**
+     * 代理申请添加失败
+     */
+    public static final CommonException AGENT_APPLY_ADD_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 21, HttpServletResponse.SC_OK, "agent apply add fail!", "代理申请添加失败.");
+
+    /**
+     * 代理申请信息不存在
+     */
+    public static final CommonException AGENT_APPLY_NOT_EXIST = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 22, HttpServletResponse.SC_OK, "agent apply not exist!", "代理申请信息不存在.");
+
+    /**
+     * 代理审核失败
+     */
+    public static final CommonException AGENT_REVIEW_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 23, HttpServletResponse.SC_OK, "agent review fail!", "代理审核失败.");
+
 
 }

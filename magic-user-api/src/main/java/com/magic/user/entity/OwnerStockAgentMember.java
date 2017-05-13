@@ -4,63 +4,63 @@ package com.magic.user.entity;
  * @Doc 业主股东代理会员数量关联表
  */
 public class OwnerStockAgentMember {
-    private long id;
+    private Long id;
 
-    private long ownerId;    //业主id
+    private Long ownerId;    //业主id
 
-    private long stockId;   //股东id
+    private Long stockId;   //股东id
 
-    private long agentId;   //代理id
+    private Long agentId;   //代理id
 
-    private int memNumber;
+    private Integer memNumber;
 
     public OwnerStockAgentMember() {
 
     }
 
-    public OwnerStockAgentMember(long ownerId, long stockId, long agentId) {
+    public OwnerStockAgentMember(Long ownerId, Long stockId, Long agentId) {
         this.ownerId = ownerId;
         this.stockId = stockId;
         this.agentId = agentId;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(long ownerId) {
+    public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
 
-    public long getStockId() {
+    public Long getStockId() {
         return stockId;
     }
 
-    public void setStockId(long stockId) {
+    public void setStockId(Long stockId) {
         this.stockId = stockId;
     }
 
-    public long getAgentId() {
+    public Long getAgentId() {
         return agentId;
     }
 
-    public void setAgentId(long agentId) {
+    public void setAgentId(Long agentId) {
         this.agentId = agentId;
     }
 
-    public int getMemNumber() {
+    public Integer getMemNumber() {
         return memNumber;
     }
 
-    public void setMemNumber(int memNumber) {
+    public void setMemNumber(Integer memNumber) {
         this.memNumber = memNumber;
     }
 }

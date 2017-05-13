@@ -6,7 +6,7 @@
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="username" jdbcType="VARCHAR" property="username"/>
         <result column="password" jdbcType="VARCHAR" property="password"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_time" jdbcType="BIGINT" property="updateTime"/>
         <result column="last_login_ip" jdbcType="INTEGER" property="lastLoginIp"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
     </resultMap>

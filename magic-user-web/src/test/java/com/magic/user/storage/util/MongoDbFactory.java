@@ -30,8 +30,8 @@ public class MongoDbFactory {
     static {
         MongoClientURI mongoClientURI = new MongoClientURI("mongodb://202.153.207.179:8999,202.153.207.181:8999,202.153.207.182:8999");
         MongoClient mongoClient = new MongoClient(mongoClientURI);
-        mongoDatabase = mongoClient.getDatabase("test8");
-        collection = mongoDatabase.getCollection("user_test");
+        mongoDatabase = mongoClient.getDatabase("admin");
+        collection = mongoDatabase.getCollection("onLineMember");
     }
 
     @Test

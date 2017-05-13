@@ -99,6 +99,17 @@ public abstract interface BaseDbService<T, PK extends Serializable> {
     public List<T> find(final String ql, final String[] paramNames, final Object... values);
 
     /**
+     * 查询用户自定义的结果
+     *
+     * @param hql
+     * @param paramNames
+     * @param values
+     * @param <X>
+     * @return
+     */
+    <X> List<X> findCustom(String hql, String[] paramNames, final Object... values);
+
+    /**
      * 查询对象列表的数量.
      *
      * @param ql

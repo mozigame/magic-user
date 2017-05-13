@@ -26,8 +26,8 @@ public class MemberService {
     @Test
     public void insertUser() {
         User user = new User();
-        user.setId(1);
-        user.setUserId(1);
+        user.setId(1L);
+        user.setUserId(1L);
         user.setRealname("joey_update");
         user.setUsername("joey_userName_update");
         user.setCurrencyType(CurrencyType.CNY);
@@ -41,8 +41,8 @@ public class MemberService {
     @Test
     public void updateUser() {
         User user = new User();
-        user.setId(1);
-        user.setUserId(1);
+        user.setId(1L);
+        user.setUserId(1L);
         user.setRealname("joey_update_____1");
         user.setUsername("joey_userName_update");
         user.setCurrencyType(CurrencyType.CNY);

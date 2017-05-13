@@ -7,20 +7,18 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
 /**
  * User: joey
- * Date: 2017/5/6
+ * Long: 2017/5/6
  * Time: 14:43
  */
 @Document(collection = "user")
 public class UserVo {
 
     @Id
-    private long id;
+    private Long id;
 
-    private long userId;   //代理id
+    private Long userId;   //代理id
 
     private String realname;    //真实姓名
 
@@ -30,25 +28,25 @@ public class UserVo {
 
     private String email;   //电子邮箱
 
-    private Date registerTime;  //注册时间
+    private Long registerTime;  //注册时间
 
-    private int registerIp; //注册ip
+    private Integer registerIp; //注册ip
 
     private String generalizeCode;  //推广码
 
-    private int gender;  //性别
+    private Integer gender;  //性别
 
-    private int status;   //账号使用状态
+    private Integer status;   //账号使用状态
 
-    private int currencyType;  //币种
+    private Integer currencyType;  //币种
 
     private String bankCardNo;  //银行卡号
 
-    private long ownerId;  //业主id
+    private Long ownerId;  //业主id
 
-    private int isDelete;  //是否删除
+    private Integer isDelete;  //是否删除
 
-    private int type;   //账号类型
+    private Integer type;   //账号类型
 
     @Version
     private Long version;
@@ -159,11 +157,11 @@ public class UserVo {
         return user;
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -199,19 +197,19 @@ public class UserVo {
         this.email = email;
     }
 
-    public Date getRegisterTime() {
+    public Long getRegisterTime() {
         return registerTime;
     }
 
-    public void setRegisterTime(Date registerTime) {
+    public void setRegisterTime(Long registerTime) {
         this.registerTime = registerTime;
     }
 
-    public int getRegisterIp() {
+    public Integer getRegisterIp() {
         return registerIp;
     }
 
-    public void setRegisterIp(int registerIp) {
+    public void setRegisterIp(Integer registerIp) {
         this.registerIp = registerIp;
     }
 
@@ -223,27 +221,27 @@ public class UserVo {
         this.generalizeCode = generalizeCode;
     }
 
-    public int getGender() {
+    public Integer getGender() {
         return gender;
     }
 
-    public void setGender(int gender) {
+    public void setGender(Integer gender) {
         this.gender = gender;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
-    public int getCurrencyType() {
+    public Integer getCurrencyType() {
         return currencyType;
     }
 
-    public void setCurrencyType(int currencyType) {
+    public void setCurrencyType(Integer currencyType) {
         this.currencyType = currencyType;
     }
 
@@ -255,35 +253,35 @@ public class UserVo {
         this.bankCardNo = bankCardNo;
     }
 
-    public long getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(long ownerId) {
+    public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
 
-    public int getIsDelete() {
+    public Integer getIsDelete() {
         return isDelete;
     }
 
-    public void setIsDelete(int isDelete) {
+    public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
     }
 
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

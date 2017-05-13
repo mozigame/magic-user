@@ -23,12 +23,12 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public long update(Login login) {
+    public int update(Login login) {
         return loginDbService.update("updatePwd", null, login);
     }
 
     @Override
-    public boolean resetPassword(long id, String loginPassword) {
+    public boolean resetPassword(Long id, String loginPassword) {
         return loginDbService.update("updatePwd", new String[]{"id", "password"}, new Object[]{id, loginPassword}) > 0;
     }
 }

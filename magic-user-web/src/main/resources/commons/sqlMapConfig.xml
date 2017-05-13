@@ -29,6 +29,10 @@
         <typeAlias alias="AgentConfig" type="com.magic.user.entity.AgentConfig"/>
         <typeAlias alias="AgentReview" type="com.magic.user.entity.AgentReview"/>
         <typeAlias alias="Member" type="com.magic.user.entity.Member"/>
+        <typeAlias alias="OwnerAccountUser" type="com.magic.user.entity.OwnerAccountUser"/>
+        <typeAlias alias="AccountOperHistory" type="com.magic.user.entity.AccountOperHistory"/>
+        <typeAlias alias="OwnerStockAgentMember" type="com.magic.user.entity.OwnerStockAgentMember"/>
+
     </typeAliases>
 
 

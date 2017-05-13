@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements BaseDbService<T, PK> {
@@ -146,6 +148,16 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
     public List<T> find(String ql, final String[] paramNames, final Object... values) {
         try {
             return getDao().find(ql, paramNames, values);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public <X> List<X> findCustom(String hql, String[] paramNames, final Object... values) {
+        try {
+            return getDao().find(hql, paramNames, values);
         } catch (Exception e) {
             e.printStackTrace();
         }

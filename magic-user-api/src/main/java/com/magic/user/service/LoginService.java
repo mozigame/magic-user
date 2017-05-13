@@ -11,7 +11,7 @@ public interface LoginService {
 
     long add(Login login);
 
-    long update(Login login);
+    int update(Login login);
 
     /**
      * 修改登录密码
@@ -20,5 +20,5 @@ public interface LoginService {
      * @param loginPassword 登陆密码
      * @return
      */
-    boolean resetPassword(long id, String loginPassword);
+    boolean resetPassword(Long id, String loginPassword);
 }

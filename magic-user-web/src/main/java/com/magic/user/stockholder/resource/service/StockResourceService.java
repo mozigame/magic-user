@@ -1,6 +1,7 @@
 package com.magic.user.stockholder.resource.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.entity.User;
 
 import java.util.List;
@@ -13,15 +14,17 @@ import java.util.Map;
  */
 public interface StockResourceService {
 
-    String findAllStock();
+    String findAllStock(RequestContext rc);
 
-    String getStockDetail(long id);
+    String simpleList(RequestContext rc );
 
-    String updatePwd(long id, String pwd);
+    String getStockDetail(RequestContext rc,Long id);
 
-    String update(long id, String telephone, String email, String bankCardNo, String bank, int status);
+    String updatePwd(RequestContext rc,Long id, String pwd);
 
-    String add(String account, String password, String realname, String telephone, int currencyType, String email, int sex);
+    String update(RequestContext rc, Long id, String telephone, String email, String bankCardNo, String bank, Integer status);
 
-    String disable(long id, int status);
+    String add(RequestContext rc, String account, String password, String realname, String telephone, Integer currencyType, String email, Integer sex);
+
+    String disable(RequestContext rc, Long id, Integer status);
 }

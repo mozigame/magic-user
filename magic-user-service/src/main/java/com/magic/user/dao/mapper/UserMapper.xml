@@ -9,7 +9,7 @@
         <result column="username" jdbcType="VARCHAR" property="username"/>
         <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
-        <result column="register_time" jdbcType="TIMESTAMP" property="registerTime"/>
+        <result column="register_time" jdbcType="BIGINT" property="registerTime"/>
         <result column="register_ip" jdbcType="INTEGER" property="registerIp"/>
         <result column="generalize_code" jdbcType="VARCHAR" property="generalizeCode"/>
         <result column="gender" jdbcType="TINYINT" property="gender"
@@ -22,6 +22,7 @@
         <result column="bank" jdbcType="VARCHAR" property="bank"/>
         <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit"/>
         <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
+        <result column="owner_name" jdbcType="VARCHAR" property="ownerName"/>
         <result column="is_delete" jdbcType="TINYINT" property="isDelete"
                 typeHandler="com.magic.user.utils.EnumKeyTypeHandler"/>
         <result column="type" jdbcType="TINYINT" property="type"
@@ -48,6 +49,7 @@
             currency_type,
             bank_card_no,
             owner_id,
+            owner_name,
             is_delete,
             type
             from t_user_info
@@ -75,7 +77,7 @@
         <if test="registerTime != null">
             register_time,
         </if>
-        <if test="registerIp > 0 ">
+        <if test="registerIp != null ">
             register_ip,
         </if>
         <if test="generalizeCode != null ">
@@ -96,8 +98,11 @@
         <if test="bankDeposit != null">
             bank_deposit,
         </if>
-        <if test="ownerId > 0">
+        <if test="ownerId  != null">
             owner_id,
+        </if>
+        <if test="ownerName  != null">
+            owner_name,
         </if>
         <if test="isDelete != null ">
             is_delete,
@@ -126,7 +131,7 @@
         <if test="registerTime != null">
             #{registerTime},
         </if>
-        <if test="registerIp >0 ">
+        <if test="registerIp != null ">
             #{registerIp},
         </if>
         <if test="generalizeCode != null ">
@@ -147,8 +152,11 @@
         <if test="bankDeposit != null">
             #{bankDeposit},
         </if>
-        <if test="ownerId > 0">
+        <if test="ownerId  != null">
             #{ownerId},
+        </if>
+        <if test="ownerName  != null">
+            #{ownerName},
         </if>
         <if test="isDelete != null ">
             #{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
@@ -163,7 +171,7 @@
 
     <!--###########   股东操作   #############-->
     <!-- 查询所有的股东--><!--used-->
-    <select id="findAllStock" resultType="java.util.HashMap">
+    <select id="findAllStock" resultType="com.magic.user.vo.StockInfoVo">
         select
           id,
           realname,
@@ -185,7 +193,7 @@
     </select>
 
     <!-- 获取股东详细信息--><!--used-->
-    <select id="getStockDetail" resultType="java.util.HashMap">
+    <select id="getStockDetail" resultType="com.magic.user.vo.StockInfoVo">
       select
 		  id,
           username account,
@@ -249,7 +257,7 @@
     </update>
 
     <!--获取代理列表--><!--used,暂时注释掉查询条件-->
-    <select id="findAgentList" resultType="java.util.HashMap">
+    <select id="findAgentList" resultType="com.magic.user.vo.AgentInfoVo">
        select
             os.stock_id holder,
             (select username from t_user_info where user_id=os.stock_id) holderName,
@@ -268,6 +276,41 @@
         limit #{offset},#{limit}
     </select>
 
+
+    <!--根据多个代理id查询代理列表-->
+    <select id="findAgentByIds" resultType="com.magic.user.vo.AgentInfoVo">
+        select
+        os.stock_id holder,
+        (select username from t_user_info where user_id=os.stock_id) holderName,
+        u.user_id id,
+        u.realname realname,
+        u.username account,
+        u.register_time registerTime,
+        u.generalize_code promotionCode,
+        u.`status` status,
+        ar.oper_user_name reviewer,
+        ar.create_time reviewTime
+        from t_user_info u LEFT JOIN t_owner_stock_agent_member os
+        on(u.user_id = os.agent_id)
+        LEFT JOIN t_agent_review ar
+        on (u.user_id=ar.oper_user_id)
+
+        <choose>
+            <when test="list != null and list.size > 0">
+                WHERE u.user_id in
+                <foreach collection="list" item="id" open="(" close=")"
+                         separator=",">
+                    #{id}
+                </foreach>
+            </when>
+            <otherwise>
+                WHERE u.type=3
+            </otherwise>
+        </choose>
+
+
+    </select>
+
     <!--获取数量--><!--used 暂时取消查询条件-->
     <select id="findAgentCount" resultType="java.lang.Long">
         select count(id) from t_user_info
@@ -277,7 +320,7 @@
     <!--新增代理-->
     <insert id="addAgent" parameterType="User">
         INSERT INTO t_user_info
-          (user_id,username,realname,telephone,bank_card_no,email,register_time,register_ip,generalize_code,status,owner_id,type)
+          (user_id,username,realname,telephone,bank_card_no,email,register_time,register_ip,generalize_code,status,owner_id,owner_name,type)
         VALUES(
         #{userId},
         #{username},
@@ -290,18 +333,19 @@
         #{generalizeCode},
         #{status,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler},
         #{ownerId},
+        #{ownerName},
         #{type,jdbcType=TINYINT,typeHandler=com.magic.user.utils.EnumKeyTypeHandler}
         )
     </insert>
 
     <!--代理详情--><!-- used -->
-    <select id="agentDetail" resultType="java.util.HashMap">
+    <select id="agentDetail" resultType="com.magic.user.vo.AgentInfoVo">
         SELECT
             u.user_id id,
             u.username account,
             u.`status` status,
             u.realname realname,
-            (SELECT username from t_user_info where user_id=os.stock_id) holder,
+            (SELECT username from t_user_info where user_id=os.stock_id) holderName,
             u.register_time registerTime,
             u.register_ip registerIp,
             l.update_time lastLoginIp,
@@ -338,6 +382,7 @@
             currency_type,
             bank_card_no,
             owner_id,
+            owner_name,
             is_delete,
             type
             from t_user_info

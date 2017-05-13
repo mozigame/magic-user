@@ -5,15 +5,13 @@ import com.magic.user.enums.CurrencyType;
 import com.magic.user.enums.DeleteStatus;
 import com.magic.user.enums.GeneraType;
 
-import java.util.Date;
-
 /**
  * @Doc 会员
  */
 public class Member {
-    private long id;
+    private Long id;
 
-    private long memberId; //会员id
+    private Long memberId; //会员id
 
     private String realname;    //真实姓名
 
@@ -29,23 +27,23 @@ public class Member {
 
     private String bankDeposit; //开户行
 
-    private long agentId;   //代理id
+    private Long agentId;   //代理id
 
     private String agentUsername; //代理账号
 
-    private long stockId;   //股东id
+    private Long stockId;   //股东id
 
     private String stockUsername;   //股东账号
 
-    private long ownerId;  //业主id
+    private Long ownerId;  //业主id
 
     private String ownerUsername; //业主账号
 
     private String sourceUrl;   //加入来源网址
 
-    private int registerIp; //注册ip
+    private Integer registerIp; //注册ip
 
-    private Date registerTime;  //注册时间
+    private Long registerTime;  //注册时间
 
     private AccountStatus status; //状态
 
@@ -61,19 +59,19 @@ public class Member {
 
     private String temp3;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getMemberId() {
+    public Long getMemberId() {
         return memberId;
     }
 
-    public void setMemberId(long memberId) {
+    public void setMemberId(Long memberId) {
         this.memberId = memberId;
     }
 
@@ -109,11 +107,11 @@ public class Member {
         this.bankCardNo = bankCardNo;
     }
 
-    public long getAgentId() {
+    public Long getAgentId() {
         return agentId;
     }
 
-    public void setAgentId(long agentId) {
+    public void setAgentId(Long agentId) {
         this.agentId = agentId;
     }
 
@@ -125,11 +123,11 @@ public class Member {
         this.agentUsername = agentUsername;
     }
 
-    public long getStockId() {
+    public Long getStockId() {
         return stockId;
     }
 
-    public void setStockId(long stockId) {
+    public void setStockId(Long stockId) {
         this.stockId = stockId;
     }
 
@@ -141,11 +139,11 @@ public class Member {
         this.stockUsername = stockUsername;
     }
 
-    public long getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(long ownerId) {
+    public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
 
@@ -165,19 +163,19 @@ public class Member {
         this.sourceUrl = sourceUrl;
     }
 
-    public int getRegisterIp() {
+    public Integer getRegisterIp() {
         return registerIp;
     }
 
-    public void setRegisterIp(int registerIp) {
+    public void setRegisterIp(Integer registerIp) {
         this.registerIp = registerIp;
     }
 
-    public Date getRegisterTime() {
+    public Long getRegisterTime() {
         return registerTime;
     }
 
-    public void setRegisterTime(Date registerTime) {
+    public void setRegisterTime(Long registerTime) {
         this.registerTime = registerTime;
     }
 

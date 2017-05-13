@@ -34,20 +34,20 @@
     <update id="update" parameterType="AgentConfig">
         UPDATE t_agent_config_info
         <set>
-            <if test="returnSchemeId > 0">
+            <if test="returnSchemeId != null">
                 return_scheme_id = #{returnSchemeId},
             </if>
-            <if test="adminCostId > 0">
+            <if test="adminCostId != null">
                 admin_cost_id = #{adminCostId},
             </if>
-            <if test="feeId > 0">
+            <if test="feeId != null">
                 fee_id = #{feeId},
             </if>
         </set>
         WHERE agent_id=#{agentId}
     </update>
     <!--获取代理的参数配置信息--><!---->
-    <select id="findByAgentId" resultType="java.util.HashMap">
+    <select id="findByAgentId" resultType="com.magic.user.vo.AgentConfigVo">
         select agent_id agentId,
             return_scheme_id returnScheme,
             admin_cost_id adminCost,

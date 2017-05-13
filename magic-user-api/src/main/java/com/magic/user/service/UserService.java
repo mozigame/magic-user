@@ -1,11 +1,10 @@
 package com.magic.user.service;
 
-import com.magic.api.commons.model.Page;
 import com.magic.user.entity.User;
-import com.magic.user.vo.UserCondition;
+import com.magic.user.vo.AgentInfoVo;
+import com.magic.user.vo.StockInfoVo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: joey
@@ -16,37 +15,31 @@ public interface UserService {
 
     /**
      * 根据用户id获取用户信息
+     *
      * @param id
      * @return
      */
-    User get(long id);
+    User get(Long id);
 
     /**
      * @return
      * @Doc 获取所有股东
      */
-    List<Map<String, Object>> findAllStock();
+    List<StockInfoVo> findAllStock();
 
     /**
      * @param id
      * @return
      * @Doc 获取股东详情
      */
-    Map<String, Object> getStockDetail(long id);
+    StockInfoVo getStockDetail(Long id);
 
     /**
-     * @param userCondition
+     * @param ids
      * @return
-     * @Doc 分页查询代理信息
+     * @Doc 根据多个id获取代理信息
      */
-    List<Map<String, Object>> findAgentByPage(UserCondition userCondition);
-
-    /**
-     * @param userCondition
-     * @return
-     * @Doc 获取代理条数
-     */
-    long getAgentCount(UserCondition userCondition);
+    List<AgentInfoVo> findAgents(List<Long> ids);
 
     /**
      * 添加代理
@@ -61,7 +54,7 @@ public interface UserService {
      * @return
      * @Doc 根据股东id获取业主id
      */
-    long getOwnerIdByStock(long id);
+    long getOwnerIdByStock(Long id);
 
     /**
      * 根据推广码查询代理数据
@@ -76,7 +69,7 @@ public interface UserService {
      * @return
      * @Doc 查询代理详情
      */
-    Map<String, Object> getAgentDetail(long id);
+    AgentInfoVo getAgentDetail(Long id);
 
     /**
      * 获取用户数据
@@ -84,7 +77,7 @@ public interface UserService {
      * @param uid
      * @return
      */
-    User getUserById(long uid);
+    User getUserById(Long uid);
 
     /**
      * 用户更新
@@ -98,7 +91,7 @@ public interface UserService {
      * @param bankDeposit
      * @return
      */
-    boolean updateUser(long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
+    boolean updateUser(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
 
 
     /**
@@ -121,5 +114,5 @@ public interface UserService {
      * @return
      * @Doc 启用停用账号
      */
-    int disable(long id, int status);
+    int disable(Long id, Integer status);
 }

@@ -2,16 +2,14 @@ package com.magic.user.entity;
 
 import com.magic.user.enums.*;
 
-import java.util.Date;
-
 /**
  * @Doc 用户，股东，代理
  */
 public class User {
 
-    private long id;
+    private Long id;
 
-    private long userId;   //代理id
+    private Long userId;   //代理id
 
     private String realname;    //真实姓名
 
@@ -21,9 +19,9 @@ public class User {
 
     private String email;   //电子邮箱
 
-    private Date registerTime;  //注册时间
+    private Long registerTime;  //注册时间
 
-    private int registerIp; //注册ip
+    private Integer registerIp; //注册ip
 
     private String generalizeCode;  //推广码
 
@@ -39,7 +37,9 @@ public class User {
 
     private String bankDeposit; //开户行
 
-    private long ownerId;  //业主id
+    private Long ownerId;  //业主id
+
+    private String ownerName;   //业主账户
 
     private DeleteStatus isDelete;  //是否删除
 
@@ -63,7 +63,7 @@ public class User {
      * @param currencyType
      * @Doc 股东
      */
-    public User(long userId, String realname, String username, String telephone, String email, AccountType type, GeneraType gender, CurrencyType currencyType, Date registerTime) {
+    public User(Long userId, String realname, String username, String telephone, String email, AccountType type, GeneraType gender, CurrencyType currencyType, Long registerTime) {
         this.userId = userId;
         this.realname = realname;
         this.username = username;
@@ -88,7 +88,7 @@ public class User {
      * @param bankCardNo
      * @Doc agent
      */
-    public User(long userId, String realname, String username, String telephone, String email, AccountType type, Date registerTime, int registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
+    public User(Long userId, String realname, String username, String telephone, String email, AccountType type, Long registerTime, Integer registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
         this.userId = userId;
         this.realname = realname;
         this.username = username;
@@ -102,19 +102,19 @@ public class User {
         this.bankCardNo = bankCardNo;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -150,19 +150,19 @@ public class User {
         this.email = email;
     }
 
-    public Date getRegisterTime() {
+    public Long getRegisterTime() {
         return registerTime;
     }
 
-    public void setRegisterTime(Date registerTime) {
+    public void setRegisterTime(Long registerTime) {
         this.registerTime = registerTime;
     }
 
-    public int getRegisterIp() {
+    public Integer getRegisterIp() {
         return registerIp;
     }
 
-    public void setRegisterIp(int registerIp) {
+    public void setRegisterIp(Integer registerIp) {
         this.registerIp = registerIp;
     }
 
@@ -206,11 +206,11 @@ public class User {
         this.bankCardNo = bankCardNo;
     }
 
-    public long getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(long ownerId) {
+    public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
 
@@ -244,6 +244,14 @@ public class User {
 
     public void setBankDeposit(String bankDeposit) {
         this.bankDeposit = bankDeposit;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public String getTemp1() {

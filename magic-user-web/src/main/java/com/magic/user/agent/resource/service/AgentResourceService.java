@@ -1,9 +1,18 @@
 package com.magic.user.agent.resource.service;
 
-import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.user.entity.User;
-import com.magic.user.vo.UserCondition;
+import com.magic.api.commons.core.tools.HeaderUtil;
+import com.magic.user.bean.UserCondition;
+import com.magic.user.po.DownLoadFile;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * User: joey
@@ -17,7 +26,16 @@ public interface AgentResourceService {
      * @return
      * @Doc 分页查询
      */
-    String findByPage(UserCondition userCondition);
+    String findByPage(UserCondition userCondition, int page, int count);
+
+    /**
+     * 会员层级列表导出
+     *
+     * @param rc        RequestContext
+     * @param condition 查询条件
+     * @return
+     */
+    DownLoadFile agentListExport(RequestContext rc, String condition);
 
     /**
      * @param rc
@@ -37,15 +55,15 @@ public interface AgentResourceService {
      * @return
      * @Doc 添加
      */
-    String add(RequestContext rc, long holder, String account, String password, String realname, String telephone, String bankCardNo, String email, int returnScheme,
-               int adminCost, int feeScheme, String[] domain, int discount, int cost);
+    String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone, String bankCardNo, String email, Integer returnScheme,
+               Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost);
 
     /**
      * @param id
      * @return
      * @Doc 获取代理详情
      */
-    String getDetail(RequestContext rc, long id);
+    String getDetail(RequestContext rc, Long id);
 
     /**
      * @param id
@@ -53,20 +71,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 重置密码
      */
-    String resetPwd(RequestContext rc, long id, String password);
-
-    /**
-     * @param rc
-     * @param id
-     * @param realname
-     * @param telephone
-     * @param email
-     * @param bankCardNo
-     * @param status
-     * @return
-     * @Doc 修改代理资料
-     */
-    String update(RequestContext rc, long id, String realname, String telephone, String email, String bankCardNo, int status);
+    String resetPwd(RequestContext rc, Long id, String password);
 
     /**
      * @param rc
@@ -79,7 +84,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 代理基础信息修改
      */
-    String update(RequestContext rc, long id, String realname, String telephone, String email, String bankCardNo, String bank);
+    String update(RequestContext rc, Long id, String realname, String telephone, String email, String bankCardNo, String bank);
 
 
     /**
@@ -91,7 +96,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 修改代理配置信息
      */
-    String updateAgentConfig(RequestContext rc, long agentId, int returnScheme, int adminCost, int feeScheme);
+    String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme);
 
     /**
      * @param rc
@@ -104,7 +109,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 添加代理申请
      */
-    String agentApply(RequestContext rc, String account, String password, String realname, String telephone, String email, String bankCardNo);
+    String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo);
 
     /**
      * @param rc
@@ -115,7 +120,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 新增代理审核列表
      */
-    String agentApplyList(RequestContext rc, String account, int status, int page, int count);
+    String agentApplyList(RequestContext rc, String account, Integer status, Integer page, Integer count);
 
     /**
      * @param rc
@@ -123,7 +128,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 代理审核基础信息
      */
-    String agentApplyInfo(RequestContext rc, long applyId);
+    String agentApplyInfo(RequestContext rc, Long applyId);
 
     /**
      * @param rc
@@ -143,9 +148,28 @@ public interface AgentResourceService {
      * @return
      * @Doc 代理审核通过/拒绝
      */
-    String agentReview(RequestContext rc, long id, int reviewStatus, long holder, String realname, String telephone,
-                       String bankCardNo, String email, int returnScheme,
-                       int adminCost, int feeScheme, String[] domain, int discount, int cost);
+    String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone,
+                       String bankCardNo, String email, Integer returnScheme,
+                       Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost);
 
-    String disable(RequestContext rc,long agentId,int status);
+    /**
+     * @param rc
+     * @param agentId
+     * @param status
+     * @return
+     * @Doc 修改代理可用状态
+     */
+    String disable(RequestContext rc, Long agentId, Integer status);
+
+    /**
+     * @Doc 用户登录
+     * @param rc
+     * @param agent
+     * @param url
+     * @param username
+     * @param password
+     * @param code
+     * @return
+     */
+    String login(RequestContext rc, String agent, String url, String username, String password, String code);
 }

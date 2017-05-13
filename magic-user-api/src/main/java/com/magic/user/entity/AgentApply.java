@@ -2,13 +2,11 @@ package com.magic.user.entity;
 
 import com.magic.user.enums.ReviewStatus;
 
-import java.util.Date;
-
 /**
  * @Doc 代理申请基础信息
  */
 public class AgentApply {
-    private long id;
+    private Long id;
 
     private String username;    //申请人账号
 
@@ -16,7 +14,7 @@ public class AgentApply {
 
     private String password;    //  密码
 
-    private long stockId;   //股东id
+    private Long stockId;   //股东id
 
     private String stockName;   //股东账号
 
@@ -30,9 +28,9 @@ public class AgentApply {
 
     private String resourceUrl; //加入来源
 
-    private int registerIp; //注册ip
+    private Integer registerIp; //注册ip
 
-    private Date createTime; //注册时间
+    private Long createTime; //注册时间
 
     private String temp1;
 
@@ -41,7 +39,7 @@ public class AgentApply {
     public AgentApply() {
     }
 
-    public AgentApply(String username, String realname, String password, long stockId, String telephone, String email, ReviewStatus status, String resourceUrl, int registerIp, Date createTime) {
+    public AgentApply(String username, String realname, String password, Long stockId, String telephone, String email, ReviewStatus status, String resourceUrl, Integer registerIp, Long createTime) {
         this.username = username;
         this.realname = realname;
         this.password = password;
@@ -55,11 +53,11 @@ public class AgentApply {
     }
 
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -87,11 +85,11 @@ public class AgentApply {
         this.username = username;
     }
 
-    public long getStockId() {
+    public Long getStockId() {
         return stockId;
     }
 
-    public void setStockId(long stockId) {
+    public void setStockId(Long stockId) {
         this.stockId = stockId;
     }
 
@@ -127,19 +125,19 @@ public class AgentApply {
         this.resourceUrl = resourceUrl;
     }
 
-    public int getRegisterIp() {
+    public Integer getRegisterIp() {
         return registerIp;
     }
 
-    public void setRegisterIp(int registerIp) {
+    public void setRegisterIp(Integer registerIp) {
         this.registerIp = registerIp;
     }
 
-    public Date getCreateTime() {
+    public Long getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(Long createTime) {
         this.createTime = createTime;
     }
 

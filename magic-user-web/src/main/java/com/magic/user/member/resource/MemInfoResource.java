@@ -25,7 +25,7 @@ import java.net.URLEncoder;
  * Time: 17:13
  */
 @Component
-@RequestMapping("/info")
+@RequestMapping("/v1/info")
 public class MemInfoResource {
 
     @Resource
