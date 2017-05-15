@@ -8,6 +8,27 @@ package com.magic.user.constants;
  */
 public class RedisConstants {
 
+
+    public enum USER_PREFIX {
+        USER_BASE_INFO("ubi_", 60 * 60 * 24); //业主平台用户基础信息
+
+        private String prefix;  //
+        private int expire;    //过期时间
+
+        USER_PREFIX(String prefix, int expire) {
+            this.prefix = prefix;
+            this.expire = expire;
+        }
+
+        public String key(long id) {
+            return prefix + id;
+        }
+
+        public int expire() {
+            return expire;
+        }
+    }
+
     /**
      * 业主会员列表
      */
@@ -19,7 +40,7 @@ public class RedisConstants {
      * @param ownerId
      * @return
      */
-    public static String assembleOwnerMembersList(long ownerId){
+    public static String assembleOwnerMembersList(long ownerId) {
         return assemble(OWNER_MEMBERS_LIST, ownerId);
     }
 

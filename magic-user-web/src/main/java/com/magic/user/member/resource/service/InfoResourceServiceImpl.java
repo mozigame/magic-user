@@ -267,7 +267,7 @@ public class InfoResourceServiceImpl {
                 throw UserException.ILLEGAL_USER;
             }
             //用户数据更新
-            boolean result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit)) > 0;
+            boolean result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
                 if (realname != null) {
                     newMap.put("realname", realname);

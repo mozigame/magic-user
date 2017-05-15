@@ -43,7 +43,7 @@ public abstract interface BaseDbService<T, PK extends Serializable> {
     /**
      * 删除对象.
      *
-     * @param entity 对象必须是session中的对象或含id属性的transient对象.
+     * @param paramNames 对象必须是session中的对象或含id属性的transient对象.
      */
     public int delete(final String ql, final String[] paramNames, final Object... values);
 

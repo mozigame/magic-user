@@ -166,7 +166,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         //3、添加代理基础信息
         User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, account, telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
-        if (userService.addAgent(agentUser) <= 0) {
+        if (userService.addAgent(agentUser)) {
             ApiLogger.error("add agent info failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
         }
@@ -294,7 +294,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (agentUser == null)
             throw UserException.ILLEGAL_USER;
         User user = assembleUpdateAgentInfo(id, realname, telephone, email, bankCardNo, bank);
-        if (userService.update(user) <= 0) {
+        if (!userService.update(user)) {
             ApiLogger.error("update agent info error,userId:" + id);
             throw UserException.USER_UPDATE_FAIL;
         }
@@ -479,7 +479,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             //3、添加代理基础信息
             String generalizeCode = UUIDUtil.getCode();
             User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, agentApply.getUsername(), telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
-            if (userService.addAgent(agentUser) <= 0) {
+            if (!userService.addAgent(agentUser)) {
                 ApiLogger.error("add agent info failed,userId:" + userId);
                 throw UserException.REGISTER_FAIL;
             }
@@ -541,7 +541,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.ILLEGAL_USER;
         if (status == agentUser.getStatus().value())
             throw UserException.USER_STATUS_UPDATE_FAIL;
-        if (userService.disable(agentId, status) <= 0) {
+        if (!userService.disable(agentId, status)) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;

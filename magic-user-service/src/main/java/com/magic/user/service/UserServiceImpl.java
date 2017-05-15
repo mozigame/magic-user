@@ -1,9 +1,11 @@
 package com.magic.user.service;
 
+import com.magic.api.commons.ApiLogger;
 import com.magic.user.entity.User;
 import com.magic.user.storage.AgentDbService;
 import com.magic.user.storage.StockDbService;
 import com.magic.user.storage.UserDbService;
+import com.magic.user.storage.UserRedisStorageService;
 import com.magic.user.vo.AgentInfoVo;
 import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource(name = "userDbService")
     private UserDbService userDbService;
+    @Resource(name = "userRedisStorageService")
+    private UserRedisStorageService userRedisStorageService;
+
     @Resource(name = "stockDbService")
     private StockDbService stockDbService;
     @Resource(name = "agentDbService")
@@ -29,7 +34,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(Long userId) {
-        return stockDbService.get(userId);
+        User user = userRedisStorageService.getUser(userId);
+        if (user == null) {
+            user = stockDbService.get(userId);
+            if (user != null)
+                if (!userRedisStorageService.addUser(user)) {
+                    ApiLogger.warn("add user info to redis error,userId:" + user.getUserId());
+                }
+        }
+        return user;
     }
 
     @Override
@@ -43,18 +56,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int update(User user) {
-        return stockDbService.update(user);
+    public boolean update(User user) {
+        boolean result = stockDbService.update(user) > 0;
+        if (result)
+            if (!userRedisStorageService.updateUser(user))
+                ApiLogger.warn("update user info to redis error,userId:" + user.getUserId());
+        return result;
     }
 
     @Override
-    public long addStock(User user) {
-        return stockDbService.insert(user);
+    public boolean addStock(User user) {
+        long result = stockDbService.insert(user);
+        return result > 0;
     }
 
     @Override
-    public int disable(Long id, Integer status) {
-        return stockDbService.update("updateDisable", new String[]{"id", "status"}, new Object[]{id, status});
+    public boolean disable(Long id, Integer status) {
+        int result = stockDbService.update("updateDisable", new String[]{"id", "status"}, new Object[]{id, status});
+        return result > 0;
     }
 
 
@@ -64,8 +83,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public long addAgent(User user) {
-        return agentDbService.insert(user);
+    public boolean addAgent(User user) {
+        long result = agentDbService.insert(user);
+        return result > 0;
     }
 
     @Override

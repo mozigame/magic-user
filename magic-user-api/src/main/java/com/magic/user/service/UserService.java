@@ -47,7 +47,7 @@ public interface UserService {
      * @param user
      * @return
      */
-    long addAgent(User user);
+    boolean addAgent(User user);
 
     /**
      * @param id
@@ -99,14 +99,14 @@ public interface UserService {
      * @return
      * @Doc 修改用户信息
      */
-    int update(User user);
+    boolean update(User user);
 
     /**
      * @param user
      * @return
      * @Doc 添加股东
      */
-    long addStock(User user);
+    boolean addStock(User user);
 
     /**
      * @param id
@@ -114,5 +114,5 @@ public interface UserService {
      * @return
      * @Doc 启用停用账号
      */
-    int disable(Long id, Integer status);
+    boolean disable(Long id, Integer status);
 }

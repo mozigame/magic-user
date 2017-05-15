@@ -150,8 +150,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (opera == null)
             throw UserException.ILLEGAL_USER;
         User user = assembleUserUpdate(id, telephone, email, bankCardNo, bank, status);
-        int count = userService.update(user);
-        if (count <= 0) {
+        if (!userService.update(user)) {
             throw UserException.USER_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
@@ -202,7 +201,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         }
         //4、添加股东基础信息
         User stockUser = assembleStock(userId, realname, account, telephone, email, AccountType.stockholder, GeneraType.parse(sex), CurrencyType.parse(currencyType), IPUtil.ipToInt(rc.getIp()), System.currentTimeMillis(), ownerId);
-        if (userService.addStock(stockUser) <= 0) {
+        if (!userService.addStock(stockUser)) {
             throw UserException.REGISTER_FAIL;
         }
         JSONObject result = new JSONObject();
@@ -253,7 +252,7 @@ public class StockResourceServiceImpl implements StockResourceService {
             throw UserException.ILLEGAL_USER;
         if (stockUser.getStatus().value() == status)
             throw UserException.USER_STATUS_UPDATE_FAIL;
-        if (userService.disable(id, status) <= 0) {
+        if (!userService.disable(id, status)) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
