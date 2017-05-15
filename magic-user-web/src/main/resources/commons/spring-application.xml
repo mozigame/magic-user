@@ -26,5 +26,6 @@
     <import resource="classpath*:spring/spring-core.xml"/>
     <import resource="classpath:codis-user.xml"/>
     <import resource="classpath:mongo-db-user.xml"/>
+    <import resource="classpath*:spring/thrift-client.xml"/>
 
 </beans>

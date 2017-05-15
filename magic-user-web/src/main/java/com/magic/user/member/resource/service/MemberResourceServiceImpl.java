@@ -11,7 +11,7 @@ import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
-import com.magic.commons.enginegw.EngineUtil;
+import com.magic.commons.enginegw.service.ThriftFactory;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
@@ -73,6 +73,8 @@ public class MemberResourceServiceImpl {
     private UuidService uuidService;
     @Resource
     private PassportDubboService passportDubboService;
+    @Resource
+    private ThriftFactory thriftFactory;
 
     /**
      * 会员列表
@@ -308,7 +310,7 @@ public class MemberResourceServiceImpl {
         //组装请求数据
         String body = assembleReqBody(rc, member, password);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100006, body);
-        EGResp resp = EngineUtil.call(req, "account");
+        EGResp resp = thriftFactory.call(req, "account");
         if (resp != null && resp.getCode() == 0x4444) {//重置成功
             return UserContants.EMPTY_STRING;
         }
@@ -366,7 +368,7 @@ public class MemberResourceServiceImpl {
         }
         //组装请求数据
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, logoutBody(rc, member));
-        EGResp resp = EngineUtil.call(req, "account");
+        EGResp resp = thriftFactory.call(req, "account");
         if (resp != null && (resp.getCode() == 0x5555 || resp.getCode() == 0x1013)) {//注销成功
             return UserContants.EMPTY_STRING;
         }
@@ -595,7 +597,7 @@ public class MemberResourceServiceImpl {
         EGReq egReq = assembleEGReq(CmdType.PASSPORT, 0x100001, body);
 
         //todo 暂时注释调用引擎网关的逻辑
-        /*EGResp resp = EngineUtil.call(egReq, "account");
+        /*EGResp resp = thriftFactory.call(egReq, "account");
         if (resp == null) {
             throw UserException.REGISTER_FAIL;
         }
@@ -743,7 +745,7 @@ public class MemberResourceServiceImpl {
         }
         String body = assembleLoginBody(rc, ownerId, username, password, agent, url);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100002, body);
-        EGResp resp = EngineUtil.call(req, "account");
+        EGResp resp = thriftFactory.call(req, "account");
         if (resp == null || resp.getCode() == 0x1011) {
             throw UserException.MEMBER_LOGIN_FAIL;
         }
@@ -847,7 +849,7 @@ public class MemberResourceServiceImpl {
         }
         String body = assembleResetBody(rc, username, oldPassword, newPassword);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100004, body);
-        EGResp resp = EngineUtil.call(req, "account");
+        EGResp resp = thriftFactory.call(req, "account");
         if (resp == null) {
             throw UserException.PASSWORD_RESET_FAIL;
         }
@@ -912,7 +914,7 @@ public class MemberResourceServiceImpl {
     public String memberLoginVerify(RequestContext rc) {
         String body = assembleVerifyBody(rc);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100003, body);
-        EGResp resp = EngineUtil.call(req, "account");
+        EGResp resp = thriftFactory.call(req, "account");
         boolean result = Optional.ofNullable(resp).filter(response -> response.getCode() != 0x3333).isPresent();
         if (!result) {
             throw UserException.VERIFY_FAIL;
@@ -946,7 +948,7 @@ public class MemberResourceServiceImpl {
         }
         String body = assembleLogoutBody(rc, username);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
-        EGResp resp = EngineUtil.call(req, "account");
+        EGResp resp = thriftFactory.call(req, "account");
         if (resp == null) {
             throw UserException.LOGOUT_FAIL;
         }
