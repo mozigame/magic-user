@@ -39,8 +39,10 @@ public class UserLogoutSuccessConsumer implements Consumer {
             Long createTime = object.getLongValue("createTime");
             Integer requestIp = object.getIntValue("requestIp");
             String platform = object.getString("platform");
+            //TODO 注销  LoginType.logout
             if (!loginService.updateLoginStatus(userId, null, null, LoginType.login.value())) {
                 ApiLogger.error("user logout status update error: userId:" + userId);
+                //TODO 参考UserLoginSuccessConsumer
             }
             LoginHistory history = assembleLoginHistory(userId, createTime, requestIp, LoginType.logout, platform);
             if (!loginHistoryService.add(history))
@@ -51,6 +53,7 @@ public class UserLogoutSuccessConsumer implements Consumer {
         return true;
     }
 
+    //TODO 注释
     private LoginHistory assembleLoginHistory(Long userId, Long createTime, Integer requestIp, LoginType loginType, String platform) {
         LoginHistory history = new LoginHistory();
         history.setUserId(userId);

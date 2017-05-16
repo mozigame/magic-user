@@ -14,6 +14,7 @@ import com.magic.user.service.LoginService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * User: joey
@@ -42,16 +43,25 @@ public class UserLoginSuccessConsumer implements Consumer {
             String platform = object.getString("platform");
             if (!loginService.updateLoginStatus(userId, createTime, requestIp, LoginType.login.value())) {
                 ApiLogger.error("user login status update error: userId:" + userId);
+                //TODO 检查登陆状态，如果已修改，则直接return true，否则返回false
+                Login login = loginService.get(userId);
+                if (login == null){
+                    return true;
+                }
+                if (login.getStatus() == LoginType.login){
+                    return true;
+                }
+                return false;
             }
             LoginHistory history = assembleLoginHistory(userId, createTime, requestIp, LoginType.login, platform);
-            if (!loginHistoryService.add(history))
-                return false;
+            return loginHistoryService.add(history);
         } catch (Exception e) {
             ApiLogger.error(String.format("user login success mq consumer error. key:%s, msg:%s", key, msg), e);
         }
         return true;
     }
 
+    //TODO 注释
     private LoginHistory assembleLoginHistory(Long userId, Long createTime, Integer requestIp, LoginType loginType, String platform) {
         LoginHistory history = new LoginHistory();
         history.setUserId(userId);

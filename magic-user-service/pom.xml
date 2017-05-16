@@ -48,6 +48,11 @@
             <groupId>com.magic.commons</groupId>
             <artifactId>engine-gw</artifactId>
         </dependency>
+        <!-- http -->
+        <dependency>
+            <groupId>com.magic.commons</groupId>
+            <artifactId>http</artifactId>
+        </dependency>
         <!-- spring -->
         <dependency>
             <groupId>org.springframework</groupId>

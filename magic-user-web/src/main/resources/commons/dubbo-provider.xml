@@ -16,6 +16,8 @@
     <!-- provider service -->
     <dubbo:service interface="com.magic.user.service.dubbo.AccountDubboService" ref="accountDubboService">
         <dubbo:method name="getOwnerId" timeout="3000"/>
+        <dubbo:method name="getUser" timeout="3000"/>
+        <dubbo:method name="getMember" timeout="3000"/>
     </dubbo:service>
 
 </beans>

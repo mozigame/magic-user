@@ -3,6 +3,7 @@ package com.magic.user.resource.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.service.java.UuidService;
@@ -46,12 +47,14 @@ public class StockResourceServiceImpl implements StockResourceService {
 
     @Override
     public String findAllStock(RequestContext rc) {
+        //TODO
         List<StockInfoVo> list = userService.findAllStock();
         assembleStockList(list);
         for (StockInfoVo info : list) {
             info.setShowStatus(AccountStatus.parse(info.getStatus()).desc());
             info.setCurrencyName(CurrencyType.parse(info.getCurrencyType()).desc());
         }
+        //TODO SimpleListResult
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("list", list);
         return jsonObject.toJSONString();
@@ -64,6 +67,7 @@ public class StockResourceServiceImpl implements StockResourceService {
             throw UserException.ILLEGAL_USER;
         List<StockInfoVo> list = userService.findAllStock();
         list = assembleSimple(list);
+        //TODO SimpleListResult
         JSONObject result = new JSONObject();
         result.put("list", list);
         return result.toJSONString();
@@ -105,6 +109,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         }
     }
 
+    //TODO 注释
     private List<StockInfoVo> assembleSimple(List<StockInfoVo> list) {
         List<StockInfoVo> infos = new ArrayList<>();
         for (StockInfoVo info : list) {

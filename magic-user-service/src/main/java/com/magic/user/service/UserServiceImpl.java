@@ -109,6 +109,7 @@ public class UserServiceImpl implements UserService {
         return userDbService.get(uid);
     }
 
+    //TODO 删除
     @Override
     public boolean updateUser(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
         return false;

@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.core.tools.MauthUtil;
+import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.DateUtil;
@@ -24,6 +25,7 @@ import com.magic.user.service.*;
 import com.magic.user.vo.AgentApplyVo;
 import com.magic.user.vo.AgentConfigVo;
 import com.magic.user.vo.AgentInfoVo;
+import com.sun.tools.javac.comp.Todo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -69,7 +71,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         List<Long> agentIds = Lists.newArrayList();
         List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds));
         if (list != null && list.size() > 0) {
-
+            //TODO pagebean
             JSONObject jsonObject = new JSONObject();
             //todo
             jsonObject.put("page", 0);
@@ -77,6 +79,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             jsonObject.put("total", count);
             jsonObject.put("list", list);
             return jsonObject.toJSONString();
+
         }
         return UserContants.EMPTY_STRING;
     }
@@ -171,6 +174,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.REGISTER_FAIL;
         }
         String domainSpit = StringUtils.arrayToStrSplit(domain);
+
+        //TODO 整合成一个 TOPIC 代理新增
         //mq 处理 4、添加代理配置
         AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
         sendAgentConfigMq(agentConfig);
@@ -183,6 +188,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return result.toJSONString();
     }
 
+    //TODO 注释
     private User assembleAgent(Long userId, long ownerId, String ownerName, String realname, String username, String telephone, String email, AccountType type, Long registerTime,
                                Integer registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
         User user = new User();
@@ -203,6 +209,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
     }
 
+    //TODO 注释
     private OwnerStockAgentMember assembleOwnerStockAgent(Long ownerId, Long stockId, Long agentId) {
         OwnerStockAgentMember ownerStockAgentMember = new OwnerStockAgentMember();
         ownerStockAgentMember.setOwnerId(ownerId);
@@ -212,6 +219,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return ownerStockAgentMember;
     }
 
+    //TODO 注释
     private AgentConfig assembleAgentConfig(Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain, Integer discount, Integer cost) {
         AgentConfig agentConfig = new AgentConfig();
         agentConfig.setAgentId(agentId);
@@ -335,6 +343,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return UserContants.EMPTY_STRING;
     }
 
+    //TODO 流程有待确认
+    //1.url获取ownerId
+    //2.ownerId + ownername 获取 stockId
     @Override
     public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo) {
         StringBuffer url = request.getRequestURL();
@@ -401,6 +412,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return jsonObject.toJSONString();
     }
 
+    //TODO 注释
     private void assembleAgentApplyList(List<AgentApplyVo> list) {
         for (AgentApplyVo vo : list) {
             vo.setShowStatus(ReviewStatus.parse(vo.getStatus()).desc());
@@ -520,6 +532,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     }
 
 
+    //TODO 注释
     private AgentReview assembleAgentReview(Long agentApplyId, String agentName, Long operUserId, String operUserName, ReviewStatus status, Long createTime) {
         AgentReview review = new AgentReview();
         review.setAgentApplyId(agentApplyId);
@@ -566,6 +579,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         User loginUser = userService.get(userId);
         if (loginUser == null)
             throw UserException.ILLEGAL_USER;
+        //TODO user不包含member数据 AccountType.member
         if (loginUser.getStatus() == AccountStatus.disable
                 || loginUser.getIsDelete() == DeleteStatus.del
                 || loginUser.getType() == AccountType.member)
@@ -599,6 +613,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return UserContants.EMPTY_STRING;
     }
 
+    //TODO 注释
     private void sendLoginHistory(Long userId, Long createTime, Integer requestIp, LoginType loginType, String platform) {
         JSONObject object = new JSONObject();
         object.put("userId", userId);
@@ -612,7 +627,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             producer.send(Topic.USER_LOGOUT_SUCCESS, userId + "", object.toJSONString());
     }
 
-
+    //TODO 注释
     private RegisterReq assembleRegister(String usernmae, String password) {
         RegisterReq req = new RegisterReq();
         req.setUsername(usernmae);
@@ -633,6 +648,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 .isPresent();
     }
 
+    //TODO 注释
     private boolean checkLoginReq(String username, String password) {
         if (username.length() >= 6 && username.length() <= 16 && password.length() == 32) {
             return true;

@@ -2,10 +2,12 @@ package com.magic.user.entity;
 
 import com.magic.user.enums.*;
 
+import java.io.Serializable;
+
 /**
  * @Doc 用户，股东，代理
  */
-public class User {
+public class User implements Serializable{
 
     private Long id;
 
