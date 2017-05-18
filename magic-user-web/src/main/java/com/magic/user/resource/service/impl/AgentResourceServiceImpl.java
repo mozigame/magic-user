@@ -1,9 +1,11 @@
 package com.magic.user.resource.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.core.tools.MD5Util;
 import com.magic.api.commons.core.tools.MauthUtil;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
@@ -12,8 +14,10 @@ import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.api.commons.utils.StringUtils;
+import com.magic.config.service.DomainDubboService;
+import com.magic.config.vo.OwnerInfo;
 import com.magic.service.java.UuidService;
-import com.magic.user.bean.UserCondition;
+import com.magic.user.bean.AgentCondition;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.*;
 import com.magic.user.enums.*;
@@ -22,10 +26,11 @@ import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.RegisterReq;
 import com.magic.user.resource.service.AgentResourceService;
 import com.magic.user.service.*;
+import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.AgentApplyVo;
+import com.magic.user.vo.AgentConditionVo;
 import com.magic.user.vo.AgentConfigVo;
 import com.magic.user.vo.AgentInfoVo;
-import com.sun.tools.javac.comp.Todo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,44 +49,80 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
     @Resource(name = "agentConfigService")
     private AgentConfigService agentConfigService;
-    @Resource(name = "ownerStockAgentService")
-    private OwnerStockAgentService ownerStockAgentService;
     @Resource(name = "userService")
     private UserService userService;
     @Resource(name = "loginService")
     private LoginService loginService;
     @Resource(name = "agentApplyService")
     private AgentApplyService agentApplyService;
-    @Resource(name = "agentReviewService")
-    private AgentReviewService agentReviewService;
     @Resource
     private UuidService uuidService;
     @Resource
     private AccountIdMappingService accountIdMappingService;
     @Resource
     private Producer producer;
+    @Resource
+    private AgentMongoService agentMongoService;
+    @Resource
+    private DomainDubboService domainDubboService;
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param condition
+     * @param page
+     * @param count
+     * @return
+     */
     @Override
-    public String findByPage(UserCondition userCondition, int page, int count) {
+    public String findByPage(RequestContext rc, String condition, int page, int count) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        AgentCondition userCondition = AgentCondition.valueOf(condition);
+        userCondition.setOwnerId(operaUser.getOwnerId());
+        if (!checkAgentCondition(userCondition)) {
+            return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+        }
+        //1、如果代理账号不为空，直接查询代理信息
+        if (StringUtils.isNotBlank(userCondition.getAccount())) {
+            long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), userCondition.getAccount());
+            if (agentId <= 0) {
+                return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+            }
+            //1.2、如果推广码不为空，验证推广码是否正确
+            if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {
+                User agentUser = userService.get(agentId);
+                if (!agentUser.getGeneralizeCode().equals(userCondition.getPromotionCode())) {
+                    return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+                }
+            }
+        } else if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {  //2、如果代理账号为空，推广代码不为空，查询代理
+            User agentUser = userService.getUserByCode(userCondition.getPromotionCode());
+            if (agentUser == null || agentUser.getOwnerId() != operaUser.getOwnerId()) {
+                return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+            }
+        }
 
-        //todo 1、在Kevin 处根据条件获取代理的id
-        //todo 2、在kevin 处获取会员存款的数据
-
+        long totalCount = agentMongoService.getCount(userCondition);
+        if (totalCount <= 0) {
+            return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+        }
+        //3、条件查询mongo中的代理，组装id
+        List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, page, count);
+        //todo 将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
         List<Long> agentIds = Lists.newArrayList();
+        for (AgentConditionVo vo : agentConditionVoList) {
+            agentIds.add(vo.getAgentId());
+        }
+
         List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds));
         if (list != null && list.size() > 0) {
-            //TODO pagebean
-            JSONObject jsonObject = new JSONObject();
-            //todo
-            jsonObject.put("page", 0);
-            jsonObject.put("count", 0);
-            jsonObject.put("total", count);
-            jsonObject.put("list", list);
-            return jsonObject.toJSONString();
-
+            return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
         }
-        return UserContants.EMPTY_STRING;
+        return JSON.toJSONString(assemblePageBean(count, page, totalCount, null));
     }
 
     /**
@@ -97,14 +138,75 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     }
 
     /**
+     * @param count
+     * @param page
+     * @param total
+     * @param list
+     * @return
+     * @Doc 组装PageBean
+     */
+    private PageBean assemblePageBean(Integer count, Integer page, Long total, List list) {
+        PageBean pageBean = new PageBean<>();
+        pageBean.setCount(count);
+        pageBean.setPage(page);
+        pageBean.setTotal(total);
+        pageBean.setList(list);
+        return pageBean;
+    }
+
+    /**
+     * @param condition
+     * @return
+     * @Doc 检查代理的condition条件是否合法
+     */
+    private boolean checkAgentCondition(AgentCondition condition) {
+        Integer status = condition.getStatus();
+        if (status != null && AccountStatus.parse(status) == null) {
+            return false;
+        }
+        if (condition.getRegister() != null) {
+            if (condition.getRegister().getStart() != null && condition.getRegister().getEnd() != null
+                    && condition.getRegister().getStart() > condition.getRegister().getEnd()) {
+                return false;
+            }
+        }
+        if (condition.getMembers() != null) {
+            if (condition.getMembers().getMin() != null && condition.getMembers().getMax() != null
+                    && condition.getMembers().getMin() > condition.getMembers().getMax()) {
+                return false;
+            }
+        }
+        if (condition.getDepositMoney() != null) {
+            if (condition.getDepositMoney().getMin() != null && condition.getDepositMoney().getMax() != null
+                    && condition.getDepositMoney().getMin() > condition.getDepositMoney().getMax()) {
+                return false;
+            }
+        }
+        if (condition.getWithdrawMoney() != null) {
+            if (condition.getWithdrawMoney().getMin() != null && condition.getWithdrawMoney().getMax() != null
+                    && condition.getWithdrawMoney().getMin() > condition.getWithdrawMoney().getMax()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * @param rc        RequestContext
      * @param condition 查询条件
      * @return
      * @Doc 导出代理列表信息
      */
     public DownLoadFile agentListExport(RequestContext rc, String condition) {
-        UserCondition memberCondition = UserCondition.valueOf(condition);
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        AgentCondition userCondition = AgentCondition.valueOf(condition);
+        //todo 没有查询到结果如何处理
+        if (!checkAgentCondition(userCondition)) {
 
+        }
         long uid = rc.getUid(); //业主ID、股东或代理ID
         String filename = assembleFileName(uid, "代理列表");
         DownLoadFile downLoadFile = new DownLoadFile();
@@ -132,6 +234,26 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return filename.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param request
+     * @param holder
+     * @param account
+     * @param password
+     * @param realname
+     * @param telephone
+     * @param bankCardNo
+     * @param email
+     * @param returnScheme
+     * @param adminCost
+     * @param feeScheme
+     * @param domain
+     * @param discount
+     * @param cost
+     * @return
+     */
     @Override
     public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone, String bankCardNo, String email, Integer returnScheme,
                       Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
@@ -152,8 +274,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         long userId = uuidService.assignUid();
-        if (userId <= 0)
+        if (userId <= 0) {
             throw UserException.ILLEGAL_USER;
+        }
         //1、添加业主id账号映射消息
         OwnerAccountUser ownerAccountUser = new OwnerAccountUser(holderUser.getOwnerId() + UserContants.SPLIT_LINE + account, userId);
         if (accountIdMappingService.add(ownerAccountUser) <= 0) {
@@ -162,7 +285,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //2、添加代理登录信息
-        Login login = new Login(userId, account, password);
+        Login login = new Login(userId, account, PasswordCapture.getSaltPwd(password));
         if (loginService.add(login) <= 0) {
             ApiLogger.error("add agent login failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
@@ -175,20 +298,37 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         String domainSpit = StringUtils.arrayToStrSplit(domain);
 
-        //TODO 整合成一个 TOPIC 代理新增
         //mq 处理 4、添加代理配置
         AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
-        sendAgentConfigMq(agentConfig);
         //mq 处理 5、添加业主股东代理id映射信息
         OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
-        sendAllUserIdMapping(ownerStockAgentMember);
+        //mq 处理 6、将代理基础信息放入mongo
+        AgentConditionVo agentConditionVo = assembleAgentConfigVo(userId, account, generalizeCode, holder, agentUser.getOwnerId());
+        sendAgentAddSuccessMq(agentConfig, ownerStockAgentMember, agentConditionVo);
 
         JSONObject result = new JSONObject();
         result.put("id", userId);
         return result.toJSONString();
     }
 
-    //TODO 注释
+
+    /**
+     * @param userId
+     * @param ownerId
+     * @param ownerName
+     * @param realname
+     * @param username
+     * @param telephone
+     * @param email
+     * @param type
+     * @param registerTime
+     * @param registerIp
+     * @param generalizeCode
+     * @param status
+     * @param bankCardNo
+     * @return
+     * @Doc 组装添加的代理对象
+     */
     private User assembleAgent(Long userId, long ownerId, String ownerName, String realname, String username, String telephone, String email, AccountType type, Long registerTime,
                                Integer registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
         User user = new User();
@@ -209,7 +349,28 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
     }
 
-    //TODO 注释
+    private AgentConditionVo assembleAgentConfigVo(Long agentId, String agentName, String generalizeCode, Long stockId, Long ownerId) {
+        AgentConditionVo vo = new AgentConditionVo();
+        vo.setAgentId(agentId);
+        vo.setAgentName(agentName);
+        vo.setStatus(AccountStatus.enable.value());
+        vo.setDepositMoney(0L);
+        vo.setWithdrawMoney(0L);
+        vo.setMembers(0);
+        vo.setGeneralizeCode(generalizeCode);
+        vo.setStockId(stockId);
+        vo.setOwnerId(ownerId);
+        return vo;
+    }
+
+
+    /**
+     * @param ownerId
+     * @param stockId
+     * @param agentId
+     * @return
+     * @Doc 组装添加的业主股东代理映射对象
+     */
     private OwnerStockAgentMember assembleOwnerStockAgent(Long ownerId, Long stockId, Long agentId) {
         OwnerStockAgentMember ownerStockAgentMember = new OwnerStockAgentMember();
         ownerStockAgentMember.setOwnerId(ownerId);
@@ -219,7 +380,17 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return ownerStockAgentMember;
     }
 
-    //TODO 注释
+    /**
+     * @param agentId
+     * @param returnSchemeId
+     * @param adminCostId
+     * @param feeId
+     * @param domain
+     * @param discount
+     * @param cost
+     * @return
+     * @Doc 组装添加的代理配置对象
+     */
     private AgentConfig assembleAgentConfig(Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain, Integer discount, Integer cost) {
         AgentConfig agentConfig = new AgentConfig();
         agentConfig.setAgentId(agentId);
@@ -232,14 +403,23 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return agentConfig;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param id
+     * @return
+     */
     @Override
     public String getDetail(RequestContext rc, Long id) {
         User opera = userService.get(rc.getUid());
-        if (opera == null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
+        }
         User agentUser = userService.get(id);
-        if (agentUser == null)
+        if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
+        }
         JSONObject result = new JSONObject();
         AgentInfoVo agentVo = userService.getAgentDetail(id);
         assembleAgentDetail(agentVo);
@@ -275,32 +455,57 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         vo.setLastLoginIp(IPUtil.intToIp(Integer.parseInt(vo.getLastLoginIp())));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param id
+     * @param password
+     * @return
+     */
     @Override
     public String resetPwd(RequestContext rc, Long id, String password) {
         User opera = userService.get(rc.getUid());
-        if (opera == null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
+        }
         User agentUser = userService.get(id);
-        if (agentUser == null)
+        if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
+        }
         Login login = loginService.get(id);
-        if (login == null)
+        if (login == null) {
             throw UserException.ILLEGAL_USER;
-        if (!loginService.resetPassword(id, password)) {
+        }
+        if (!loginService.resetPassword(id, PasswordCapture.getSaltPwd(password))) {
             ApiLogger.error("update agent password failed,userId:" + id);
             throw UserException.PASSWORD_RESET_FAIL;
         }
         return UserContants.EMPTY_STRING;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param id
+     * @param realname
+     * @param telephone
+     * @param email
+     * @param bankCardNo
+     * @param bank
+     * @return
+     */
     @Override
     public String update(RequestContext rc, Long id, String realname, String telephone, String email, String bankCardNo, String bank) {
         User opera = userService.get(rc.getUid());
-        if (opera == null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
+        }
         User agentUser = userService.get(id);
-        if (agentUser == null)
+        if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
+        }
         User user = assembleUpdateAgentInfo(id, realname, telephone, email, bankCardNo, bank);
         if (!userService.update(user)) {
             ApiLogger.error("update agent info error,userId:" + id);
@@ -330,14 +535,25 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return user;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param agentId
+     * @param returnScheme
+     * @param adminCost
+     * @param feeScheme
+     * @return
+     */
     @Override
     public String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme) {
         User agentUser = userService.get(agentId);
-        if (agentUser == null)
+        if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
+        }
 
         AgentConfig agentConfig = new AgentConfig(agentId, returnScheme, adminCost, feeScheme);
-        if (agentConfigService.update(agentConfig) <= 0) {
+        if (!agentConfigService.update(agentConfig)) {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
@@ -350,19 +566,20 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo) {
         StringBuffer url = request.getRequestURL();
         String resourceUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).append("/").toString();
-        //todo 根据请求的域名获取股东id
-        long stockId = 0;
-        if (stockId == 0)
-            stockId = 105094L;
+        OwnerInfo ownerInfo = domainDubboService.getOwnerInfoByDomain(resourceUrl);
+        if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
+            throw UserException.ILLEGAL_SOURCE_URL;
+        }
+        long stockId = accountIdMappingService.getUid(ownerInfo.getOwnerId(),ownerInfo.getOwnerName());
         User stockUser = userService.get(stockId);
-        if (stockUser == null)
+        if (stockUser == null) {
             throw UserException.ILLEGAL_USER;
-        long ownerId = stockUser.getOwnerId();
-        if (accountIdMappingService.getUid(ownerId, account) > 0) {
+        }
+        if (accountIdMappingService.getUid(stockUser.getOwnerId(), account) <= 0) {
             throw UserException.USERNAME_EXIST;
         }
         int ip = IPUtil.ipToInt(rc.getIp());
-        AgentApply agentApply = assembleAgentApply(account, realname, password, stockId, telephone, email, ReviewStatus.noReview, resourceUrl, ip, System.currentTimeMillis());
+        AgentApply agentApply = assembleAgentApply(account, realname, password, stockId, ownerInfo.getOwnerId(), telephone, email, ReviewStatus.noReview, resourceUrl, ip, System.currentTimeMillis());
         if (agentApplyService.add(agentApply) <= 0) {
             throw UserException.AGENT_APPLY_ADD_FAIL;
         }
@@ -383,13 +600,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 组装代理申请信息
      */
-    private AgentApply assembleAgentApply(String username, String realname, String password, Long stockId, String telephone, String email,
+    private AgentApply assembleAgentApply(String username, String realname, String password, Long stockId,Long ownerId, String telephone, String email,
                                           ReviewStatus status, String resourceUrl, Integer registerIp, Long createTime) {
         AgentApply apply = new AgentApply();
         apply.setUsername(username);
         apply.setRealname(realname);
         apply.setPassword(password);
         apply.setStockId(stockId);
+        apply.setOwnerId(ownerId);
         apply.setTelephone(telephone);
         apply.setEmail(email);
         apply.setStatus(status);
@@ -399,11 +617,25 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return apply;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param account
+     * @param status
+     * @param page
+     * @param count
+     * @return
+     */
     @Override
     public String agentApplyList(RequestContext rc, String account, Integer status, Integer page, Integer count) {
-        List<AgentApplyVo> agentApplyVos = agentApplyService.findByPage(account, status, page, count);
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        List<AgentApplyVo> agentApplyVos = agentApplyService.findByPage(operaUser.getOwnerId(), account, status, page, count);
         assembleAgentApplyList(agentApplyVos);
-        long totalCount = agentApplyService.getCount(account, status);
+        long totalCount = agentApplyService.getCount(operaUser.getOwnerId(), account, status);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("page", page);
         jsonObject.put("count", count);
@@ -412,16 +644,27 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return jsonObject.toJSONString();
     }
 
-    //TODO 注释
+    /**
+     * @param list
+     * @Doc 组装代理申请列表数据
+     */
     private void assembleAgentApplyList(List<AgentApplyVo> list) {
         for (AgentApplyVo vo : list) {
             vo.setShowStatus(ReviewStatus.parse(vo.getStatus()).desc());
             vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
-            if (vo.getOperatorTime() != null)
+            if (vo.getOperatorTime() != null) {
                 vo.setOperatorTime(DateUtil.formatDateTime(new Date(Long.parseLong(vo.getOperatorTime())), DateUtil.formatDefaultTimestamp));
+            }
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param applyId
+     * @return
+     */
     @Override
     public String agentApplyInfo(RequestContext rc, Long applyId) {
         AgentApplyVo baseInfo = agentApplyService.agentReviewInfo(applyId);
@@ -430,7 +673,25 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return result.toJSONString();
     }
 
-
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param id
+     * @param reviewStatus
+     * @param holder
+     * @param realname
+     * @param telephone
+     * @param bankCardNo
+     * @param email
+     * @param returnScheme
+     * @param adminCost
+     * @param feeScheme
+     * @param domain
+     * @param discount
+     * @param cost
+     * @return
+     */
     @Override
     public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
         User opera = userService.get(rc.getUid());
@@ -438,8 +699,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.ILLEGAL_USER;
         }
         User holderUser = userService.get(holder);
-        if (holderUser == null)
+        if (holderUser == null) {
             throw UserException.ILLEGAL_USER;
+        }
         AgentApply agentApply = agentApplyService.get(id);
         if (agentApply == null) {
             throw UserException.AGENT_APPLY_NOT_EXIST;
@@ -457,13 +719,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 throw UserException.AGENT_REVIEW_FAIL;
             }
             //代理审核历史记录，可以通过mq处理
-            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
+            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(),opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
             sendAgentReviewMq(agentReview);
         } else if (reviewStatus == ReviewStatus.pass.value()) {//2、通过，修改申请状态，增加审核信息，增加代理信息
 
             RegisterReq req = assembleRegister(agentApply.getUsername(), agentApply.getPassword());
-            if (!checkRegisterAgentParam(req))
+            if (!checkRegisterAgentParam(req)) {
                 throw UserException.ILLEGAL_PARAMETERS;
+            }
 
             if (accountIdMappingService.getUid(holderUser.getOwnerId(), agentApply.getUsername()) > 0) {
                 throw UserException.USERNAME_EXIST;
@@ -471,7 +734,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             if (agentApplyService.updateStatus(id, reviewStatus) <= 0) {
                 throw UserException.AGENT_REVIEW_FAIL;
             }
-            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
+            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(),opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
             sendAgentReviewMq(agentReview);
 
             long userId = uuidService.assignUid();
@@ -483,7 +746,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
 
             //2、添加代理登录信息
-            Login login = new Login(userId, agentApply.getUsername(), agentApply.getPassword());
+            Login login = new Login(userId, agentApply.getUsername(), PasswordCapture.getSaltPwd(agentApply.getPassword()));
             if (loginService.add(login) <= 0) {
                 ApiLogger.error("add agent login failed,userId:" + userId);
                 throw UserException.REGISTER_FAIL;
@@ -498,28 +761,28 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             String domainSpit = StringUtils.arrayToStrSplit(domain);
             //mq 处理 4、添加代理配置
             AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
-            sendAgentConfigMq(agentConfig);
             //mq 处理 5、添加业主股东代理id映射信息
             OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
-            sendAllUserIdMapping(ownerStockAgentMember);
+            //mq 处理 6、将代理基础信息放入mongo
+            AgentConditionVo agentConditionVo = assembleAgentConfigVo(userId, agentUser.getUsername(), generalizeCode, holder, agentUser.getOwnerId());
+            sendAgentAddSuccessMq(agentConfig, ownerStockAgentMember, agentConditionVo);
         }
         return UserContants.EMPTY_STRING;
     }
 
     /**
      * @param agentConfig
-     * @Doc 发送增加代理配置消息
-     */
-    private void sendAgentConfigMq(AgentConfig agentConfig) {
-        producer.send(Topic.AGENT_ADD_SUCCESS, agentConfig.getAgentId() + "", UserContants.CUSTOMER_MQ_TAG.AGENT_CONFIG_ADD.name(), JSONObject.toJSONString(agentConfig));
-    }
-
-    /**
      * @param ownerStockAgentMember
-     * @Doc 发送所有用户id映射消息
+     * @Doc 代理添加成功发送mq消息
+     * 1、代理配置信息
+     * 2、业主股东代理映射数据
      */
-    private void sendAllUserIdMapping(OwnerStockAgentMember ownerStockAgentMember) {
-        producer.send(Topic.AGENT_ADD_SUCCESS, ownerStockAgentMember.getOwnerId() + "", UserContants.CUSTOMER_MQ_TAG.USER_ID_MAPPING_ADD.name(), JSONObject.toJSONString(ownerStockAgentMember));
+    private void sendAgentAddSuccessMq(AgentConfig agentConfig, OwnerStockAgentMember ownerStockAgentMember, AgentConditionVo agentConditionVo) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(UserContants.CUSTOMER_MQ_TAG.AGENT_CONFIG_ADD.name(), agentConfig);
+        jsonObject.put(UserContants.CUSTOMER_MQ_TAG.USER_ID_MAPPING_ADD.name(), ownerStockAgentMember);
+        jsonObject.put(UserContants.CUSTOMER_MQ_TAG.AGENT_CONDITION_ADD.name(), agentConditionVo);
+        producer.send(Topic.AGENT_ADD_SUCCESS, agentConfig.getAgentId() + "", jsonObject.toJSONString());
     }
 
     /**
@@ -532,63 +795,111 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     }
 
 
-    //TODO 注释
-    private AgentReview assembleAgentReview(Long agentApplyId, String agentName, Long operUserId, String operUserName, ReviewStatus status, Long createTime) {
+    /**
+     * @param agentApplyId
+     * @param agentName
+     * @param operUserId
+     * @param operUserName
+     * @param status
+     * @param createTime
+     * @return
+     * @Doc 组装代理审核对象
+     */
+    private AgentReview assembleAgentReview(Long agentApplyId, String agentName, Long operUserId, String operUserName,Long ownerId, ReviewStatus status, Long createTime) {
         AgentReview review = new AgentReview();
         review.setAgentApplyId(agentApplyId);
         review.setAgentName(agentName);
         review.setOperUserId(operUserId);
         review.setOperUserName(operUserName);
+        review.setOwnerId(ownerId);
         review.setStatus(status);
         review.setCreateTime(createTime);
         return review;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param agentId
+     * @param status
+     * @return
+     */
     @Override
-    public String disable(RequestContext rc, Long agentId, Integer status) {
+    public String updateStatus(RequestContext rc, Long agentId, Integer status) {
         User opera = userService.get(rc.getUid());
-        if (opera == null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
+        }
         User agentUser = userService.get(agentId);
-        if (agentUser == null)
+        if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
-        if (status == agentUser.getStatus().value())
+        }
+        if (status == agentUser.getStatus().value()) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
+        }
         if (!userService.disable(agentId, status)) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }
+        sendAgentStatusUpdateMq(agentId, status);
         return UserContants.EMPTY_STRING;
     }
 
+    /**
+     * @param id
+     * @param status
+     * @Doc 发送代理状态修改
+     */
+    private void sendAgentStatusUpdateMq(Long id, Integer status) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("agentId", id);
+        jsonObject.put("status", status);
+        producer.send(Topic.AGENT_STATUS_UPDATE_SUCCESS, id + "", jsonObject.toJSONString());
+    }
 
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param agent
+     * @param url
+     * @param username
+     * @param password
+     * @param code
+     * @return
+     */
     @Override
     public String login(RequestContext rc, String agent, String url, String username, String password, String code) {
         if (!checkLoginReq(username, password)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        //todo 根据请求的url拿取到业主id
-        long ownerId = 14L;
-        long userId = accountIdMappingService.getUid(ownerId, username);
-        if (userId <= 0)
+        OwnerInfo ownerInfo = domainDubboService.getOwnerInfoByDomain(url);
+        if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
+            throw UserException.ILLEGAL_SOURCE_URL;
+        }
+        long userId = accountIdMappingService.getUid(ownerInfo.getOwnerId(), username);
+        if (userId <= 0) {
             throw UserException.USERNAME_NOT_EXIST;
+        }
         //todo 从redis里面获取ownerId_username下的验证码，如果存在验证码，与code对比，如果相符，进行下一步操作
         String proCode = "";
 //        if (!proCode.equals(code)) {
 //            throw UserException.PROCODE_ERROR;
 //        }
         User loginUser = userService.get(userId);
-        if (loginUser == null)
+        if (loginUser == null) {
             throw UserException.ILLEGAL_USER;
-        //TODO user不包含member数据 AccountType.member
+        }
         if (loginUser.getStatus() == AccountStatus.disable
-                || loginUser.getIsDelete() == DeleteStatus.del
-                || loginUser.getType() == AccountType.member)
+                || loginUser.getIsDelete() == DeleteStatus.del) {
             throw UserException.ILLEGAL_USER;
+        }
         Login loginInfo = loginService.get(userId);
-        if (loginInfo == null)
+        if (loginInfo == null) {
             throw UserException.ILLEGAL_USER;
-        //todo 此处做加密功能
-        if (!loginInfo.getPassword().equals(password)) {
+        }
+        if (!loginInfo.getPassword().equals(PasswordCapture.getSaltPwd(password))) {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
 
@@ -601,19 +912,35 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return result.toJSONString();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rc
+     * @param agent
+     * @param username
+     * @return
+     */
     @Override
     public String logout(RequestContext rc, String agent, String username) {
         if (username == null || username.length() < 6 || username.length() > 16) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         User user = userService.get(rc.getUid());
-        if (user == null)
+        if (user == null) {
             throw UserException.ILLEGAL_USER;
+        }
         sendLoginHistory(rc.getUid(), System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), LoginType.logout, agent);
         return UserContants.EMPTY_STRING;
     }
 
-    //TODO 注释
+    /**
+     * @param userId
+     * @param createTime
+     * @param requestIp
+     * @param loginType
+     * @param platform
+     * @Doc 发送用户登录历史到mq
+     */
     private void sendLoginHistory(Long userId, Long createTime, Integer requestIp, LoginType loginType, String platform) {
         JSONObject object = new JSONObject();
         object.put("userId", userId);
@@ -621,13 +948,20 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         object.put("requestIp", requestIp);
         object.put("loginType", loginType.value());
         object.put("platform", platform);
-        if (loginType == LoginType.login)
+        if (loginType == LoginType.login) {
             producer.send(Topic.USER_LOGIN_SUCCESS, userId + "", object.toJSONString());
-        if (loginType == LoginType.logout)
+        }
+        if (loginType == LoginType.logout) {
             producer.send(Topic.USER_LOGOUT_SUCCESS, userId + "", object.toJSONString());
+        }
     }
 
-    //TODO 注释
+    /**
+     * @param usernmae
+     * @param password
+     * @return
+     * @Doc 组装注册需要验证的对象
+     */
     private RegisterReq assembleRegister(String usernmae, String password) {
         RegisterReq req = new RegisterReq();
         req.setUsername(usernmae);
@@ -648,7 +982,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 .isPresent();
     }
 
-    //TODO 注释
+    /**
+     * @param username
+     * @param password
+     * @return
+     * @Doc 验证登陆参数合法性
+     */
     private boolean checkLoginReq(String username, String password) {
         if (username.length() >= 6 && username.length() <= 16 && password.length() == 32) {
             return true;

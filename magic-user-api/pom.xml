@@ -16,6 +16,10 @@
             <artifactId>model</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.magic.commons</groupId>
+            <artifactId>log</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
         </dependency>

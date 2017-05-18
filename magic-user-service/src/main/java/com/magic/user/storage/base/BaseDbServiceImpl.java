@@ -23,7 +23,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().insert(entity);
         } catch (Exception e) {
-            e.printStackTrace();
+            ApiLogger.error("BaseDb insert entity error:", e);
         }
         return null;
     }
@@ -33,7 +33,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().insert(id, entity);
         } catch (Exception e) {
-            e.printStackTrace();
+            ApiLogger.error(String.format("BaseDb shard insert entity error,id:%s",id), e);
         }
         return null;
     }
@@ -42,7 +42,7 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         try {
             return getDao().insert(entitys);
         } catch (Exception e) {
-            e.printStackTrace();
+            ApiLogger.error("BaseDb insert entitys error", e);
         }
         return null;
     }

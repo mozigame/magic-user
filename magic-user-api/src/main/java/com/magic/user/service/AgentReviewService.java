@@ -9,5 +9,10 @@ import com.magic.user.entity.AgentReview;
  */
 public interface AgentReviewService {
 
-    long add(AgentReview agentReview);
+    /**
+     * @Doc 添加代理审核信息
+     * @param agentReview
+     * @return
+     */
+    boolean add(AgentReview agentReview);
 }

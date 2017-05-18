@@ -159,7 +159,7 @@ public class StockholderResource {
             @RequestParam(name = "status") Integer status
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return stockResourceService.disable(rc, id, status);
+        return stockResourceService.updateStatus(rc, id, status);
     }
 
 

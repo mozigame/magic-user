@@ -23,31 +23,51 @@ public class UserRedisStorageServiceImpl implements UserRedisStorageService {
 
     @Override
     public boolean addUser(User user) {
-        String key = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(user.getUserId());
-        jedisFactory.getInstance().setex(key, RedisConstants.USER_PREFIX.USER_BASE_INFO.expire(), JSONObject.toJSONString(user));
-        return true;
+        try {
+            String key = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(user.getUserId());
+            jedisFactory.getInstance().setex(key, RedisConstants.USER_PREFIX.USER_BASE_INFO.expire(), JSONObject.toJSONString(user));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public boolean delUser(Long userId) {
-        String userKey = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(userId);
-        long result = jedisFactory.getInstance().del(userKey);
-        return result > 0;
+        try {
+            String userKey = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(userId);
+            long result = jedisFactory.getInstance().del(userKey);
+            return result > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public boolean updateUser(User user) {
-        String userKey = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(user.getUserId());
-        jedisFactory.getInstance().setex(userKey, RedisConstants.USER_PREFIX.USER_BASE_INFO.expire(), JSONObject.toJSONString(user));
-        return true;
+        try {
+            String userKey = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(user.getUserId());
+            jedisFactory.getInstance().setex(userKey, RedisConstants.USER_PREFIX.USER_BASE_INFO.expire(), JSONObject.toJSONString(user));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public User getUser(Long userId) {
-        String userKey = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(userId);
-        String value = jedisFactory.getInstance().get(userKey);
-        if (StringUtils.isNoneBlank(value)) {
-            return JSONObject.parseObject(value, User.class);
+        try {
+            String userKey = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(userId);
+            String value = jedisFactory.getInstance().get(userKey);
+            if (StringUtils.isNoneBlank(value)) {
+                return JSONObject.parseObject(value, User.class);
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

@@ -1,8 +1,10 @@
 package com.magic.user.resource.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
@@ -45,40 +47,65 @@ public class StockResourceServiceImpl implements StockResourceService {
     @Resource(name = "accountIdMappingService")
     private AccountIdMappingService accountIdMappingService;
 
+    /**
+     * @Doc 查询所有股东
+     * @param rc
+     * @return
+     */
     @Override
     public String findAllStock(RequestContext rc) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         //TODO
-        List<StockInfoVo> list = userService.findAllStock();
+        List<StockInfoVo> list = userService.findAllStock(user.getOwnerId());
         assembleStockList(list);
         for (StockInfoVo info : list) {
             info.setShowStatus(AccountStatus.parse(info.getStatus()).desc());
             info.setCurrencyName(CurrencyType.parse(info.getCurrencyType()).desc());
         }
-        //TODO SimpleListResult
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("list", list);
-        return jsonObject.toJSONString();
+        return JSON.toJSONString(assemblePageBean(1,list.size(), Long.valueOf(list.size()),list));
     }
 
+    private PageBean assemblePageBean(Integer page,Integer count, Long total, List list) {
+        PageBean pageBean = new PageBean();
+        pageBean.setPage(page);
+        pageBean.setCount(count);
+        pageBean.setTotal(total);
+        pageBean.setList(list);
+        return pageBean;
+    }
+
+    /**
+     * @Doc 获取股东名称列表
+     * @param rc
+     * @return
+     */
     @Override
     public String simpleList(RequestContext rc) {
         User opera=userService.get(rc.getUid());
-        if (opera==null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
-        List<StockInfoVo> list = userService.findAllStock();
+        }
+        List<StockInfoVo> list = userService.findAllStock(opera.getOwnerId());
         list = assembleSimple(list);
-        //TODO SimpleListResult
-        JSONObject result = new JSONObject();
-        result.put("list", list);
-        return result.toJSONString();
+        return JSON.toJSONString(assemblePageBean(1, list.size(), Long.valueOf(list.size()), list));
     }
 
 
+    /**
+     * @Doc 获取股东详情
+     * @param rc
+     * @param id
+     * @return
+     */
     @Override
     public String getStockDetail(RequestContext rc, Long id) {
         User user = userService.get(rc.getUid());
-        if (user == null)
+        if (user == null) {
             throw UserException.ILLEGAL_USER;
+        }
         StockInfoVo stockDetail = userService.getStockDetail(id);
         assembleStockDetail(stockDetail);
         JSONObject jsonObject = new JSONObject();
@@ -109,7 +136,11 @@ public class StockResourceServiceImpl implements StockResourceService {
         }
     }
 
-    //TODO 注释
+    /**
+     * @Doc 组装股东名称列表
+     * @param list
+     * @return
+     */
     private List<StockInfoVo> assembleSimple(List<StockInfoVo> list) {
         List<StockInfoVo> infos = new ArrayList<>();
         for (StockInfoVo info : list) {
@@ -134,14 +165,23 @@ public class StockResourceServiceImpl implements StockResourceService {
         }
     }
 
+    /**
+     * @Doc 股东密码重置
+     * @param rc
+     * @param id
+     * @param pwd
+     * @return
+     */
     @Override
     public String updatePwd(RequestContext rc, Long id, String pwd) {
         User opera = userService.get(rc.getUid());
-        if (opera == null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
+        }
         User stock = userService.get(id);
-        if (stock == null)
+        if (stock == null) {
             throw UserException.ILLEGAL_USER;
+        }
         if (!loginService.resetPassword(id, pwd)) {
             ApiLogger.error("update password error,userId:" + id);
             throw UserException.PASSWORD_RESET_FAIL;
@@ -149,11 +189,23 @@ public class StockResourceServiceImpl implements StockResourceService {
         return UserContants.EMPTY_STRING;
     }
 
+    /**
+     * @Doc 修改股东信息
+     * @param rc
+     * @param id
+     * @param telephone
+     * @param email
+     * @param bankCardNo
+     * @param bank
+     * @param status
+     * @return
+     */
     @Override
     public String update(RequestContext rc, Long id, String telephone, String email, String bankCardNo, String bank, Integer status) {
         User opera = userService.get(rc.getUid());
-        if (opera == null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
+        }
         User user = assembleUserUpdate(id, telephone, email, bankCardNo, bank, status);
         if (!userService.update(user)) {
             throw UserException.USER_UPDATE_FAIL;
@@ -182,6 +234,18 @@ public class StockResourceServiceImpl implements StockResourceService {
         return user;
     }
 
+    /**
+     * @Doc 添加股东
+     * @param rc
+     * @param account
+     * @param password
+     * @param realname
+     * @param telephone
+     * @param currencyType
+     * @param email
+     * @param sex
+     * @return
+     */
     @Override
     public String add(RequestContext rc, String account, String password, String realname, String telephone,
                       Integer currencyType, String email, Integer sex) {
@@ -191,8 +255,9 @@ public class StockResourceServiceImpl implements StockResourceService {
         long ownerId = opera.getOwnerId();
         long userId = uuidService.assignUid();
         //1、判断用户名是否已经存在
-        if (accountIdMappingService.getUid(ownerId, account) > 0)
+        if (accountIdMappingService.getUid(ownerId, account) > 0) {
             throw UserException.USERNAME_EXIST;
+        }
 
         //2、添加业主与账号id映射
         OwnerAccountUser ownerAccountUser = new OwnerAccountUser(ownerId + UserContants.SPLIT_LINE + account, userId);
@@ -246,17 +311,26 @@ public class StockResourceServiceImpl implements StockResourceService {
         return user;
     }
 
-
+    /**
+     * @Doc 设置股东可用状态
+     * @param rc
+     * @param id
+     * @param status
+     * @return
+     */
     @Override
-    public String disable(RequestContext rc, Long id, Integer status) {
+    public String updateStatus(RequestContext rc, Long id, Integer status) {
         User opera = userService.get(rc.getUid());
-        if (opera == null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
+        }
         User stockUser = userService.get(id);
-        if (stockUser == null)
+        if (stockUser == null) {
             throw UserException.ILLEGAL_USER;
-        if (stockUser.getStatus().value() == status)
+        }
+        if (stockUser.getStatus().value() == status) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
+        }
         if (!userService.disable(id, status)) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }

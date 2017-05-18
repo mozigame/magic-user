@@ -11,11 +11,14 @@ import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.commons.enginegw.service.ThriftFactory;
+import com.magic.config.service.DomainDubboService;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
+import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.service.java.UuidService;
@@ -40,7 +43,6 @@ import com.magic.user.service.MemberMongoService;
 import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
 import com.magic.user.vo.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -75,6 +77,11 @@ public class MemberResourceServiceImpl {
     private PassportDubboService passportDubboService;
     @Resource
     private ThriftFactory thriftFactory;
+    @Resource
+    private DomainDubboService domainDubboService;
+
+
+    private static final String MEMBER_UPDATE_SUCCESS="MEMBER_UPDATE_SUCCESS";
 
     /**
      * 会员列表
@@ -86,17 +93,22 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberList(RequestContext rc, String condition, int page, int count) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         MemberCondition memberCondition = MemberCondition.valueOf(condition);
         if (!checkCondition(memberCondition)) {
             return JSON.toJSONString(assemblePageBean(page, count, 0, null));
         }
-        long uid = rc.getUid(); //业主ID、股东或代理ID
-        //TODO mongo 检索满足条件的数据记录数
-        long total = 0;
+        long total = memberMongoService.getCount(memberCondition);
         if (total <= 0) {
             return JSON.toJSONString(assemblePageBean(page, count, 0, null));
         }
-        //TODO mongo 检索满足条件的数据列表
+        //获取mongo中查询到的会员列表
+        memberCondition.setOwnerId(operaUser.getOwnerId());
+        List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
+        //todo 组装mongo中拿取的列表
         List<?> list = new ArrayList<>();
         List<MemberListVo> members = assembleMemberVos(list);
         return JSON.toJSONString(assemblePageBean(page, count, total, members));
@@ -276,6 +288,11 @@ public class MemberResourceServiceImpl {
         return vo;
     }
 
+    /**
+     * @Doc 组装会员基础信息中的会员信息
+     * @param member
+     * @return
+     */
     private MemberInfo assembleMemberInfo(Member member) {
         MemberInfo info = new MemberInfo();
         info.setId(member.getMemberId());
@@ -409,6 +426,10 @@ public class MemberResourceServiceImpl {
         if (!result) {
             throw UserException.MEMBER_UPDATE_FAIL;
         }
+        if (status > 0) {
+            sendMemberStatusUpdateMq(id, status);
+        }
+
         return UserContants.EMPTY_STRING;
     }
 
@@ -442,6 +463,7 @@ public class MemberResourceServiceImpl {
      * @param level
      * @return
      */
+    @Deprecated
     public String updateLevel(RequestContext rc, long id, int level) {
         Member member = memberService.getMemberById(id);
         if (member == null) {
@@ -528,7 +550,20 @@ public class MemberResourceServiceImpl {
         if (!result) {
             throw UserException.MEMBER_STATUS_UPDATE_FAIL;
         }
+        sendMemberStatusUpdateMq(id,status);
         return UserContants.EMPTY_STRING;
+    }
+
+    /**
+     * @Doc 发送会员状态修改
+     * @param id
+     * @param status
+     */
+    private void sendMemberStatusUpdateMq(Long id,Integer status) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("memberId", id);
+        jsonObject.put("status", status);
+        producer.send(Topic.MEMBER_STATUS_UPDATE_SUCCESS, id + "", jsonObject.toJSONString());
     }
 
     /**
@@ -564,11 +599,12 @@ public class MemberResourceServiceImpl {
         if (!checkRegisterParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        //TODO andy 根据url 获取 ownerId 和 ownerName
-        long ownerId = 14;
-        String ownerName = "owner1";
+        OwnerInfo ownerInfo = domainDubboService.getOwnerInfoByDomain(url);
+        if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
+            throw UserException.ILLEGAL_SOURCE_URL;
+        }
         //todo holderId暂时注释掉
-        long holderId = accountIdMappingService.getUid(ownerId, ownerName);//股东id
+        long holderId = accountIdMappingService.getUid(ownerInfo.getOwnerId(), ownerInfo.getOwnerName());//股东id
         if (holderId <= 0) {
             throw UserException.ILLEGAL_USER;
         }
@@ -579,13 +615,13 @@ public class MemberResourceServiceImpl {
         User agent = null;//所属代理ID
         String proCode = req.getProCode();
         if (StringUtils.isNoneEmpty(proCode)) {
-            User user = userService.getUserByCode(proCode);
-            if (user != null && user.getOwnerId() == ownerId) {
-                agent = user;
+            User agentUser = userService.getUserByCode(proCode);
+            if (agentUser != null && agentUser.getOwnerId() == ownerInfo.getOwnerId()) {
+                agent = agentUser;
             }
         }
         if (agent == null) {
-            long agentId = accountIdMappingService.getUid(ownerId, ownerName + "_dl");
+            long agentId = accountIdMappingService.getUid(ownerInfo.getOwnerId(), ownerInfo.getOwnerName() + "_dl");
             if (agentId > 0) {
                 agent = userService.getUserById(agentId);
             }
@@ -593,7 +629,7 @@ public class MemberResourceServiceImpl {
         if (agent == null) {
             throw UserException.ILLEGAL_USER;
         }
-        String body = assembleRegisterBody(rc, url, ownerId, agent.getId(), req);
+        String body = assembleRegisterBody(rc, url, ownerInfo.getOwnerId(), agent.getId(), req);
         EGReq egReq = assembleEGReq(CmdType.PASSPORT, 0x100001, body);
 
         //todo 暂时注释调用引擎网关的逻辑
@@ -619,7 +655,7 @@ public class MemberResourceServiceImpl {
         if (userId <= 0) {
             throw UserException.REGISTER_FAIL;
         }
-        Member member = assembleMember(rc, req, userId, ownerId, ownerName, holder, agent, url);
+        Member member = assembleMember(rc, req, userId, ownerInfo.getOwnerId(), ownerInfo.getOwnerName(), holder, agent, url);
         boolean result = memberService.saveMember(member);
         if (!result) {
             throw UserException.REGISTER_FAIL;
@@ -734,16 +770,16 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
         //todo andy 根据url获取业主ID
-        long ownerId = 14;
-        if (ownerId <= 0) {
-            throw UserException.ILLEGAL_USER;
+        OwnerInfo ownerInfo = domainDubboService.getOwnerInfoByDomain(url);
+        if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
+            throw UserException.ILLEGAL_SOURCE_URL;
         }
         //todo 从redis里面获取ownerId_username下的验证码，如果存在验证码，与code对比，如果相符，进行下一步操作
         String proCode = "";
         if (!proCode.equals(code)) {
             throw UserException.PROCODE_ERROR;
         }
-        String body = assembleLoginBody(rc, ownerId, username, password, agent, url);
+        String body = assembleLoginBody(rc, ownerInfo.getOwnerId(), username, password, agent, url);
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100002, body);
         EGResp resp = thriftFactory.call(req, "account");
         if (resp == null || resp.getCode() == 0x1011) {
@@ -763,7 +799,7 @@ public class MemberResourceServiceImpl {
         JSONObject object = JSONObject.parseObject(resp.getData());
         long uid = object.getLongValue("uid");
         String token = object.getString("token");
-        sendLoginMessage(ownerId, uid, rc.getIp());
+        sendLoginMessage(ownerInfo.getOwnerId(), uid, rc.getIp());
         //todo 组装返回数据（需参考前端页面）
         return "{\" token: \"" + "\"" + resp.getData() + "\"}";
     }
@@ -1033,8 +1069,9 @@ public class MemberResourceServiceImpl {
                 OnLineMemberVo onLineMemberVo = new OnLineMemberVo();
                 onLineMemberVo.setMemberId(next.getMemberId());
                 onLineMemberVo.setAccount(next.getAccount());
-                if (next.getLoginTime() != null)
+                if (next.getLoginTime() != null) {
                     onLineMemberVo.setLoginTime(CommonDateParseUtil.date2string(new Date(next.getLoginTime()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+                }
                 onLineMemberVo.setRegisterTime(CommonDateParseUtil.date2string(new Date(next.getRegisterTime()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
                 onLineMemberVo.setLoginIp(next.getLoginIp());
                 onLineMemberVo.setRegisterIp(next.getRegisterIp());

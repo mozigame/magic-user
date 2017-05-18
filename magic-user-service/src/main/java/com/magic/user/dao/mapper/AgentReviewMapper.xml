@@ -7,6 +7,7 @@
         <result column="agent_name" jdbcType="VARCHAR" property="agentName"/>
         <result column="oper_user_id" jdbcType="BIGINT" property="operUserId"/>
         <result column="oper_user_name" jdbcType="VARCHAR" property="operUserName"/>
+        <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="create_time" jdbcType="BIGINT" property="createTime"/>
     </resultMap>
@@ -18,6 +19,7 @@
         agent_name,
         oper_user_id,
         oper_user_name,
+        owner_id,
         status,
         create_time
       )
@@ -26,6 +28,7 @@
         #{agentName},
         #{operUserId},
         #{operUserName},
+        #{ownerId},
         #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         #{createTime}
       )

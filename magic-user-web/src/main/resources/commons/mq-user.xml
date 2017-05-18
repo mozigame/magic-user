@@ -26,6 +26,8 @@
                 <ref bean="agentReviewSuccessConsumer"></ref>
                 <ref bean="userLoginSuccessConsumer"></ref>
                 <ref bean="userLogoutSuccessConsumer"></ref>
+                <ref bean="memberStatusUpdateSuccessMongoConsumer"></ref>
+                <ref bean="agentStatusUpdateSuccessMongoConsumer"></ref>
             </list>
         </constructor-arg>
         <constructor-arg index="1" value="${mq.all.consumer.nameserver}"/>

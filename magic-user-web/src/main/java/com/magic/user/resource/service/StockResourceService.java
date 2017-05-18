@@ -26,5 +26,5 @@ public interface StockResourceService {
 
     String add(RequestContext rc, String account, String password, String realname, String telephone, Integer currencyType, String email, Integer sex);
 
-    String disable(RequestContext rc, Long id, Integer status);
+    String updateStatus(RequestContext rc, Long id, Integer status);
 }

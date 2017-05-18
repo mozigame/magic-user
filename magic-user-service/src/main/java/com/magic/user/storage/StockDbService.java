@@ -33,9 +33,9 @@ public class StockDbService extends BaseDbServiceImpl<User, Long> {
      * @return
      * @Doc 查询所有股东信息
      */
-    public List<StockInfoVo> findAll() {
+    public List<StockInfoVo> findAll(Long ownerId) {
         try {
-            return stockDao.findCustom("findAllStock", null, null);
+            return stockDao.findCustom("findAllStock", null, new Object[]{ownerId});
         } catch (Exception e) {
             e.printStackTrace();
         }

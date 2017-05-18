@@ -181,6 +181,7 @@
           status
         FROM t_user_info
         WHERE type=2
+          and owner_id=#{ownerId}
     </select>
 
     <!-- 查询所有股东名称-->
@@ -190,6 +191,7 @@
           username account
         FROM t_user_info
         WHERE type=2
+          and owner_id=#{ownerId}
     </select>
 
     <!-- 获取股东详细信息--><!--used-->
@@ -297,25 +299,20 @@
 
         <choose>
             <when test="list != null and list.size > 0">
-                WHERE u.user_id in
+                WHERE
+                u.user_id in
                 <foreach collection="list" item="id" open="(" close=")"
                          separator=",">
                     #{id}
                 </foreach>
+
             </when>
             <otherwise>
                 WHERE u.type=3
             </otherwise>
         </choose>
-
-
     </select>
 
-    <!--获取数量--><!--used 暂时取消查询条件-->
-    <select id="findAgentCount" resultType="java.lang.Long">
-        select count(id) from t_user_info
-        WHERE type=3
-    </select>
 
     <!--新增代理-->
     <insert id="addAgent" parameterType="User">

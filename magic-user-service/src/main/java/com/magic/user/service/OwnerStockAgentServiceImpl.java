@@ -20,7 +20,13 @@ public class OwnerStockAgentServiceImpl implements OwnerStockAgentService {
 
 
     @Override
-    public long add(OwnerStockAgentMember ownerStockAgentMember) {
-        return ownerStockAgentDbService.insert(ownerStockAgentMember);
+    public boolean add(OwnerStockAgentMember ownerStockAgentMember) {
+        long result = ownerStockAgentDbService.insert(ownerStockAgentMember);
+        return result > 0;
+    }
+
+    @Override
+    public OwnerStockAgentMember findById(OwnerStockAgentMember ownerStockAgentMember) {
+        return (OwnerStockAgentMember) ownerStockAgentDbService.get("findById", null, ownerStockAgentMember);
     }
 }

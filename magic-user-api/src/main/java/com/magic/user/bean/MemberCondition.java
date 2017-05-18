@@ -13,6 +13,10 @@ import com.magic.api.commons.ApiLogger;
 public class MemberCondition {
 
     /**
+     * 业主ID
+     */
+    private Long ownerId;
+    /**
      * 币种
      */
     private Integer currencyType;
@@ -133,6 +137,14 @@ public class MemberCondition {
 
     public static MemberCondition getEmptyMemberCondition() {
         return EMPTY_MEMBER_CONDITION;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     /**

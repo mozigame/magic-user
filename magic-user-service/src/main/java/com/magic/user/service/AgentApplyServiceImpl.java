@@ -27,13 +27,13 @@ public class AgentApplyServiceImpl implements AgentApplyService {
     }
 
     @Override
-    public List<AgentApplyVo> findByPage(String account, Integer status, Integer page, Integer count) {
-        return agentApplyDbService.findByPage(account, status, page, count);
+    public List<AgentApplyVo> findByPage(Long ownerId, String account, Integer status, Integer page, Integer count) {
+        return agentApplyDbService.findByPage(ownerId, account, status, page, count);
     }
 
     @Override
-    public long getCount(String account, Integer status) {
-        return agentApplyDbService.getCount(account, status);
+    public long getCount(Long ownerId, String account, Integer status) {
+        return agentApplyDbService.getCount(ownerId, account, status);
     }
 
     @Override

@@ -15,6 +15,18 @@
         <result column="temp3" jdbcType="VARCHAR" property="temp3" />
     </resultMap>
 
+    <select id="get" resultType="AgentConfig">
+        SELECT
+          agent_id,
+          return_scheme_id,
+          admin_cost_id,
+          fee_id,
+          discount,
+          cost,
+          domain
+        FROM t_agent_config_info
+          WHERE agent_id=#{agentId}
+    </select>
 
     <!--添加代理参数配置-->
     <insert id="insert" parameterType="AgentConfig">

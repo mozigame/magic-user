@@ -5,6 +5,7 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.mq.annotation.ConsumerConfig;
 import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
+import com.magic.user.entity.Login;
 import com.magic.user.entity.LoginHistory;
 import com.magic.user.enums.LoginType;
 import com.magic.user.service.LoginHistoryService;
@@ -39,14 +40,17 @@ public class UserLogoutSuccessConsumer implements Consumer {
             Long createTime = object.getLongValue("createTime");
             Integer requestIp = object.getIntValue("requestIp");
             String platform = object.getString("platform");
-            //TODO 注销  LoginType.logout
-            if (!loginService.updateLoginStatus(userId, null, null, LoginType.login.value())) {
+            if (!loginService.updateLoginStatus(userId, null, null, LoginType.logout.value())) {
                 ApiLogger.error("user logout status update error: userId:" + userId);
-                //TODO 参考UserLoginSuccessConsumer
+                Login login = loginService.get(userId);
+                if (login != null && login.getStatus() != LoginType.logout) {
+                    return false;
+                }
             }
             LoginHistory history = assembleLoginHistory(userId, createTime, requestIp, LoginType.logout, platform);
-            if (!loginHistoryService.add(history))
+            if (!loginHistoryService.add(history)) {
                 return false;
+            }
         } catch (Exception e) {
             ApiLogger.error(String.format("user logout success mq consumer error. key:%s, msg:%s", key, msg), e);
         }

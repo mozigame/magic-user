@@ -43,18 +43,15 @@ public class UserLoginSuccessConsumer implements Consumer {
             String platform = object.getString("platform");
             if (!loginService.updateLoginStatus(userId, createTime, requestIp, LoginType.login.value())) {
                 ApiLogger.error("user login status update error: userId:" + userId);
-                //TODO 检查登陆状态，如果已修改，则直接return true，否则返回false
                 Login login = loginService.get(userId);
-                if (login == null){
-                    return true;
+                if (login != null && login.getStatus() != LoginType.login){
+                    return false;
                 }
-                if (login.getStatus() == LoginType.login){
-                    return true;
-                }
-                return false;
             }
             LoginHistory history = assembleLoginHistory(userId, createTime, requestIp, LoginType.login, platform);
-            return loginHistoryService.add(history);
+            if (!loginHistoryService.add(history)) {
+                return false;
+            }
         } catch (Exception e) {
             ApiLogger.error(String.format("user login success mq consumer error. key:%s, msg:%s", key, msg), e);
         }

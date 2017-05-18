@@ -4,6 +4,7 @@ import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.core.tools.HeaderUtil;
 import com.magic.user.resource.service.AgentResourceService;
+import com.magic.user.util.PasswordCapture;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

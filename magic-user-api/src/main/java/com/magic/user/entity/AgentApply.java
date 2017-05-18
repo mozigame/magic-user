@@ -18,6 +18,8 @@ public class AgentApply {
 
     private String stockName;   //股东账号
 
+    private Long ownerId;   //业主id
+
     private String bankCardNo;  //银行卡号
 
     private String telephone;   //电话
@@ -171,5 +173,13 @@ public class AgentApply {
 
     public void setTemp2(String temp2) {
         this.temp2 = temp2;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 }

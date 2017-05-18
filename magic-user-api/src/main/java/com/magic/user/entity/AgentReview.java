@@ -14,6 +14,8 @@ public class AgentReview {
 
     private Long operUserId;    //操作用户id
 
+    private Long ownerId;   //业主id
+
     private String operUserName;    //操作人账号
 
     private ReviewStatus status; //审核状态
@@ -87,5 +89,13 @@ public class AgentReview {
 
     public void setOperUserName(String operUserName) {
         this.operUserName = operUserName;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 }

@@ -4,9 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.user.bean.UserCondition;
+import com.magic.user.bean.AgentCondition;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.AgentResourceService;
+import com.magic.user.util.PasswordCapture;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,8 +50,7 @@ public class AgentResource {
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
 
-        UserCondition userCondition = JSONObject.parseObject(condition, UserCondition.class);
-        String result = agentResourceService.findByPage(userCondition, page, count);
+        String result = agentResourceService.findByPage(RequestContext.getRequestContext(), condition, page, count);
         return result;
     }
 
@@ -103,7 +103,7 @@ public class AgentResource {
      * @param discount     优惠扣除  默认1 1不选 2勾选
      * @param cost         反水成本  默认1 1不选 2勾选
      * @return
-     * @Doc
+     * @Doc 手动添加代理
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/add", method = RequestMethod.POST)
@@ -125,8 +125,6 @@ public class AgentResource {
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        StringBuffer url = request.getRequestURL();
-        String sourceUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).append("/").toString();
         return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
     }
 
@@ -182,7 +180,7 @@ public class AgentResource {
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
             @RequestParam(name = "bank", required = false) String bank,
-            @RequestParam(name = "status", required = false) Integer status
+            @RequestParam(name = "status", required = false, defaultValue = "-1") Integer status
     ) {
 
         return agentResourceService.update(RequestContext.getRequestContext(), id, realname, telephone, email, bankCardNo, bank);
@@ -239,14 +237,14 @@ public class AgentResource {
      * @param page    当前页
      * @param count   每页数据量
      * @return
-     * @Doc 新增代理审核列表
+     * @Doc 获取代理审核列表
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/review/list", method = RequestMethod.GET)
     @ResponseBody
     public String reviewList(
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false) Integer status,
+            @RequestParam(name = "status", required = false, defaultValue = "-1") Integer status,
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
@@ -258,14 +256,14 @@ public class AgentResource {
      * @param account 账号
      * @param status  状态
      * @return
-     * @Doc 新增代理审核列表导出
+     * @Doc 代理审核列表导出
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/review/list/export", method = RequestMethod.GET)
     @ResponseBody
     public String reviewListExport(
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false) Integer status
+            @RequestParam(name = "status", required = false, defaultValue = "-1") Integer status
 //            股东ID（从RequestContext中获取股东ID）
     ) {
         return "";
@@ -313,9 +311,9 @@ public class AgentResource {
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
             @RequestParam(name = "email", required = false) String email,
-            @RequestParam(name = "returnScheme", required = false) Integer returnScheme,
-            @RequestParam(name = "adminCost", required = false) Integer adminCost,
-            @RequestParam(name = "feeScheme", required = false) Integer feeScheme,
+            @RequestParam(name = "returnScheme", required = false, defaultValue = "-1") Integer returnScheme,
+            @RequestParam(name = "adminCost", required = false, defaultValue = "-1") Integer adminCost,
+            @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme,
             @RequestParam(name = "domain", required = false) String[] domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
@@ -338,7 +336,7 @@ public class AgentResource {
             @RequestParam(name = "status") Integer status
 
     ) {
-        return agentResourceService.disable(RequestContext.getRequestContext(), id, status);
+        return agentResourceService.updateStatus(RequestContext.getRequestContext(), id, status);
     }
 
 

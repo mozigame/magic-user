@@ -15,7 +15,8 @@ public class UserContants {
     public enum CUSTOMER_MQ_TAG {
         USER_ID_MAPPING_ADD,    //添加id映射表
         USER_ID_MAPPING_MODIFY, //修改id映射表
-        AGENT_CONFIG_ADD;   //添加代理配置信息
+        AGENT_CONFIG_ADD,   //添加代理配置信息
+        AGENT_CONDITION_ADD;   //添加代理基础信息到mongo
 
     }
 

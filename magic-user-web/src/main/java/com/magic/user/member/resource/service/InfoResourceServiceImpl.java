@@ -7,6 +7,7 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
+import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.AccountOperHistory;
 import com.magic.user.entity.Member;
@@ -49,6 +50,9 @@ public class InfoResourceServiceImpl {
 
     @Resource
     private Producer producer;
+
+    @Resource
+    private PassportDubboService passportDubboService;
 
     private static HashSet<AccountType> sets = new HashSet<>();
 
@@ -155,7 +159,8 @@ public class InfoResourceServiceImpl {
         AccountType accountType = AccountType.parse(type);
         long uid = 0;
         if (accountType == AccountType.member) {
-            //TODO passport获取会员ID
+            uid = passportDubboService.getUid(ownerId, account);
+            return uid;
         }
         uid = accountIdMappingService.getUid(ownerId, account);
         return uid;

@@ -20,8 +20,9 @@ public class AgentConfigServiceImpl implements AgentConfigService {
     private AgentConfigDbService agentConfigDbService;
 
     @Override
-    public long add(AgentConfig agentConfig) {
-        return agentConfigDbService.insert(agentConfig);
+    public boolean add(AgentConfig agentConfig) {
+        long result = agentConfigDbService.insert(agentConfig);
+        return result > 0 ;
     }
 
     @Override
@@ -35,7 +36,8 @@ public class AgentConfigServiceImpl implements AgentConfigService {
     }
 
     @Override
-    public int update(AgentConfig agentConfig) {
-        return agentConfigDbService.update(agentConfig);
+    public boolean update(AgentConfig agentConfig) {
+        int result = agentConfigDbService.update(agentConfig);
+        return result > 0;
     }
 }

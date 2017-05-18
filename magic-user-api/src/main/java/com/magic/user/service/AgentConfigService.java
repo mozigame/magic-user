@@ -12,11 +12,31 @@ import java.util.Map;
  */
 public interface AgentConfigService {
 
-    long add(AgentConfig agentConfig);
+    /**
+     * @Doc 添加代理配置
+     * @param agentConfig
+     * @return
+     */
+    boolean add(AgentConfig agentConfig);
 
+    /**
+     * @Doc 获取代理配置
+     * @param id
+     * @return
+     */
     AgentConfig get(Long id);
 
+    /**
+     * @Doc 根据代理id获取代理配置
+     * @param agentId
+     * @return
+     */
     AgentConfigVo findByAgentId(Long agentId);
 
-    int update(AgentConfig agentConfig);
+    /**
+     * @Doc 修改代理配置
+     * @param agentConfig
+     * @return
+     */
+    boolean update(AgentConfig agentConfig);
 }

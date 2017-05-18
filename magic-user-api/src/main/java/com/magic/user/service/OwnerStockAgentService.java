@@ -13,5 +13,11 @@ public interface OwnerStockAgentService {
      * @param ownerStockAgentMember
      * @Doc 添加业主股东代理用户数映射
      */
-    long add(OwnerStockAgentMember ownerStockAgentMember);
+    boolean add(OwnerStockAgentMember ownerStockAgentMember);
+
+    /**
+     * @Doc 根据所有id获取映射数据
+     * @return
+     */
+    OwnerStockAgentMember findById(OwnerStockAgentMember ownerStockAgentMember);
 }

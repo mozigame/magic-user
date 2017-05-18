@@ -1,11 +1,14 @@
 package com.magic.user.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
+import com.magic.user.bean.MemberCondition;
+import com.magic.user.dao.MemberMongoDaoImpl;
 import com.magic.user.dao.OnlineMemberDaoImpl;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.po.OnLineMember;
-import com.sun.org.apache.bcel.internal.generic.NEW;
+import com.magic.user.vo.MemberConditionVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -22,6 +25,8 @@ public class MemberMongoServiceImpl implements MemberMongoService {
 
     @Resource
     private OnlineMemberDaoImpl onlineMemberDao;
+    @Resource
+    private MemberMongoDaoImpl memberMongoDao;
 
     /**
      * {@inheritDoc}
@@ -86,5 +91,83 @@ public class MemberMongoServiceImpl implements MemberMongoService {
             ApiLogger.error(String.format("update online member logout error. memberId: %d", memberId), e);
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param memberConditionVo
+     * @return
+     */
+    @Override
+    public boolean saveMemberInfo(MemberConditionVo memberConditionVo) {
+        try {
+            return memberMongoDao.save(memberConditionVo) != null;
+        } catch (Exception e) {
+            ApiLogger.error(String.format("save memberConditionVo error.memberId:%d", memberConditionVo.getMemberId()), e);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param memberId
+     * @param status
+     * @return
+     */
+    @Override
+    public boolean updateMemberStatus(Long memberId, Integer status) {
+        try {
+            return memberMongoDao.updateMemberStatus(memberId,status);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("update memberConditionVo error.memberId:%d, status:%d",memberId,status), e);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param memberId
+     * @return
+     */
+    @Override
+    public MemberConditionVo get(Long memberId) {
+        try {
+            return memberMongoDao.get(memberId);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("get memberConditionVo error.memberId:%d ",memberId), e);
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param memberCondition
+     * @param page
+     * @param count
+     * @return
+     */
+    @Override
+    public List<MemberConditionVo> queryByPage(MemberCondition memberCondition, Integer page, Integer count) {
+        try {
+            return memberMongoDao.queryByPage(memberCondition,page,count);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("queryPage memberConditionVo error.condition:%d ", JSONObject.toJSONString(memberCondition)), e);
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param memberCondition
+     * @return
+     */
+    @Override
+    public long getCount(MemberCondition memberCondition) {
+        try {
+            return memberMongoDao.getCount(memberCondition);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("get memberConditionVo count error.condition:%d ", JSONObject.toJSONString(memberCondition)), e);
+        }
+        return 0;
     }
 }

@@ -9,8 +9,18 @@ import com.magic.user.entity.Login;
  */
 public interface LoginService {
 
+    /**
+     * @Doc 添加用户登录基础信息
+     * @param login
+     * @return
+     */
     long add(Login login);
 
+    /**
+     * @Doc 修改用户登录基础信息
+     * @param login
+     * @return
+     */
     int update(Login login);
 
     /**

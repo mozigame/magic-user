@@ -46,8 +46,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<StockInfoVo> findAllStock() {
-        return stockDbService.findAll();
+    public List<StockInfoVo> findAllStock(Long ownerId) {
+        return stockDbService.findAll(ownerId);
     }
 
     @Override
@@ -58,16 +58,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean update(User user) {
         boolean result = stockDbService.update(user) > 0;
-        if (result)
-            if (!userRedisStorageService.updateUser(user))
+        if (result) {
+            if (!userRedisStorageService.updateUser(user)) {
                 ApiLogger.warn("update user info to redis error,userId:" + user.getUserId());
+            }
+        }
         return result;
     }
 
     @Override
     public boolean addStock(User user) {
-        long result = stockDbService.insert(user);
-        return result > 0;
+        Long result = stockDbService.insert(user);
+        return (result == null || result <= 0) ? false : true;
     }
 
     @Override
@@ -84,13 +86,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean addAgent(User user) {
-        long result = agentDbService.insert(user);
-        return result > 0;
+        Long result = agentDbService.insert(user);
+        return (result == null || result <= 0) ? false : true;
     }
 
     @Override
     public long getOwnerIdByStock(Long id) {
-        return (Long) userDbService.get("getOwnerIdByStock", null, id);
+        Long result = (Long) userDbService.get("getOwnerIdByStock", null, id);
+        return result == null ? 0 : result;
     }
 
     @Override
@@ -107,11 +110,5 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long uid) {
         return userDbService.get(uid);
-    }
-
-    //TODO 删除
-    @Override
-    public boolean updateUser(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
-        return false;
     }
 }

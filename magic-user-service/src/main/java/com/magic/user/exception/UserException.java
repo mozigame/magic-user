@@ -164,5 +164,11 @@ public class UserException extends ExceptionFactor {
     public static final CommonException AGENT_REVIEW_FAIL = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 23, HttpServletResponse.SC_OK, "agent review fail!", "代理审核失败.");
 
+    /**
+     * 无效的请求来源
+     */
+    public static final CommonException ILLEGAL_SOURCE_URL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 24, HttpServletResponse.SC_OK, "illegal source url!", "无效的请求来源.");
+
 
 }

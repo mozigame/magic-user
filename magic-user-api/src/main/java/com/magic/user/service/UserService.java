@@ -25,7 +25,7 @@ public interface UserService {
      * @return
      * @Doc 获取所有股东
      */
-    List<StockInfoVo> findAllStock();
+    List<StockInfoVo> findAllStock(Long ownerId);
 
     /**
      * @param id
@@ -78,21 +78,6 @@ public interface UserService {
      * @return
      */
     User getUserById(Long uid);
-
-    /**
-     * 用户更新
-     *
-     * @param id
-     * @param realname
-     * @param telephone
-     * @param email
-     * @param bankCardNo
-     * @param bank
-     * @param bankDeposit
-     * @return
-     */
-    boolean updateUser(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
-
 
     /**
      * @param user

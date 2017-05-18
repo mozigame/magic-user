@@ -1,7 +1,7 @@
 package com.magic.user.resource.service;
 
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.user.bean.UserCondition;
+import com.magic.user.bean.AgentCondition;
 import com.magic.user.po.DownLoadFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,9 +16,9 @@ public interface AgentResourceService {
     /**
      * @param userCondition
      * @return
-     * @Doc 分页查询
+     * @Doc 分页查询代理列表
      */
-    String findByPage(UserCondition userCondition, int page, int count);
+    String findByPage(RequestContext rc, String userCondition, int page, int count);
 
     /**
      * 会员层级列表导出
@@ -151,7 +151,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 修改代理可用状态
      */
-    String disable(RequestContext rc, Long agentId, Integer status);
+    String updateStatus(RequestContext rc, Long agentId, Integer status);
 
     /**
      * @param rc

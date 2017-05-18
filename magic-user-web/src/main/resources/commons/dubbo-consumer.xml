@@ -14,4 +14,7 @@
     <!-- 配置passport dubbo -->
     <dubbo:reference id="passportDubboService" interface="com.magic.passport.service.dubbo.PassportDubboService" init="true" timeout="15000"
                      retries="0" check="false"/>
+    <!-- 配置config dubbo -->
+    <dubbo:reference id="domainDubboService" interface="com.magic.config.service.DomainDubboService" init="true" timeout="15000"
+                     retries="0" check="false"/>
 </beans>

@@ -9,6 +9,7 @@
         <result column="password" jdbcType="VARCHAR" property="password"/>
         <result column="stock_id" jdbcType="BIGINT" property="stockId"/>
         <result column="stock_name" jdbcType="VARCHAR" property="stockName"/>
+        <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
         <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
@@ -21,17 +22,13 @@
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
     </resultMap>
 
-
-    <sql id="Base_Column_List">
-    id, username, stock_id, telephone, email, status, resource_url, register_ip, create_time,
-    temp1, temp2
-  </sql>
-
     <!-- 新增代理申请--><!--used-->
     <insert id="insert" parameterType="AgentApply">
         insert into t_agent_apply (
           username,
           stock_id,
+          stock_name,
+          owner_id,
           password,
           realname,
           telephone,
@@ -44,6 +41,8 @@
         values (
           #{username},
           #{stockId},
+          #{stockName},
+          #{ownerId},
           #{password},
           #{realname},
           #{telephone},
@@ -117,6 +116,7 @@
         LEFT JOIN t_agent_review r ON(a.id=r.agent_apply_id)
         <![CDATA[
          WHERE a.`status` <> 2
+         and a.owner_id=#{ownerId}
 
         ]]>
         <if test="status != null ">
@@ -133,7 +133,7 @@
         select count(id) from t_agent_review
         <![CDATA[
          WHERE `status` <> 1
-
+          and a.owner_id=#{ownerId}
         ]]>
         <if test="status != null ">
             and status=#{status}

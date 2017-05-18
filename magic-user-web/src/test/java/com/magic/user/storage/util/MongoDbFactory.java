@@ -2,6 +2,10 @@ package com.magic.user.storage.util;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.core.tools.MD5Util;
+import com.magic.user.enums.AccountStatus;
+import com.magic.user.vo.AgentConditionVo;
+import com.magic.user.vo.MemberConditionVo;
 import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -12,8 +16,10 @@ import javassist.*;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.LocalVariableAttribute;
 import javassist.bytecode.MethodInfo;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.bson.Document;
 import org.junit.Test;
+import sun.security.rsa.RSASignature;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -119,6 +125,7 @@ public class MongoDbFactory {
 //                        .append("categories", "Bakery")).forEach(printBlock);
     }
 
+
     @Test
     public void updateOne() {
         System.out.println(collection.updateOne(eq("userId", 2017050500110033L), new Document("$set", new Document("username", "update2"))));
@@ -138,6 +145,48 @@ public class MongoDbFactory {
     @Test
     public void createIndex() {
         collection.createIndex(new Document("userId", 1));
+    }
+
+    @Test
+    public void addAgentMongo() {
+        System.out.println(0x10);
+        Long[] ids=new Long[]{11111L,2222L};
+        System.out.println(JSONObject.toJSONString(ids));
+        Integer a= null;
+        int b=a;
+        System.out.println(b);
+        AgentConditionVo vo=new AgentConditionVo();
+        vo.setAgentId(100000L);
+        vo.setStatus(AccountStatus.enable.value());
+        vo.setAgentName("agent_test");
+        vo.setDepositMoney(10000L);
+        vo.setWithdrawMoney(10000L);
+        vo.setMembers(1000);
+        vo.setGeneralizeCode("EDFSEFAS356O");
+        vo.setRegisterTime(System.currentTimeMillis());
+        System.out.println(JSONObject.toJSONString(vo));
+    }
+
+    @Test
+    public void md5Test() {
+    }
+    @Test
+    public void addMemberMongo() {
+        MemberConditionVo vo=new MemberConditionVo();
+        vo.setMemberId(1000000L);
+        vo.setMemberName("member_test");
+        vo.setAgentId(100000L);
+        vo.setAgentName("agent_test");
+        vo.setRegisterTime(System.currentTimeMillis());
+        vo.setStatus(AccountStatus.enable.value());
+        vo.setLevel(0);
+        vo.setDepositCount(1000);
+        vo.setWithdrawCount(1000);
+        vo.setWithdrawMoney(10000L);
+        vo.setDepositMoney(10000L);
+        vo.setCurrencyType(1);
+
+        System.out.println(JSONObject.toJSONString(vo));
     }
 
 

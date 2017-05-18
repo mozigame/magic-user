@@ -320,8 +320,9 @@ public class MemberResource {
      * @param id    会员ID
      * @param level 层级ID
      * @return
-     * @Doc 会员层级修改
+     * @Doc 会员层级修改,前端直接进行页面跳转
      */
+    @Deprecated
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/level/update", method = RequestMethod.POST)
     @ResponseBody
