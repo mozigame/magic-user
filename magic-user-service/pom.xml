@@ -165,13 +165,6 @@
         <dependency>
             <groupId>com.magic</groupId>
             <artifactId>magic-uuid-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>*</artifactId>
-                    <groupId>*</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
@@ -185,13 +178,6 @@
         <dependency>
             <groupId>com.magic</groupId>
             <artifactId>magic-passport-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
