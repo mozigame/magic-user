@@ -13,15 +13,12 @@ import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.commons.enginegw.service.ThriftFactory;
-import com.magic.config.service.DomainDubboService;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
-import com.magic.passport.service.dubbo.PassportDubboService;
-import com.magic.service.java.UuidService;
 import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
 import com.magic.user.bean.RegionNumber;
@@ -42,6 +39,7 @@ import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.MemberMongoService;
 import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
+import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
@@ -71,14 +69,11 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private Producer producer;
-    @Resource
-    private UuidService uuidService;
-    @Resource
-    private PassportDubboService passportDubboService;
+
     @Resource
     private ThriftFactory thriftFactory;
     @Resource
-    private DomainDubboService domainDubboService;
+    private DubboOutAssembleServiceImpl dubboOutAssembleService;
 
 
     private static final String MEMBER_UPDATE_SUCCESS="MEMBER_UPDATE_SUCCESS";
@@ -218,7 +213,7 @@ public class MemberResourceServiceImpl {
      */
     public String memberDetails(RequestContext rc, long id) {
         Member member = memberService.getMemberById(id);
-        SubAccount subAccount = passportDubboService.getSubLoginById(member.getMemberId());
+        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
 
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
@@ -306,8 +301,10 @@ public class MemberResourceServiceImpl {
         info.setStatus(member.getStatus().value());
         info.setShowStatus(member.getStatus().desc());
         info.setBankCardNo(member.getBankCardNo());
-        SubAccount subAccount = passportDubboService.getSubLoginById(member.getMemberId());
-        info.setLastLoginIp(IPUtil.intToIp(subAccount.getLastIp()));
+        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
+        if (subAccount != null) {
+            info.setLastLoginIp(IPUtil.intToIp(subAccount.getLastIp()));
+        }
         return info;
     }
 
@@ -599,7 +596,7 @@ public class MemberResourceServiceImpl {
         if (!checkRegisterParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        OwnerInfo ownerInfo = domainDubboService.getOwnerInfoByDomain(url);
+        OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
@@ -646,7 +643,7 @@ public class MemberResourceServiceImpl {
         }*/
         //todo
 //        long userId = 0l;
-        long userId = uuidService.assignUid();
+        long userId = dubboOutAssembleService.assignUid();
         /*try {
             userId = Long.parseLong(resp.getData());
         } catch (Exception e) {
@@ -770,7 +767,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
         //todo andy 根据url获取业主ID
-        OwnerInfo ownerInfo = domainDubboService.getOwnerInfoByDomain(url);
+        OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }

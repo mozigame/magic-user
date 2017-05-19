@@ -5,10 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
-import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
-import com.magic.service.java.UuidService;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.OwnerAccountUser;
@@ -18,10 +16,11 @@ import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.enums.GeneraType;
 import com.magic.user.exception.UserException;
+import com.magic.user.resource.service.StockResourceService;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.UserService;
-import com.magic.user.resource.service.StockResourceService;
+import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 
@@ -42,10 +41,10 @@ public class StockResourceServiceImpl implements StockResourceService {
     private UserService userService;
     @Resource(name = "loginService")
     private LoginService loginService;
-    @Resource
-    private UuidService uuidService;
     @Resource(name = "accountIdMappingService")
     private AccountIdMappingService accountIdMappingService;
+    @Resource
+    private DubboOutAssembleServiceImpl dubboOutAssembleService;
 
     /**
      * @Doc 查询所有股东
@@ -253,7 +252,10 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (opera == null)
             throw UserException.ILLEGAL_USER;
         long ownerId = opera.getOwnerId();
-        long userId = uuidService.assignUid();
+        long userId = dubboOutAssembleService.assignUid();
+        if (userId <= 0) {
+            throw UserException.ILLEGAL_USER;
+        }
         //1、判断用户名是否已经存在
         if (accountIdMappingService.getUid(ownerId, account) > 0) {
             throw UserException.USERNAME_EXIST;

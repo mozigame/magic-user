@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.api.commons.core.tools.MD5Util;
 import com.magic.api.commons.core.tools.MauthUtil;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
@@ -14,9 +13,7 @@ import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.api.commons.utils.StringUtils;
-import com.magic.config.service.DomainDubboService;
 import com.magic.config.vo.OwnerInfo;
-import com.magic.service.java.UuidService;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.*;
@@ -26,6 +23,7 @@ import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.RegisterReq;
 import com.magic.user.resource.service.AgentResourceService;
 import com.magic.user.service.*;
+import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.AgentApplyVo;
 import com.magic.user.vo.AgentConditionVo;
@@ -56,15 +54,13 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     @Resource(name = "agentApplyService")
     private AgentApplyService agentApplyService;
     @Resource
-    private UuidService uuidService;
-    @Resource
     private AccountIdMappingService accountIdMappingService;
     @Resource
     private Producer producer;
     @Resource
     private AgentMongoService agentMongoService;
     @Resource
-    private DomainDubboService domainDubboService;
+    private DubboOutAssembleServiceImpl dubboOutAssembleService;
 
 
     /**
@@ -273,7 +269,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.USERNAME_EXIST;
         }
 
-        long userId = uuidService.assignUid();
+        long userId = dubboOutAssembleService.assignUid();
         if (userId <= 0) {
             throw UserException.ILLEGAL_USER;
         }
@@ -566,7 +562,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo) {
         StringBuffer url = request.getRequestURL();
         String resourceUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).append("/").toString();
-        OwnerInfo ownerInfo = domainDubboService.getOwnerInfoByDomain(resourceUrl);
+        OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(resourceUrl);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
@@ -737,7 +733,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(),opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
             sendAgentReviewMq(agentReview);
 
-            long userId = uuidService.assignUid();
+            long userId = dubboOutAssembleService.assignUid();
+            if (userId <= 0) {
+                throw UserException.ILLEGAL_USER;
+            }
             //1、添加业主id账号映射消息
             OwnerAccountUser ownerAccountUser = new OwnerAccountUser(holderUser.getOwnerId() + UserContants.SPLIT_LINE + agentApply.getUsername(), userId);
             if (accountIdMappingService.add(ownerAccountUser) <= 0) {
@@ -874,7 +873,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!checkLoginReq(username, password)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        OwnerInfo ownerInfo = domainDubboService.getOwnerInfoByDomain(url);
+        OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }

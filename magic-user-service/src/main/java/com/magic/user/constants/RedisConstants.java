@@ -9,6 +9,9 @@ package com.magic.user.constants;
 public class RedisConstants {
 
 
+    /**
+     * @doc 组装业主平台用户的redis key
+     */
     public enum USER_PREFIX {
         USER_BASE_INFO("ubi_", 60 * 60 * 24); //业主平台用户基础信息
 

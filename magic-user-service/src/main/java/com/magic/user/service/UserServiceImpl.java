@@ -36,11 +36,12 @@ public class UserServiceImpl implements UserService {
     public User get(Long userId) {
         User user = userRedisStorageService.getUser(userId);
         if (user == null) {
-            user = stockDbService.get(userId);
-            if (user != null)
+            user = userDbService.get(userId);
+            if (user != null) {
                 if (!userRedisStorageService.addUser(user)) {
                     ApiLogger.warn("add user info to redis error,userId:" + user.getUserId());
                 }
+            }
         }
         return user;
     }
@@ -109,6 +110,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long uid) {
-        return userDbService.get(uid);
+        return get(uid);
     }
 }

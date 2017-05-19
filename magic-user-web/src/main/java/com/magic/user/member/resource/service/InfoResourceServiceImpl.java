@@ -7,7 +7,6 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
-import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.AccountOperHistory;
 import com.magic.user.entity.Member;
@@ -16,6 +15,7 @@ import com.magic.user.enums.AccountType;
 import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.service.*;
+import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.vo.AccountModifyInfoVo;
 import com.magic.user.vo.AccountModifyListVo;
 import org.apache.commons.collections.map.HashedMap;
@@ -52,7 +52,7 @@ public class InfoResourceServiceImpl {
     private Producer producer;
 
     @Resource
-    private PassportDubboService passportDubboService;
+    private DubboOutAssembleServiceImpl dubboOutAssembleService;
 
     private static HashSet<AccountType> sets = new HashSet<>();
 
@@ -159,7 +159,7 @@ public class InfoResourceServiceImpl {
         AccountType accountType = AccountType.parse(type);
         long uid = 0;
         if (accountType == AccountType.member) {
-            uid = passportDubboService.getUid(ownerId, account);
+            uid = dubboOutAssembleService.getUid(ownerId, account);
             return uid;
         }
         uid = accountIdMappingService.getUid(ownerId, account);
