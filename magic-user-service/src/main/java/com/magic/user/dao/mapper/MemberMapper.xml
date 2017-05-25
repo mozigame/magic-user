@@ -34,14 +34,30 @@
     </resultMap>
 
     <!--查询会员列表-->
-    <select id="findList" >
+    <select id="findMemberByIds" resultMap="BaseResultMap">
         SELECT
-        id,
-        member_id,
-        realname,
-        agent_id agentId,
-        agent_username agentUsername,
-        status
+            member_id,
+            realname,
+            username,
+            telephone,
+            bank_card_no,
+            bank,
+            bank_deposit,
+            agent_id,
+            agent_username,
+            stock_id,
+            stock_username,
+            stock_username,
+            owner_id,
+            owner_username,
+            source_url,
+            email,
+            register_ip,
+            register_time,
+            status,
+            gender,
+            currency_type,
+            is_delete
         FROM t_member
         WHERE member_id IN
         <foreach collection="list" item="id" open="(" close=")"

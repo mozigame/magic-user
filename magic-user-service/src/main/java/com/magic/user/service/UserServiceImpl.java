@@ -1,6 +1,8 @@
 package com.magic.user.service;
 
 import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.model.PageBean;
+import com.magic.user.entity.Login;
 import com.magic.user.entity.User;
 import com.magic.user.storage.AgentDbService;
 import com.magic.user.storage.StockDbService;
@@ -70,13 +72,30 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean addStock(User user) {
         Long result = stockDbService.insert(user);
-        return (result == null || result <= 0) ? false : true;
+        return !(result == null || result <= 0);
     }
 
     @Override
-    public boolean disable(Long id, Integer status) {
-        int result = stockDbService.update("updateDisable", new String[]{"id", "status"}, new Object[]{id, status});
+    public boolean disable(User user) {
+        int result = stockDbService.update("updateDisable", new String[]{"id", "status"}, new Object[]{user.getUserId(), user.getStatus().value()});
+        if (result > 0) {
+            if (!userRedisStorageService.updateUser(user)) {
+                ApiLogger.warn("update user status to redis error,userId:" + user.getUserId());
+            }
+        }
         return result > 0;
+    }
+
+    @Override
+    public List<User> findWorkers(Long ownerId, String account, String realname, Integer page, Integer count) {
+        Integer offset = page == null ? null : (page - 1) * count;
+        return agentDbService.find("findWorkers", new String[]{"ownerId", "account", "realname", "offset", "limit"}, new Object[]{ownerId, account, realname, offset, count});
+    }
+
+    @Override
+    public Long getWorkerCount(Long ownerId, String account, String realname) {
+        Long count = (Long) agentDbService.get("getWorkerCount", new String[]{"ownerId", "account", "realname"}, new Object[]{ownerId, account, realname});
+        return count == null ? 0 : count;
     }
 
 
@@ -88,24 +107,30 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean addAgent(User user) {
         Long result = agentDbService.insert(user);
-        return (result == null || result <= 0) ? false : true;
+        return !(result == null || result <= 0);
+    }
+
+    @Override
+    public boolean addWorker(User user) {
+        Long result = agentDbService.insert(user);
+        return result != null && result > 0;
     }
 
     @Override
     public long getOwnerIdByStock(Long id) {
-        Long result = (Long) userDbService.get("getOwnerIdByStock", null, id);
+        Long result = (Long) userDbService.get("getOwnerIdByStock", new String[]{"userId"}, id);
         return result == null ? 0 : result;
     }
 
     @Override
     public User getUserByCode(String proCode) {
-        List<User> list = userDbService.find("findAgentByProCode", null, proCode);
+        List<User> list = userDbService.find("findAgentByProCode", new String[]{"proCode"}, proCode);
         return (list != null && list.size() > 0) ? list.get(0) : null;
     }
 
     @Override
     public AgentInfoVo getAgentDetail(Long id) {
-        return (AgentInfoVo) userDbService.get("agentDetail", null, id);
+        return (AgentInfoVo) userDbService.get("agentDetail", new String[]{"userId"}, id);
     }
 
     @Override

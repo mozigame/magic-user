@@ -19,12 +19,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public long add(Login login) {
-        return loginDbService.insert(login);
-    }
-
-    @Override
-    public int update(Login login) {
-        return loginDbService.update("updatePwd", null, login);
+        Long result = loginDbService.insert(login);
+        return result == null ? 0 : result;
     }
 
     @Override

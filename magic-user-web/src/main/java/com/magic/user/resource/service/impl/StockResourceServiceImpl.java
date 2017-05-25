@@ -7,6 +7,7 @@ import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.user.bean.AgentCondition;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.OwnerAccountUser;
@@ -16,11 +17,14 @@ import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.enums.GeneraType;
 import com.magic.user.exception.UserException;
+import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.StockResourceService;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
+import com.magic.user.util.ExcelUtil;
+import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 
@@ -47,9 +51,9 @@ public class StockResourceServiceImpl implements StockResourceService {
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
 
     /**
-     * @Doc 查询所有股东
      * @param rc
      * @return
+     * @Doc 查询所有股东
      */
     @Override
     public String findAllStock(RequestContext rc) {
@@ -64,10 +68,29 @@ public class StockResourceServiceImpl implements StockResourceService {
             info.setShowStatus(AccountStatus.parse(info.getStatus()).desc());
             info.setCurrencyName(CurrencyType.parse(info.getCurrencyType()).desc());
         }
-        return JSON.toJSONString(assemblePageBean(1,list.size(), Long.valueOf(list.size()),list));
+        return JSON.toJSONString(assemblePageBean(1, list.size(), Long.valueOf(list.size()), list));
     }
 
-    private PageBean assemblePageBean(Integer page,Integer count, Long total, List list) {
+    @Override
+    public DownLoadFile listExport(RequestContext rc) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        long uid = rc.getUid(); //业主ID、股东或代理ID
+        String filename = ExcelUtil.assembleFileName(uid, ExcelUtil.STOCK_LIST);
+        DownLoadFile downLoadFile = new DownLoadFile();
+        downLoadFile.setFilename(filename);
+        List<StockInfoVo> list = userService.findAllStock(operaUser.getOwnerId());
+        assembleStockList(list);
+        //TODO 查询表数据，生成excel的zip，并返回zip byte[]
+        byte[] content = ExcelUtil.stockListExport(list, filename);
+        downLoadFile.setContent(content);
+        return downLoadFile;
+    }
+
+    private PageBean assemblePageBean(Integer page, Integer count, Long total, List list) {
         PageBean pageBean = new PageBean();
         pageBean.setPage(page);
         pageBean.setCount(count);
@@ -77,13 +100,13 @@ public class StockResourceServiceImpl implements StockResourceService {
     }
 
     /**
-     * @Doc 获取股东名称列表
      * @param rc
      * @return
+     * @Doc 获取股东名称列表
      */
     @Override
     public String simpleList(RequestContext rc) {
-        User opera=userService.get(rc.getUid());
+        User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
         }
@@ -94,10 +117,10 @@ public class StockResourceServiceImpl implements StockResourceService {
 
 
     /**
-     * @Doc 获取股东详情
      * @param rc
      * @param id
      * @return
+     * @Doc 获取股东详情
      */
     @Override
     public String getStockDetail(RequestContext rc, Long id) {
@@ -136,9 +159,9 @@ public class StockResourceServiceImpl implements StockResourceService {
     }
 
     /**
-     * @Doc 组装股东名称列表
      * @param list
      * @return
+     * @Doc 组装股东名称列表
      */
     private List<StockInfoVo> assembleSimple(List<StockInfoVo> list) {
         List<StockInfoVo> infos = new ArrayList<>();
@@ -165,14 +188,15 @@ public class StockResourceServiceImpl implements StockResourceService {
     }
 
     /**
-     * @Doc 股东密码重置
      * @param rc
      * @param id
      * @param pwd
      * @return
+     * @Doc 股东密码重置
      */
     @Override
     public String updatePwd(RequestContext rc, Long id, String pwd) {
+        //todo 对密码长度做验证
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
@@ -181,7 +205,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (stock == null) {
             throw UserException.ILLEGAL_USER;
         }
-        if (!loginService.resetPassword(id, pwd)) {
+        if (!loginService.resetPassword(id, PasswordCapture.getSaltPwd(pwd))) {
             ApiLogger.error("update password error,userId:" + id);
             throw UserException.PASSWORD_RESET_FAIL;
         }
@@ -189,31 +213,32 @@ public class StockResourceServiceImpl implements StockResourceService {
     }
 
     /**
-     * @Doc 修改股东信息
      * @param rc
      * @param id
+     * @param realname
      * @param telephone
      * @param email
      * @param bankCardNo
      * @param bank
      * @param status
      * @return
+     * @Doc 修改股东信息
      */
     @Override
-    public String update(RequestContext rc, Long id, String telephone, String email, String bankCardNo, String bank, Integer status) {
+    public String update(RequestContext rc, Long id, String realname, String telephone, String email, String bankCardNo, String bank, Integer status) {
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
         }
-        User user = assembleUserUpdate(id, telephone, email, bankCardNo, bank, status);
-        if (!userService.update(user)) {
+        User updateUser = userService.get(id);
+        assembleUserUpdate(updateUser, realname, telephone, email, bankCardNo, bank, status);
+        if (!userService.update(updateUser)) {
             throw UserException.USER_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
     }
 
     /**
-     * @param id
      * @param telephone
      * @param email
      * @param bankCardNo
@@ -222,19 +247,16 @@ public class StockResourceServiceImpl implements StockResourceService {
      * @return
      * @Doc 组装修改股东的信息
      */
-    private User assembleUserUpdate(Long id, String telephone, String email, String bankCardNo, String bank, Integer status) {
-        User user = new User();
-        user.setUserId(id);
+    private void assembleUserUpdate(User user, String realname, String telephone, String email, String bankCardNo, String bank, Integer status) {
+        user.setRealname(realname);
         user.setTelephone(telephone);
         user.setEmail(email);
         user.setBankCardNo(bankCardNo);
         user.setBank(bank);
         user.setStatus(AccountStatus.parse(status));
-        return user;
     }
 
     /**
-     * @Doc 添加股东
      * @param rc
      * @param account
      * @param password
@@ -244,13 +266,15 @@ public class StockResourceServiceImpl implements StockResourceService {
      * @param email
      * @param sex
      * @return
+     * @Doc 添加股东
      */
     @Override
-    public String add(RequestContext rc, String account, String password, String realname, String telephone,
-                      Integer currencyType, String email, Integer sex) {
+    public String add(RequestContext rc, String account, String password, String realname,String bankCardNo, String bankDeposit, String bank,
+                      String telephone, Integer currencyType, String email, Integer sex) {
         User opera = userService.get(rc.getUid());
-        if (opera == null)
+        if (opera == null) {
             throw UserException.ILLEGAL_USER;
+        }
         long ownerId = opera.getOwnerId();
         long userId = dubboOutAssembleService.assignUid();
         if (userId <= 0) {
@@ -267,12 +291,12 @@ public class StockResourceServiceImpl implements StockResourceService {
             throw UserException.REGISTER_FAIL;
         }
         //3、添加登录信息
-        Login login = new Login(userId, account, password);
+        Login login = new Login(userId, account, PasswordCapture.getSaltPwd(password));
         if (loginService.add(login) <= 0) {
             throw UserException.REGISTER_FAIL;
         }
         //4、添加股东基础信息
-        User stockUser = assembleStock(userId, realname, account, telephone, email, AccountType.stockholder, GeneraType.parse(sex), CurrencyType.parse(currencyType), IPUtil.ipToInt(rc.getIp()), System.currentTimeMillis(), ownerId);
+        User stockUser = assembleStock(userId, realname, bankCardNo, bankDeposit, bank, account, telephone, email, AccountType.stockholder, GeneraType.parse(sex), CurrencyType.parse(currencyType), IPUtil.ipToInt(rc.getIp()), System.currentTimeMillis(), ownerId);
         if (!userService.addStock(stockUser)) {
             throw UserException.REGISTER_FAIL;
         }
@@ -296,11 +320,14 @@ public class StockResourceServiceImpl implements StockResourceService {
      * @return
      * @Doc 组装股东基础数据
      */
-    private User assembleStock(Long userId, String realname, String username, String telephone, String email,
+    private User assembleStock(Long userId, String realname,String bankCardNo, String bankDeposit, String bank, String username, String telephone, String email,
                                AccountType type, GeneraType gender, CurrencyType currencyType, Integer registerIp, Long registerTime, Long ownerId) {
         User user = new User();
         user.setUserId(userId);
         user.setRealname(realname);
+        user.setBankCardNo(bankCardNo);
+        user.setBankDeposit(bankDeposit);
+        user.setBank(bank);
         user.setUsername(username);
         user.setTelephone(telephone);
         user.setEmail(email);
@@ -314,11 +341,11 @@ public class StockResourceServiceImpl implements StockResourceService {
     }
 
     /**
-     * @Doc 设置股东可用状态
      * @param rc
      * @param id
      * @param status
      * @return
+     * @Doc 设置股东可用状态
      */
     @Override
     public String updateStatus(RequestContext rc, Long id, Integer status) {
@@ -333,7 +360,8 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (stockUser.getStatus().value() == status) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }
-        if (!userService.disable(id, status)) {
+        stockUser.setStatus(AccountStatus.parse(status));
+        if (!userService.disable(stockUser)) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;

@@ -17,13 +17,6 @@ public interface LoginService {
     long add(Login login);
 
     /**
-     * @Doc 修改用户登录基础信息
-     * @param login
-     * @return
-     */
-    int update(Login login);
-
-    /**
      * 修改登录密码
      *
      * @param id            用户ID

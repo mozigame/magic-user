@@ -108,7 +108,7 @@ public class MemInfoResource {
      * @return
      * @Doc 修改记录导出
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/modify/list/export", method = RequestMethod.GET)
     @ResponseBody
     public void modifyListExport(
@@ -117,12 +117,14 @@ public class MemInfoResource {
             @RequestParam(name = "account", required = false, defaultValue = "") String account
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        //todo
+        rc.setUid(105094L);
         DownLoadFile downLoadFile = infoResourceService.modifyListExport(rc, type, account);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
             if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
                 response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
             }
             response.setHeader("Content-Disposition", contnetDisposition);

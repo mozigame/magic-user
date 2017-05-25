@@ -24,9 +24,9 @@
 
     <select id="findById" resultMap="BaseResultMap">
       SELECT * from t_owner_stock_agent_member
-        WHERE owner_id=#{ownerId}
-          AND stock_id=#{stockId}
-          AND agent_id=#{agentId}
+        WHERE owner_id=#{ownerMapper.ownerId}
+          AND stock_id=#{ownerMapper.stockId}
+          AND agent_id=#{ownerMapper.agentId}
     </select>
 
 

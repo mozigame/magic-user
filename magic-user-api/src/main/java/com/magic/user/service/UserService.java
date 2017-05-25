@@ -1,5 +1,7 @@
 package com.magic.user.service;
 
+import com.magic.api.commons.model.PageBean;
+import com.magic.user.entity.Login;
 import com.magic.user.entity.User;
 import com.magic.user.vo.AgentInfoVo;
 import com.magic.user.vo.StockInfoVo;
@@ -50,6 +52,13 @@ public interface UserService {
     boolean addAgent(User user);
 
     /**
+     * 添加子账号
+     * @param user
+     * @return
+     */
+    boolean addWorker(User user);
+
+    /**
      * @param id
      * @return
      * @Doc 根据股东id获取业主id
@@ -94,10 +103,29 @@ public interface UserService {
     boolean addStock(User user);
 
     /**
-     * @param id
-     * @param status
+     * @param user
      * @return
      * @Doc 启用停用账号
      */
-    boolean disable(Long id, Integer status);
+    boolean disable(User user);
+
+    /**
+     * 查询子账号列表，子账号在业主平台只包括工作人员
+     * @param ownerId
+     * @param account
+     * @param realname
+     * @param page
+     * @param count
+     * @return
+     */
+    List<User> findWorkers(Long ownerId, String account, String realname, Integer page, Integer count);
+
+    /**
+     * 获取子账号的数量
+     * @param ownerId
+     * @param account
+     * @param realname
+     * @return
+     */
+    Long getWorkerCount(Long ownerId, String account, String realname);
 }

@@ -37,7 +37,7 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
             Member member = JSONObject.parseObject(msg, Member.class);
             OnLineMember lineMember = parseOnlineMember(member);
             MemberConditionVo vo = parseMemberConditionVo(member);
-            if (memberMongoService.saveMemberInfo(vo)) {
+            if (!memberMongoService.saveMemberInfo(vo)) {
                 return false;
             }
             return memberMongoService.saveOnlieMember(lineMember);

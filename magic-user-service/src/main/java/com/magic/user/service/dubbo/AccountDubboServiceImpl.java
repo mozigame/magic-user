@@ -1,12 +1,18 @@
 package com.magic.user.service.dubbo;
 
+import com.magic.api.commons.model.PageBean;
+import com.magic.user.entity.Login;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.User;
+import com.magic.user.service.AccountIdMappingService;
+import com.magic.user.service.LoginService;
 import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
+import com.magic.user.util.PasswordCapture;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * AccountDubboServiceImpl
@@ -15,12 +21,16 @@ import javax.annotation.Resource;
  * @date 2017/5/15
  */
 @Service("accountDubboService")
-public class AccountDubboServiceImpl implements AccountDubboService{
+public class AccountDubboServiceImpl implements AccountDubboService {
 
     @Resource
     private UserService userService;
     @Resource
     private MemberService memberService;
+    @Resource(name = "loginService")
+    private LoginService loginService;
+    @Resource
+    private AccountIdMappingService accountIdMappingService;
 
     /**
      * {@inheritDoc}
@@ -46,4 +56,6 @@ public class AccountDubboServiceImpl implements AccountDubboService{
     public Member getMember(long uid) {
         return memberService.getMemberById(uid);
     }
+
+
 }

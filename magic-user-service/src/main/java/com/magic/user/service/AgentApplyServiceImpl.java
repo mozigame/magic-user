@@ -23,7 +23,8 @@ public class AgentApplyServiceImpl implements AgentApplyService {
 
     @Override
     public long add(AgentApply agentApply) {
-        return agentApplyDbService.insert(agentApply);
+        Long result = agentApplyDbService.insert(agentApply);
+        return result == null ? 0L : result;
     }
 
     @Override
@@ -38,7 +39,7 @@ public class AgentApplyServiceImpl implements AgentApplyService {
 
     @Override
     public AgentApplyVo agentReviewInfo(Long applyId) {
-        return (AgentApplyVo) agentApplyDbService.get("getDetail", null, applyId);
+        return (AgentApplyVo) agentApplyDbService.get("getDetail", new String[]{"id"}, applyId);
     }
 
     @Override

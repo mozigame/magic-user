@@ -97,6 +97,7 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
         Query query = new Query();
         //组装查询条件
         if (condition != null){
+            query.addCriteria(new Criteria("ownerId").is(condition.getOwnerId()));
             Long memberId = condition.getMemberId();
             if (memberId != null && memberId > 0){
                 query.addCriteria(new Criteria("memberId").is(memberId));

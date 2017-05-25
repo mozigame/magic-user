@@ -30,9 +30,8 @@ public class AgentApplyDbService extends BaseDbServiceImpl<AgentApply, Long> {
 
     public List<AgentApplyVo> findByPage(Long ownerId, String account, Integer status, Integer page, Integer count) {
         try {
-            int offset = (page - 1) * count;
-            List<AgentApplyVo> list = agentApplyDao.find("findByPage", new String[]{"offset", "limit", "status", "account", "ownerId"}, new Object[]{offset, count, status, account, ownerId});
-            return list;
+            Integer offset = page == null ? null : (page - 1) * count;
+            return agentApplyDao.find("findByPage", new String[]{"offset", "limit", "status", "account", "ownerId"}, new Object[]{offset, count, status, account, ownerId});
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -41,7 +40,7 @@ public class AgentApplyDbService extends BaseDbServiceImpl<AgentApply, Long> {
 
     public long getCount(Long ownerId, String account, Integer status) {
         try {
-            return agentApplyDao.findCount("findCount", new String[]{"status", "account", "ownerId"}, new Object[]{status, account, ownerId});
+            return agentApplyDao.findCount("getCount", new String[]{"status", "account", "ownerId"}, new Object[]{status, account, ownerId});
         } catch (Exception e) {
             e.printStackTrace();
         }

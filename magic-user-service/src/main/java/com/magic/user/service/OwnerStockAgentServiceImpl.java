@@ -27,6 +27,6 @@ public class OwnerStockAgentServiceImpl implements OwnerStockAgentService {
 
     @Override
     public OwnerStockAgentMember findById(OwnerStockAgentMember ownerStockAgentMember) {
-        return (OwnerStockAgentMember) ownerStockAgentDbService.get("findById", null, ownerStockAgentMember);
+        return (OwnerStockAgentMember) ownerStockAgentDbService.get("findById", new String[]{"ownerMapper"}, ownerStockAgentMember);
     }
 }

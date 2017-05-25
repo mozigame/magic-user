@@ -8,6 +8,8 @@ import com.magic.service.java.UuidService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: joey
@@ -35,7 +37,7 @@ public class DubboOutAssembleServiceImpl {
      */
     public long assignUid() {
         try {
-            return uuidService.assignId();
+            return uuidService.assignUid();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,7 +55,11 @@ public class DubboOutAssembleServiceImpl {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        // todo 自己固定一个业主信息
+        OwnerInfo ownerInfo = new OwnerInfo();
+        ownerInfo.setOwnerId(10001L);
+        ownerInfo.setOwnerName("owner2");
+        return ownerInfo;
     }
 
     /**
@@ -65,6 +71,20 @@ public class DubboOutAssembleServiceImpl {
     public SubAccount getSubLoginById(Long uid) {
         try {
             return passportDubboService.getSubLoginById(uid);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * @doc 获取多个用户的最近登录时间
+     * @param ids
+     * @return
+     */
+    public Map<Long, SubAccount> getSubLogins(List<Long> ids) {
+        try {
+            return passportDubboService.getSubLogins(ids);
         } catch (Exception e) {
             e.printStackTrace();
         }

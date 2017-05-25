@@ -57,8 +57,9 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         if (memberCondition != null) {
             Query query = assembleQuery(memberCondition);
             if (page != null && count != null) {
-                Pageable pageable = new PageRequest(page, count, new Sort(Sort.Direction.DESC, "registerTime"));
-                query.with(pageable);
+                query.skip((page - 1) * count );
+                query.limit(count);
+                query.with(new Sort(Sort.Direction.DESC, "registerTime"));
             }
             List<MemberConditionVo> result = super.find(query);
             return result;

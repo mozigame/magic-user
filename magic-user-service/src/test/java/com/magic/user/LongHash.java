@@ -11,6 +11,7 @@ public class LongHash {
 
     @Test
     public void getLongHash() {
+        System.out.println(0x1008);
         Long a1 = 1023435666123L;
         Long a2 = 1333090332442L;
         Long a3 = 1556758888888L;

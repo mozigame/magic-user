@@ -24,6 +24,7 @@ import com.magic.user.po.RegisterReq;
 import com.magic.user.resource.service.AgentResourceService;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
+import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.AgentApplyVo;
 import com.magic.user.vo.AgentConditionVo;
@@ -113,13 +114,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         for (AgentConditionVo vo : agentConditionVoList) {
             agentIds.add(vo.getAgentId());
         }
-
         List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds));
         if (list != null && list.size() > 0) {
             return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
         }
         return JSON.toJSONString(assemblePageBean(count, page, totalCount, null));
     }
+
+
 
     /**
      * @param users
@@ -198,36 +200,51 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        AgentCondition userCondition = AgentCondition.valueOf(condition);
-        //todo 没有查询到结果如何处理
-        if (!checkAgentCondition(userCondition)) {
-
-        }
-        long uid = rc.getUid(); //业主ID、股东或代理ID
-        String filename = assembleFileName(uid, "代理列表");
+        byte[] content = new byte[0];
+        String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.AGENT_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
         downLoadFile.setFilename(filename);
+
+        AgentCondition userCondition = AgentCondition.valueOf(condition);
+        userCondition.setOwnerId(operaUser.getOwnerId());
+        if (!checkAgentCondition(userCondition)) {
+            downLoadFile.setContent(content);
+            return downLoadFile;
+        }
+        //1、如果代理账号不为空，直接查询代理信息
+        if (StringUtils.isNotBlank(userCondition.getAccount())) {
+            long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), userCondition.getAccount());
+            if (agentId <= 0) {
+                downLoadFile.setContent(content);
+                return downLoadFile;
+            }
+            //1.2、如果推广码不为空，验证推广码是否正确
+            if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {
+                User agentUser = userService.get(agentId);
+                if (!agentUser.getGeneralizeCode().equals(userCondition.getPromotionCode())) {
+                    downLoadFile.setContent(content);
+                    return downLoadFile;
+                }
+            }
+        } else if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {  //2、如果代理账号为空，推广代码不为空，查询代理
+            User agentUser = userService.getUserByCode(userCondition.getPromotionCode());
+            if (agentUser == null || agentUser.getOwnerId() != operaUser.getOwnerId()) {
+                downLoadFile.setContent(content);
+                return downLoadFile;
+            }
+        }
+        //3、条件查询mongo中的代理，组装id
+        List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, null, null);
+        //todo 将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
+        List<Long> agentIds = Lists.newArrayList();
+        for (AgentConditionVo vo : agentConditionVoList) {
+            agentIds.add(vo.getAgentId());
+        }
+        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds));
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
-        byte[] content = new byte[5];
+        content = ExcelUtil.agentListExport(list, filename);
         downLoadFile.setContent(content);
         return downLoadFile;
-    }
-
-    /**
-     * 组装文件名
-     *
-     * @param uid
-     * @param name
-     * @return
-     */
-    private String assembleFileName(long uid, String name) {
-        StringBuilder filename = new StringBuilder();
-        filename.append(uid);
-        filename.append("-");
-        filename.append(name);
-        filename.append(System.currentTimeMillis());
-        filename.append(".xlsx");
-        return filename.toString();
     }
 
     /**
@@ -255,8 +272,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                       Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
         String generalizeCode = UUIDUtil.getCode();
         RegisterReq req = assembleRegister(account, password);
-        if (!checkRegisterAgentParam(req))
+        if (!checkRegisterAgentParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
+        }
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
@@ -279,17 +297,16 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             ApiLogger.error(String.format("add ownerAccountUser failed,ownerId:%d,account:%d,agentId:%d", holderUser.getOwnerId(), account, userId));
             throw UserException.REGISTER_FAIL;
         }
-
-        //2、添加代理登录信息
+        //2、添加代理基础信息
+        User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, account, telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
+        if (!userService.addAgent(agentUser)) {
+            ApiLogger.error("add agent info failed,userId:" + userId);
+            throw UserException.REGISTER_FAIL;
+        }
+        //3、添加代理登录信息
         Login login = new Login(userId, account, PasswordCapture.getSaltPwd(password));
         if (loginService.add(login) <= 0) {
             ApiLogger.error("add agent login failed,userId:" + userId);
-            throw UserException.REGISTER_FAIL;
-        }
-        //3、添加代理基础信息
-        User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, account, telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
-        if (userService.addAgent(agentUser)) {
-            ApiLogger.error("add agent info failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
         }
         String domainSpit = StringUtils.arrayToStrSplit(domain);
@@ -418,6 +435,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         JSONObject result = new JSONObject();
         AgentInfoVo agentVo = userService.getAgentDetail(id);
+        if (agentVo == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         assembleAgentDetail(agentVo);
         //todo 代理参数配置名称获取 andy 调用接口
         AgentConfigVo agentConfig = agentConfigService.findByAgentId(id);
@@ -502,8 +522,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        User user = assembleUpdateAgentInfo(id, realname, telephone, email, bankCardNo, bank);
-        if (!userService.update(user)) {
+        User updateUser = userService.get(id);
+        assembleUpdateAgentInfo(updateUser, realname, telephone, email, bankCardNo, bank);
+        if (!userService.update(updateUser)) {
             ApiLogger.error("update agent info error,userId:" + id);
             throw UserException.USER_UPDATE_FAIL;
         }
@@ -511,7 +532,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     }
 
     /**
-     * @param id
      * @param realname
      * @param telephone
      * @param email
@@ -520,15 +540,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 组装修改的代理数据
      */
-    private User assembleUpdateAgentInfo(Long id, String realname, String telephone, String email, String bankCardNo, String bank) {
-        User user = new User();
-        user.setUserId(id);
+    private void assembleUpdateAgentInfo(User user, String realname, String telephone, String email, String bankCardNo, String bank) {
         user.setRealname(realname);
         user.setTelephone(telephone);
         user.setEmail(email);
         user.setBankCardNo(bankCardNo);
         user.setBank(bank);
-        return user;
     }
 
     /**
@@ -571,11 +588,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (stockUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        if (accountIdMappingService.getUid(stockUser.getOwnerId(), account) <= 0) {
+        if (accountIdMappingService.getUid(stockUser.getOwnerId(), account) > 0) {
             throw UserException.USERNAME_EXIST;
         }
         int ip = IPUtil.ipToInt(rc.getIp());
-        AgentApply agentApply = assembleAgentApply(account, realname, password, stockId, ownerInfo.getOwnerId(), telephone, email, ReviewStatus.noReview, resourceUrl, ip, System.currentTimeMillis());
+        AgentApply agentApply = assembleAgentApply(account, realname, PasswordCapture.getSaltPwd(password), stockId, stockUser.getUsername(), ownerInfo.getOwnerId(), telephone, email, ReviewStatus.noReview, resourceUrl, ip, System.currentTimeMillis());
         if (agentApplyService.add(agentApply) <= 0) {
             throw UserException.AGENT_APPLY_ADD_FAIL;
         }
@@ -596,13 +613,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 组装代理申请信息
      */
-    private AgentApply assembleAgentApply(String username, String realname, String password, Long stockId,Long ownerId, String telephone, String email,
+    private AgentApply assembleAgentApply(String username, String realname, String password, Long stockId, String stockName, Long ownerId, String telephone, String email,
                                           ReviewStatus status, String resourceUrl, Integer registerIp, Long createTime) {
         AgentApply apply = new AgentApply();
         apply.setUsername(username);
         apply.setRealname(realname);
         apply.setPassword(password);
         apply.setStockId(stockId);
+        apply.setStockName(stockName);
         apply.setOwnerId(ownerId);
         apply.setTelephone(telephone);
         apply.setEmail(email);
@@ -629,15 +647,44 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
         }
+        long totalCount = agentApplyService.getCount(operaUser.getOwnerId(), account, status);
+        if (totalCount <= 0) {
+            return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+        }
         List<AgentApplyVo> agentApplyVos = agentApplyService.findByPage(operaUser.getOwnerId(), account, status, page, count);
         assembleAgentApplyList(agentApplyVos);
-        long totalCount = agentApplyService.getCount(operaUser.getOwnerId(), account, status);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("page", page);
-        jsonObject.put("count", count);
-        jsonObject.put("total", totalCount);
-        jsonObject.put("list", agentApplyVos);
-        return jsonObject.toJSONString();
+        return  JSON.toJSONString(assemblePageBean(count, page, totalCount, agentApplyVos));
+    }
+
+    /**
+     * @Doc 导出代理审核列表
+     * @param rc
+     * @param account
+     * @param status
+     * @return
+     */
+    @Override
+    public DownLoadFile reviewListExport(RequestContext rc, String account, Integer status) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        byte[] content = new byte[0];
+        String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.AGENT_REVIEW_LIST);
+        DownLoadFile downLoadFile = new DownLoadFile();
+        downLoadFile.setFilename(filename);
+        List<AgentApplyVo> agentApplyVos = agentApplyService.findByPage(operaUser.getOwnerId(), account, status, null, null);
+        if (agentApplyVos == null || agentApplyVos.size() <= 0) {
+            downLoadFile.setContent(content);
+            return downLoadFile;
+        }
+        assembleAgentApplyList(agentApplyVos);
+        //TODO 查询表数据，生成excel的zip，并返回zip byte[]
+        content = ExcelUtil.agentReviewListExport(agentApplyVos, filename);
+        downLoadFile.setContent(content);
+        return downLoadFile;
+
     }
 
     /**
@@ -745,7 +792,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
 
             //2、添加代理登录信息
-            Login login = new Login(userId, agentApply.getUsername(), PasswordCapture.getSaltPwd(agentApply.getPassword()));
+            Login login = new Login(userId, agentApply.getUsername(), agentApply.getPassword());
             if (loginService.add(login) <= 0) {
                 ApiLogger.error("add agent login failed,userId:" + userId);
                 throw UserException.REGISTER_FAIL;
@@ -837,7 +884,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (status == agentUser.getStatus().value()) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }
-        if (!userService.disable(agentId, status)) {
+        agentUser.setStatus(AccountStatus.parse(status));
+        if (!userService.disable(agentUser)) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }
         sendAgentStatusUpdateMq(agentId, status);
@@ -870,9 +918,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      */
     @Override
     public String login(RequestContext rc, String agent, String url, String username, String password, String code) {
-        if (!checkLoginReq(username, password)) {
-            throw UserException.ILLEGAL_PARAMETERS;
-        }
+        //todo
+//        if (!checkLoginReq(username, password)) {
+//            throw UserException.ILLEGAL_PARAMETERS;
+//        }
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;

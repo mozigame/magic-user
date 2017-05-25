@@ -1,7 +1,11 @@
 package com.magic.user.service.dubbo;
 
+import com.magic.api.commons.model.PageBean;
+import com.magic.user.entity.Login;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.User;
+
+import java.util.List;
 
 /**
  * AccountDubboService

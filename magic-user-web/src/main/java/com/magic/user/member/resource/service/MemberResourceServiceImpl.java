@@ -2,6 +2,7 @@ package com.magic.user.member.resource.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
@@ -40,6 +41,8 @@ import com.magic.user.service.MemberMongoService;
 import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
+import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
+import com.magic.user.util.ExcelUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
@@ -71,12 +74,10 @@ public class MemberResourceServiceImpl {
     private Producer producer;
 
     @Resource
-    private ThriftFactory thriftFactory;
+    private ThriftOutAssembleServiceImpl thriftOutAssembleService;
+
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
-
-
-    private static final String MEMBER_UPDATE_SUCCESS="MEMBER_UPDATE_SUCCESS";
 
     /**
      * 会员列表
@@ -93,6 +94,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_USER;
         }
         MemberCondition memberCondition = MemberCondition.valueOf(condition);
+        memberCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkCondition(memberCondition)) {
             return JSON.toJSONString(assemblePageBean(page, count, 0, null));
         }
@@ -101,30 +103,50 @@ public class MemberResourceServiceImpl {
             return JSON.toJSONString(assemblePageBean(page, count, 0, null));
         }
         //获取mongo中查询到的会员列表
-        memberCondition.setOwnerId(operaUser.getOwnerId());
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
+        List<Long> ids = Lists.newArrayList();
+        for (MemberConditionVo vo : memberConditionVos) {
+            ids.add(vo.getMemberId());
+        }
         //todo 组装mongo中拿取的列表
-        List<?> list = new ArrayList<>();
-        List<MemberListVo> members = assembleMemberVos(list);
-        return JSON.toJSONString(assemblePageBean(page, count, total, members));
+        List<MemberListVo> memberVos = assembleMemberVos(ids);
+        return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
     }
 
     /**
      * 组装会员列表
      *
-     * @param list
+     * @param ids
      * @return
      */
-    private List<MemberListVo> assembleMemberVos(List<?> list) {
+    private List<MemberListVo> assembleMemberVos(List<Long> ids) {
+        List<MemberListVo> memberListVos = Lists.newArrayList();
+        //1、获取会员基础信息
+        List<Member> members = memberService.findMemberByIds(ids);
+        //2、获取会员最近登录信息
+        Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(ids);
 
-        //TODO list包含 会员ID,会员账号，代理ID,代理账号，状态，层级ID，最近登陆时间
-
-        //TODO 1.根据会员ID查询余额balance @sundy dubbo
-
-        //TODO 2.根据会员ID查询返水方案ID,名称,层级名称  @andy dubbo
-
+        for (Member member : members) {
+            MemberListVo memberListVo = new MemberListVo();
+            memberListVo.setId(member.getMemberId());
+            memberListVo.setAccount(member.getUsername());
+            memberListVo.setAgentId(member.getAgentId());
+            memberListVo.setAgent(member.getAgentUsername());
+            memberListVo.setRegisterTime(DateUtil.formatDateTime(new Date(member.getRegisterTime()),DateUtil.formatDefaultTimestamp));
+            memberListVo.setStatus(member.getStatus().value());
+            memberListVo.setShowStatus(member.getStatus().desc());
+            if (subLogins != null) {
+                SubAccount subAccount = subLogins.get(member.getId());
+                if (subAccount != null) {
+                    memberListVo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()),DateUtil.formatDefaultTimestamp));
+                }
+            }
+            //todo 1、会员层级、余额在 kevin 拿取
+            //todo 2、当前反水方案在 jason 拿取
+            memberListVos.add(memberListVo);
+        }
         //TODO foreach list for item
-        return null;
+        return memberListVos;
     }
 
     /**
@@ -190,16 +212,35 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public DownLoadFile memberListExport(RequestContext rc, String condition) {
-        MemberCondition memberCondition = MemberCondition.valueOf(condition);
-        if (!checkCondition(memberCondition)) {
-            throw UserException.ILLEGAL_PARAMETERS;
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
         }
-        long uid = rc.getUid(); //业主ID、股东或代理ID
-        String filename = assembleFileName(uid, "会员列表");
+        String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.MEMBER_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
         downLoadFile.setFilename(filename);
+        byte[] content = new byte[0];
+        MemberCondition memberCondition = MemberCondition.valueOf(condition);
+        memberCondition.setOwnerId(operaUser.getOwnerId());
+        if (!checkCondition(memberCondition)) {
+            downLoadFile.setContent(content);
+            return downLoadFile;
+        }
+        long total = memberMongoService.getCount(memberCondition);
+        if (total <= 0) {
+            downLoadFile.setContent(content);
+            return downLoadFile;
+        }
+        //获取mongo中查询到的会员列表
+        List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, null, null);
+        List<Long> ids = Lists.newArrayList();
+        for (MemberConditionVo vo : memberConditionVos) {
+            ids.add(vo.getMemberId());
+        }
+        //todo 组装mongo中拿取的列表
+        List<MemberListVo> memberVos = assembleMemberVos(ids);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
-        byte[] content = new byte[5];
+        content = ExcelUtil.memberListExport(memberVos, filename);
         downLoadFile.setContent(content);
         return downLoadFile;
     }
@@ -323,8 +364,7 @@ public class MemberResourceServiceImpl {
         }
         //组装请求数据
         String body = assembleReqBody(rc, member, password);
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100006, body);
-        EGResp resp = thriftFactory.call(req, "account");
+        EGResp resp = thriftOutAssembleService.passwordReset(body, "account");
         if (resp != null && resp.getCode() == 0x4444) {//重置成功
             return UserContants.EMPTY_STRING;
         }
@@ -351,24 +391,6 @@ public class MemberResourceServiceImpl {
     }
 
     /**
-     * 组装请求对象
-     *
-     * @param cmdType
-     * @param cmd
-     * @param body
-     * @return
-     */
-    private EGReq assembleEGReq(CmdType cmdType, int cmd, String body) {
-        EGReq req = new EGReq();
-        EGHeader header = new EGHeader();
-        header.setType(cmdType);
-        header.setCmd(cmd);
-        req.setHeader(header);
-        req.setBody(body);
-        return req;
-    }
-
-    /**
      * 会员强制下线
      *
      * @param rc
@@ -381,8 +403,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_MEMBER;
         }
         //组装请求数据
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, logoutBody(rc, member));
-        EGResp resp = thriftFactory.call(req, "account");
+        EGResp resp = thriftOutAssembleService.logout(logoutBody(rc, member), "account");
         if (resp != null && (resp.getCode() == 0x5555 || resp.getCode() == 0x1013)) {//注销成功
             return UserContants.EMPTY_STRING;
         }
@@ -500,31 +521,16 @@ public class MemberResourceServiceImpl {
      */
     public DownLoadFile memberLevelListExport(RequestContext rc, int lock) {
         long uid = rc.getUid(); //业主ID、股东或代理ID
-        String filename = assembleFileName(uid, "会员层级列表");
+        String filename = ExcelUtil.assembleFileName(uid, ExcelUtil.MEMBER_LEVEL_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
         downLoadFile.setFilename(filename);
         //TODO andy dubbo 查询表数据，生成excel的zip，并返回zip byte[]
         byte[] content = new byte[5];
-        downLoadFile.setContent(content);
+        List<MemberLevelListVo> list = new ArrayList<>();
+        downLoadFile.setContent(ExcelUtil.memberLevelListExport(list, filename));
         return downLoadFile;
     }
 
-    /**
-     * 组装文件名
-     *
-     * @param uid
-     * @param name
-     * @return
-     */
-    private String assembleFileName(long uid, String name) {
-        StringBuilder filename = new StringBuilder();
-        filename.append(uid);
-        filename.append("-");
-        filename.append(name);
-        filename.append(System.currentTimeMillis());
-        filename.append(".xlsx");
-        return filename.toString();
-    }
 
     /**
      * 状态变更
@@ -600,7 +606,6 @@ public class MemberResourceServiceImpl {
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
-        //todo holderId暂时注释掉
         long holderId = accountIdMappingService.getUid(ownerInfo.getOwnerId(), ownerInfo.getOwnerName());//股东id
         if (holderId <= 0) {
             throw UserException.ILLEGAL_USER;
@@ -627,10 +632,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_USER;
         }
         String body = assembleRegisterBody(rc, url, ownerInfo.getOwnerId(), agent.getId(), req);
-        EGReq egReq = assembleEGReq(CmdType.PASSPORT, 0x100001, body);
-
-        //todo 暂时注释调用引擎网关的逻辑
-        /*EGResp resp = thriftFactory.call(egReq, "account");
+        EGResp resp = thriftOutAssembleService.memberRegister(body, "account");
         if (resp == null) {
             throw UserException.REGISTER_FAIL;
         }
@@ -640,15 +642,13 @@ public class MemberResourceServiceImpl {
         }
         if (code != 0x1111) {
             throw UserException.REGISTER_FAIL;
-        }*/
-        //todo
-//        long userId = 0l;
-        long userId = dubboOutAssembleService.assignUid();
-        /*try {
+        }
+        long userId = 0l;
+        try {
             userId = Long.parseLong(resp.getData());
         } catch (Exception e) {
             ApiLogger.error(String.format("passport register return data error. resp: %s", JSON.toJSONString(resp)), e);
-        }*/
+        }
         if (userId <= 0) {
             throw UserException.REGISTER_FAIL;
         }
@@ -658,8 +658,9 @@ public class MemberResourceServiceImpl {
             throw UserException.REGISTER_FAIL;
         }
         sendRegisterMessage(member);
-        return UserContants.EMPTY_STRING;
+        return "{\"id\":" + userId + "}";
     }
+
 
     /**
      * 发送注册成功消息
@@ -669,7 +670,6 @@ public class MemberResourceServiceImpl {
      */
     private boolean sendRegisterMessage(Member member) {
         try {
-            //TODO topic + 消费者
             return producer.send(Topic.MEMBER_REGISTER_SUCCESS, String.valueOf(member.getId()), JSON.toJSONString(member));
         } catch (Exception e) {
             ApiLogger.error(String.format("send member register success mq message error. member: %s", JSON.toJSONString(member)), e);
@@ -777,8 +777,7 @@ public class MemberResourceServiceImpl {
             throw UserException.PROCODE_ERROR;
         }
         String body = assembleLoginBody(rc, ownerInfo.getOwnerId(), username, password, agent, url);
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100002, body);
-        EGResp resp = thriftFactory.call(req, "account");
+        EGResp resp = thriftOutAssembleService.memberLogin(body, "account");
         if (resp == null || resp.getCode() == 0x1011) {
             throw UserException.MEMBER_LOGIN_FAIL;
         }
@@ -798,7 +797,7 @@ public class MemberResourceServiceImpl {
         String token = object.getString("token");
         sendLoginMessage(ownerInfo.getOwnerId(), uid, rc.getIp());
         //todo 组装返回数据（需参考前端页面）
-        return "{\" token: \"" + "\"" + resp.getData() + "\"}";
+        return resp.getData();
     }
 
     /**
@@ -843,8 +842,10 @@ public class MemberResourceServiceImpl {
         object.put("appId", rc.getClient().getAppId());
         object.put("loginUrl", url);
         object.put("deviceId", rc.getClient().getDeviceId());
-        object.put("ext", new JSONObject().put("user-agent", agent).toString());
-        object.put("operatorTime", System.currentTimeMillis() / 1000);
+        JSONObject userAgentObj = new JSONObject();
+        userAgentObj.put("user-agent", agent);
+        object.put("ext", userAgentObj);
+        object.put("operatorTime", System.currentTimeMillis());
 
 
         return object.toJSONString();
@@ -881,8 +882,7 @@ public class MemberResourceServiceImpl {
             throw UserException.PASSWORD_RESET_FAIL;
         }
         String body = assembleResetBody(rc, username, oldPassword, newPassword);
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100004, body);
-        EGResp resp = thriftFactory.call(req, "account");
+        EGResp resp = thriftOutAssembleService.memberPasswordReset(body, "account");
         if (resp == null) {
             throw UserException.PASSWORD_RESET_FAIL;
         }
@@ -946,8 +946,7 @@ public class MemberResourceServiceImpl {
      */
     public String memberLoginVerify(RequestContext rc) {
         String body = assembleVerifyBody(rc);
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100003, body);
-        EGResp resp = thriftFactory.call(req, "account");
+        EGResp resp = thriftOutAssembleService.memberLoginVerify(body, "account");
         boolean result = Optional.ofNullable(resp).filter(response -> response.getCode() != 0x3333).isPresent();
         if (!result) {
             throw UserException.VERIFY_FAIL;
@@ -980,8 +979,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         String body = assembleLogoutBody(rc, username);
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
-        EGResp resp = thriftFactory.call(req, "account");
+        EGResp resp = thriftOutAssembleService.memberLogout(body, "account");
         if (resp == null) {
             throw UserException.LOGOUT_FAIL;
         }
@@ -1043,6 +1041,7 @@ public class MemberResourceServiceImpl {
             return JSON.toJSONString(assemblePage(page, count, 0, null));
         }
         OnlineMemberConditon memberCondition = parseContion(condition, user);
+        memberCondition.setOwnerId(user.getOwnerId());
         long total = memberMongoService.getOnlineMemberCount(memberCondition);
         if (total <= 0) {
             return JSON.toJSONString(assemblePage(page, count, 0, null));
@@ -1142,6 +1141,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_USER;
         }
         OnlineMemberConditon conditon = parseContion(null, user);
+        conditon.setOwnerId(user.getOwnerId());
         conditon.setStatus(LoginType.login.value());
         long count = memberMongoService.getOnlineMemberCount(conditon);
         return "{\" count: \"" + count + "}";

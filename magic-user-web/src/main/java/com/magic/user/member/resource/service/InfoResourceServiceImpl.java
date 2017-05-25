@@ -16,6 +16,7 @@ import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
+import com.magic.user.util.ExcelUtil;
 import com.magic.user.vo.AccountModifyInfoVo;
 import com.magic.user.vo.AccountModifyListVo;
 import org.apache.commons.collections.map.HashedMap;
@@ -221,7 +222,7 @@ public class InfoResourceServiceImpl {
             if (member == null) {
                 throw UserException.ILLEGAL_MEMBER;
             }
-            boolean result = memberService.updateMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit);
+            boolean result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
                 if (realname != null) {
                     newMap.put("realname", realname);
@@ -317,6 +318,17 @@ public class InfoResourceServiceImpl {
         return UserContants.EMPTY_STRING;
     }
 
+    /**
+     * @Doc 组装更新的用户数据
+     * @param id
+     * @param realname
+     * @param telephone
+     * @param email
+     * @param bankCardNo
+     * @param bank
+     * @param bankDeposit
+     * @return
+     */
     private User assembleModifyUser(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
         User user = new User();
         user.setUserId(id);
@@ -329,6 +341,28 @@ public class InfoResourceServiceImpl {
         return user;
     }
 
+    /**
+     * @doc 组装更新的会员数据
+     * @param id
+     * @param realname
+     * @param telephone
+     * @param email
+     * @param bankCardNo
+     * @param bank
+     * @param bankDeposit
+     * @return
+     */
+    private Member assembleModifyMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
+        Member member = new Member();
+        member.setMemberId(id);
+        member.setRealname(realname);
+        member.setTelephone(telephone);
+        member.setEmail(email);
+        member.setBankCardNo(bankCardNo);
+        member.setBank(bank);
+        member.setBankDeposit(bankDeposit);
+        return member;
+    }
     /**
      * 参数检查
      *
@@ -402,12 +436,16 @@ public class InfoResourceServiceImpl {
      * @return
      */
     public String modifyList(RequestContext rc, Integer type, String account, int page, int count) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         long uid = rc.getUid();
-        long total = accountOperHistoryService.getCount(type, account, uid);
+        long total = accountOperHistoryService.getCount(type, account, uid, operaUser.getOwnerId());
         if (total <= 0) {
             return JSON.toJSONString(assemblePageBean(page, count, 0, null));
         }
-        List<AccountOperHistory> list = accountOperHistoryService.getList(type, account, uid, page, count);
+        List<AccountOperHistory> list = accountOperHistoryService.getList(type, account, uid, operaUser.getOwnerId(), page, count);
         List<AccountModifyListVo> modifyListVos = assembleModifyList(list);
         return JSON.toJSONString(assemblePageBean(page, count, total, modifyListVos));
     }
@@ -471,13 +509,19 @@ public class InfoResourceServiceImpl {
      * @return
      */
     public DownLoadFile modifyListExport(RequestContext rc, Integer type, String account) {
-        long uid = rc.getUid(); //业主ID、股东或代理ID
-        String filename = assembleFileName(uid, "资料修改记录");
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        long uid = rc.getUid();
+        List<AccountOperHistory> list = accountOperHistoryService.getList(type, account, uid, operaUser.getOwnerId(), null, null);
+        List<AccountModifyListVo> modifyListVos = assembleModifyList(list);
+
+        String filename = assembleFileName(rc.getUid(), ExcelUtil.MODIFY_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
         downLoadFile.setFilename(filename);
         //TODO 查询表数据，生成excel的zip，并返回excel byte[]
-        List<AccountOperHistory> list = accountOperHistoryService.getList(type, account, uid);
-        byte[] content = new byte[5];
+        byte[] content = ExcelUtil.modifyListExport(modifyListVos, filename);
         downLoadFile.setContent(content);
         return downLoadFile;
     }

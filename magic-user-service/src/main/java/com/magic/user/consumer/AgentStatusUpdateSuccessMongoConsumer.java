@@ -22,8 +22,8 @@ import javax.annotation.Resource;
 @ConsumerConfig(consumerName = "v1agentStatusUpdateSuccessMongoConsumer", topic =  Topic.AGENT_STATUS_UPDATE_SUCCESS)
 public class AgentStatusUpdateSuccessMongoConsumer implements Consumer{
 
-    @Resource
-    private AgentMongoService memberMongoService;
+    @Resource(name = "agentMongoService")
+    private AgentMongoService agentMongoService;
 
     @Override
     public boolean doit(String topic, String tags, String key, String msg) {
@@ -32,7 +32,7 @@ public class AgentStatusUpdateSuccessMongoConsumer implements Consumer{
             JSONObject jsonObject = JSONObject.parseObject(msg);
             Long agentId = jsonObject.getLongValue("agentId");
             Integer status = jsonObject.getIntValue("status");
-            return memberMongoService.updateStatus(agentId, status);
+            return agentMongoService.updateStatus(agentId, status);
         }catch (Exception e){
             ApiLogger.error(String.format("agent status update success mongo mq consumer error. key:%s, msg:%s", key, msg), e);
         }

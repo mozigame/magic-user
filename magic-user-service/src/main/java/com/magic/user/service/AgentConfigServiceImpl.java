@@ -32,7 +32,7 @@ public class AgentConfigServiceImpl implements AgentConfigService {
 
     @Override
     public AgentConfigVo findByAgentId(Long agentId) {
-        return (AgentConfigVo) agentConfigDbService.get("findByAgentId", null, agentId);
+        return (AgentConfigVo) agentConfigDbService.get("findByAgentId", new String[]{"agentId"}, agentId);
     }
 
     @Override

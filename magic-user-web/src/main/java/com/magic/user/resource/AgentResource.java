@@ -19,6 +19,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 /**
@@ -59,20 +60,22 @@ public class AgentResource {
      * @return
      * @Doc 代理列表导出
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/list/export", method = RequestMethod.GET)
     @ResponseBody
     public void listExport(
             HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(name = "condition", required = false) String condition
+            @RequestParam(name = "condition", required = false,defaultValue = "{}") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        //todo 自定义user
+        rc.setUid(105094L);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
             if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
                 response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
             }
             response.setHeader("Content-Disposition", contnetDisposition);
@@ -228,7 +231,7 @@ public class AgentResource {
             @RequestParam(name = "email") String email,
             @RequestParam(name = "bankCardNo") String bankCardNo
     ) {
-        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password, realname, email, telephone, bankCardNo);
+        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password, realname, telephone, email, bankCardNo);
     }
 
     /**
@@ -244,7 +247,7 @@ public class AgentResource {
     @ResponseBody
     public String reviewList(
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false, defaultValue = "-1") Integer status,
+            @RequestParam(name = "status", required = false, defaultValue = "1") Integer status,
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
@@ -258,15 +261,36 @@ public class AgentResource {
      * @return
      * @Doc 代理审核列表导出
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/review/list/export", method = RequestMethod.GET)
     @ResponseBody
-    public String reviewListExport(
+    public void reviewListExport(
+            HttpServletResponse response,
             @RequestParam(name = "account", required = false) String account,
             @RequestParam(name = "status", required = false, defaultValue = "-1") Integer status
-//            股东ID（从RequestContext中获取股东ID）
-    ) {
-        return "";
+    ) throws IOException {
+        RequestContext rc = RequestContext.getRequestContext();
+        //todo 自定义user
+        rc.setUid(105094L);
+        DownLoadFile downLoadFile = agentResourceService.reviewListExport(rc, account, status);
+        response.setCharacterEncoding("UTF-8");
+        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
+            String contnetDisposition = "attachment;filename=";
+            if (downLoadFile.getFilename() != null) {
+                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
+                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
+            }
+            response.setHeader("Content-Disposition", contnetDisposition);
+            ServletOutputStream outputStream = response.getOutputStream();
+            try {
+                outputStream.write(downLoadFile.getContent());
+            } catch (Exception e) {
+                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
+            } finally {
+                outputStream.flush();
+                outputStream.close();
+            }
+        }
     }
 
     /**
@@ -277,7 +301,7 @@ public class AgentResource {
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/detail/simple", method = RequestMethod.GET)
     @ResponseBody
-    public String listExport(
+    public String detailSimple(
             @RequestParam(name = "id") Long id
     ) {
         return agentResourceService.agentApplyInfo(RequestContext.getRequestContext(), id);

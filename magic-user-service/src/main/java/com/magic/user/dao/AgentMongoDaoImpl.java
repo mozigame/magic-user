@@ -54,8 +54,9 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
         if (userCondition != null) {
             Query query = assembleQuery(userCondition);
             if (page != null && count != null) {
-                Pageable pageable = new PageRequest(page, count, new Sort(Sort.Direction.DESC, "registerTime"));
-                query.with(pageable);
+                query.skip((page - 1) * count );
+                query.limit(count);
+                query.with(new Sort(Sort.Direction.DESC, "registerTime"));
             }
             List<AgentConditionVo> result = super.find(query);
             return result;

@@ -8,6 +8,7 @@ import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.user.service.MemberMongoService;
 import com.magic.user.storage.OnlineMemberRedisStorageService;
+import com.magic.user.vo.MemberConditionVo;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -34,7 +35,9 @@ public class MemberLoginSucessMongoConsumer implements Consumer{
             long memberId = object.getLongValue("memberId");
             String ip = object.getString("ip");
             long loginTime = object.getLongValue("loginTime");
-            return memberMongoService.updateLogin(memberId, ip, loginTime);
+            if (!memberMongoService.updateLogin(memberId, ip, loginTime)) {
+                ApiLogger.error(String.format("member update login mq consumer failed. key:%s, msg:%s", key, msg));
+            }
         }catch (Exception e){
             ApiLogger.error(String.format("member login sucess mq consumer error. key:%s, msg:%s", key, msg), e);
         }

@@ -6,6 +6,7 @@ import com.magic.user.storage.MemberDbService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * User: joey
@@ -20,7 +21,13 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member getMemberById(Long id) {
+
         return memberDbService.get(id);
+    }
+
+    @Override
+    public List<Member> findMemberByIds(List<Long> ids) {
+        return memberDbService.find("findMemberByIds", new String[]{"list"}, ids);
     }
 
     @Override

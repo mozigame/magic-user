@@ -173,13 +173,14 @@
     <!-- 查询所有的股东--><!--used-->
     <select id="findAllStock" resultType="com.magic.user.vo.StockInfoVo">
         select
-          id,
+          user_id id,
           realname,
           username account,
           currency_type currencyType,
           register_time registerTime,
+          (select count(id) from t_owner_stock_agent_member WHERE owner_id=#{ownerId} and stock_id=u.user_id ) agentNumber,
           status
-        FROM t_user_info
+        FROM t_user_info u
         WHERE type=2
           and owner_id=#{ownerId}
     </select>
@@ -298,14 +299,14 @@
         on (u.user_id=ar.oper_user_id)
 
         <choose>
-            <when test="list != null and list.size > 0">
+            <when test="ids != null and ids.size > 0">
                 WHERE
                 u.user_id in
-                <foreach collection="list" item="id" open="(" close=")"
+                <foreach collection="ids" item="id" open="(" close=")"
                          separator=",">
                     #{id}
                 </foreach>
-
+                AND u.type=3
             </when>
             <otherwise>
                 WHERE u.type=3
@@ -386,6 +387,53 @@
         WHERE generalize_code=#{proCode}
     </select>
     <!--###########   代理操作   #############-->
+
+    <!--##############   子账号   #################-->
+    <!--获取子账号列表-->
+    <select id="findWorkers" resultMap="baseResultMap">
+        SELECT
+        id,
+        user_id,
+        realname,
+        username,
+        register_time,
+        status,
+        owner_id,
+        owner_name,
+        type
+        from t_user_info
+        WHERE owner_id=#{ownerId}
+        AND type = 4
+        <if test="account != null and account != ''">
+          and username=#{account}
+        </if>
+        <if test="realname != null and realname != ''">
+          and realname=#{realname}
+        </if>
+        <if test="offset != null and offset > -1">
+            limit #{offset},#{limit}
+        </if>
+
+    </select>
+
+    <!--获取子账号数量-->
+    <select id="getWorkerCount" resultType="java.lang.Long">
+        SELECT
+          count(id)
+        from t_user_info
+        WHERE owner_id=#{ownerId}
+        AND type = 4
+        <if test="account != null and account != ''">
+            and username=#{account}
+        </if>
+        <if test="realname != null and realname != ''">
+            and realname=#{realname}
+        </if>
+    </select>
+
+
+    <!--##############   子账号   #################-->
+
 
 
 </mapper>

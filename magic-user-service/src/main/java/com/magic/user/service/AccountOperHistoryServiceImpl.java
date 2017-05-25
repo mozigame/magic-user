@@ -19,8 +19,9 @@ public class AccountOperHistoryServiceImpl implements AccountOperHistoryService 
     private AccountOperHistoryDbService accountOperHistoryDbService;
 
     @Override
-    public long getCount(Integer type, String account, Long uid) {
-        return (long) accountOperHistoryDbService.get("getCount", new String[]{"type", "account", "procUserId"}, new Object[]{type, account, uid});
+    public long getCount(Integer type, String account, Long uid, Long ownerId) {
+        Long result = (Long) accountOperHistoryDbService.get("getCount", new String[]{"type", "account", "procUserId", "ownerId"}, new Object[]{type, account, uid, ownerId});
+        return result == null ? 0 : result ;
     }
 
     @Override
@@ -29,13 +30,9 @@ public class AccountOperHistoryServiceImpl implements AccountOperHistoryService 
     }
 
     @Override
-    public List<AccountOperHistory> getList(Integer type, String account, Long uid, Integer page, Integer count) {
-        Integer offset = (page - 1) * count;
-        return accountOperHistoryDbService.find("findbyPage", new String[]{"type", "account", "procUserId", "offset", "limit"}, new Object[]{type, account, uid, offset, count});
+    public List<AccountOperHistory> getList(Integer type, String account, Long uid, Long ownerId, Integer page, Integer count) {
+        Integer offset = page == null ? null : (page - 1) * count;
+        return accountOperHistoryDbService.find("findbyPage", new String[]{"type", "account", "procUserId", "ownerId", "offset", "limit"}, new Object[]{type, account, uid, ownerId, offset, count});
     }
 
-    @Override
-    public List<AccountOperHistory> getList(Integer type, String account, Long uid) {
-        return accountOperHistoryDbService.find("findbyPage", new String[]{"type", "account", "procUserId"}, new Object[]{type, account, uid});
-    }
 }

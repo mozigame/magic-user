@@ -16,9 +16,10 @@ public interface AccountOperHistoryService {
      * @param type
      * @param account
      * @param uid     所属ID
+     * @param ownerId 业主id
      * @return
      */
-    long getCount(Integer type, String account, Long uid);
+    long getCount(Integer type, String account, Long uid, Long ownerId);
 
     /**
      * @param operHistory
@@ -33,19 +34,11 @@ public interface AccountOperHistoryService {
      * @param type
      * @param account
      * @param uid     所属ID
+     * @param ownerId   业主id
      * @param page
      * @param count
      * @return
      */
-    List<AccountOperHistory> getList(Integer type, String account, Long uid, Integer page, Integer count);
+    List<AccountOperHistory> getList(Integer type, String account, Long uid, Long ownerId, Integer page, Integer count);
 
-    /**
-     * 获取记录列表，业主ID或操作人ID为UID的记录
-     *
-     * @param type
-     * @param account
-     * @param uid
-     * @return
-     */
-    List<AccountOperHistory> getList(Integer type, String account, Long uid);
 }

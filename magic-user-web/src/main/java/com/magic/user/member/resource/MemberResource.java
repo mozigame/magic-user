@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLEncoder;
 
 /**
@@ -215,7 +215,7 @@ public class MemberResource {
      * @return
      * @Doc 会员列表导出
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/list/export", method = RequestMethod.GET)
     @ResponseBody
     public void listExport(
@@ -223,12 +223,14 @@ public class MemberResource {
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        //todo 自定义user
+        rc.setUid(105094L);
         DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
             if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
                 response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
             }
             response.setHeader("Content-Disposition", contnetDisposition);
@@ -243,6 +245,33 @@ public class MemberResource {
             }
         }
     }
+
+//
+//    /**
+//     * @param request  HttpServletRequest
+//     * @param response HttpServletResponse
+//     * @param filePath example "/filesOut/Download/mst.txt"
+//     * @return
+//     */
+//    public static void FilesDownload_stream(HttpServletRequest request, HttpServletResponse response, String filename, byte [] content ) {
+//        //get server path (real path)
+//        try {
+//            byte[] buffer = new byte[inputStream.available()];
+//            response.reset();
+//            // 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
+//            response.addHeader("Content-Disposition", "attachment;filename=" + new String(filenames.replaceAll(" ", "").getBytes("utf-8"), "iso8859-1"));
+//            response.addHeader("Content-Length", "" + content.length);
+//            OutputStream os = new BufferedOutputStream(response.getOutputStream());
+//            response.setContentType("application/octet-stream");
+//            os.write(buffer);// 输出文件
+//            os.flush();
+//            os.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+
 
     /**
      * @param id 会员id
@@ -358,7 +387,7 @@ public class MemberResource {
      * @return
      * @Doc 会员层级列表导出
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/level/list/export", method = RequestMethod.GET)
     @ResponseBody
     public void levelListExport(
@@ -366,12 +395,14 @@ public class MemberResource {
             @RequestParam(name = "lock", required = false, defaultValue = "1") int lock
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        //todo 自定义user
+        rc.setUid(105094L);
         DownLoadFile downLoadFile = memberServiceResource.memberLevelListExport(rc, lock);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
             if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
                 response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
             }
             response.setHeader("Content-Disposition", contnetDisposition);
@@ -411,7 +442,7 @@ public class MemberResource {
      * @return
      * @Doc 某层级系会员列表导出
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/level/list/special/export", method = RequestMethod.GET)
     @ResponseBody
     public void levelListSpecialExport(
@@ -424,7 +455,7 @@ public class MemberResource {
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
             if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(contnetDisposition, "utf-8");
+                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
                 response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
             }
             response.setHeader("Content-Disposition", contnetDisposition);

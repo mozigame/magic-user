@@ -115,6 +115,14 @@ public interface AgentResourceService {
     String agentApplyList(RequestContext rc, String account, Integer status, Integer page, Integer count);
 
     /**
+     * @Doc 代理审核列表导出
+     * @param rc
+     * @param status
+     * @return
+     */
+    DownLoadFile reviewListExport(RequestContext rc,String account, Integer status);
+
+    /**
      * @param rc
      * @param applyId
      * @return

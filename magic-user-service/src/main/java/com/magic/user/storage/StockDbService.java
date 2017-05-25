@@ -35,7 +35,7 @@ public class StockDbService extends BaseDbServiceImpl<User, Long> {
      */
     public List<StockInfoVo> findAll(Long ownerId) {
         try {
-            return stockDao.findCustom("findAllStock", null, new Object[]{ownerId});
+            return stockDao.findCustom("findAllStock", new String[]{"ownerId"}, new Object[]{ownerId});
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -49,7 +49,7 @@ public class StockDbService extends BaseDbServiceImpl<User, Long> {
      */
     public StockInfoVo getDetail(Long id) {
         try {
-            return (StockInfoVo) stockDao.get("getStockDetail", null, new Object[]{id});
+            return (StockInfoVo) stockDao.get("getStockDetail", new String[]{"id"}, new Object[]{id});
         } catch (Exception e) {
             e.printStackTrace();
         }
