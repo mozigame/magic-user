@@ -43,7 +43,7 @@
     </dependencies>
 
     <build>
-        <finalName>ROOT</finalName>
+        <finalName>magic-user-web</finalName>
 
         <plugins>
             <plugin>

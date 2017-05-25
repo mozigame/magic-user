@@ -7,18 +7,11 @@
         http://code.alibabatech.com/schema/dubbo
         http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
-
-    <dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}"/>
-    <dubbo:protocol port="${dubbo.port}"/>
-
-
     <!-- provider service -->
     <dubbo:service interface="com.magic.user.service.dubbo.AccountDubboService" ref="accountDubboService">
         <dubbo:method name="getOwnerId" timeout="3000"/>
         <dubbo:method name="getUser" timeout="3000"/>
         <dubbo:method name="getMember" timeout="3000"/>
-        <dubbo:method name="addWorker" timeout="3000"/>
-        <dubbo:method name="checkOwnerAccountMapping" timeout="3000"/>
     </dubbo:service>
 
 </beans>
