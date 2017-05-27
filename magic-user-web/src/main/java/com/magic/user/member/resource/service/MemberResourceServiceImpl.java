@@ -138,11 +138,18 @@ public class MemberResourceServiceImpl {
             if (subLogins != null) {
                 SubAccount subAccount = subLogins.get(member.getId());
                 if (subAccount != null) {
-                    memberListVo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()),DateUtil.formatDefaultTimestamp));
+                    memberListVo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp));
                 }
+            } else {
+                //todo
+                memberListVo.setLastLoginTime("2017-04-17 18:03:22");
             }
             //todo 1、会员层级、余额在 kevin 拿取
+            memberListVo.setLevel("未分层");
+            memberListVo.setBalance("29843.23");
             //todo 2、当前反水方案在 jason 拿取
+            memberListVo.setReturnWater(1);
+            memberListVo.setReturnWaterName("反水基本方案1");
             memberListVos.add(memberListVo);
         }
         //TODO foreach list for item
@@ -544,12 +551,12 @@ public class MemberResourceServiceImpl {
         if (!checkParams(id, status)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        AccountStatus newStatus = AccountStatus.parse(status);
-        AccountStatus oldStatus = AccountStatus.enable;
-        if (newStatus == AccountStatus.enable) {
-            oldStatus = AccountStatus.disable;
+        Member member = memberService.getMemberById(id);
+        if (member != null && member.getStatus().value() == status) {
+            throw UserException.ILLEGAL_PARAMETERS;
         }
-        boolean result = memberService.updateStatus(id, oldStatus, newStatus);
+        member.setStatus(AccountStatus.parse(status));
+        boolean result = memberService.updateStatus(member);
         if (!result) {
             throw UserException.MEMBER_STATUS_UPDATE_FAIL;
         }
@@ -584,7 +591,7 @@ public class MemberResourceServiceImpl {
             return false;
         }
         AccountStatus accountStatus = AccountStatus.parse(status);
-        if (accountStatus != AccountStatus.disable || accountStatus != AccountStatus.enable) {
+        if (!(accountStatus != AccountStatus.disable || accountStatus != AccountStatus.enable)) {
             return false;
         }
         return true;

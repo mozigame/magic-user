@@ -478,7 +478,7 @@ public class MemberResource {
      * @return
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/disable", method = RequestMethod.GET)
+    @RequestMapping(value = "/disable", method = RequestMethod.POST)
     @ResponseBody
     public String statusUpdate(
             @RequestParam(name = "id", required = true) Long id,

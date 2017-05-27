@@ -4,6 +4,7 @@ import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.core.tools.HeaderUtil;
 import com.magic.user.resource.service.AgentResourceService;
+import com.magic.user.resource.service.UserLoginResourceService;
 import com.magic.user.util.PasswordCapture;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -26,11 +27,11 @@ import javax.servlet.http.HttpServletResponse;
 public class UserLoginResource {
 
 
-    @Resource(name = "agentResourceService")
-    private AgentResourceService agentResourceService;
+    @Resource(name = "userLoginResourceService")
+    private UserLoginResourceService userLoginResourceService;
 
     /**
-     * 会员登陆
+     * 用户登陆
      *
      * @param request
      * @param response
@@ -55,16 +56,16 @@ public class UserLoginResource {
         //获取域名
         StringBuffer requestURL = request.getRequestURL();
         String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
-        return agentResourceService.login(rc, agent, url, username, password, code);
+        return userLoginResourceService.login(rc, agent, url, username, password, code);
     }
 
     /**
-     * 会员注销
+     * 用户注销
      *
      * @param username
      * @return
      */
-    @Access(type = Access.AccessType.PUBLIC)
+    @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String logout(
@@ -74,6 +75,19 @@ public class UserLoginResource {
         RequestContext rc = RequestContext.getRequestContext();
         //获取浏览器、操作系统名称等数据
         String agent = request.getHeader(HeaderUtil.USER_AGENT);
-        return agentResourceService.logout(rc, agent, username);
+        return userLoginResourceService.logout(rc, agent, username);
     }
+
+    /**
+     * 检查用户登录状态
+     * @return
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/login/verify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String verify() {
+        RequestContext rc = RequestContext.getRequestContext();
+        return userLoginResourceService.verify(rc);
+    }
+
 }

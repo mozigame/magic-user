@@ -35,25 +35,9 @@ public interface MemberService {
     /**
      * 更新会员状态
      *
-     * @param id
-     * @param oldStatus
-     * @param newStatus
      * @return
      */
-    boolean updateStatus(Long id, AccountStatus oldStatus, AccountStatus newStatus);
-
-    /**
-     * 修改会员数据
-     * @param id
-     * @param realname
-     * @param telephone
-     * @param email
-     * @param bankCardNo
-     * @param bank
-     * @param bankDeposit
-     * @return
-     */
-    boolean updateMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
+    boolean updateStatus(Member member);
 
     /**
      * 保存会员数据

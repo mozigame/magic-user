@@ -26,7 +26,8 @@ public class AccountIdMappingServiceImpl implements AccountIdMappingService {
 
     @Override
     public long add(OwnerAccountUser ownerAccountUser) {
-        return ownerAccountUserDbService.insert(ownerAccountUser);
+        Long result = ownerAccountUserDbService.insert(ownerAccountUser);
+        return result == null ? 0 : result;
     }
 
 }

@@ -27,7 +27,7 @@ import javax.annotation.Resource;
  * Time: 16:52
  */
 @Service("masterAddOwnerSuccessConsumer")
-//@ConsumerConfig(consumerName = "v1masterAddOwnerSuccessConsumer", topic = Topic.AGENT_STATUS_UPDATE_SUCCESS)
+@ConsumerConfig(consumerName = "v1masterAddOwnerSuccessConsumer", topic = Topic.BC_COMPANY_ADD_SUCCESS)
 public class MasterAddOwnerSuccessConsumer implements Consumer {
 
     @Resource

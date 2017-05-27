@@ -16,7 +16,7 @@ public interface WorkerResourceService {
      * @param realname
      * @return
      */
-    String list(RequestContext rc, String account, String realname, Integer page, Integer count);
+    String list(RequestContext rc, String account, String realname, Integer roleId, Integer page, Integer count);
 
     /**
      * @Doc 添加子账号

@@ -36,13 +36,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean updateStatus(Long id, AccountStatus oldStatus, AccountStatus newStatus) {
-        return false;
-    }
-
-    @Override
-    public boolean updateMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
-        return false;
+    public boolean updateStatus(Member member) {
+        return memberDbService.update("updateStatus", new String[]{"status", "memberId"}, new Object[]{member.getStatus().value(), member.getMemberId()}) > 0;
     }
 
     @Override

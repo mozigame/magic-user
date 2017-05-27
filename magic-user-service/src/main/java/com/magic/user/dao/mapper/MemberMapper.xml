@@ -292,4 +292,11 @@
         #{memberId}
         )
     </insert>
+
+    <!--修改状态-->
+    <update id="updateStatus">
+        UPDATE t_member
+          SET status=#{status}
+          WHERE member_id=#{memberId}
+    </update>
 </mapper>

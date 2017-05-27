@@ -2,6 +2,9 @@ package com.magic.user.service;
 
 import com.magic.user.entity.Login;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * User: joey
  * Date: 2017/5/5
@@ -42,4 +45,10 @@ public interface LoginService {
      * @return
      */
     boolean updateLoginStatus(Long userId, Long lastLoginTime, Integer lastLoginIp, Integer status);
+
+    /**
+     * 批量获取用户登录信息
+     * @return
+     */
+    Map<Long, Login> findByUserIds(List<Long> ids);
 }

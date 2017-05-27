@@ -118,7 +118,7 @@ public interface UserService {
      * @param count
      * @return
      */
-    List<User> findWorkers(Long ownerId, String account, String realname, Integer page, Integer count);
+    List<User> findWorkers(Long ownerId, String account, String realname, Integer roleId, Integer page, Integer count);
 
     /**
      * 获取子账号的数量
@@ -127,5 +127,5 @@ public interface UserService {
      * @param realname
      * @return
      */
-    Long getWorkerCount(Long ownerId, String account, String realname);
+    Long getWorkerCount(Long ownerId, String account, String realname, Integer roleId);
 }

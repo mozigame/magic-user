@@ -79,22 +79,22 @@ public class UserServiceImpl implements UserService {
     public boolean disable(User user) {
         int result = stockDbService.update("updateDisable", new String[]{"id", "status"}, new Object[]{user.getUserId(), user.getStatus().value()});
         if (result > 0) {
-            if (!userRedisStorageService.updateUser(user)) {
-                ApiLogger.warn("update user status to redis error,userId:" + user.getUserId());
+            if (!userRedisStorageService.delUser(user.getUserId())) {
+                ApiLogger.warn("delete user status to redis error,userId:" + user.getUserId());
             }
         }
         return result > 0;
     }
 
     @Override
-    public List<User> findWorkers(Long ownerId, String account, String realname, Integer page, Integer count) {
+    public List<User> findWorkers(Long ownerId, String account, String realname, Integer roleId, Integer page, Integer count) {
         Integer offset = page == null ? null : (page - 1) * count;
-        return agentDbService.find("findWorkers", new String[]{"ownerId", "account", "realname", "offset", "limit"}, new Object[]{ownerId, account, realname, offset, count});
+        return agentDbService.find("findWorkers", new String[]{"ownerId", "account", "realname", "roleId", "offset", "limit"}, new Object[]{ownerId, account, realname, roleId, offset, count});
     }
 
     @Override
-    public Long getWorkerCount(Long ownerId, String account, String realname) {
-        Long count = (Long) agentDbService.get("getWorkerCount", new String[]{"ownerId", "account", "realname"}, new Object[]{ownerId, account, realname});
+    public Long getWorkerCount(Long ownerId, String account, String realname, Integer roleId) {
+        Long count = (Long) agentDbService.get("getWorkerCount", new String[]{"ownerId", "account", "realname", "roleId"}, new Object[]{ownerId, account, realname, roleId});
         return count == null ? 0 : count;
     }
 
