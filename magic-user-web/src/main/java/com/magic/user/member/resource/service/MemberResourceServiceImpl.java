@@ -286,25 +286,25 @@ public class MemberResourceServiceImpl {
         //todo 会员优惠、资金概况等信息去 jason 那边拿取
         //会员优惠方案
         String preferScheme = "{\n" +
-                "    \"level\": 1,\n" +
-                "    \"showLevel\": \"未分层\",\n" +
-                "    \"onlineDiscount\": \"100返10\",\n" +
-                "    \"depositFee\": \"无\",\n" +
-                "    \"withdrawFee\": \"无\",\n" +
-                "    \"returnWater\": \"返水基本1\",\n" +
-                "    \"depositDiscountScheme\": \"100返10\"\n" +
+                "\"level\": 1,\n" +
+                "\"showLevel\": \"未分层\",\n" +
+                "\"onlineDiscount\": \"100返10\",\n" +
+                "\"depositFee\": \"无\",\n" +
+                "\"withdrawFee\": \"无\",\n" +
+                "\"returnWater\": \"返水基本1\",\n" +
+                "\"depositDiscountScheme\": \"100返10\"\n" +
                 "}";
         MemberPreferScheme memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
         vo.setPreferScheme(memberPreferScheme);
         ///会员资金概况
         String memberFundInfo = "{\n" +
-                "    \"balance\": \"1805.50\",\n" +
-                "    \"depositNumbers\": 15,\n" +
-                "    \"depositTotalMoney\": \"29006590\",\n" +
-                "    \"lastDeposit\": \"1200\",\n" +
-                "    \"withdrawNumbers\": 10,\n" +
-                "    \"withdrawTotalMoney\": \"24500120\",\n" +
-                "    \"lastWithdraw\": \"2500\"\n" +
+                "\t\"balance\": \"1805.50\",\n" +
+                "\t\"depositNumbers\": 15,\n" +
+                "\t\"depositTotalMoney\": \"29006590\",\n" +
+                "\t\"lastDeposit\": \"1200\",\n" +
+                "\t\"withdrawNumbers\": 10,\n" +
+                "\t\"withdrawTotalMoney\": \"24500120\",\n" +
+                "\t\"lastWithdraw\": \"2500\"\n" +
                 "}";
 
         MemberFundInfo memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
@@ -314,17 +314,17 @@ public class MemberResourceServiceImpl {
         vo.setFundProfile(fundProfile);
         //投注记录
         String memberBetHistory = "{\n" +
-                "    \"totalMoney\": \"29000\",\n" +
-                "    \"effMoney\": \"28000\",\n" +
-                "    \"gains\": \"18000\"\n" +
+                "\t\"totalMoney\": \"29000\",\n" +
+                "\t\"effMoney\": \"28000\",\n" +
+                "\t\"gains\": \"18000\"\n" +
                 "}";
         MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
         vo.setBetHistory(memberBetHistoryObj);
         //优惠记录
         String memberDiscountHistory = "{\n" +
-                "    \"totalMoney\": \"1350\",\n" +
-                "    \"numbers\": 98,\n" +
-                "    \"returnWaterTotalMoney\": \"1450\"\n" +
+                "\t\"totalMoney\": \"1350\",\n" +
+                "\t\"numbers\": 98,\n" +
+                "\t\"returnWaterTotalMoney\": \"1450\"\n" +
                 "}";
         MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
         vo.setDiscountHistory(memberDiscountHistoryObj);
