@@ -14,10 +14,6 @@ import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.utils.StringUtils;
-import com.magic.commons.enginegw.service.ThriftFactory;
-import com.magic.config.thrift.base.CmdType;
-import com.magic.config.thrift.base.EGHeader;
-import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
@@ -184,7 +180,7 @@ public class MemberResourceServiceImpl {
         memberBalanceBody.put("memberIds", ids);
         EGResp balanceResp = thriftOutAssembleService.getMemberBalances(memberBalanceBody.toJSONString(), "account");
         //TODO 判断resp的code
-        if (balanceResp != null) {
+        if (balanceResp != null && balanceResp.getData()!= null) {
             JSONArray balanceObj = JSONObject.parseArray(balanceResp.getData());
             Map<Long, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
             for (Object object : balanceObj) {
@@ -210,7 +206,7 @@ public class MemberResourceServiceImpl {
         memberRetWaterBody.put("level", levelIds);
         EGResp retWaterResp = thriftOutAssembleService.getMemberBalances(memberRetWaterBody.toJSONString(), "account");
         //TODO 判断resp的code
-        if (retWaterResp != null) {
+        if (retWaterResp != null&& retWaterResp.getData()!= null) {
             JSONArray balanceObj = JSONObject.parseArray(retWaterResp.getData());
             Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
             for (Object object : balanceObj) {
@@ -240,7 +236,7 @@ public class MemberResourceServiceImpl {
         Account account = condition.getAccount();
         if (account != null && StringUtils.isNoneEmpty(account.getName())) {
             Integer type = account.getType();
-            if (type == null || AccountType.parse(type) == null) {
+            if (type == null || AccountType.parse(type) == null || type != AccountType.agent.value() || type != AccountType.member.value()) {
                 return false;
             }
         }
@@ -359,7 +355,7 @@ public class MemberResourceServiceImpl {
         String privilegeBody = "{\"memberId\":" + member.getMemberId() + "}";
         EGResp privilegeResp = thriftOutAssembleService.getMemberPrivilege(privilegeBody, "account");
         //TODO 确定resp的code
-        if (privilegeResp != null) {
+        if (privilegeResp != null && privilegeResp.getData() != null) {
             JSONObject privilegeData = JSONObject.parseObject(privilegeResp.getData());
             memberPreferScheme = new MemberPreferScheme();
             memberPreferScheme.setLevel(privilegeData.getInteger("level"));
@@ -394,7 +390,7 @@ public class MemberResourceServiceImpl {
         String capitalBody = "{\"memberId\":" + member.getMemberId() + "}";
         EGResp capitalResp = thriftOutAssembleService.getMemberCapital(capitalBody, "account");
         //TODO 确定resp的code
-        if (capitalResp != null) {
+        if (capitalResp != null && capitalResp.getData() != null) {
             JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
             fundProfile.setSyncTime(capitalData.getString("syncTime"));
             memberFundInfoObj = new MemberFundInfo();
@@ -650,7 +646,7 @@ public class MemberResourceServiceImpl {
         jsonObject.put("count", count);
         EGResp resp = thriftOutAssembleService.findLevelList(jsonObject.toJSONString(), "account");
         //TODO 确定resp的code
-        if (resp != null) {
+        if (resp != null && resp.getData() != null) {
             List<MemberLevelListVo> memberLevelListVos = new ArrayList<>();
             JSONArray array = JSONArray.parseArray(resp.getData());
             for (Object object : array) {
