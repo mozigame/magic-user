@@ -2,11 +2,13 @@ package com.magic.user.service;
 
 import com.magic.user.entity.Member;
 import com.magic.user.enums.AccountStatus;
+import com.magic.user.storage.CountRedisStorageService;
 import com.magic.user.storage.MemberDbService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * User: joey
@@ -18,6 +20,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Resource(name = "memberDbService")
     private MemberDbService memberDbService;
+    @Resource
+    private CountRedisStorageService countRedisStorageService;
 
     @Override
     public Member getMemberById(Long id) {
@@ -47,6 +51,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public boolean saveMember(Member member) {
+        Long result = memberDbService.insert(member);
+        if (Optional.ofNullable(result).filter(resultValue -> resultValue > 0).isPresent()){
+            countRedisStorageService.incrMember(member.getOwnerId());
+        }
         return memberDbService.insert(member) > 0;
     }
 

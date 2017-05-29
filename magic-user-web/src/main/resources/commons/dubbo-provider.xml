@@ -12,6 +12,7 @@
         <dubbo:method name="getOwnerId" timeout="3000"/>
         <dubbo:method name="getUser" timeout="3000"/>
         <dubbo:method name="getMember" timeout="3000"/>
+        <dubbo:method name="getOwnerStaticInfo" timeout="3000"/>
     </dubbo:service>
 
 </beans>

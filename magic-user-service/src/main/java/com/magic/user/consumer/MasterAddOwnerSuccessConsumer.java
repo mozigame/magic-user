@@ -1,11 +1,11 @@
 package com.magic.user.consumer;
 
-import com.alibaba.druid.support.logging.Log;
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.mq.annotation.ConsumerConfig;
 import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
+import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
@@ -14,7 +14,10 @@ import com.magic.user.entity.OwnerStockAgentMember;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
-import com.magic.user.service.*;
+import com.magic.user.service.AccountIdMappingService;
+import com.magic.user.service.LoginService;
+import com.magic.user.service.OwnerStockAgentService;
+import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.util.PasswordCapture;
 import org.springframework.stereotype.Service;
@@ -27,7 +30,7 @@ import javax.annotation.Resource;
  * Time: 16:52
  */
 @Service("masterAddOwnerSuccessConsumer")
-//@ConsumerConfig(consumerName = "v1masterAddOwnerSuccessConsumer", topic = Topic.AGENT_STATUS_UPDATE_SUCCESS)
+@ConsumerConfig(consumerName = "v1masterAddOwnerSuccessConsumer", topic = Topic.BC_COMPANY_ADD_SUCCESS)
 public class MasterAddOwnerSuccessConsumer implements Consumer {
 
     @Resource
@@ -43,29 +46,31 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
 
     @Override
     public boolean doit(String topic, String tags, String key, String msg) {
-        //todo 1、解析业主数据
-        //todo 2、根据业主的id和account 创建一个默认的股东账号，业主ID与账号映射表添加数据，stockId=ownerId,stockName=ownerName
-        //todo 3、创建代理账号，agentId自动生成，agentName=stockName+"_dl"
-        //todo 4、股东、代理的密码为 PasswordCapture.getSaltPwd(ownerPwd)
-
-
         ApiLogger.info(String.format("master control add owner success mq consumer start. key:%s, msg:%s", key, msg));
         boolean flag = true;
         try {
             JSONObject object = JSONObject.parseObject(msg);
-            long ownerId = object.getLongValue("ownerId");
-            String ownerName = object.getString("ownerName");
-            String password = object.getString("password");
-            String realname = object.getString("realname");
+            long ownerId = object.getLongValue("id");
+            String ownerName = object.getString("account");
+            String password = PasswordCapture.getSaltPwd(object.getString("password"));
+            String realname = object.getString("realName");
             String telephone = object.getString("telephone");
             String email = object.getString("email");
-            Integer registerIp = object.getInteger("registerIp");
+            Integer registerIp = IPUtil.ipToInt(object.getString("ip"));
+            String bankName = object.getString("bankName");
+            String bankDeposit = object.getString("bankDeposit");
             String bankCardNo = object.getString("bankCardNo");
-            long registerTime = System.currentTimeMillis();
+            long registerTime = object.getLongValue("createTime");
             /*股东*/
             OwnerAccountUser stockAccountUser = assembleOwnerAccountUser(ownerId, ownerName, ownerId);
             if (accountIdMappingService.add(stockAccountUser) <= 0) {
                 if (accountIdMappingService.getUid(ownerId, ownerName) <= 0) {
+                    flag = false;
+                }
+            }
+            User stockUser = assembleUser(ownerId, ownerName, ownerId, ownerName, realname, telephone, email, AccountType.stockholder, registerTime, registerIp, null, AccountStatus.enable, bankCardNo, bankName, bankDeposit);
+            if (!userService.addStock(stockUser)) {
+                if (userService.getUserById(stockUser.getUserId()) == null) {
                     flag = false;
                 }
             }
@@ -75,33 +80,26 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
                     flag = false;
                 }
             }
-            User stockUser = assembleUser(ownerId, ownerName, ownerId, ownerName, realname, telephone, email, AccountType.stockholder, registerTime, registerIp, null, AccountStatus.enable, bankCardNo);
-            if (!userService.addStock(stockUser)) {
-                if (userService.getUserById(stockUser.getUserId()) == null) {
-                    flag = false;
-                }
-            }
-            /*股东*/
             /*代理*/
             long agentId = dubboOutAssembleService.assignUid();
             String agentName = ownerName + "_dl";
             String generalizeCode = UUIDUtil.getCode();
-            String agentRealname = realname + "_dl";
-            OwnerAccountUser agentAccountUser = assembleOwnerAccountUser(ownerId, ownerName + "_dl", agentId);
+            String agentRealname = realname;
+            OwnerAccountUser agentAccountUser = assembleOwnerAccountUser(ownerId, agentName, agentId);
             if (accountIdMappingService.add(agentAccountUser) <= 0) {
                 if (accountIdMappingService.getUid(agentId, agentName) <= 0) {
+                    flag = false;
+                }
+            }
+            User agentUser = assembleUser(agentId, agentName, ownerId, realname, agentRealname, telephone, email, AccountType.agent, registerTime, registerIp, generalizeCode, AccountStatus.enable, bankCardNo, bankName, bankDeposit);
+            if (!userService.addAgent(agentUser)) {
+                if (userService.get(agentId) == null) {
                     flag = false;
                 }
             }
             Login agentLogin = new Login(agentId, agentName, PasswordCapture.getSaltPwd(password));
             if (loginService.add(agentLogin) <= 0) {
                 if (loginService.get(agentId) == null) {
-                    flag = false;
-                }
-            }
-            User agentUser = assembleUser(agentId, agentName, ownerId, realname, agentRealname, telephone, email, AccountType.agent, registerTime, registerIp, generalizeCode, AccountStatus.enable, null);
-            if (!userService.addAgent(agentUser)) {
-                if (userService.get(agentId) == null) {
                     flag = false;
                 }
             }
@@ -148,7 +146,7 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
     }
 
     private User assembleUser(Long userId, String username, Long ownerId, String ownerName, String realname, String telephone, String email,
-                              AccountType type, Long registerTime, Integer registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
+                              AccountType type, Long registerTime, Integer registerIp, String generalizeCode, AccountStatus status, String bankCardNo, String bankName, String bankDeposit) {
         User user = new User();
         user.setUserId(userId);
         user.setOwnerId(ownerId);
@@ -163,6 +161,8 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
         user.setGeneralizeCode(generalizeCode);
         user.setStatus(status);
         user.setBankCardNo(bankCardNo);
+        user.setBank(bankName);
+        user.setBankDeposit(bankDeposit);
         return user;
     }
 
