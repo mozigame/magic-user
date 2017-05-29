@@ -156,6 +156,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             throw UserException.REGISTER_FAIL;
         }
         //添加账号信息
+        //todo 子账号中需要冗余roleId,用于查询功能
         User worker = assembleAddWorker(userId, operaUser.getOwnerId(), operaUser.getOwnerName(), AccountType.worker, account, realname);
         if (!userService.addWorker(worker)) {
             throw UserException.REGISTER_FAIL;
