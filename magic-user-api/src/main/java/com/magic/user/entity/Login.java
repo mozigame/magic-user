@@ -18,7 +18,7 @@ public class Login {
 
     private Integer lastLoginIp;    //最后登录ip
 
-    private LoginType status; //登录等出
+    private LoginType status; //登录登出
 
     public Login(){}
     public Login(Long userId, String username, String password) {

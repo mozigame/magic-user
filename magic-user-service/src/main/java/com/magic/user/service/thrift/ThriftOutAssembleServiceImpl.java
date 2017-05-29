@@ -98,6 +98,118 @@ public class ThriftOutAssembleServiceImpl {
         return thriftFactory.call(req, caller);
     }
 
+    /**调用kevin Thrift接口**/
+    /**
+     * 获取单个会员资金概况
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp getMemberCapital(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 获取会员的余额列表
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp getMemberBalances(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 重置会员的支付密码
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp resetMemberPayPwd(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**调用Jason Thrift接口**/
+    /**
+     * 获取代理参数配置信息
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp getAgentConfig(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 查询某个会员的优惠方案
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp getMemberPrivilege(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 查询层级列表
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp findLevelList(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 查询会员反水方案列表
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp findReturnWaters(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 添加代理参数配置
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp addAgentConfig(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 添加代理参数配置
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp updateAgentConfig(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+
+
 
     /**
      * 组装thrift请求对象

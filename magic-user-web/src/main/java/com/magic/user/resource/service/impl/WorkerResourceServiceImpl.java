@@ -2,15 +2,16 @@ package com.magic.user.resource.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.tools.DateUtil;
+import com.magic.owner.entity.Role;
+import com.magic.owner.service.dubbo.PermitDubboService;
+import com.magic.owner.vo.UserRoleVo;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.service.java.UuidService;
-import com.magic.tongtu.entity.Role;
-import com.magic.tongtu.service.dubbo.PermitDubboService;
-import com.magic.tongtu.vo.UserRoleVo;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.OwnerAccountUser;
@@ -44,8 +45,6 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
     @Resource
     private UuidService uuidService;
     @Resource
-    private PassportDubboService passportDubboService;
-    @Resource
     private AccountIdMappingService accountIdMappingService;
     @Resource
     private LoginService loginService;
@@ -59,25 +58,25 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
      * @return
      */
     @Override
-    public String list(RequestContext rc, String account, String realname, Integer page, Integer count) {
+    public String list(RequestContext rc, String account, String realname, Integer roleId, Integer page, Integer count) {
         //todo 检查请求参数
         User operaUser = userService.get(rc.getUid());
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        long total = userService.getWorkerCount(operaUser.getOwnerId(), account, realname);
+        long total = userService.getWorkerCount(operaUser.getOwnerId(), account, realname, roleId);
         if (total <= 0) {
             return JSON.toJSONString(assemblePageBean(page, count, total, null));
         }
-        List<User> users = userService.findWorkers(operaUser.getOwnerId(), account, realname, page, count);
+        List<User> users = userService.findWorkers(operaUser.getOwnerId(), account, realname, roleId, page, count);
         List<Long> userIds = Lists.newArrayList();
         for (User user : users) {
             userIds.add(user.getUserId());
         }
-        Map<Long, SubAccount> subAccountMap = passportDubboService.getSubLogins(userIds);
+        Map<Long, Login> loginMap = loginService.findByUserIds(userIds);
         //todo 调用dubbo
         Map<Long, UserRoleVo> userRoleVoMap = permitDubboService.getUsersRole(userIds);
-        return JSON.toJSONString(assemblePageBean(page,count, total, assembleWorkerVoList(users, subAccountMap, userRoleVoMap)));
+        return JSON.toJSONString(assemblePageBean(page,count, total, assembleWorkerVoList(users, loginMap, userRoleVoMap)));
     }
 
     /**
@@ -99,12 +98,11 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
     /**
      * @组装子账号列表
      * @param users
-     * @param subAccountMap
      * @param userRoleVoMap
      * @return
      */
-    private List<WorkerVo> assembleWorkerVoList(List<User> users, Map<Long, SubAccount> subAccountMap, Map<Long, UserRoleVo> userRoleVoMap) {
-        List<WorkerVo> WorkerVos = Lists.newArrayList();
+    private List<WorkerVo> assembleWorkerVoList(List<User> users, Map<Long, Login> loginMap, Map<Long, UserRoleVo> userRoleVoMap) {
+        List<WorkerVo> workerVos = Lists.newArrayList();
         for (User user : users) {
             WorkerVo vo = new WorkerVo();
             vo.setId(user.getId());
@@ -113,16 +111,21 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             vo.setStatus(user.getStatus().value());
             vo.setShowStatus(user.getStatus().desc());
             vo.setCreateTime(DateUtil.formatDateTime(new Date(user.getRegisterTime()),DateUtil.formatDefaultTimestamp));
-            SubAccount subAccount = subAccountMap.get(user.getUserId());
-            if (subAccount != null) {
-                vo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()),DateUtil.formatDefaultTimestamp));
+            if (loginMap != null) {
+                Login subAccount = loginMap.get(user.getUserId());
+                if (subAccount != null) {
+                    vo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getUpdateTime()),DateUtil.formatDefaultTimestamp));
+                }
             }
-            UserRoleVo userRoleVo = userRoleVoMap.get(user.getUserId());
-            if (userRoleVo != null) {
-                vo.setRoleName(userRoleVo.getRoleName());
+            if (userRoleVoMap != null) {
+                UserRoleVo userRoleVo = userRoleVoMap.get(user.getUserId());
+                if (userRoleVo != null) {
+                    vo.setRoleName(userRoleVo.getRoleName());
+                }
             }
+            workerVos.add(vo);
         }
-        return WorkerVos;
+        return workerVos;
     }
 
     /**
@@ -145,17 +148,21 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         //添加业主账号映射数据
         OwnerAccountUser ownerAccountUser = assembleOwnerAccount(operaUser.getOwnerId(), account, userId);
         if (accountIdMappingService.add(ownerAccountUser) <= 0) {
-            throw UserException.REGISTER_FAIL;
+            throw UserException.USERNAME_EXIST;
         }
         //添加登录信息
-        Login login = assembleWorkerLogin(userId, account, password);
+        Login login = assembleWorkerLogin(userId, account, PasswordCapture.getSaltPwd(password));
         if (loginService.add(login) <= 0) {
             throw UserException.REGISTER_FAIL;
         }
         //添加账号信息
+        //todo 子账号中需要冗余roleId,用于查询功能
         User worker = assembleAddWorker(userId, operaUser.getOwnerId(), operaUser.getOwnerName(), AccountType.worker, account, realname);
         if (!userService.addWorker(worker)) {
             throw UserException.REGISTER_FAIL;
+        }
+        if (!permitDubboService.updateUserRole(worker.getOwnerId(), worker.getUserId(), roleId)) {
+            ApiLogger.error(String.format("add user role failed, userId:%d", userId));
         }
         return "{\"id\":" + userId + "}";
     }
@@ -183,7 +190,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
      * @param realname
      * @return
      */
-    public User assembleAddWorker(Long userId, Long ownerId, String ownerName, AccountType type, String account, String realname) {
+    private User assembleAddWorker(Long userId, Long ownerId, String ownerName, AccountType type, String account, String realname) {
         User user = new User();
         user.setUserId(userId);
         user.setOwnerId(ownerId);
@@ -260,7 +267,8 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         if (user.getStatus().value() == status) {
             throw  UserException.USER_STATUS_UPDATE_FAIL;
         }
-        //todo 调用dubbo修改状态,失败处理机制
+        user.setStatus(AccountStatus.parse(status));
+        //todo 如果是停用账号，修改角色账号关联数据为不可用，如果是启用账号，修改角色账号关联数据可用
         if (!userService.disable(user)) {
             throw UserException.USER_STATUS_UPDATE_FAIL;
         }

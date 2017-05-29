@@ -7,6 +7,7 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
+import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.AccountOperHistory;
 import com.magic.user.entity.Member;
@@ -16,6 +17,7 @@ import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
+import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.vo.AccountModifyInfoVo;
 import com.magic.user.vo.AccountModifyListVo;
@@ -54,6 +56,10 @@ public class InfoResourceServiceImpl {
 
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
+
+    @Resource
+    private ThriftOutAssembleServiceImpl thriftOutAssembleService;
+
 
     private static HashSet<AccountType> sets = new HashSet<>();
 
@@ -262,9 +268,14 @@ public class InfoResourceServiceImpl {
                 newMap.put("loginPassword", "password reset");
             }
             if (paymentPassword != null) {
-                //todo jason
+                //todo kevin
                 //todo 如果修改成功，则添加
                 newMap.put("paymentPassword", "password reset");
+                EGResp resp = thriftOutAssembleService.resetMemberPayPwd(assemblePayPwdBody(id, paymentPassword), "account");
+                //TODO 处理结果
+                if (resp != null) {
+
+                }
             }
             //todo 组织map
         } else {//代理或股东
@@ -316,6 +327,19 @@ public class InfoResourceServiceImpl {
             producer.send(Topic.USER_INFO_MODIFY_SUCCESS, String.valueOf(uid), object.toJSONString());
         }
         return UserContants.EMPTY_STRING;
+    }
+
+    /**
+     * 组装修改支付密码的body
+     * @param memberId
+     * @param payPwd
+     * @return
+     */
+    private String assemblePayPwdBody(Long memberId, String payPwd) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("memberId", memberId);
+        jsonObject.put("password",payPwd);
+        return jsonObject.toJSONString();
     }
 
     /**

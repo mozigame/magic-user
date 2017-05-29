@@ -1,6 +1,7 @@
 package com.magic.user.member.resource.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
@@ -13,10 +14,6 @@ import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.utils.StringUtils;
-import com.magic.commons.enginegw.service.ThriftFactory;
-import com.magic.config.thrift.base.CmdType;
-import com.magic.config.thrift.base.EGHeader;
-import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
@@ -104,28 +101,31 @@ public class MemberResourceServiceImpl {
         }
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
-        List<Long> ids = Lists.newArrayList();
-        for (MemberConditionVo vo : memberConditionVos) {
-            ids.add(vo.getMemberId());
-        }
         //todo 组装mongo中拿取的列表
-        List<MemberListVo> memberVos = assembleMemberVos(ids);
+        List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
     }
 
     /**
      * 组装会员列表
      *
-     * @param ids
+     * @param memberConditionVos
      * @return
      */
-    private List<MemberListVo> assembleMemberVos(List<Long> ids) {
+    private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
+        Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
+        for (MemberConditionVo vo : memberConditionVos) {
+            memberConditionVoMap.put(vo.getMemberId(), vo);
+        }
         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
-        List<Member> members = memberService.findMemberByIds(ids);
+        List<Member> members = memberService.findMemberByIds(memberConditionVoMap.keySet());
         //2、获取会员最近登录信息
-        Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(ids);
-
+        Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(memberConditionVoMap.keySet());
+        //3.获取会员层级、余额列表
+        Map<Long, MemberListVo> memberBalanceLevelVoMap = getMemberBalances(memberConditionVoMap.keySet());
+        //4.获取会员反水方案列表
+        Map<Integer, MemberListVo> memberRetWaterMap = getMemberReturnWater(memberConditionVoMap.keySet());
         for (Member member : members) {
             MemberListVo memberListVo = new MemberListVo();
             memberListVo.setId(member.getMemberId());
@@ -138,16 +138,89 @@ public class MemberResourceServiceImpl {
             if (subLogins != null) {
                 SubAccount subAccount = subLogins.get(member.getId());
                 if (subAccount != null) {
-                    memberListVo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()),DateUtil.formatDefaultTimestamp));
+                    memberListVo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp));
                 }
+            } else {
+                //todo 假数据删除
+                memberListVo.setLastLoginTime("2017-04-17 18:03:22");
             }
             //todo 1、会员层级、余额在 kevin 拿取
-            //todo 2、当前反水方案在 jason 拿取
+            MemberListVo memberBalanceLevelVo = memberBalanceLevelVoMap.get(member.getMemberId());
+            if (memberBalanceLevelVo != null) {
+                memberListVo.setLevel(memberBalanceLevelVo.getLevel());
+                memberListVo.setBalance(memberBalanceLevelVo.getBalance());
+            } else {
+                //TODO 假数据删除
+                memberListVo.setLevel("未分层");
+                memberListVo.setBalance("29843.23");
+            }
+            //todo 2、当前反水方案在 jason 拿取,根据层级id获取
+            MemberListVo memberRetWaterVo = memberRetWaterMap.get(memberConditionVoMap.get(member.getMemberId()).getLevel());
+            if (memberRetWaterVo != null) {
+                memberListVo.setReturnWater(memberRetWaterVo.getReturnWater());
+                memberListVo.setReturnWaterName(memberRetWaterVo.getReturnWaterName());
+            } else {
+                memberListVo.setReturnWater(1);
+                memberListVo.setReturnWaterName("反水基本方案1");
+            }
+
             memberListVos.add(memberListVo);
         }
         //TODO foreach list for item
         return memberListVos;
     }
+
+    /**
+     * 获取会员的余额列表
+     * @param ids
+     * @return
+     */
+    private Map<Long, MemberListVo> getMemberBalances(Collection<Long> ids) {
+        JSONObject memberBalanceBody = new JSONObject();
+        memberBalanceBody.put("memberIds", ids);
+        EGResp balanceResp = thriftOutAssembleService.getMemberBalances(memberBalanceBody.toJSONString(), "account");
+        //TODO 判断resp的code
+        if (balanceResp != null && balanceResp.getData()!= null) {
+            JSONArray balanceObj = JSONObject.parseArray(balanceResp.getData());
+            Map<Long, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
+            for (Object object : balanceObj) {
+                JSONObject jsonObject = (JSONObject) object;
+                MemberListVo vo = new MemberListVo();
+                vo.setId(jsonObject.getLong("id"));
+                vo.setLevel(jsonObject.getString("level"));
+                vo.setBalance(jsonObject.getString("balance"));
+                memberBalanceLevelVoMap.put(jsonObject.getLong("id"), vo);
+            }
+            return memberBalanceLevelVoMap;
+        }
+        return null;
+    }
+
+    /**
+     * 组装会员反水记录列表
+     * @param levelIds
+     * @return
+     */
+    private Map<Integer, MemberListVo> getMemberReturnWater(Collection<Long> levelIds) {
+        JSONObject memberRetWaterBody = new JSONObject();
+        memberRetWaterBody.put("level", levelIds);
+        EGResp retWaterResp = thriftOutAssembleService.getMemberBalances(memberRetWaterBody.toJSONString(), "account");
+        //TODO 判断resp的code
+        if (retWaterResp != null&& retWaterResp.getData()!= null) {
+            JSONArray balanceObj = JSONObject.parseArray(retWaterResp.getData());
+            Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
+            for (Object object : balanceObj) {
+                JSONObject jsonObject = (JSONObject) object;
+                MemberListVo vo = new MemberListVo();
+                vo.setReturnWater(jsonObject.getInteger("returnWater"));
+                vo.setReturnWaterName(jsonObject.getString("returnWaterName"));
+                memberBalanceLevelVoMap.put(jsonObject.getInteger("level"), vo);
+            }
+            return memberBalanceLevelVoMap;
+        }
+        return null;
+    }
+
 
     /**
      * 检查请求参数
@@ -163,7 +236,7 @@ public class MemberResourceServiceImpl {
         Account account = condition.getAccount();
         if (account != null && StringUtils.isNoneEmpty(account.getName())) {
             Integer type = account.getType();
-            if (type == null || AccountType.parse(type) == null) {
+            if (type == null || AccountType.parse(type) == null || type != AccountType.agent.value() || type != AccountType.member.value()) {
                 return false;
             }
         }
@@ -233,12 +306,8 @@ public class MemberResourceServiceImpl {
         }
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, null, null);
-        List<Long> ids = Lists.newArrayList();
-        for (MemberConditionVo vo : memberConditionVos) {
-            ids.add(vo.getMemberId());
-        }
         //todo 组装mongo中拿取的列表
-        List<MemberListVo> memberVos = assembleMemberVos(ids);
+        List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
         content = ExcelUtil.memberListExport(memberVos, filename);
         downLoadFile.setContent(content);
@@ -260,15 +329,16 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_MEMBER;
         }
         //TODO 1.jason 根据会员ID查询会员优惠方案
-        //TODO 2.jason 根据会员ID查询会员资金概括
-        //TODO 3.jason 根据会员ID查询投注记录
-        //TODO 4.jason 根据会员ID查询优惠记录
+        //TODO 2.kevin 根据会员ID查询会员资金概括
+
+        //TODO 3.sundy 根据会员ID查询投注记录
+        //TODO 4.sundy 根据会员ID查询优惠记录
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
     }
 
     /**
-     * 组装会员详情 //TODO
+     * 组装会员详情 //TODO 暂未完成
      *
      * @return
      */
@@ -276,36 +346,79 @@ public class MemberResourceServiceImpl {
         MemberDetailVo vo = new MemberDetailVo();
         ////会员基础信息
         vo.setBaseInfo(assembleMemberInfo(member));
-        //todo 会员优惠、资金概况等信息去 jason 那边拿取
-        //会员优惠方案
-        String preferScheme = "{\n" +
-                "\"level\": 1,\n" +
-                "\"showLevel\": \"未分层\",\n" +
-                "\"onlineDiscount\": \"100返10\",\n" +
-                "\"depositFee\": \"无\",\n" +
-                "\"withdrawFee\": \"无\",\n" +
-                "\"returnWater\": \"返水基本1\",\n" +
-                "\"depositDiscountScheme\": \"100返10\"\n" +
-                "}";
-        MemberPreferScheme memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
-        vo.setPreferScheme(memberPreferScheme);
-        ///会员资金概况
-        String memberFundInfo = "{\n" +
-                "\t\"balance\": \"1805.50\",\n" +
-                "\t\"depositNumbers\": 15,\n" +
-                "\t\"depositTotalMoney\": \"29006590\",\n" +
-                "\t\"lastDeposit\": \"1200\",\n" +
-                "\t\"withdrawNumbers\": 10,\n" +
-                "\t\"withdrawTotalMoney\": \"24500120\",\n" +
-                "\t\"lastWithdraw\": \"2500\"\n" +
-                "}";
 
-        MemberFundInfo memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
+        /**
+         * 会员优惠方案
+         */
+        MemberPreferScheme memberPreferScheme;
+        //todo 1、会员优惠方案去 jason 那边拿取
+        String privilegeBody = "{\"memberId\":" + member.getMemberId() + "}";
+        EGResp privilegeResp = thriftOutAssembleService.getMemberPrivilege(privilegeBody, "account");
+        //TODO 确定resp的code
+        if (privilegeResp != null && privilegeResp.getData() != null) {
+            JSONObject privilegeData = JSONObject.parseObject(privilegeResp.getData());
+            memberPreferScheme = new MemberPreferScheme();
+            memberPreferScheme.setLevel(privilegeData.getInteger("level"));
+            memberPreferScheme.setShowLevel(privilegeData.getString("showLevel"));
+            memberPreferScheme.setOnlineDiscount(privilegeData.getString("onlineDiscount"));
+            memberPreferScheme.setReturnWater(privilegeData.getString("returnWater"));
+            memberPreferScheme.setDepositDiscountScheme(privilegeData.getString("depositDiscountScheme"));
+            //TODO 出款手续费、入款手续费 再次确定
+
+        } else {
+            //TODO 假数据去掉
+            String preferScheme = "{\n" +
+                    "\"level\": 1,\n" +
+                    "\"showLevel\": \"未分层\",\n" +
+                    "\"onlineDiscount\": \"100返10\",\n" +
+                    "\"depositFee\": \"无\",\n" +
+                    "\"withdrawFee\": \"无\",\n" +
+                    "\"returnWater\": \"返水基本1\",\n" +
+                    "\"depositDiscountScheme\": \"100返10\"\n" +
+                    "}";
+            memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
+        }
+        vo.setPreferScheme(memberPreferScheme);
+
+
+        /**
+         * 会员资金概况
+         */
+        MemberFundInfo memberFundInfoObj;
         FundProfile fundProfile = new FundProfile();
+        //TODO 2、kevin 根据会员ID查询会员资金概括
+        String capitalBody = "{\"memberId\":" + member.getMemberId() + "}";
+        EGResp capitalResp = thriftOutAssembleService.getMemberCapital(capitalBody, "account");
+        //TODO 确定resp的code
+        if (capitalResp != null && capitalResp.getData() != null) {
+            JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
+            fundProfile.setSyncTime(capitalData.getString("syncTime"));
+            memberFundInfoObj = new MemberFundInfo();
+            memberFundInfoObj.setBalance(capitalData.getString("balance"));
+            memberFundInfoObj.setLastDeposit(capitalData.getString("lastDeposit"));
+            memberFundInfoObj.setLastWithdraw(capitalData.getString("lastWithdraw"));
+            //TODO 存款总金额、取款总金额、存款总次数、取款总次数在mongo中获取
+
+        } else {
+            //TODO 假数据去掉
+            String memberFundInfo = "{\n" +
+                    "\t\"balance\": \"1805.50\",\n" +
+                    "\t\"depositNumbers\": 15,\n" +
+                    "\t\"depositTotalMoney\": \"29006590\",\n" +
+                    "\t\"lastDeposit\": \"1200\",\n" +
+                    "\t\"withdrawNumbers\": 10,\n" +
+                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
+                    "\t\"lastWithdraw\": \"2500\"\n" +
+                    "}";
+            memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
+        }
         fundProfile.setInfo(memberFundInfoObj);
-        fundProfile.setSyncTime(DateUtil.formatDateTime(new Date(), DateUtil.formatDefaultTimestamp));
         vo.setFundProfile(fundProfile);
-        //投注记录
+
+
+        /**
+         * TODO 3.sundy 根据会员ID查询投注记录
+         */
         String memberBetHistory = "{\n" +
                 "\t\"totalMoney\": \"29000\",\n" +
                 "\t\"effMoney\": \"28000\",\n" +
@@ -313,7 +426,9 @@ public class MemberResourceServiceImpl {
                 "}";
         MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
         vo.setBetHistory(memberBetHistoryObj);
-        //优惠记录
+        /**
+         * TODO 4.sundy 根据会员ID查询优惠记录
+         */
         String memberDiscountHistory = "{\n" +
                 "\t\"totalMoney\": \"1350\",\n" +
                 "\t\"numbers\": 98,\n" +
@@ -323,6 +438,7 @@ public class MemberResourceServiceImpl {
         vo.setDiscountHistory(memberDiscountHistoryObj);
         return vo;
     }
+
 
     /**
      * @Doc 组装会员基础信息中的会员信息
@@ -505,11 +621,41 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberLevelList(RequestContext rc, int lock, int page, int count) {
+        Member member = memberService.getMemberById(rc.getUid());
+        if (member == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         SimpleListResult<List<MemberLevelListVo>> result = new SimpleListResult<>();
-        //TODO andy dubbo
-        List<MemberLevelListVo> list = new ArrayList<>();
+        //TODO jason dubbo
+        List<MemberLevelListVo> list = getMemberLevelList(member.getOwnerId(), lock, page, count);
         result.setList(list != null ? list : new ArrayList<>());
         return JSON.toJSONString(result);
+    }
+
+    /**
+     * 在jason thrift获取层级列表
+     * @param ownerId
+     * @param lock
+     * @return
+     */
+    private List<MemberLevelListVo> getMemberLevelList(Long ownerId, Integer lock, Integer page, Integer count) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ownerId", ownerId);
+        jsonObject.put("lock", lock);
+        jsonObject.put("page", page);
+        jsonObject.put("count", count);
+        EGResp resp = thriftOutAssembleService.findLevelList(jsonObject.toJSONString(), "account");
+        //TODO 确定resp的code
+        if (resp != null && resp.getData() != null) {
+            List<MemberLevelListVo> memberLevelListVos = new ArrayList<>();
+            JSONArray array = JSONArray.parseArray(resp.getData());
+            for (Object object : array) {
+                MemberLevelListVo memberLevelListVo = JSON.parseObject(JSON.toJSONString(object), MemberLevelListVo.class);
+                memberLevelListVos.add(memberLevelListVo);
+            }
+            return memberLevelListVos;
+        }
+        return null;
     }
 
     /**
@@ -544,12 +690,12 @@ public class MemberResourceServiceImpl {
         if (!checkParams(id, status)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        AccountStatus newStatus = AccountStatus.parse(status);
-        AccountStatus oldStatus = AccountStatus.enable;
-        if (newStatus == AccountStatus.enable) {
-            oldStatus = AccountStatus.disable;
+        Member member = memberService.getMemberById(id);
+        if (member != null && member.getStatus().value() == status) {
+            throw UserException.ILLEGAL_PARAMETERS;
         }
-        boolean result = memberService.updateStatus(id, oldStatus, newStatus);
+        member.setStatus(AccountStatus.parse(status));
+        boolean result = memberService.updateStatus(member);
         if (!result) {
             throw UserException.MEMBER_STATUS_UPDATE_FAIL;
         }
@@ -584,7 +730,7 @@ public class MemberResourceServiceImpl {
             return false;
         }
         AccountStatus accountStatus = AccountStatus.parse(status);
-        if (accountStatus != AccountStatus.disable || accountStatus != AccountStatus.enable) {
+        if (!(accountStatus != AccountStatus.disable || accountStatus != AccountStatus.enable)) {
             return false;
         }
         return true;

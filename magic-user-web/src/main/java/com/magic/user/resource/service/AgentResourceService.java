@@ -161,23 +161,5 @@ public interface AgentResourceService {
      */
     String updateStatus(RequestContext rc, Long agentId, Integer status);
 
-    /**
-     * @param rc
-     * @param agent
-     * @param url
-     * @param username
-     * @param password
-     * @param code
-     * @return
-     * @Doc 用户登录
-     */
-    String login(RequestContext rc, String agent, String url, String username, String password, String code);
 
-    /**
-     * @param rc
-     * @param username
-     * @return
-     * @Doc 用户注销
-     */
-    String logout(RequestContext rc, String agent, String username);
 }

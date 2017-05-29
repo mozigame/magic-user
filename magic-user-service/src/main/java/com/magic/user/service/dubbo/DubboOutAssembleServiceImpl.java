@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: joey
@@ -82,7 +83,7 @@ public class DubboOutAssembleServiceImpl {
      * @param ids
      * @return
      */
-    public Map<Long, SubAccount> getSubLogins(List<Long> ids) {
+    public Map<Long, SubAccount> getSubLogins(Set<Long> ids) {
         try {
             return passportDubboService.getSubLogins(ids);
         } catch (Exception e) {

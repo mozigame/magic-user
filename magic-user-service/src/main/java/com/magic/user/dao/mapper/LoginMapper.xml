@@ -12,6 +12,16 @@
                 typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
     </resultMap>
 
+    <sql id="Base_Column_List">
+        user_id,
+        username,
+        password,
+        update_time,
+        last_login_ip,
+        status
+    </sql>
+
+
     <select id="get" resultMap="BaseResultMap">
         select * from t_login_info
         WHERE user_id=#{id}
@@ -50,5 +60,18 @@
         </set>
         WHERE user_id=#{userId}
     </update>
+
+
+    <!--获取多个用户的登录信息-->
+    <select id="selectByUserIds" resultMap="BaseResultMap" parameterType="java.util.List" >
+        select
+        <include refid="Base_Column_List" />
+        from t_login_info
+        where user_id IN
+        <foreach collection="list" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+
+    </select>
 
 </mapper>

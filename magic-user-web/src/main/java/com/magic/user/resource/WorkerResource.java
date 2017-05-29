@@ -34,10 +34,11 @@ public class WorkerResource {
     public String list(
             @RequestParam(name = "account", required = false, defaultValue = "") String account,
             @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
-            @RequestParam(name = "page", required = false, defaultValue = "") Integer page,
-            @RequestParam(name = "count", required = false, defaultValue = "") Integer count
+            @RequestParam(name = "roleId", required = false) Integer roleId,
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+            @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
-        return workerResourceService.list(RequestContext.getRequestContext(), account, realname, page, count);
+        return workerResourceService.list(RequestContext.getRequestContext(), account, realname, roleId, page, count);
     }
 
     /**
@@ -127,4 +128,6 @@ public class WorkerResource {
     ) {
         return workerResourceService.pwdReset(RequestContext.getRequestContext(), userId, password);
     }
+
+
 }

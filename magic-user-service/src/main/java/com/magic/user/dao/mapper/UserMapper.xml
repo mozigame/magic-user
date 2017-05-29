@@ -403,12 +403,15 @@
         type
         from t_user_info
         WHERE owner_id=#{ownerId}
-        AND type = 4
+        AND type = 4  --4代表子账号
         <if test="account != null and account != ''">
           and username=#{account}
         </if>
         <if test="realname != null and realname != ''">
           and realname=#{realname}
+        </if>
+        <if test="roleId != null and roleId > 0">
+            and role_id=#{roleId}
         </if>
         <if test="offset != null and offset > -1">
             limit #{offset},#{limit}
@@ -422,12 +425,15 @@
           count(id)
         from t_user_info
         WHERE owner_id=#{ownerId}
-        AND type = 4
+        AND type = 4  --4代表子账号
         <if test="account != null and account != ''">
             and username=#{account}
         </if>
         <if test="realname != null and realname != ''">
             and realname=#{realname}
+        </if>
+        <if test="roleId != null and roleId > 0">
+            and role_id=#{roleId}
         </if>
     </select>
 

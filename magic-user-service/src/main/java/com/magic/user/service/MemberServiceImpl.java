@@ -1,12 +1,12 @@
 package com.magic.user.service;
 
 import com.magic.user.entity.Member;
-import com.magic.user.enums.AccountStatus;
 import com.magic.user.storage.CountRedisStorageService;
 import com.magic.user.storage.MemberDbService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> findMemberByIds(List<Long> ids) {
+    public List<Member> findMemberByIds(Collection<Long> ids) {
         return memberDbService.find("findMemberByIds", new String[]{"list"}, ids);
     }
 
@@ -40,13 +40,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean updateStatus(Long id, AccountStatus oldStatus, AccountStatus newStatus) {
-        return false;
-    }
-
-    @Override
-    public boolean updateMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
-        return false;
+    public boolean updateStatus(Member member) {
+        return memberDbService.update("updateStatus", new String[]{"status", "memberId"}, new Object[]{member.getStatus().value(), member.getMemberId()}) > 0;
     }
 
     @Override

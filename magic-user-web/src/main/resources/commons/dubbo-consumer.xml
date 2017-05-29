@@ -18,6 +18,6 @@
     <dubbo:reference id="domainDubboService" interface="com.magic.config.service.DomainDubboService" init="true" timeout="15000"
                      retries="0" check="false"/>
     <!-- 配置config dubbo -->
-    <dubbo:reference id="permitDubboService" interface="com.magic.tongtu.service.dubbo.PermitDubboService" init="true" timeout="15000"
+    <dubbo:reference id="permitDubboService" interface="com.magic.owner.service.dubbo.PermitDubboService" init="true" timeout="15000"
                      retries="0" check="false"/>
 </beans>

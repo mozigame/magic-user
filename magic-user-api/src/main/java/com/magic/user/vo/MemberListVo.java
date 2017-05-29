@@ -152,4 +152,6 @@ public class MemberListVo {
     public void setShowStatus(String showStatus) {
         this.showStatus = showStatus;
     }
+
+
 }

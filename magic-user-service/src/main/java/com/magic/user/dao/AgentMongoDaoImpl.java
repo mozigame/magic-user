@@ -87,40 +87,44 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
             if (userCondition.getRegister() != null) {
                 Long start = userCondition.getRegister().getStart();
                 Long end = userCondition.getRegister().getEnd();
-                if (start != null ) {
+                if (start != null && end != null) {
+                    query.addCriteria(new Criteria("registerTime").gte(start).lte(end));
+                } else if (start != null) {
                     query.addCriteria(new Criteria("registerTime").gte(start));
-                }
-                if (end != null ) {
+                } else if (end != null) {
                     query.addCriteria(new Criteria("registerTime").lte(end));
                 }
             }
             if (userCondition.getMembers() != null) {
                 Long min = userCondition.getMembers().getMin();
                 Long max = userCondition.getMembers().getMax();
-                if (min != null ) {
+                if (min != null && max != null) {
+                    query.addCriteria(new Criteria("members").gte(min).lte(max));
+                } else if (min != null) {
                     query.addCriteria(new Criteria("members").gte(min));
-                }
-                if (max != null) {
+                } else if (max != null) {
                     query.addCriteria(new Criteria("members").lte(max));
                 }
             }
             if (userCondition.getDepositMoney() != null) {
                 Long min = userCondition.getDepositMoney().getMin();
                 Long max = userCondition.getDepositMoney().getMax();
-                if (min != null ) {
+                if (min != null && max != null) {
+                    query.addCriteria(new Criteria("depositMoney").gte(min).lte(max));
+                } else if (min != null) {
                     query.addCriteria(new Criteria("depositMoney").gte(min));
-                }
-                if (max != null ) {
+                } else if (max != null) {
                     query.addCriteria(new Criteria("depositMoney").lte(max));
                 }
             }
             if (userCondition.getWithdrawMoney() != null) {
                 Long min = userCondition.getWithdrawMoney().getMin();
                 Long max = userCondition.getWithdrawMoney().getMax();
-                if (min != null ) {
+                if (min != null && max != null) {
+                    query.addCriteria(new Criteria("withdrawMoney").gte(min).lte(max));
+                } else if (min != null) {
                     query.addCriteria(new Criteria("withdrawMoney").gte(min));
-                }
-                if (max != null) {
+                } else if (max != null) {
                     query.addCriteria(new Criteria("withdrawMoney").lte(max));
                 }
             }
