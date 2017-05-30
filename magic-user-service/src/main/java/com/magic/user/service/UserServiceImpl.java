@@ -4,16 +4,14 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.model.PageBean;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.User;
-import com.magic.user.storage.AgentDbService;
-import com.magic.user.storage.StockDbService;
-import com.magic.user.storage.UserDbService;
-import com.magic.user.storage.UserRedisStorageService;
+import com.magic.user.storage.*;
 import com.magic.user.vo.AgentInfoVo;
 import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * User: joey
@@ -32,6 +30,8 @@ public class UserServiceImpl implements UserService {
     private StockDbService stockDbService;
     @Resource(name = "agentDbService")
     private AgentDbService agentDbService;
+    @Resource
+    private CountRedisStorageService countRedisStorageService;
 
 
     @Override
@@ -72,6 +72,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean addStock(User user) {
         Long result = stockDbService.insert(user);
+        if (Optional.ofNullable(result).filter(resultValue -> resultValue > 0).isPresent()){//添加成功，redis计数
+            countRedisStorageService.incrStock(user.getOwnerId());
+        }
         return !(result == null || result <= 0);
     }
 
@@ -107,12 +110,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean addAgent(User user) {
         Long result = agentDbService.insert(user);
+        if (Optional.ofNullable(result).filter(resultValue -> resultValue > 0).isPresent()){//添加成功，redis计数
+            countRedisStorageService.incrAgent(user.getOwnerId());
+        }
         return !(result == null || result <= 0);
     }
 
     @Override
     public boolean addWorker(User user) {
         Long result = agentDbService.insert(user);
+        if (Optional.ofNullable(result).filter(resultValue -> resultValue > 0).isPresent()){//添加成功，redis计数
+            countRedisStorageService.incrWorker(user.getOwnerId());
+        }
         return result != null && result > 0;
     }
 

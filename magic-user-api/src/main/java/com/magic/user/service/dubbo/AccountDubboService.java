@@ -1,11 +1,11 @@
 package com.magic.user.service.dubbo;
 
-import com.magic.api.commons.model.PageBean;
-import com.magic.user.entity.Login;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.User;
+import com.magic.user.po.OwnerStaticInfo;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * AccountDubboService
@@ -36,4 +36,11 @@ public interface AccountDubboService {
      */
     Member getMember(long uid);
 
+    /**
+     * 获取业主下股东、代理、会员、子账号数
+     *
+     * @param ownerIds
+     * @return
+     */
+    Map<Long, OwnerStaticInfo> getOwnerStaticInfo(Collection<Long> ownerIds);
 }
