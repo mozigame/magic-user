@@ -136,7 +136,7 @@ public class MemberResourceServiceImpl {
             memberListVo.setStatus(member.getStatus().value());
             memberListVo.setShowStatus(member.getStatus().desc());
             if (subLogins != null) {
-                SubAccount subAccount = subLogins.get(member.getId());
+                SubAccount subAccount = subLogins.get(member.getMemberId());
                 if (subAccount != null) {
                     memberListVo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp));
                 }
@@ -193,7 +193,7 @@ public class MemberResourceServiceImpl {
             }
             return memberBalanceLevelVoMap;
         }
-        return null;
+        return new HashMap<>();
     }
 
     /**
@@ -218,7 +218,7 @@ public class MemberResourceServiceImpl {
             }
             return memberBalanceLevelVoMap;
         }
-        return null;
+        return new HashMap<>();
     }
 
 
@@ -497,7 +497,7 @@ public class MemberResourceServiceImpl {
      */
     private String assembleReqBody(RequestContext rc, Member member, String password) {
         JSONObject body = new JSONObject();
-        body.put("userId", member.getId());
+        body.put("userId", member.getMemberId());
         body.put("username", member.getUsername());
         body.put("newPassword", password);
         body.put("appId", rc.getClient().getAppId());
@@ -535,9 +535,9 @@ public class MemberResourceServiceImpl {
      */
     private String logoutBody(RequestContext rc, Member member) {
         JSONObject body = new JSONObject();
-        body.put("userId", member.getId());
+        body.put("userId", member.getMemberId());
         body.put("username", member.getUsername());
-        body.put("deviceId", rc.getClient().getDeviceId());
+        body.put("deviceId", StringUtils.isEmpty(rc.getClient().getDeviceId()) ? "default_deviceId" : rc.getClient().getDeviceId());
         body.put("operatorTime", System.currentTimeMillis());
         return body.toJSONString();
     }
@@ -816,7 +816,7 @@ public class MemberResourceServiceImpl {
      */
     private boolean sendRegisterMessage(Member member) {
         try {
-            return producer.send(Topic.MEMBER_REGISTER_SUCCESS, String.valueOf(member.getId()), JSON.toJSONString(member));
+            return producer.send(Topic.MEMBER_REGISTER_SUCCESS, String.valueOf(member.getMemberId()), JSON.toJSONString(member));
         } catch (Exception e) {
             ApiLogger.error(String.format("send member register success mq message error. member: %s", JSON.toJSONString(member)), e);
             return false;
@@ -987,7 +987,7 @@ public class MemberResourceServiceImpl {
         object.put("ip", rc.getIp());
         object.put("appId", rc.getClient().getAppId());
         object.put("loginUrl", url);
-        object.put("deviceId", rc.getClient().getDeviceId());
+        object.put("deviceId", StringUtils.isEmpty(rc.getClient().getDeviceId()) ? "default_deviceId" : rc.getClient().getDeviceId());
         JSONObject userAgentObj = new JSONObject();
         userAgentObj.put("user-agent", agent);
         object.put("ext", userAgentObj);
@@ -1164,7 +1164,7 @@ public class MemberResourceServiceImpl {
         JSONObject object = new JSONObject();
         object.put("userId", rc.getUid());
         object.put("username", username);
-        object.put("deviceId", rc.getClient().getDeviceId());
+        object.put("deviceId", StringUtils.isEmpty(rc.getClient().getDeviceId()) ? "default_deviceId" : rc.getClient().getDeviceId());
         object.put("operatorTime", System.currentTimeMillis());
         return object.toJSONString();
     }

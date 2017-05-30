@@ -8,6 +8,7 @@ import com.magic.service.java.UuidService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,7 +90,7 @@ public class DubboOutAssembleServiceImpl {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return new HashMap<>();
     }
 
     /**

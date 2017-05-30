@@ -9,7 +9,6 @@ import com.magic.user.enums.GeneraType;
  * @Doc 会员
  */
 public class Member {
-    private Long id;
 
     private Long memberId; //会员id
 
@@ -58,14 +57,6 @@ public class Member {
     private String temp2;
 
     private String temp3;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getMemberId() {
         return memberId;

@@ -144,7 +144,7 @@ public class InfoResourceServiceImpl {
      */
     private AccountModifyInfoVo assembleModifyInfo(Member member) {
         AccountModifyInfoVo result = new AccountModifyInfoVo();
-        result.setId(member.getId());
+        result.setId(member.getMemberId());
         result.setAccount(member.getUsername());
         result.setRealname(member.getRealname());
         result.setBankCardNo(member.getBankCardNo());
