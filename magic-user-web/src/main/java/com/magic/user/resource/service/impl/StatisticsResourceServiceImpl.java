@@ -9,6 +9,7 @@ import com.magic.user.resource.service.StatisticsResourceService;
 import com.magic.user.service.StatisticsService;
 import com.magic.user.service.UserService;
 import com.magic.user.util.UserUtil;
+import com.magic.user.vo.StatisticsInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -50,6 +51,18 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
         }
         Set<String> dates = UserUtil.parseDates(startTime, endTime);
         Map<String, Long> map = statisticsService.getCounts(user, dates);
-        return JSON.toJSONString(map);
+        return JSON.toJSONString(assembleStatis(map));
+    }
+
+    /**
+     * 组装返回数据
+     * @param map
+     * @return
+     */
+    private StatisticsInfoVo assembleStatis(Map<String, Long> map) {
+        StatisticsInfoVo vo = new StatisticsInfoVo();
+        vo.setDateList(map.keySet());
+        vo.setActiveList(map.values());
+        return vo;
     }
 }
