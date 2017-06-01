@@ -367,15 +367,7 @@ public class MemberResourceServiceImpl {
 
         } else {
             //TODO 假数据去掉
-            String preferScheme = "{\n" +
-                    "\"level\": 1,\n" +
-                    "\"showLevel\": \"未分层\",\n" +
-                    "\"onlineDiscount\": \"100返10\",\n" +
-                    "\"depositFee\": \"无\",\n" +
-                    "\"withdrawFee\": \"无\",\n" +
-                    "\"returnWater\": \"返水基本1\",\n" +
-                    "\"depositDiscountScheme\": \"100返10\"\n" +
-                    "}";
+            String preferScheme = "";
             memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
         }
         vo.setPreferScheme(memberPreferScheme);
@@ -401,15 +393,7 @@ public class MemberResourceServiceImpl {
 
         } else {
             //TODO 假数据去掉
-            String memberFundInfo = "{\n" +
-                    "\t\"balance\": \"1805.50\",\n" +
-                    "\t\"depositNumbers\": 15,\n" +
-                    "\t\"depositTotalMoney\": \"29006590\",\n" +
-                    "\t\"lastDeposit\": \"1200\",\n" +
-                    "\t\"withdrawNumbers\": 10,\n" +
-                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
-                    "\t\"lastWithdraw\": \"2500\"\n" +
-                    "}";
+            String memberFundInfo = "";
             memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
         }
         fundProfile.setInfo(memberFundInfoObj);
@@ -419,21 +403,13 @@ public class MemberResourceServiceImpl {
         /**
          * TODO 3.sundy 根据会员ID查询投注记录
          */
-        String memberBetHistory = "{\n" +
-                "\t\"totalMoney\": \"29000\",\n" +
-                "\t\"effMoney\": \"28000\",\n" +
-                "\t\"gains\": \"18000\"\n" +
-                "}";
+        String memberBetHistory = "";
         MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
         vo.setBetHistory(memberBetHistoryObj);
         /**
          * TODO 4.sundy 根据会员ID查询优惠记录
          */
-        String memberDiscountHistory = "{\n" +
-                "\t\"totalMoney\": \"1350\",\n" +
-                "\t\"numbers\": 98,\n" +
-                "\t\"returnWaterTotalMoney\": \"1450\"\n" +
-                "}";
+        String memberDiscountHistory = "";
         MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
         vo.setDiscountHistory(memberDiscountHistoryObj);
         return vo;
@@ -699,7 +675,7 @@ public class MemberResourceServiceImpl {
         if (!result) {
             throw UserException.MEMBER_STATUS_UPDATE_FAIL;
         }
-        sendMemberStatusUpdateMq(id,status);
+        sendMemberStatusUpdateMq(id, status);
         return UserContants.EMPTY_STRING;
     }
 
@@ -940,8 +916,13 @@ public class MemberResourceServiceImpl {
         }
         JSONObject object = JSONObject.parseObject(resp.getData());
         long uid = object.getLongValue("uid");
+        //TODO 查询会员是否被停用
+        Member member = memberService.getMemberById(uid);
+        if (!Optional.ofNullable(member).isPresent()){
+            throw UserException.USERNAME_NOT_EXIST;
+        }
         String token = object.getString("token");
-        sendLoginMessage(ownerInfo.getOwnerId(), uid, rc.getIp());
+        sendLoginMessage(member, rc);
         //todo 组装返回数据（需参考前端页面）
         return resp.getData();
     }
@@ -949,21 +930,19 @@ public class MemberResourceServiceImpl {
     /**
      * 发送登陆成功消息
      *
-     * @param ownerId
-     * @param memberId
-     * @param ip
+     * @param member
+     * @param rc
      * @return
      */
-    private boolean sendLoginMessage(long ownerId, long memberId, String ip) {
+    private boolean sendLoginMessage(Member member, RequestContext rc) {
         try {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("ownerId", ownerId);
-            map.put("memberId", memberId);
-            map.put("ip", ip);
+            map.put("member", member);
+            map.put("ip", rc.getIp());
             map.put("loginTime", System.currentTimeMillis());
-            return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), JSON.toJSONString(map));
+            return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(member.getMemberId()), JSON.toJSONString(map));
         } catch (Exception e) {
-            ApiLogger.error(String.format("send member login success mq message error. ownerId: %d, memberId: %d", ownerId, memberId), e);
+            ApiLogger.error(String.format("send member login success mq message error. member: %s, ip: %s", JSON.toJSONString(member), rc.getIp()), e);
             return false;
         }
     }

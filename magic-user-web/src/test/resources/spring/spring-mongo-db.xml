@@ -10,7 +10,7 @@
        default-lazy-init="false">
 
 
-    <mongo:mongo-client id="mongoClient" replica-set="202.153.207.179:8999,202.153.207.181:8999,202.153.207.182:8999">
+    <mongo:mongo-client id="mongoClient" replica-set="192.168.0.253:27017">
         <mongo:client-options connections-per-host="8"
                               threads-allowed-to-block-for-connection-multiplier="4"
                               connect-timeout="1000"
