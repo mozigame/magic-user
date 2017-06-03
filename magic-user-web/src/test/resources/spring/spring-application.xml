@@ -15,17 +15,22 @@
 
     <!-- 扫描文件 -->
     <context:annotation-config/>
-    <context:component-scan base-package="com.magic"/>
+    <context:component-scan base-package="com.magic.user.mongodb, com.magic.user.dbdao"/>
 
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 
     <import resource="classpath:spring/spring-mvc.xml"/>
-    <import resource="classpath:spring/spring-mongo-db.xml"/>
+    <!--<import resource="classpath:spring/spring-mongo-db.xml"/>
     <import resource="classpath:spring/db-user.xml"/>
-    <import resource="classpath:spring/sqlMapConfig.xml"/>
+    <import resource="classpath:spring/sqlMapConfig.xml"/>-->
     <!--<import resource="classpath*:spring/spring-core.xml"/>-->
     <!--<import resource="classpath:dubbo-provider.xml"/>-->
     <!--<import resource="classpath:codis-user.xml"/>-->
-
+    <import resource="mongodb-user.xml" />
+    <!--<import resource="classpath*:spring/thrift-factory-client.xml"/>
+    <import resource="classpath*:spring/thrift-service.xml"/>-->
+<!--
+    <import resource="classpath*:spring/thrift-client.xml"/>
+-->
 
 </beans>

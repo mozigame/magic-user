@@ -8,12 +8,11 @@ package com.magic.user.constants;
  */
 public class RedisConstants {
 
-
     /**
      * @doc 组装业主平台用户的redis key
      */
     public enum USER_PREFIX {
-        USER_BASE_INFO("ubi_", 60 * 60 * 24); //业主平台用户基础信息
+        USER_BASE_INFO("ubi_", 86400); //业主平台用户基础信息
 
         private String prefix;  //
         private int expire;    //过期时间
@@ -101,6 +100,52 @@ public class RedisConstants {
      */
     public static String assembleOwnerWorkerNum(long ownerId) {
         return assemble(OWNER_WORKER_NUM, ownerId);
+    }
+
+    /**
+     * 记录业主或代理下登录用户
+     */
+    private static final String OWNER_AGENT_MEMBER_LOGINS = "oaml_";
+
+    /**
+     * 组装incr key
+     * @param id
+     * @param last
+     * @return
+     */
+    public static String assmbleIncrKey(Long id, String last) {
+        String prefix = OWNER_AGENT_MEMBER_LOGINS.concat(String.valueOf(id)).concat("_");
+        return assemble(prefix, last);
+    }
+
+    /**
+     * 业主某天登录用户数
+     */
+    private static final String OWNER_MEMBER_LOGINS = "omlogins_";
+
+    /**
+     * 业主维度某天登录用户数
+     *
+     * @param date
+     * @return
+     */
+    public static String assmbleOwnerCountKey(String date) {
+        return assemble(OWNER_MEMBER_LOGINS, date);
+    }
+
+    /**
+     * 代理某天登录用户数
+     */
+    private static final String AGENT_MEMBER_LOGINS = "amlogins_";
+
+    /**
+     * 代理维度某天登录用户数
+     *
+     * @param date
+     * @return
+     */
+    public static String assmbleAgentCountKey(String date) {
+        return assemble(AGENT_MEMBER_LOGINS, date);
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.magic.user.storage;
 
+import com.magic.user.entity.Member;
+
 /**
  * CountRedisStorageServiceImpl
  *
@@ -70,4 +72,46 @@ public interface CountRedisStorageService {
      * @return
      */
     int getWorkers(Long ownerId);
+
+    /**
+     * 原子性 +1
+     *
+     * @param key
+     * @return
+     */
+    long incr(String key);
+
+    /**
+     * 原子性 -1
+     *
+     * @param key
+     * @return
+     */
+    long decr(String key);
+
+    /**
+     * 按天记录登陆次数
+     *
+     * @param member
+     * @param date
+     * @return
+     */
+    boolean countLogins(Member member, String date);
+
+    /**
+     * 获取活跃用户数
+     *
+     * @param key
+     * @param uid
+     * @return
+     */
+    long getCount(String key, Long uid);
+
+    /**
+     * 获取活跃用户数，所有业主下的，指定某天
+     *
+     * @param key
+     * @return
+     */
+    long getCounts(String key);
 }

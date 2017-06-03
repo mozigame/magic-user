@@ -875,7 +875,7 @@ public class MemberResourceServiceImpl {
         if (!result) {
             throw UserException.MEMBER_STATUS_UPDATE_FAIL;
         }
-        sendMemberStatusUpdateMq(id,status);
+        sendMemberStatusUpdateMq(id, status);
         return UserContants.EMPTY_STRING;
     }
 
@@ -1116,8 +1116,13 @@ public class MemberResourceServiceImpl {
         }
         JSONObject object = JSONObject.parseObject(resp.getData());
         long uid = object.getLongValue("uid");
+        //TODO 查询会员是否被停用
+        Member member = memberService.getMemberById(uid);
+        if (!Optional.ofNullable(member).isPresent()){
+            throw UserException.USERNAME_NOT_EXIST;
+        }
         String token = object.getString("token");
-        sendLoginMessage(ownerInfo.getOwnerId(), uid, rc.getIp());
+        sendLoginMessage(member, rc);
         //todo 组装返回数据（需参考前端页面）
         return resp.getData();
     }
@@ -1125,21 +1130,19 @@ public class MemberResourceServiceImpl {
     /**
      * 发送登陆成功消息
      *
-     * @param ownerId
-     * @param memberId
-     * @param ip
+     * @param member
+     * @param rc
      * @return
      */
-    private boolean sendLoginMessage(long ownerId, long memberId, String ip) {
+    private boolean sendLoginMessage(Member member, RequestContext rc) {
         try {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("ownerId", ownerId);
-            map.put("memberId", memberId);
-            map.put("ip", ip);
+            map.put("member", member);
+            map.put("ip", rc.getIp());
             map.put("loginTime", System.currentTimeMillis());
-            return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(memberId), JSON.toJSONString(map));
+            return producer.send(Topic.MEMBER_LOGIN_SUCCESS, String.valueOf(member.getMemberId()), JSON.toJSONString(map));
         } catch (Exception e) {
-            ApiLogger.error(String.format("send member login success mq message error. ownerId: %d, memberId: %d", ownerId, memberId), e);
+            ApiLogger.error(String.format("send member login success mq message error. member: %s, ip: %s", JSON.toJSONString(member), rc.getIp()), e);
             return false;
         }
     }
