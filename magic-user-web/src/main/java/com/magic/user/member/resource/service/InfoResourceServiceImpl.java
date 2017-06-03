@@ -15,6 +15,7 @@ import com.magic.user.entity.User;
 import com.magic.user.enums.AccountType;
 import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
+import com.magic.user.resource.service.AgentResourceService;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
@@ -59,6 +60,10 @@ public class InfoResourceServiceImpl {
 
     @Resource
     private ThriftOutAssembleServiceImpl thriftOutAssembleService;
+    @Resource
+    private MemberResourceServiceImpl memberResourceService;
+    @Resource
+    private AgentResourceService agentResourceService;
 
 
     private static HashSet<AccountType> sets = new HashSet<>();
@@ -96,6 +101,37 @@ public class InfoResourceServiceImpl {
     }
 
     /**
+     * 快速检测
+     *
+     * @param rc      RequestContext
+     * @param type    账号类型
+     * @param account
+     * @return
+     */
+    public String accountSearch(RequestContext rc, Integer type, String account) {
+        if (!checkParams(type, account)) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        long uid = rc.getUid();
+        User user = userService.getUserById(uid);
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        long ownerId = user.getOwnerId();//业主ID
+        long memberId = getMemberId(type, ownerId, account);
+        if (memberId <= 0) {
+            throw UserException.ILLEGAL_MEMBER;
+        }
+        if (type == AccountType.agent.value()) {
+            return agentResourceService.getDetail(rc, memberId);
+        } else if (type == AccountType.member.value()) {
+            return memberResourceService.memberDetails(rc, memberId);
+        }
+        return UserContants.EMPTY_STRING;
+    }
+
+
+    /**
      * 获取modifyinfo
      *
      * @param type
@@ -131,6 +167,8 @@ public class InfoResourceServiceImpl {
         result.setAccount(user.getUsername());
         result.setRealname(user.getRealname());
         result.setBankCardNo(user.getBankCardNo());
+        result.setBank(user.getBank());
+        result.setBankDeposit(user.getBankDeposit());
         result.setTelephone(user.getTelephone());
         result.setEmail(user.getEmail());
         return result;

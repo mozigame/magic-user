@@ -56,6 +56,8 @@ CREATE TABLE `t_agent_apply` (
   `stock_name` varchar(20) NOT NULL DEFAULT '',
   `owner_id` bigint(20) NOT NULL,
   `bank_card_no` varchar(25) NOT NULL DEFAULT '',
+  `bank` varchar(50) NOT NULL DEFAULT '',
+  `bank_deposit` varchar(50) NOT NULL DEFAULT '',
   `telephone` varchar(25) NOT NULL DEFAULT '',
   `email` varchar(50) NOT NULL DEFAULT '',
   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1 未审核\r\n            2 已拒绝\r\n            3 已审核\r\n            ',

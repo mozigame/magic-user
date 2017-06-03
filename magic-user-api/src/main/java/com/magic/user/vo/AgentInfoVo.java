@@ -29,6 +29,7 @@ public class AgentInfoVo {
     private String email;   //电子邮箱
     private String bankCardNo;//银行卡号
     private String bank;    //银行名称
+    private Integer type;   //账号类型
 
     public Long getId() {
         return id;
@@ -205,5 +206,13 @@ public class AgentInfoVo {
 
     public void setBank(String bank) {
         this.bank = bank;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

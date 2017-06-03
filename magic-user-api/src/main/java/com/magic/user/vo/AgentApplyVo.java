@@ -23,6 +23,10 @@ public class AgentApplyVo {
     private String operUserName;    //操作人账号
     private String operatorTime;    //操作时间
 
+    private String bankCardNo;  //银行卡号
+    private String bank;    //银行信息
+    private String bankDeposit; //开户行
+
     public Long getId() {
         return id;
     }
@@ -125,5 +129,29 @@ public class AgentApplyVo {
 
     public void setOperatorTime(String operatorTime) {
         this.operatorTime = operatorTime;
+    }
+
+    public String getBankCardNo() {
+        return bankCardNo;
+    }
+
+    public void setBankCardNo(String bankCardNo) {
+        this.bankCardNo = bankCardNo;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public String getBankDeposit() {
+        return bankDeposit;
+    }
+
+    public void setBankDeposit(String bankDeposit) {
+        this.bankDeposit = bankDeposit;
     }
 }

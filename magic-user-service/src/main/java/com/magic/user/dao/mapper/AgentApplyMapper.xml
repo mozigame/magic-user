@@ -11,6 +11,8 @@
         <result column="stock_name" jdbcType="VARCHAR" property="stockName"/>
         <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="bank_card_no" jdbcType="VARCHAR" property="bankCardNo"/>
+        <result column="bank" jdbcType="VARCHAR" property="bank"/>
+        <result column="bank_Deposit" jdbcType="VARCHAR" property="bankDeposit"/>
         <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
         <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="status" jdbcType="TINYINT" property="status"
@@ -36,7 +38,11 @@
           status,
           resource_url,
           register_ip,
-          create_time
+          create_time,
+          bank_card_no,
+          bank,
+          bank_deposit
+
           )
         values (
           #{username},
@@ -50,7 +56,10 @@
           #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
           #{resourceUrl},
           #{registerIp},
-          #{createTime}
+          #{createTime},
+          #{bankCardNo},
+          #{bank},
+          #{bankDeposit}
         )
     </insert>
 
@@ -62,14 +71,16 @@
         realname,
         password,
         stock_id stockId,
-        stock_name stockName,
+        stock_name,
         status status,
-        resource_url resourceUrl,
-        register_ip registerIp,
-        create_time createTime,
+        resource_url,
+        register_ip,
+        create_time,
         telephone,
         email,
-        bank_card_no bankCardNo
+        bank_card_no,
+        bank,
+        bank_deposit
         from t_agent_apply
         WHERE id=#{id}
 
@@ -83,7 +94,9 @@
         realname,
         telephone,
         email,
-        bank_card_no bankCardNo
+        bank_card_no bankCardNo,
+        bank,
+        bank_deposit bankDeposit
         from t_agent_apply
         WHERE id=#{id}
 

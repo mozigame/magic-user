@@ -75,7 +75,7 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
     public long getCount(MemberCondition memberCondition) {
         if (memberCondition != null) {
             Query query = assembleQuery(memberCondition);
-            return super.count(query);
+            return count(query);
         }
         return 0;
     }

@@ -236,7 +236,7 @@ public class MemberResourceServiceImpl {
         Account account = condition.getAccount();
         if (account != null && StringUtils.isNoneEmpty(account.getName())) {
             Integer type = account.getType();
-            if (type == null || AccountType.parse(type) == null || type != AccountType.agent.value() || type != AccountType.member.value()) {
+            if (type == null || AccountType.parse(type) == null && (type != AccountType.agent.value() || type != AccountType.member.value())) {
                 return false;
             }
         }
@@ -411,6 +411,7 @@ public class MemberResourceServiceImpl {
                     "\t\"lastWithdraw\": \"2500\"\n" +
                     "}";
             memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
+            fundProfile.setSyncTime("2017-05-31 09:12:35");
         }
         fundProfile.setInfo(memberFundInfoObj);
         vo.setFundProfile(fundProfile);
@@ -458,6 +459,7 @@ public class MemberResourceServiceImpl {
         info.setStatus(member.getStatus().value());
         info.setShowStatus(member.getStatus().desc());
         info.setBankCardNo(member.getBankCardNo());
+        info.setType(AccountType.member.value());
         SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         if (subAccount != null) {
             info.setLastLoginIp(IPUtil.intToIp(subAccount.getLastIp()));
@@ -621,15 +623,122 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberLevelList(RequestContext rc, int lock, int page, int count) {
-        Member member = memberService.getMemberById(rc.getUid());
-        if (member == null) {
-            throw UserException.ILLEGAL_USER;
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            return UserContants.EMPTY_LIST;
         }
         SimpleListResult<List<MemberLevelListVo>> result = new SimpleListResult<>();
         //TODO jason dubbo
-        List<MemberLevelListVo> list = getMemberLevelList(member.getOwnerId(), lock, page, count);
+        List<MemberLevelListVo> list = getMemberLevelList(operaUser.getOwnerId(), lock, page, count);
         result.setList(list != null ? list : new ArrayList<>());
-        return JSON.toJSONString(result);
+//        return JSON.toJSONString(result);
+        //TODO 假数据
+        return "{\n" +
+                "    \"list\": [\n" +
+                "        {\n" +
+                "            \"id\": 10001,\n" +
+                "            \"name\": \"VIP1\",\n" +
+                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+                "            \"members\": 4310,\n" +
+                "            \"condition\": {\n" +
+                "                \"depositNumbers\": 1,\n" +
+                "                \"depositTotalMoney\": \"1\",\n" +
+                "                \"maxDepositMoney\": \"0\",\n" +
+                "                \"withdrawNumbers\": 0,\n" +
+                "                \"withdrawTotalMoney\": \"0\"\n" +
+                "            },\n" +
+                "            \"returnWater\": 1,\n" +
+                "            \"returnWaterName\": \"返水方案1\",\n" +
+                "            \"discount\": 1,\n" +
+                "            \"discountName\": \"出入款优惠1\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 10002,\n" +
+                "            \"name\": \"VIP2\",\n" +
+                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+                "            \"members\": 4310,\n" +
+                "            \"condition\": {\n" +
+                "                \"depositNumbers\": 1,\n" +
+                "                \"depositTotalMoney\": \"1\",\n" +
+                "                \"maxDepositMoney\": \"0\",\n" +
+                "                \"withdrawNumbers\": 0,\n" +
+                "                \"withdrawTotalMoney\": \"0\"\n" +
+                "            },\n" +
+                "            \"returnWater\": 2,\n" +
+                "            \"returnWaterName\": \"返水方案2\",\n" +
+                "            \"discount\": 2,\n" +
+                "            \"discountName\": \"出入款优惠2\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 10003,\n" +
+                "            \"name\": \"VIP3\",\n" +
+                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+                "            \"members\": 4310,\n" +
+                "            \"condition\": {\n" +
+                "                \"depositNumbers\": 1,\n" +
+                "                \"depositTotalMoney\": \"1\",\n" +
+                "                \"maxDepositMoney\": \"0\",\n" +
+                "                \"withdrawNumbers\": 0,\n" +
+                "                \"withdrawTotalMoney\": \"0\"\n" +
+                "            },\n" +
+                "            \"returnWater\": 3,\n" +
+                "            \"returnWaterName\": \"返水方案3\",\n" +
+                "            \"discount\": 3,\n" +
+                "            \"discountName\": \"出入款优惠3\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 10004,\n" +
+                "            \"name\": \"VIP4\",\n" +
+                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+                "            \"members\": 4310,\n" +
+                "            \"condition\": {\n" +
+                "                \"depositNumbers\": 1,\n" +
+                "                \"depositTotalMoney\": \"1\",\n" +
+                "                \"maxDepositMoney\": \"0\",\n" +
+                "                \"withdrawNumbers\": 0,\n" +
+                "                \"withdrawTotalMoney\": \"0\"\n" +
+                "            },\n" +
+                "            \"returnWater\": 4,\n" +
+                "            \"returnWaterName\": \"返水方案4\",\n" +
+                "            \"discount\": 4,\n" +
+                "            \"discountName\": \"出入款优惠4\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 10005,\n" +
+                "            \"name\": \"VIP5\",\n" +
+                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+                "            \"members\": 4310,\n" +
+                "            \"condition\": {\n" +
+                "                \"depositNumbers\": 1,\n" +
+                "                \"depositTotalMoney\": \"1\",\n" +
+                "                \"maxDepositMoney\": \"0\",\n" +
+                "                \"withdrawNumbers\": 0,\n" +
+                "                \"withdrawTotalMoney\": \"0\"\n" +
+                "            },\n" +
+                "            \"returnWater\": 5,\n" +
+                "            \"returnWaterName\": \"返水方案5\",\n" +
+                "            \"discount\": 5,\n" +
+                "            \"discountName\": \"出入款优惠5\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 10006,\n" +
+                "            \"name\": \"VIP6\",\n" +
+                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+                "            \"members\": 4310,\n" +
+                "            \"condition\": {\n" +
+                "                \"depositNumbers\": 1,\n" +
+                "                \"depositTotalMoney\": \"1\",\n" +
+                "                \"maxDepositMoney\": \"0\",\n" +
+                "                \"withdrawNumbers\": 0,\n" +
+                "                \"withdrawTotalMoney\": \"0\"\n" +
+                "            },\n" +
+                "            \"returnWater\": 6,\n" +
+                "            \"returnWaterName\": \"返水方案6\",\n" +
+                "            \"discount\": 6,\n" +
+                "            \"discountName\": \"出入款优惠6\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
     }
 
     /**
@@ -675,6 +784,73 @@ public class MemberResourceServiceImpl {
         List<MemberLevelListVo> list = new ArrayList<>();
         downLoadFile.setContent(ExcelUtil.memberLevelListExport(list, filename));
         return downLoadFile;
+    }
+
+    /**
+     * 会员层级映射列表
+     * @return
+     */
+    public String levelListSimple(RequestContext rc) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            return UserContants.EMPTY_LIST;
+        }
+        SimpleListResult<List<MemberLevelListVo>> result = new SimpleListResult<>();
+        //TODO jason dubbo
+        List<MemberLevelListVo> list = getMemberLevelListSimple(operaUser.getOwnerId());
+        result.setList(list != null ? list : new ArrayList<>());
+//        return JSON.toJSONString(result);
+
+        //TODO 假数据
+        return "{\n" +
+                "    \"list\": [\n" +
+                "        {\n" +
+                "            \"id\": 1001,\n" +
+                "            \"name\": \"未分层\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 1002,\n" +
+                "            \"name\": \"VIP1\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 1003,\n" +
+                "            \"name\": \"VIP2\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 1004,\n" +
+                "            \"name\": \"VIP3\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"id\": 1005,\n" +
+                "            \"name\": \"VIP4\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
+    }
+
+    /**
+     * 组装会员层级映射列表
+     * @param ownerId
+     * @return
+     */
+    private List<MemberLevelListVo> getMemberLevelListSimple(Long ownerId) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ownerId", ownerId);
+        EGResp resp = thriftOutAssembleService.findLevelListSimple(jsonObject.toJSONString(), "account");
+        //TODO 确定resp的code
+        if (resp != null && resp.getData() != null) {
+            List<MemberLevelListVo> memberLevelListVos = new ArrayList<>();
+            JSONArray array = JSONArray.parseArray(resp.getData());
+            for (Object object : array) {
+                JSONObject jsonObject1 = JSON.parseObject(JSON.toJSONString(object));
+                MemberLevelListVo memberLevelListVo = new MemberLevelListVo();
+                memberLevelListVo.setId(jsonObject1.getInteger("id"));
+                memberLevelListVo.setName(jsonObject1.getString("name"));
+                memberLevelListVos.add(memberLevelListVo);
+            }
+            return memberLevelListVos;
+        }
+        return null;
     }
 
 

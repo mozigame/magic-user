@@ -119,6 +119,8 @@ public class AgentResource {
             @RequestParam(name = "realname") String realname,
             @RequestParam(name = "telephone") String telephone,
             @RequestParam(name = "bankCardNo") String bankCardNo,
+            @RequestParam(name = "bank") String bank,
+            @RequestParam(name = "bankDeposit") String bankDeposit,
             @RequestParam(name = "email") String email,
             @RequestParam(name = "returnScheme") Integer returnScheme,
             @RequestParam(name = "adminCost") Integer adminCost,
@@ -128,7 +130,7 @@ public class AgentResource {
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
+        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
     }
 
     /**
@@ -229,9 +231,13 @@ public class AgentResource {
             @RequestParam(name = "realname") String realname,
             @RequestParam(name = "telephone") String telephone,
             @RequestParam(name = "email") String email,
-            @RequestParam(name = "bankCardNo") String bankCardNo
+            @RequestParam(name = "bankCardNo") String bankCardNo,
+            @RequestParam(name = "bank") String bank,
+            @RequestParam(name = "bankDeposit") String bankDeposit
+
     ) {
-        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password, realname, telephone, email, bankCardNo);
+        //
+        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password, realname, telephone, email, bankCardNo, bank, bankDeposit);
     }
 
     /**
@@ -314,6 +320,8 @@ public class AgentResource {
      * @param realname     真实姓名
      * @param telephone    手机号码
      * @param bankCardNo   银行卡号
+     * @param bank   银行名称
+     * @param bankDeposit   开户行
      * @param email        电子邮箱
      * @param returnScheme 返佣方案
      * @param adminCost    行政成本
@@ -334,6 +342,8 @@ public class AgentResource {
             @RequestParam(name = "realname", required = false) String realname,
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
+            @RequestParam(name = "bank", required = false) String bank,
+            @RequestParam(name = "bankDeposit", required = false) String bankDeposit,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "returnScheme", required = false, defaultValue = "-1") Integer returnScheme,
             @RequestParam(name = "adminCost", required = false, defaultValue = "-1") Integer adminCost,
@@ -343,7 +353,8 @@ public class AgentResource {
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
 
     ) {
-        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
+        //TODO 所有涉及审核的信息增加开户行信息、银行名称
+        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
     }
 
     /**

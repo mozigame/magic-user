@@ -48,6 +48,8 @@
             status,
             currency_type,
             bank_card_no,
+            bank,
+            bank_deposit,
             owner_id,
             owner_name,
             is_delete,

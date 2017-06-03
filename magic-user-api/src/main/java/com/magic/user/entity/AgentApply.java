@@ -22,6 +22,10 @@ public class AgentApply {
 
     private String bankCardNo;  //银行卡号
 
+    private String bank;    //银行名称
+
+    private String bankDeposit; ///开户行
+
     private String telephone;   //电话
 
     private String email;   //电子邮箱
@@ -181,5 +185,21 @@ public class AgentApply {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public String getBankDeposit() {
+        return bankDeposit;
+    }
+
+    public void setBankDeposit(String bankDeposit) {
+        this.bankDeposit = bankDeposit;
     }
 }

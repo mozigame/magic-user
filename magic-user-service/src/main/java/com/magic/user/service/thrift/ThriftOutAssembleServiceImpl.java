@@ -173,6 +173,18 @@ public class ThriftOutAssembleServiceImpl {
     }
 
     /**
+     * 查询层级映射列表
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp findLevelListSimple(String body, String caller) {
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
+    }
+
+    /**
      * 查询会员反水方案列表
      * @param body
      * @param caller

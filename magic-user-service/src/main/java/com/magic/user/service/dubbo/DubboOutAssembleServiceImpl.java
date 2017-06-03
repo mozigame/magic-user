@@ -1,5 +1,6 @@
 package com.magic.user.service.dubbo;
 
+import com.magic.bc.query.service.AgentSchemeService;
 import com.magic.config.service.DomainDubboService;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
@@ -31,6 +32,9 @@ public class DubboOutAssembleServiceImpl {
 
     @Resource
     private DomainDubboService domainDubboService;
+
+    @Resource
+    private AgentSchemeService agentSchemeService;
 
     /**
      * 分配ID 13位时间戳+2位机器识别码+4位随机数
@@ -107,6 +111,20 @@ public class DubboOutAssembleServiceImpl {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    /**
+     * 获取配置列表
+     * @param ownerId
+     * @return
+     */
+    public Map<String,Object> agentSchemeList(Long ownerId) {
+        try {
+            return agentSchemeService.agentSchemeList(ownerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

@@ -13,6 +13,7 @@ import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.api.commons.utils.StringUtils;
+import com.magic.bc.query.service.AgentSchemeService;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.enums.LoginStatus;
 import com.magic.user.bean.AgentCondition;
@@ -37,6 +38,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -63,6 +65,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private AgentMongoService agentMongoService;
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
+    @Resource
+    private AgentSchemeService agentSchemeService;
 
 
     /**
@@ -269,7 +273,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone, String bankCardNo, String email, Integer returnScheme,
+    public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
+                      String bankCardNo, String bank, String bankDeposit,String email, Integer returnScheme,
                       Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
         String generalizeCode = UUIDUtil.getCode();
         RegisterReq req = assembleRegister(account, password);
@@ -299,7 +304,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.REGISTER_FAIL;
         }
         //2、添加代理基础信息
-        User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, account, telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
+        User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, account, telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo, bank, bankDeposit);
         if (!userService.addAgent(agentUser)) {
             ApiLogger.error("add agent info failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
@@ -344,7 +349,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @Doc 组装添加的代理对象
      */
     private User assembleAgent(Long userId, long ownerId, String ownerName, String realname, String username, String telephone, String email, AccountType type, Long registerTime,
-                               Integer registerIp, String generalizeCode, AccountStatus status, String bankCardNo) {
+                               Integer registerIp, String generalizeCode, AccountStatus status, String bankCardNo, String bank, String bankDeposit) {
         User user = new User();
         user.setUserId(userId);
         user.setOwnerId(ownerId);
@@ -359,6 +364,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         user.setGeneralizeCode(generalizeCode);
         user.setStatus(status);
         user.setBankCardNo(bankCardNo);
+        user.setBank(bank);
+        user.setBankDeposit(bankDeposit);
         return user;
 
     }
@@ -466,6 +473,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @Doc 组装代理详情
      */
     private void assembleAgentDetail(AgentInfoVo vo) {
+        vo.setType(AccountType.agent.value());
         vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
         vo.setRegisterTime(DateUtil.formatDateTime(new Date(Long.parseLong(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
         vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
@@ -577,7 +585,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     //1.url获取ownerId
     //2.ownerId + ownername 获取 stockId
     @Override
-    public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo) {
+    public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
         StringBuffer url = request.getRequestURL();
         String resourceUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).append("/").toString();
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(resourceUrl);
@@ -593,7 +601,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.USERNAME_EXIST;
         }
         int ip = IPUtil.ipToInt(rc.getIp());
-        AgentApply agentApply = assembleAgentApply(account, realname, PasswordCapture.getSaltPwd(password), stockId, stockUser.getUsername(), ownerInfo.getOwnerId(), telephone, email, ReviewStatus.noReview, resourceUrl, ip, System.currentTimeMillis());
+        AgentApply agentApply = assembleAgentApply(account, realname, PasswordCapture.getSaltPwd(password), stockId, stockUser.getUsername(), ownerInfo.getOwnerId(), telephone, email, ReviewStatus.noReview, resourceUrl, ip, System.currentTimeMillis(), bankCardNo, bank, bankDeposit);
         if (agentApplyService.add(agentApply) <= 0) {
             throw UserException.AGENT_APPLY_ADD_FAIL;
         }
@@ -615,7 +623,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @Doc 组装代理申请信息
      */
     private AgentApply assembleAgentApply(String username, String realname, String password, Long stockId, String stockName, Long ownerId, String telephone, String email,
-                                          ReviewStatus status, String resourceUrl, Integer registerIp, Long createTime) {
+                                          ReviewStatus status, String resourceUrl, Integer registerIp, Long createTime, String bankCardNo, String bank, String bankDeposit) {
         AgentApply apply = new AgentApply();
         apply.setUsername(username);
         apply.setRealname(realname);
@@ -629,6 +637,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         apply.setResourceUrl(resourceUrl);
         apply.setRegisterIp(registerIp);
         apply.setCreateTime(createTime);
+        apply.setBankCardNo(bankCardNo);
+        apply.setBank(bank);
+        apply.setBankDeposit(bankDeposit);
         return apply;
     }
 
@@ -711,9 +722,15 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      */
     @Override
     public String agentApplyInfo(RequestContext rc, Long applyId) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         AgentApplyVo baseInfo = agentApplyService.agentReviewInfo(applyId);
         JSONObject result = new JSONObject();
         result.put("baseInfo", baseInfo);
+        Map<String,Object> map = dubboOutAssembleService.agentSchemeList(operaUser.getOwnerId());
+        result.put("agentConfig", map);
         return result.toJSONString();
     }
 
@@ -737,15 +754,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
+    public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
         }
-        User holderUser = userService.get(holder);
-        if (holderUser == null) {
-            throw UserException.ILLEGAL_USER;
-        }
+
         AgentApply agentApply = agentApplyService.get(id);
         if (agentApply == null) {
             throw UserException.AGENT_APPLY_NOT_EXIST;
@@ -766,12 +780,15 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(),opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
             sendAgentReviewMq(agentReview);
         } else if (reviewStatus == ReviewStatus.pass.value()) {//2、通过，修改申请状态，增加审核信息，增加代理信息
-
+            //TODO 校验是参数
+            User holderUser = userService.get(holder);
+            if (holderUser == null) {
+                throw UserException.ILLEGAL_USER;
+            }
             RegisterReq req = assembleRegister(agentApply.getUsername(), agentApply.getPassword());
             if (!checkRegisterAgentParam(req)) {
                 throw UserException.ILLEGAL_PARAMETERS;
             }
-
             if (accountIdMappingService.getUid(holderUser.getOwnerId(), agentApply.getUsername()) > 0) {
                 throw UserException.USERNAME_EXIST;
             }
@@ -800,7 +817,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
             //3、添加代理基础信息
             String generalizeCode = UUIDUtil.getCode();
-            User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, agentApply.getUsername(), telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo);
+            User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, agentApply.getUsername(), telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo, bank, bankDeposit);
             if (!userService.addAgent(agentUser)) {
                 ApiLogger.error("add agent info failed,userId:" + userId);
                 throw UserException.REGISTER_FAIL;

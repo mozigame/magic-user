@@ -47,7 +47,8 @@ public interface AgentResourceService {
      * @return
      * @Doc 添加
      */
-    String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone, String bankCardNo, String email, Integer returnScheme,
+    String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
+               String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
                Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost);
 
     /**
@@ -101,7 +102,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 添加代理申请
      */
-    String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo);
+    String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
 
     /**
      * @param rc
@@ -149,7 +150,7 @@ public interface AgentResourceService {
      * @Doc 代理审核通过/拒绝
      */
     String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone,
-                       String bankCardNo, String email, Integer returnScheme,
+                       String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
                        Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost);
 
     /**

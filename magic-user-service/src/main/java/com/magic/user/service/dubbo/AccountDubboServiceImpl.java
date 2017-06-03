@@ -67,9 +67,9 @@ public class AccountDubboServiceImpl implements AccountDubboService {
     @Override
     public Map<Long, OwnerStaticInfo> getOwnerStaticInfo(Collection<Long> ownerIds) {
         Map<Long, OwnerStaticInfo> map = new HashMap<>();
-        if (!Optional.ofNullable(ownerIds).filter(size -> size.size() > 0).isPresent()){
-            return map;
-        }
+//        if (!Optional.ofNullable(ownerIds).filter(size -> size.size() > 0).isPresent()){
+//            return map;
+//        }
 
         Iterator<Long> iterator = ownerIds.iterator();
         while (iterator.hasNext()){

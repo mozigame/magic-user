@@ -31,6 +31,26 @@ public class MemInfoResource {
     @Resource
     private InfoResourceServiceImpl infoResourceService;
 
+
+
+    /**
+     * @param type    账号类型
+     * @param account 账号名
+     * @return
+     * @Doc 快速检测
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/account/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String accountSearch(
+            @RequestParam(name = "type") Integer type,
+            @RequestParam(name = "account") String account
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return infoResourceService.accountSearch(rc, type, account);
+    }
+
+
     /**
      * @param type    账号类型
      * @param account 账号名

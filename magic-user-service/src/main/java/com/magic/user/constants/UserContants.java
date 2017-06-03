@@ -9,6 +9,7 @@ package com.magic.user.constants;
 public class UserContants {
 
     public static final String EMPTY_STRING = "{}";//空字符串
+    public static final String EMPTY_LIST = "{\"list\":[]}";//空list
 
     public static final String SPLIT_LINE = "-";    //业主id与用户账号连接符
 

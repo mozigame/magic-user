@@ -21,6 +21,7 @@ public class MemberInfo {
     private String showStatus;//状态描述
     private String bankCardNo;//银行卡号
     private String lastLoginIp;//最近登入
+    private Integer type;   // 类型
 
     public Long getId() {
         return id;
@@ -124,5 +125,13 @@ public class MemberInfo {
 
     public void setLastLoginIp(String lastLoginIp) {
         this.lastLoginIp = lastLoginIp;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

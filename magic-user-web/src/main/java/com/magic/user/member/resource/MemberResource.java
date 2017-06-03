@@ -167,7 +167,7 @@ public class MemberResource {
      * @param username
      * @return
      */
-    @Access(type = Access.AccessType.PUBLIC)
+    @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String logout(
@@ -182,7 +182,7 @@ public class MemberResource {
      *
      * @return
      */
-    @Access(type = Access.AccessType.PUBLIC)
+    @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/game/verify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String verify(
@@ -416,6 +416,18 @@ public class MemberResource {
                 outputStream.close();
             }
         }
+    }
+
+    /**
+     * @return
+     * @Doc 层级映射列表
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/level/list/simple", method = RequestMethod.GET)
+    @ResponseBody
+    public String levelListSpecial() {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.levelListSimple(rc);
     }
 
     /**
