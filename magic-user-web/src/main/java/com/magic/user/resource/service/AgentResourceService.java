@@ -58,6 +58,14 @@ public interface AgentResourceService {
      */
     String getDetail(RequestContext rc, Long id);
 
+
+    /**
+     * @param id
+     * @return
+     * @Doc 获取代理拥有的域名
+     */
+    String getDomain(RequestContext rc, Long agentId);
+
     /**
      * @param id
      * @param password

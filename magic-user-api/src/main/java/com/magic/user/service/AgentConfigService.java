@@ -3,6 +3,7 @@ package com.magic.user.service;
 import com.magic.user.entity.AgentConfig;
 import com.magic.user.vo.AgentConfigVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,4 +40,11 @@ public interface AgentConfigService {
      * @return
      */
     boolean update(AgentConfig agentConfig);
+
+    /**
+     * 获取代理下的域名
+     * @param agentId
+     * @return
+     */
+    List<String> getAgentDomain(Long agentId);
 }

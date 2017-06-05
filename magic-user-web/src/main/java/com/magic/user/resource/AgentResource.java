@@ -149,6 +149,22 @@ public class AgentResource {
     }
 
     /**
+     * @param id 代理ID
+     * @return
+     * @Doc 获取代理下的域名
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/domain", method = RequestMethod.GET)
+    @ResponseBody
+    public String domain(
+            @RequestParam(name = "id") Long id
+    ) {
+
+        return agentResourceService.getDomain(RequestContext.getRequestContext(), id);
+    }
+
+
+    /**
      * @param id       代理ID
      * @param password 密码
      * @return

@@ -348,7 +348,7 @@
             (SELECT username from t_user_info where user_id=os.stock_id) holderName,
             u.register_time registerTime,
             u.register_ip registerIp,
-            l.update_time lastLoginIp,
+            l.last_login_ip lastLoginIp,
             u.generalize_code promotionCode,
             ac.domain domain,
             u.telephone telephone,

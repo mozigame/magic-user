@@ -7,6 +7,7 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.core.tools.MauthUtil;
 import com.magic.api.commons.model.PageBean;
+import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.DateUtil;
@@ -468,6 +469,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return result.toJSONString();
     }
 
+    @Override
+    public String getDomain(RequestContext rc, Long agentId) {
+        List<String> domains = agentConfigService.getAgentDomain(agentId);
+        SimpleListResult simpleListResult = new SimpleListResult<>();
+        simpleListResult.setList(domains);
+        return JSON.toJSONString(simpleListResult);
+    }
+
     /**
      * @param vo
      * @Doc 组装代理详情
@@ -478,6 +487,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         vo.setRegisterTime(DateUtil.formatDateTime(new Date(Long.parseLong(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
         vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
         vo.setLastLoginIp(IPUtil.intToIp(Integer.parseInt(vo.getLastLoginIp())));
+        if (StringUtils.isNotBlank(vo.getDomain())) {
+            String[] domains = vo.getDomain().split(",");
+            vo.setDomain(domains[0]);
+        }
     }
 
     /**
