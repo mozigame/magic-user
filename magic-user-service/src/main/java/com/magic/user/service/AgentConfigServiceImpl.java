@@ -23,6 +23,8 @@ public class AgentConfigServiceImpl implements AgentConfigService {
     @Resource(name = "agentConfigDbService")
     private AgentConfigDbService agentConfigDbService;
 
+    //TODO joey 这样会有空指针异常，如agentConfigDbService.insert(agentConfig)返回null
+    //类似此类操作，都需进行调整
     @Override
     public boolean add(AgentConfig agentConfig) {
         long result = agentConfigDbService.insert(agentConfig);

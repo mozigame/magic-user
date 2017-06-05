@@ -148,7 +148,7 @@ public class MemberResource {
      * @return
      */
     @Access(type = Access.AccessType.PUBLIC)
-    @RequestMapping(value = "/passport/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/password/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String reset(
             HttpServletRequest request, HttpServletResponse response,
