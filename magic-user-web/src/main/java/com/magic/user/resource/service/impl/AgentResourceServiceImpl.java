@@ -464,6 +464,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         assembleAgentDetail(agentVo, isReview);
         //todo 代理参数配置名称获取 andy 调用接口
         AgentConfigVo agentConfig = agentConfigService.findByAgentId(id);
+        assembleAgentConfigVo(agentConfig);
         result.put("baseInfo", agentVo);
         result.put("settings", agentConfig);
         if (!isReview) {
@@ -483,6 +484,17 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             result.put("fundProfile", JSONObject.parseObject(fundProfile));
         }
         return result;
+    }
+
+    /**
+     * 组装代理配置信息
+     * @param vo
+     */
+    private void assembleAgentConfigVo(AgentConfigVo vo) {
+        //todo 代理参数配置名称通过jason thrift调用
+        vo.setReturnSchemeName("退佣方案1");
+        vo.setAdminCostName("行政成本1");
+        vo.setFeeSchemeName("手续费1");
     }
 
     @Override

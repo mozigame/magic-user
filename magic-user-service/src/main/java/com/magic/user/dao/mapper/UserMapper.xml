@@ -354,7 +354,8 @@
             u.telephone telephone,
             u.email email,
             u.bank_card_no bankCardNo,
-            u.bank bank
+            u.bank bank,
+            u.bank_deposit bankDeposit
           from t_user_info u
           LEFT JOIN t_owner_stock_agent_member os
           on(u.user_id = os.agent_id)

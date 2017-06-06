@@ -30,6 +30,7 @@ public class AgentInfoVo {
     private String email;   //电子邮箱
     private String bankCardNo;//银行卡号
     private String bank;    //银行名称
+    private String bankDeposit; //开户行
     private Integer type;   //账号类型
 
     public Long getId() {
@@ -223,5 +224,13 @@ public class AgentInfoVo {
 
     public void setDomains(String[] domains) {
         this.domains = domains;
+    }
+
+    public String getBankDeposit() {
+        return bankDeposit;
+    }
+
+    public void setBankDeposit(String bankDeposit) {
+        this.bankDeposit = bankDeposit;
     }
 }
