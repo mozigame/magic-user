@@ -1,6 +1,9 @@
 package com.magic.user.service.dubbo;
 
+import com.alibaba.fastjson.JSON;
+import com.magic.api.commons.ApiLogger;
 import com.magic.bc.query.service.AgentSchemeService;
+import com.magic.bc.query.service.UserLevelService;
 import com.magic.config.service.DomainDubboService;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
@@ -9,8 +12,8 @@ import com.magic.service.java.UuidService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +38,11 @@ public class DubboOutAssembleServiceImpl {
 
     @Resource
     private AgentSchemeService agentSchemeService;
+
+    @Resource
+    private UserLevelService userLevelService;
+
+    private static final Map<Long, String> EMPTY_MAP = new HashMap<>();
 
     /**
      * 分配ID 13位时间戳+2位机器识别码+4位随机数
@@ -127,4 +135,18 @@ public class DubboOutAssembleServiceImpl {
         return null;
     }
 
+    /**
+     * 获取层级名称
+     *
+     * @param ids
+     * @return
+     */
+    public Map<Long, String> getLevels(Collection<Long> ids){
+        try {
+            return userLevelService.getBatchByIds(ids);
+        }catch (Exception e){
+            ApiLogger.error(String.format("get levels error. ids: %s", JSON.toJSONString(ids)), e);
+        }
+        return EMPTY_MAP;
+    }
 }

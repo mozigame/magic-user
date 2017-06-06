@@ -57,7 +57,7 @@ public class MemberResource {
             @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
             @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
             @RequestParam(name = "bankCardNo", required = false, defaultValue = "") String bankCardNo,
-            @RequestParam(name = "bankReposit", required = false, defaultValue = "") String bankReposit,
+            @RequestParam(name = "bankDeposit", required = false, defaultValue = "") String bankDeposit,
             @RequestParam(name = "province", required = false, defaultValue = "") String province,
             @RequestParam(name = "city", required = false, defaultValue = "") String city,
             @RequestParam(name = "weixin", required = false, defaultValue = "") String weixin,
@@ -68,7 +68,7 @@ public class MemberResource {
         //获取域名
         StringBuffer requestURL = request.getRequestURL();
         String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
-        RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, realname, bankCardNo, bankReposit, province, city, weixin, qq);
+        RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
         return memberServiceResource.memberRegister(rc, url, req);
     }
 
@@ -83,14 +83,14 @@ public class MemberResource {
      * @param bank
      * @param realname
      * @param bankCardNo
-     * @param bankReposit
+     * @param bankDeposit
      * @param province
      * @param city
      * @param weixin
      * @param qq
      * @return
      */
-    private RegisterReq assembleRegister(String proCode, String username, String password, String paymentPassword, String telephone, String email, String bank, String realname, String bankCardNo, String bankReposit, String province, String city, String weixin, String qq) {
+    private RegisterReq assembleRegister(String proCode, String username, String password, String paymentPassword, String telephone, String email, String bank, String realname, String bankCardNo, String bankDeposit, String province, String city, String weixin, String qq) {
         RegisterReq req = new RegisterReq();
         req.setProCode(proCode);
         req.setUsername(username);
@@ -101,7 +101,7 @@ public class MemberResource {
         req.setBank(bank);
         req.setRealname(realname);
         req.setBankCardNo(bankCardNo);
-        req.setBankReposit(bankReposit);
+        req.setBankDeposit(bankDeposit);
         req.setProvince(province);
         req.setCity(city);
         req.setWeixin(weixin);
@@ -148,7 +148,7 @@ public class MemberResource {
      * @return
      */
     @Access(type = Access.AccessType.PUBLIC)
-    @RequestMapping(value = "/passport/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/password/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String reset(
             HttpServletRequest request, HttpServletResponse response,

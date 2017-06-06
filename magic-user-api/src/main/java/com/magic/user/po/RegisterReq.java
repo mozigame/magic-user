@@ -17,7 +17,7 @@ public class RegisterReq {
     private String bank;//银行名称
     private String realname;//姓名
     private String bankCardNo;//银行卡号
-    private String bankReposit;//开户行
+    private String bankDeposit;//开户行
     private String province;//省
     private String city;//市
     private String weixin;//微信
@@ -95,12 +95,12 @@ public class RegisterReq {
         this.bankCardNo = bankCardNo;
     }
 
-    public String getBankReposit() {
-        return bankReposit;
+    public String getBankDeposit() {
+        return bankDeposit;
     }
 
-    public void setBankReposit(String bankReposit) {
-        this.bankReposit = bankReposit;
+    public void setBankDeposit(String bankDeposit) {
+        this.bankDeposit = bankDeposit;
     }
 
     public String getProvince() {

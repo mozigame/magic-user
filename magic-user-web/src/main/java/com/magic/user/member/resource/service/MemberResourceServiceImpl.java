@@ -115,6 +115,7 @@ public class MemberResourceServiceImpl {
      * @param memberConditionVos
      * @return
      */
+    //TODO 调整，避免空指针
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
         Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
         for (MemberConditionVo vo : memberConditionVos) {
@@ -1023,7 +1024,7 @@ public class MemberResourceServiceImpl {
         member.setEmail(req.getEmail());
         member.setBank(req.getBank());
         member.setBankCardNo(req.getBankCardNo());
-        member.setBankDeposit(req.getBankReposit());
+        member.setBankDeposit(req.getBankDeposit());
         member.setBank(req.getBank());
         member.setMemberId(userId);
         member.setOwnerId(ownerId);
