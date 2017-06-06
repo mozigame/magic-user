@@ -766,13 +766,13 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        AgentApply baseInfo = agentApplyService.get(applyId);
-        if (baseInfo != null && (baseInfo.getStatus() == ReviewStatus.noPass || baseInfo.getStatus() == ReviewStatus.noReview)) {
+        AgentApplyVo baseInfo = agentApplyService.agentReviewInfo(applyId);
+        if (baseInfo != null && (baseInfo.getStatus() == ReviewStatus.noPass.value() || baseInfo.getStatus() == ReviewStatus.noReview.value())) {
             JSONObject result = new JSONObject();
             result.put("baseInfo", baseInfo);
             return result.toJSONString();
-        } else if (baseInfo.getStatus() == ReviewStatus.pass) {
-            long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), baseInfo.getUsername());
+        } else if (baseInfo.getStatus() == ReviewStatus.pass.value()) {
+            long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), baseInfo.getAccount());
             if (agentId > 0) {
                 JSONObject jsonObject = getAgentInfoVo(agentId);
                 return jsonObject.toJSONString();
