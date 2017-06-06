@@ -140,6 +140,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private List<AgentInfoVo> assembleAgentList(List<AgentInfoVo> users) {
         for (AgentInfoVo vo : users) {
             vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
+            //todo 会员数量，储值会员数量，存款金额，取款金额，审核人，审核时间
+            vo.setMembers(1000);
+            vo.setStoreMembers(1000);
+            vo.setDepositTotalMoney(1000L);
+            vo.setWithdrawTotalMoney(2450L);
+            vo.setReviewer("jess");
+            vo.setReviewTime("2017-03-01 16:43:22");
+            vo.setRegisterTime(DateUtil.formatDateTime(new Date(new Long(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
         }
         return users;
     }
