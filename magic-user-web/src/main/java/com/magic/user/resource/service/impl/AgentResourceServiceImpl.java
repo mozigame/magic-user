@@ -107,7 +107,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
         } else if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {  //2、如果代理账号为空，推广代码不为空，查询代理
             User agentUser = userService.getUserByCode(userCondition.getPromotionCode());
-            if (agentUser == null || agentUser.getOwnerId() != operaUser.getOwnerId()) {
+            if (agentUser == null || agentUser.getOwnerId().longValue() != operaUser.getOwnerId().longValue()) {
                 return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
             }
         }
