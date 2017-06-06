@@ -23,4 +23,7 @@
     <!-- 配置config dubbo -->
     <dubbo:reference id="agentSchemeService" interface="com.magic.bc.query.service.AgentSchemeService" init="true" timeout="15000"
                      retries="0" check="false"/>
+    <!-- 配置层级dubbo -->
+    <dubbo:reference id="userLevelService" interface="com.magic.bc.query.service.UserLevelService" timeout="15000"
+                     retries="0" check="false"/>
 </beans>
