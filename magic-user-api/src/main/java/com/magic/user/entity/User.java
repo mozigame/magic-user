@@ -42,6 +42,8 @@ public class User implements Serializable{
     private Long ownerId;  //业主id
 
     private String ownerName;   //业主账户
+    private String weixin;   //微信
+    private String qq;   //qq
 
     private DeleteStatus isDelete;  //是否删除
 
@@ -278,5 +280,21 @@ public class User implements Serializable{
 
     public void setTemp3(String temp3) {
         this.temp3 = temp3;
+    }
+
+    public String getWeixin() {
+        return weixin;
+    }
+
+    public void setWeixin(String weixin) {
+        this.weixin = weixin;
+    }
+
+    public String getQq() {
+        return qq;
+    }
+
+    public void setQq(String qq) {
+        this.qq = qq;
     }
 }

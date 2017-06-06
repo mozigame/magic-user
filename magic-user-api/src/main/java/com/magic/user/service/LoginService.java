@@ -51,4 +51,6 @@ public interface LoginService {
      * @return
      */
     Map<Long, Login> findByUserIds(List<Long> ids);
+
+    Login getByUserId(Long uid);
 }

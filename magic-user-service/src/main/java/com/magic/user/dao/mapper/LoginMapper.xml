@@ -74,4 +74,12 @@
 
     </select>
 
+    <!--根据用户编号获用户的登录信息-->
+    <select id="getByUserId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_login_info
+        WHERE user_id=#{uid}
+    </select>
+
 </mapper>

@@ -1,11 +1,14 @@
 package com.magic.user.service;
 
+import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.enums.GeneraType;
+import com.magic.user.member.resource.service.MemberResourceServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.stereotype.Service;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -20,8 +23,9 @@ import javax.annotation.Resource;
 @ContextConfiguration({"classpath:spring/spring-application.xml"})
 public class MemberService {
 
-    @Resource(name = "userService")
+    //@Resource(name = "userService")
     private UserService userService;
+
 
     @Test
     public void insertUser() {
@@ -51,5 +55,15 @@ public class MemberService {
         user.setEmail("ccaa@qq.com-------");
 
 //        System.out.println(userService.updateUser(user));
+    }
+
+    //MemberResourceServiceImpl memberResourceService;
+
+    @Test
+    public void getUser() {
+        RequestContext c = RequestContext.getRequestContext();
+        c.setUid(64);
+        //String s = memberResourceService.memberCenterDetail(c);
+        System.out.print(c);
     }
 }

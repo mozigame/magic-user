@@ -22,6 +22,7 @@ import com.magic.user.bean.MemberCondition;
 import com.magic.user.bean.RegionNumber;
 import com.magic.user.bean.Register;
 import com.magic.user.constants.UserContants;
+import com.magic.user.entity.Login;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.entity.User;
@@ -33,14 +34,12 @@ import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.po.RegisterReq;
-import com.magic.user.service.AccountIdMappingService;
-import com.magic.user.service.MemberMongoService;
-import com.magic.user.service.MemberService;
-import com.magic.user.service.UserService;
+import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.vo.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -60,6 +59,9 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private LoginService loginService;
 
     @Resource
     private AccountIdMappingService accountIdMappingService;
@@ -1475,4 +1477,62 @@ public class MemberResourceServiceImpl {
         long count = memberMongoService.getOnlineMemberCount(conditon);
         return "{\" count: \"" + count + "}";
     }
+
+    /**
+     * 查询个人中心详细信息
+     *
+     * @param rc
+     * @return
+     */
+    public String memberCenterDetail (RequestContext rc){
+
+        Long uid = rc.getUid();
+
+        User user = userService.getUserById(uid);
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        MemberCenterDetailVo memberCenterDetailVo = new MemberCenterDetailVo();
+
+        BeanUtils.copyProperties(user,memberCenterDetailVo);
+
+        Login login = loginService.getByUserId(uid);
+        if (user != null) {
+            Date date = DateUtil.getDate(login.getUpdateTime());
+            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(login.getUpdateTime()),DateUtil.formatDefaultTimestamp));
+        }else{//如果查询不到登陆信息就取该用户的注册时间为最后登陆时间
+            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(user.getRegisterTime()),DateUtil.formatDefaultTimestamp));
+        }
+        initMemberCenterDetailVo(memberCenterDetailVo);
+        HashMap<String,Object> result = new HashMap<String,Object>();
+        result.put("apistatus",1);
+        result.put("result",memberCenterDetailVo);
+        return JSONObject.toJSON(result).toString();
+    }
+
+    private void initMemberCenterDetailVo(MemberCenterDetailVo o){
+        if(o == null){
+            return;
+        }
+        if(!StringUtils.isNotEmpty(o.getBankCardNo())){
+            o.setBankCardNo("尚未设置提款银行卡");
+        }
+        if(!StringUtils.isNotEmpty(o.getWeixin())){
+            o.setWeixin("无");
+        }
+        if(!StringUtils.isNotEmpty(o.getQq())){
+            o.setQq("无");
+        }
+        if(!StringUtils.isNotEmpty(o.getUsername())){
+            o.setUsername("无");
+        }
+        if(!StringUtils.isNotEmpty(o.getRealname())){
+            o.setRealname("无");
+        }
+        if(!StringUtils.isNotEmpty(o.getEmail())){
+            o.setEmail("无");
+        }
+    }
+
 }

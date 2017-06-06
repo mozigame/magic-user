@@ -53,4 +53,9 @@ public class LoginServiceImpl implements LoginService {
         }
         return null;
     }
+
+    @Override
+    public Login getByUserId(Long uid) {
+        return (Login) loginDbService.get("getByUserId", new String[]{"uid"},new Object[]{uid});
+    }
 }
