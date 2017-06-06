@@ -91,6 +91,9 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_USER;
         }
         MemberCondition memberCondition = MemberCondition.valueOf(condition);
+        if (memberCondition == null) {
+            memberCondition = new MemberCondition();
+        }
         memberCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkCondition(memberCondition)) {
             return JSON.toJSONString(assemblePageBean(page, count, 0, null));

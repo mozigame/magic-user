@@ -85,6 +85,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.ILLEGAL_USER;
         }
         AgentCondition userCondition = AgentCondition.valueOf(condition);
+        if (userCondition == null) {
+            userCondition = new AgentCondition();
+        }
         userCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkAgentCondition(userCondition)) {
             return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
@@ -442,6 +445,16 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
         }
+        JSONObject result = getAgentInfoVo(id);
+        return result.toJSONString();
+    }
+
+    /**
+     * 获取代理详情
+     * @param id
+     * @return
+     */
+    private JSONObject getAgentInfoVo(Long id) {
         JSONObject result = new JSONObject();
         AgentInfoVo agentVo = userService.getAgentDetail(id);
         if (agentVo == null) {
@@ -466,7 +479,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 "    }\n" +
                 "}";
         result.put("fundProfile", JSONObject.parseObject(fundProfile));
-        return result.toJSONString();
+        return result;
     }
 
     @Override
@@ -747,6 +760,27 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return result.toJSONString();
     }
 
+    @Override
+    public String reviewDetail(RequestContext rc, Long applyId) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        AgentApply baseInfo = agentApplyService.get(applyId);
+        if (baseInfo != null && (baseInfo.getStatus() == ReviewStatus.noPass || baseInfo.getStatus() == ReviewStatus.noReview)) {
+            JSONObject result = new JSONObject();
+            result.put("baseInfo", baseInfo);
+            return result.toJSONString();
+        } else if (baseInfo.getStatus() == ReviewStatus.pass) {
+            long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), baseInfo.getUsername());
+            if (agentId > 0) {
+                JSONObject jsonObject = getAgentInfoVo(agentId);
+                return jsonObject.toJSONString();
+            }
+        }
+        return UserContants.EMPTY_STRING;
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -767,7 +801,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
+    public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost) {
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
@@ -835,9 +869,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 ApiLogger.error("add agent info failed,userId:" + userId);
                 throw UserException.REGISTER_FAIL;
             }
-            String domainSpit = StringUtils.arrayToStrSplit(domain);
             //mq 处理 4、添加代理配置
-            AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
+            AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domain, discount, cost);
             //mq 处理 5、添加业主股东代理id映射信息
             OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
             //mq 处理 6、将代理基础信息放入mongo

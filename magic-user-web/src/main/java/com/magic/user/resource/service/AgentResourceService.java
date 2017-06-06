@@ -140,6 +140,13 @@ public interface AgentResourceService {
     String agentApplyInfo(RequestContext rc, Long applyId);
 
     /**
+     * 查看代理审核信息
+     * @param rc
+     * @param applyId
+     * @return
+     */
+    String reviewDetail(RequestContext rc, Long applyId);
+    /**
      * @param rc
      * @param id
      * @param reviewStatus
@@ -159,7 +166,7 @@ public interface AgentResourceService {
      */
     String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone,
                        String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
-                       Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost);
+                       Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost);
 
     /**
      * @param rc

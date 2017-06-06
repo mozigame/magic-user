@@ -96,7 +96,8 @@
         email,
         bank_card_no bankCardNo,
         bank,
-        bank_deposit bankDeposit
+        bank_deposit bankDeposit,
+        status
         from t_agent_apply
         WHERE id=#{id}
 

@@ -342,7 +342,7 @@ public class AgentResource {
      * @param returnScheme 返佣方案
      * @param adminCost    行政成本
      * @param feeScheme    手续费
-     * @param domain       域名设置
+     * @param domain       域名设置,用 "," 隔开，eg: www.123.com,www.222.com,www.bbb.com
      * @param discount     优惠扣除 默认1 1不选 2勾选
      * @param cost         返水成本 默认1 1不选 2勾选
      * @return
@@ -364,13 +364,28 @@ public class AgentResource {
             @RequestParam(name = "returnScheme", required = false, defaultValue = "-1") Integer returnScheme,
             @RequestParam(name = "adminCost", required = false, defaultValue = "-1") Integer adminCost,
             @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme,
-            @RequestParam(name = "domain", required = false) String[] domain,
+            @RequestParam(name = "domain", required = false) String domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
 
     ) {
         //TODO 所有涉及审核的信息增加开户行信息、银行名称
         return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
+    }
+
+
+    /**
+     * @param id 代理审核id
+     * @return
+     * @Doc 查看代理审核信息
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/review/detail", method = RequestMethod.GET)
+    @ResponseBody
+    public String reviewDetail(
+            @RequestParam(name = "id") Long id
+    ) {
+        return agentResourceService.reviewDetail(RequestContext.getRequestContext(), id);
     }
 
     /**
