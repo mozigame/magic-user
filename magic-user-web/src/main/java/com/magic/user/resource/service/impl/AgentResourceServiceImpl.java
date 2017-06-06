@@ -445,40 +445,43 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        JSONObject result = getAgentInfoVo(id);
+        JSONObject result = getAgentInfoVo(id, false);
         return result.toJSONString();
     }
 
     /**
      * 获取代理详情
      * @param id
+     * @param  isReview 是否是审核通过的信息
      * @return
      */
-    private JSONObject getAgentInfoVo(Long id) {
+    private JSONObject getAgentInfoVo(Long id, boolean isReview) {
         JSONObject result = new JSONObject();
         AgentInfoVo agentVo = userService.getAgentDetail(id);
         if (agentVo == null) {
             throw UserException.ILLEGAL_USER;
         }
-        assembleAgentDetail(agentVo);
+        assembleAgentDetail(agentVo, isReview);
         //todo 代理参数配置名称获取 andy 调用接口
         AgentConfigVo agentConfig = agentConfigService.findByAgentId(id);
         result.put("baseInfo", agentVo);
         result.put("settings", agentConfig);
-        //TODO 本期资金状况
-        String fundProfile = "{\n" +
-                "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
-                "    \"info\": {\n" +
-                "        \"members\": 490,\n" +
-                "        \"depositMembers\": 410,\n" +
-                "        \"depositTotalMoney\": \"29006590\",\n" +
-                "        \"withdrawTotalMoney\": \"24500120\",\n" +
-                "        \"betTotalMoney\": \"20900067\",\n" +
-                "        \"betEffMoney\": \"19007689\",\n" +
-                "        \"gains\": \"4908763\"\n" +
-                "    }\n" +
-                "}";
-        result.put("fundProfile", JSONObject.parseObject(fundProfile));
+        if (!isReview) {
+            //TODO 本期资金状况
+            String fundProfile = "{\n" +
+                    "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
+                    "    \"info\": {\n" +
+                    "        \"members\": 490,\n" +
+                    "        \"depositMembers\": 410,\n" +
+                    "        \"depositTotalMoney\": \"29006590\",\n" +
+                    "        \"withdrawTotalMoney\": \"24500120\",\n" +
+                    "        \"betTotalMoney\": \"20900067\",\n" +
+                    "        \"betEffMoney\": \"19007689\",\n" +
+                    "        \"gains\": \"4908763\"\n" +
+                    "    }\n" +
+                    "}";
+            result.put("fundProfile", JSONObject.parseObject(fundProfile));
+        }
         return result;
     }
 
@@ -494,15 +497,22 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @param vo
      * @Doc 组装代理详情
      */
-    private void assembleAgentDetail(AgentInfoVo vo) {
+    private void assembleAgentDetail(AgentInfoVo vo, boolean isReview) {
         vo.setType(AccountType.agent.value());
         vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
         vo.setRegisterTime(DateUtil.formatDateTime(new Date(Long.parseLong(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
         vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
         vo.setLastLoginIp(IPUtil.intToIp(Integer.parseInt(vo.getLastLoginIp())));
-        if (StringUtils.isNotBlank(vo.getDomain())) {
-            String[] domains = vo.getDomain().split(",");
-            vo.setDomain(domains[0]);
+        if (!isReview) {
+            if (StringUtils.isNotBlank(vo.getDomain())) {
+                String[] domains = vo.getDomain().split(",");
+                vo.setDomain(domains[0]);
+            }
+        } else {
+            if (StringUtils.isNotBlank(vo.getDomain())) {
+                String[] domains = vo.getDomain().split(",");
+                vo.setDomains(domains);
+            }
         }
     }
 
@@ -774,7 +784,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         } else if (baseInfo.getStatus() == ReviewStatus.pass.value()) {
             long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), baseInfo.getAccount());
             if (agentId > 0) {
-                JSONObject jsonObject = getAgentInfoVo(agentId);
+                JSONObject jsonObject = getAgentInfoVo(agentId, true);
                 return jsonObject.toJSONString();
             }
         }

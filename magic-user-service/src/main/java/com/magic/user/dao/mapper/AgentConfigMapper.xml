@@ -63,7 +63,9 @@
         select agent_id agentId,
             return_scheme_id returnScheme,
             admin_cost_id adminCost,
-            fee_id feeScheme
+            fee_id feeScheme,
+            discount,
+            cost
          from t_agent_config_info
           WHERE agent_id=#{agentId}
     </select>

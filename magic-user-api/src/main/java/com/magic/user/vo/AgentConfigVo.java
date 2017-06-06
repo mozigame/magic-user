@@ -15,6 +15,10 @@ public class AgentConfigVo {
     private Integer feeScheme;  //手续费方案编号
     private String feeSchemeName;   //手续费方案名称
 
+    private Integer discount;   //优惠扣除
+
+    private Integer cost;   //返水成本
+
     public Long getAgentId() {
         return agentId;
     }
@@ -69,5 +73,21 @@ public class AgentConfigVo {
 
     public void setFeeSchemeName(String feeSchemeName) {
         this.feeSchemeName = feeSchemeName;
+    }
+
+    public Integer getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Integer discount) {
+        this.discount = discount;
+    }
+
+    public Integer getCost() {
+        return cost;
+    }
+
+    public void setCost(Integer cost) {
+        this.cost = cost;
     }
 }

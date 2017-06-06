@@ -25,6 +25,7 @@ public class AgentInfoVo {
     private String registerIp;  //注册ip
     private String lastLoginIp; //最近登录ip
     private String domain;  //绑定域名
+    private String domains[];  //绑定域名列表
     private String telephone;   //手机号码
     private String email;   //电子邮箱
     private String bankCardNo;//银行卡号
@@ -214,5 +215,13 @@ public class AgentInfoVo {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public String[] getDomains() {
+        return domains;
+    }
+
+    public void setDomains(String[] domains) {
+        this.domains = domains;
     }
 }
