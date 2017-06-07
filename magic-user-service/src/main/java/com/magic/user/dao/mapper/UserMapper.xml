@@ -23,6 +23,8 @@
         <result column="bank_deposit" jdbcType="VARCHAR" property="bankDeposit"/>
         <result column="owner_id" jdbcType="BIGINT" property="ownerId"/>
         <result column="owner_name" jdbcType="VARCHAR" property="ownerName"/>
+        <result column="wenxin" jdbcType="VARCHAR" property="wenxin"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
         <result column="is_delete" jdbcType="TINYINT" property="isDelete"
                 typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="type" jdbcType="TINYINT" property="type"
@@ -52,6 +54,8 @@
             bank_deposit,
             owner_id,
             owner_name,
+            weixin,
+            qq,
             is_delete,
             type
             from t_user_info

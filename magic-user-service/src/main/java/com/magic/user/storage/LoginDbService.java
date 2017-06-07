@@ -24,4 +24,5 @@ public class LoginDbService extends BaseDbServiceImpl<Login, Long> {
     public BaseDao<Login, Long> getDao() {
         return loginDao;
     }
+
 }

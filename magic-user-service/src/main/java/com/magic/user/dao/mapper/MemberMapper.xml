@@ -30,6 +30,8 @@
         <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
+        <result column="weixin" jdbcType="VARCHAR" property="weixin"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
     </resultMap>
 
     <!--查询会员列表-->
@@ -89,7 +91,9 @@
             status,
             gender,
             currency_type,
-            is_delete
+            is_delete,
+            weixin,
+            qq
         FROM t_member
           WHERE member_id=#{memberId}
     </select>

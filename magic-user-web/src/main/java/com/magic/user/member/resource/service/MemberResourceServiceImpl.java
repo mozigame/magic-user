@@ -33,10 +33,7 @@ import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.po.RegisterReq;
-import com.magic.user.service.AccountIdMappingService;
-import com.magic.user.service.MemberMongoService;
-import com.magic.user.service.MemberService;
-import com.magic.user.service.UserService;
+import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
@@ -60,6 +57,9 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private LoginService loginService;
 
     @Resource
     private AccountIdMappingService accountIdMappingService;
@@ -1475,4 +1475,66 @@ public class MemberResourceServiceImpl {
         long count = memberMongoService.getOnlineMemberCount(conditon);
         return "{\" count: \"" + count + "}";
     }
+
+    /**
+     * 查询个人中心详细信息
+     *
+     * @param rc
+     * @return
+     */
+    public String memberCenterDetail (RequestContext rc){
+        Member member = memberService.getMemberById(rc.getUid());
+        if (member == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        MemberCenterDetailVo memberCenterDetailVo = new MemberCenterDetailVo();
+        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
+        if (subAccount != null && subAccount.getLastTime() != 0) {
+            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(subAccount.getLastTime()),DateUtil.formatDefaultTimestamp));
+        }else{//如果查询不到登陆信息就取该用户的注册时间为最后登陆时间
+            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(member.getRegisterTime()),DateUtil.formatDefaultTimestamp));
+        }
+
+        initMemberCenterDetailVo(memberCenterDetailVo,member);
+
+        return JSONObject.toJSONString(memberCenterDetailVo);
+    }
+
+    private void initMemberCenterDetailVo(MemberCenterDetailVo o,Member member){
+        if(o == null || member == null){
+            return;
+        }
+        if(StringUtils.isNotEmpty(member.getBankCardNo())){
+            o.setBankCardNo(member.getBankCardNo());
+        }else{
+            o.setBankCardNo("尚未设置提款银行卡");
+        }
+        if(StringUtils.isNotEmpty(member.getWeixin())){
+            o.setWeixin(member.getWeixin());
+        }else{
+            o.setWeixin("无");
+        }
+        if(StringUtils.isNotEmpty(member.getQq())){
+            o.setQq(member.getQq());
+        }else{
+            o.setQq("无");
+        }
+        if(StringUtils.isNotEmpty(member.getUsername())){
+            o.setUsername(member.getUsername());
+        }else{
+            o.setUsername("无");
+        }
+        if(StringUtils.isNotEmpty(member.getRealname())){
+            o.setRealname(member.getRealname());
+        }else{
+            o.setRealname("无");
+        }
+        if(StringUtils.isNotEmpty(member.getEmail())){
+            o.setEmail(member.getEmail());
+        }else{
+            o.setEmail("无");
+        }
+    }
+
 }

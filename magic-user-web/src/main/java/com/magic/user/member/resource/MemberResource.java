@@ -7,6 +7,7 @@ import com.magic.api.commons.core.tools.HeaderUtil;
 import com.magic.user.member.resource.service.MemberResourceServiceImpl;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.RegisterReq;
+import com.magic.user.vo.MemberCenterDetailVo;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -530,4 +531,17 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.onlineCount(rc);
     }
+
+    /**
+     * @return
+     * @Doc     获取会员中心详情信息
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/center/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String memberCenterDetail() {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberCenterDetail(rc);
+    }
+
 }

@@ -3,6 +3,7 @@ package com.magic.user.storage.base;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.atlas.core.BaseDao;
 import com.magic.api.commons.model.Page;
+import com.magic.user.entity.Login;
 import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,5 +191,6 @@ public abstract class BaseDbServiceImpl<T, PK extends Serializable> implements B
         }
         return null;
     }
+
 
 }
