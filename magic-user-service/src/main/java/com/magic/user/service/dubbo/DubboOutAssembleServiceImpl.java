@@ -5,6 +5,7 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.bc.query.service.AgentSchemeService;
 import com.magic.bc.query.service.UserLevelService;
 import com.magic.config.service.DomainDubboService;
+import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
@@ -12,10 +13,7 @@ import com.magic.service.java.UuidService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: joey
@@ -129,6 +127,20 @@ public class DubboOutAssembleServiceImpl {
     public Map<String,Object> agentSchemeList(Long ownerId) {
         try {
             return agentSchemeService.agentSchemeList(ownerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 获取业主的所有域名
+     * @param ownerId
+     * @return
+     */
+    public List<OwnerDomainVo> queryAllDomainList(Long ownerId) {
+        try {
+            return domainDubboService.queryAllDomainList(ownerId);
         } catch (Exception e) {
             e.printStackTrace();
         }

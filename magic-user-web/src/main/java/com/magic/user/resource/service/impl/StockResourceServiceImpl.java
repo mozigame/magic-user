@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
+import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.user.bean.AgentCondition;
@@ -68,7 +69,9 @@ public class StockResourceServiceImpl implements StockResourceService {
             info.setShowStatus(AccountStatus.parse(info.getStatus()).desc());
             info.setCurrencyName(CurrencyType.parse(info.getCurrencyType()).desc());
         }
-        return JSON.toJSONString(assemblePageBean(1, list.size(), Long.valueOf(list.size()), list));
+        SimpleListResult simpleListResult = new SimpleListResult();
+        simpleListResult.setList(list);
+        return JSON.toJSONString(simpleListResult);
     }
 
     @Override
@@ -90,15 +93,6 @@ public class StockResourceServiceImpl implements StockResourceService {
         return downLoadFile;
     }
 
-    private PageBean assemblePageBean(Integer page, Integer count, Long total, List list) {
-        PageBean pageBean = new PageBean();
-        pageBean.setPage(page);
-        pageBean.setCount(count);
-        pageBean.setTotal(total);
-        pageBean.setList(list);
-        return pageBean;
-    }
-
     /**
      * @param rc
      * @return
@@ -112,7 +106,9 @@ public class StockResourceServiceImpl implements StockResourceService {
         }
         List<StockInfoVo> list = userService.findAllStock(opera.getOwnerId());
         list = assembleSimple(list);
-        return JSON.toJSONString(assemblePageBean(1, list.size(), Long.valueOf(list.size()), list));
+        SimpleListResult simpleListResult = new SimpleListResult();
+        simpleListResult.setList(list);
+        return JSON.toJSONString(simpleListResult);
     }
 
 
