@@ -406,4 +406,15 @@ public class AgentResource {
     }
 
 
+    /**
+     * @return
+     * @Doc 获取 方案，成本，手续，域名 列表
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/all/configs", method = RequestMethod.GET)
+    @ResponseBody
+    public String allConfigs() {
+        return agentResourceService.allConfigs(RequestContext.getRequestContext());
+    }
+
 }

@@ -129,7 +129,7 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
                 }
             }
             if (userCondition.getStatus() != null && userCondition.getStatus() > 0) {
-                query.addCriteria(new Criteria("status").lte(userCondition.getStatus()));
+                query.addCriteria(new Criteria("status").is(userCondition.getStatus()));
             }
         }
         return query;

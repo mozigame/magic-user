@@ -15,6 +15,7 @@ import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.service.AgentSchemeService;
+import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.enums.LoginStatus;
 import com.magic.user.bean.AgentCondition;
@@ -29,18 +30,12 @@ import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.PasswordCapture;
-import com.magic.user.vo.AgentApplyVo;
-import com.magic.user.vo.AgentConditionVo;
-import com.magic.user.vo.AgentConfigVo;
-import com.magic.user.vo.AgentInfoVo;
+import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * User: joey
@@ -66,8 +61,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private AgentMongoService agentMongoService;
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
-    @Resource
-    private AgentSchemeService agentSchemeService;
 
 
     /**
@@ -107,7 +100,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
         } else if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {  //2、如果代理账号为空，推广代码不为空，查询代理
             User agentUser = userService.getUserByCode(userCondition.getPromotionCode());
-            if (agentUser == null || agentUser.getOwnerId() != operaUser.getOwnerId()) {
+            if (agentUser == null || agentUser.getOwnerId().longValue() != operaUser.getOwnerId().longValue()) {
                 return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
             }
         }
@@ -129,7 +122,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         return JSON.toJSONString(assemblePageBean(count, page, totalCount, null));
     }
-
 
 
     /**
@@ -286,7 +278,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      */
     @Override
     public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
-                      String bankCardNo, String bank, String bankDeposit,String email, Integer returnScheme,
+                      String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
                       Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
         String generalizeCode = UUIDUtil.getCode();
         RegisterReq req = assembleRegister(account, password);
@@ -459,8 +451,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
     /**
      * 获取代理详情
+     *
      * @param id
-     * @param  isReview 是否是审核通过的信息
+     * @param isReview 是否是审核通过的信息
      * @return
      */
     private JSONObject getAgentInfoVo(Long id, boolean isReview) {
@@ -496,6 +489,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
     /**
      * 组装代理配置信息
+     *
      * @param vo
      */
     private void assembleAgentConfigVo(AgentConfigVo vo) {
@@ -648,7 +642,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
-        long stockId = accountIdMappingService.getUid(ownerInfo.getOwnerId(),ownerInfo.getOwnerName());
+        long stockId = accountIdMappingService.getUid(ownerInfo.getOwnerId(), ownerInfo.getOwnerName());
         User stockUser = userService.get(stockId);
         if (stockUser == null) {
             throw UserException.ILLEGAL_USER;
@@ -721,15 +715,15 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         List<AgentApplyVo> agentApplyVos = agentApplyService.findByPage(operaUser.getOwnerId(), account, status, page, count);
         assembleAgentApplyList(agentApplyVos);
-        return  JSON.toJSONString(assemblePageBean(count, page, totalCount, agentApplyVos));
+        return JSON.toJSONString(assemblePageBean(count, page, totalCount, agentApplyVos));
     }
 
     /**
-     * @Doc 导出代理审核列表
      * @param rc
      * @param account
      * @param status
      * @return
+     * @Doc 导出代理审核列表
      */
     @Override
     public DownLoadFile reviewListExport(RequestContext rc, String account, Integer status) {
@@ -785,7 +779,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         AgentApplyVo baseInfo = agentApplyService.agentReviewInfo(applyId);
         JSONObject result = new JSONObject();
         result.put("baseInfo", baseInfo);
-        Map<String,Object> map = dubboOutAssembleService.agentSchemeList(operaUser.getOwnerId());
+        Map<String, Object> map = dubboOutAssembleService.agentSchemeList(operaUser.getOwnerId());
         result.put("agentConfig", map);
         return result.toJSONString();
     }
@@ -854,7 +848,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 throw UserException.AGENT_REVIEW_FAIL;
             }
             //代理审核历史记录，可以通过mq处理
-            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(),opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
+            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(), opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
             sendAgentReviewMq(agentReview);
         } else if (reviewStatus == ReviewStatus.pass.value()) {//2、通过，修改申请状态，增加审核信息，增加代理信息
             //TODO 校验是参数
@@ -872,7 +866,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             if (agentApplyService.updateStatus(id, reviewStatus) <= 0) {
                 throw UserException.AGENT_REVIEW_FAIL;
             }
-            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(),opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
+            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(), opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
             sendAgentReviewMq(agentReview);
 
             long userId = dubboOutAssembleService.assignUid();
@@ -945,7 +939,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 组装代理审核对象
      */
-    private AgentReview assembleAgentReview(Long agentApplyId, String agentName, Long operUserId, String operUserName,Long ownerId, ReviewStatus status, Long createTime) {
+    private AgentReview assembleAgentReview(Long agentApplyId, String agentName, Long operUserId, String operUserName, Long ownerId, ReviewStatus status, Long createTime) {
         AgentReview review = new AgentReview();
         review.setAgentApplyId(agentApplyId);
         review.setAgentName(agentName);
@@ -996,6 +990,39 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         jsonObject.put("agentId", id);
         jsonObject.put("status", status);
         producer.send(Topic.AGENT_STATUS_UPDATE_SUCCESS, id + "", jsonObject.toJSONString());
+    }
+
+    @Override
+    public String allConfigs(RequestContext rc) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        JSONObject result = new JSONObject();
+        List<StockInfoVo> list = userService.findAllStock(user.getOwnerId());
+        list = assembleSimple(list);
+        result.put("stocks", list);
+        Map<String, Object> map = dubboOutAssembleService.agentSchemeList(user.getOwnerId());
+        result.put("agentConfig", map);
+        List<OwnerDomainVo> allDomains = dubboOutAssembleService.queryAllDomainList(user.getOwnerId());
+        result.put("domains", allDomains);
+        return result.toJSONString();
+    }
+
+    /**
+     * @param list
+     * @return
+     * @Doc 组装股东名称列表
+     */
+    private List<StockInfoVo> assembleSimple(List<StockInfoVo> list) {
+        List<StockInfoVo> infos = new ArrayList<>();
+        for (StockInfoVo info : list) {
+            StockInfoVo info1 = new StockInfoVo();
+            info1.setId(info.getId());
+            info1.setAccount(info.getAccount());
+            infos.add(info1);
+        }
+        return infos;
     }
 
     /**

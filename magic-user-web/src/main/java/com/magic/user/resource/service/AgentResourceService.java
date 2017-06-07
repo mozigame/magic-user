@@ -177,5 +177,11 @@ public interface AgentResourceService {
      */
     String updateStatus(RequestContext rc, Long agentId, Integer status);
 
+    /**
+     * 获取所有的方案，成本，手续，域名
+     * @param rc
+     * @return
+     */
+    String allConfigs(RequestContext rc);
 
 }
