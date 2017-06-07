@@ -42,7 +42,9 @@ public class User implements Serializable{
     private Long ownerId;  //业主id
 
     private String ownerName;   //业主账户
+
     private String weixin;   //微信
+
     private String qq;   //qq
 
     private DeleteStatus isDelete;  //是否删除

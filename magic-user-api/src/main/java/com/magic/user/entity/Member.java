@@ -52,6 +52,10 @@ public class Member {
 
     private DeleteStatus isDelete;      //删除状态
 
+    private String weixin;   //微信
+
+    private String qq;   //qq
+
     private String temp1;
 
     private String temp2;
@@ -248,5 +252,21 @@ public class Member {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getWeixin() {
+        return weixin;
+    }
+
+    public void setWeixin(String weixin) {
+        this.weixin = weixin;
+    }
+
+    public String getQq() {
+        return qq;
+    }
+
+    public void setQq(String qq) {
+        this.qq = qq;
     }
 }

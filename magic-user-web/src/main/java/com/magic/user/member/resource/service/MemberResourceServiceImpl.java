@@ -22,7 +22,6 @@ import com.magic.user.bean.MemberCondition;
 import com.magic.user.bean.RegionNumber;
 import com.magic.user.bean.Register;
 import com.magic.user.constants.UserContants;
-import com.magic.user.entity.Login;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.entity.User;
@@ -39,7 +38,6 @@ import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.vo.*;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -1485,52 +1483,56 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberCenterDetail (RequestContext rc){
-
-        Long uid = rc.getUid();
-
-        User user = userService.getUserById(uid);
-        if (user == null) {
+        Member member = memberService.getMemberById(rc.getUid());
+        if (member == null) {
             throw UserException.ILLEGAL_USER;
         }
 
         MemberCenterDetailVo memberCenterDetailVo = new MemberCenterDetailVo();
-
-        BeanUtils.copyProperties(user,memberCenterDetailVo);
-
-        Login login = loginService.getByUserId(uid);
-        if (user != null) {
-            Date date = DateUtil.getDate(login.getUpdateTime());
-            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(login.getUpdateTime()),DateUtil.formatDefaultTimestamp));
+        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
+        if (subAccount != null && subAccount.getLastTime() != 0) {
+            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(subAccount.getLastTime()),DateUtil.formatDefaultTimestamp));
         }else{//如果查询不到登陆信息就取该用户的注册时间为最后登陆时间
-            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(user.getRegisterTime()),DateUtil.formatDefaultTimestamp));
+            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(member.getRegisterTime()),DateUtil.formatDefaultTimestamp));
         }
-        initMemberCenterDetailVo(memberCenterDetailVo);
-        HashMap<String,Object> result = new HashMap<String,Object>();
-        result.put("apistatus",1);
-        result.put("result",memberCenterDetailVo);
-        return JSONObject.toJSON(result).toString();
+
+        initMemberCenterDetailVo(memberCenterDetailVo,member);
+
+        return JSONObject.toJSONString(memberCenterDetailVo);
     }
 
-    private void initMemberCenterDetailVo(MemberCenterDetailVo o){
-        if(o == null){
+    private void initMemberCenterDetailVo(MemberCenterDetailVo o,Member member){
+        if(o == null || member == null){
             return;
         }
-        if(!StringUtils.isNotEmpty(o.getBankCardNo())){
+        if(StringUtils.isNotEmpty(member.getBankCardNo())){
+            o.setBankCardNo(member.getBankCardNo());
+        }else{
             o.setBankCardNo("尚未设置提款银行卡");
         }
-        if(!StringUtils.isNotEmpty(o.getWeixin())){
+        if(StringUtils.isNotEmpty(member.getWeixin())){
+            o.setWeixin(member.getWeixin());
+        }else{
             o.setWeixin("无");
         }
-        if(!StringUtils.isNotEmpty(o.getQq())){
+        if(StringUtils.isNotEmpty(member.getQq())){
+            o.setQq(member.getQq());
+        }else{
             o.setQq("无");
         }
-        if(!StringUtils.isNotEmpty(o.getUsername())){
+        if(StringUtils.isNotEmpty(member.getUsername())){
+            o.setUsername(member.getUsername());
+        }else{
             o.setUsername("无");
         }
-        if(!StringUtils.isNotEmpty(o.getRealname())){
+        if(StringUtils.isNotEmpty(member.getRealname())){
+            o.setRealname(member.getRealname());
+        }else{
             o.setRealname("无");
         }
-        if(!StringUtils.isNotEmpty(o.getEmail())){
+        if(StringUtils.isNotEmpty(member.getEmail())){
+            o.setEmail(member.getEmail());
+        }else{
             o.setEmail("无");
         }
     }
