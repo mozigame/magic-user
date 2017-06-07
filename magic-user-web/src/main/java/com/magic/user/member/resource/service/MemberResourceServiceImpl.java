@@ -1485,26 +1485,18 @@ public class MemberResourceServiceImpl {
     public String memberCenterDetail (RequestContext rc){
         Member member = memberService.getMemberById(rc.getUid());
         if (member == null) {
-            throw UserException.ILLEGAL_USER;
+            throw UserException.ILLEGAL_MEMBER;
         }
-
         MemberCenterDetailVo memberCenterDetailVo = new MemberCenterDetailVo();
         SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         if (subAccount != null && subAccount.getLastTime() != 0) {
             memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(subAccount.getLastTime()),DateUtil.formatDefaultTimestamp));
-        }else{//如果查询不到登陆信息就取该用户的注册时间为最后登陆时间
-            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(member.getRegisterTime()),DateUtil.formatDefaultTimestamp));
         }
-
-        initMemberCenterDetailVo(memberCenterDetailVo,member);
-
+        initMemberCenterDetailVo(memberCenterDetailVo, member);
         return JSONObject.toJSONString(memberCenterDetailVo);
     }
 
     private void initMemberCenterDetailVo(MemberCenterDetailVo o,Member member){
-        if(o == null || member == null){
-            return;
-        }
         if(StringUtils.isNotEmpty(member.getBankCardNo())){
             o.setBankCardNo(member.getBankCardNo());
         }else{
@@ -1520,11 +1512,7 @@ public class MemberResourceServiceImpl {
         }else{
             o.setQq("无");
         }
-        if(StringUtils.isNotEmpty(member.getUsername())){
-            o.setUsername(member.getUsername());
-        }else{
-            o.setUsername("无");
-        }
+        o.setUsername(member.getUsername());
         if(StringUtils.isNotEmpty(member.getRealname())){
             o.setRealname(member.getRealname());
         }else{
