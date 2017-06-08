@@ -635,7 +635,24 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     //1.url获取ownerId
     //2.ownerId + ownername 获取 stockId
     @Override
-    public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
+    public String agentApply(RequestContext rc, HttpServletRequest request,
+        String account,
+        String password,
+        String paymentPassword,
+        String realname,
+        String telephone,
+        String email,
+        String bankCardNo,
+        String bank,
+        String bankDeposit,
+        String province,
+        String city,
+        String weixin,
+        String qq
+    ) {
+        if (!checkRegisterParam(account,password,paymentPassword)) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
         StringBuffer url = request.getRequestURL();
         String resourceUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).append("/").toString();
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(resourceUrl);
@@ -651,11 +668,20 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.USERNAME_EXIST;
         }
         int ip = IPUtil.ipToInt(rc.getIp());
-        AgentApply agentApply = assembleAgentApply(account, realname, PasswordCapture.getSaltPwd(password), stockId, stockUser.getUsername(), ownerInfo.getOwnerId(), telephone, email, ReviewStatus.noReview, resourceUrl, ip, System.currentTimeMillis(), bankCardNo, bank, bankDeposit);
+        AgentApply agentApply = assembleAgentApply(account, realname, PasswordCapture.getSaltPwd(password), stockId,
+                stockUser.getUsername(), ownerInfo.getOwnerId(), telephone, email, ReviewStatus.noReview, resourceUrl, ip,
+                System.currentTimeMillis(), bankCardNo, bank, bankDeposit,province,city,weixin,qq);
         if (agentApplyService.add(agentApply) <= 0) {
             throw UserException.AGENT_APPLY_ADD_FAIL;
         }
         return UserContants.EMPTY_STRING;
+    }
+
+    private boolean checkRegisterParam(String account, String password, String paymentPassword) {
+        if(account.length() < 6 || account.length() > 16 || password.length() != 32 || paymentPassword.length() != 32){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -673,7 +699,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @Doc 组装代理申请信息
      */
     private AgentApply assembleAgentApply(String username, String realname, String password, Long stockId, String stockName, Long ownerId, String telephone, String email,
-                                          ReviewStatus status, String resourceUrl, Integer registerIp, Long createTime, String bankCardNo, String bank, String bankDeposit) {
+                                          ReviewStatus status, String resourceUrl, Integer registerIp, Long createTime,
+                                          String bankCardNo, String bank, String bankDeposit,String province, String city, String weixin, String qq) {
         AgentApply apply = new AgentApply();
         apply.setUsername(username);
         apply.setRealname(realname);
@@ -690,6 +717,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         apply.setBankCardNo(bankCardNo);
         apply.setBank(bank);
         apply.setBankDeposit(bankDeposit);
+        apply.setProvince(province);
+        apply.setCity(city);
+        apply.setWeixin(weixin);
+        apply.setQq(qq);
         return apply;
     }
 

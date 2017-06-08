@@ -58,7 +58,9 @@
             status,
             gender,
             currency_type,
-            is_delete
+            is_delete,
+            weixin,
+            qq
         FROM t_member
         WHERE member_id IN
         <foreach collection="list" item="id" open="(" close=")"
@@ -138,6 +140,12 @@
             <if test="ownerUsername != null ">
                 owner_username=#{ownerUsername},
             </if>
+            <if test="qq != null ">
+                qq=#{qq},
+            </if>
+            <if test="weixin != null ">
+                weixin=#{weixin},
+            </if>
             <if test="sourceUrl != null ">
                 source_url=#{sourceUrl},
             </if>
@@ -205,6 +213,12 @@
         <if test="ownerUsername != null ">
             owner_username,
         </if>
+        <if test="qq != null ">
+            qq,
+        </if>
+        <if test="weixin != null ">
+            weixin,
+        </if>
         <if test="sourceUrl != null ">
             source_url,
         </if>
@@ -267,6 +281,12 @@
         </if>
         <if test="ownerUsername != null ">
             #{ownerUsername},
+        </if>
+        <if test="qq != null ">
+            #{qq},
+        </if>
+        <if test="weixin != null ">
+            #{weixin},
         </if>
         <if test="sourceUrl != null ">
             #{sourceUrl},

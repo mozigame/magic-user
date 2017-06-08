@@ -38,6 +38,14 @@ public class AgentApply {
 
     private Long createTime; //注册时间
 
+    private String province;//所属省
+
+    private String city;//所属市
+
+    private String weixin;//微信
+
+    private String qq;//QQ
+
     private String temp1;
 
     private String temp2;
@@ -201,5 +209,37 @@ public class AgentApply {
 
     public void setBankDeposit(String bankDeposit) {
         this.bankDeposit = bankDeposit;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getWeixin() {
+        return weixin;
+    }
+
+    public void setWeixin(String weixin) {
+        this.weixin = weixin;
+    }
+
+    public String getQq() {
+        return qq;
+    }
+
+    public void setQq(String qq) {
+        this.qq = qq;
     }
 }

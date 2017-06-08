@@ -65,6 +65,7 @@ public class MemberResource {
             @RequestParam(name = "qq", required = false, defaultValue = "") String qq
 
     ) {
+
         RequestContext rc = RequestContext.getRequestContext();
         //获取域名
         StringBuffer requestURL = request.getRequestURL();
@@ -114,7 +115,6 @@ public class MemberResource {
      * 会员登陆
      * @param request
      * @param response
-     * @param code
      * @param username
      * @param password
      * @return
@@ -124,7 +124,6 @@ public class MemberResource {
     @ResponseBody
     public String login(
             HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(name = "code", required = false, defaultValue = "") String code,
             @RequestParam(name = "username", required = true) String username,
             @RequestParam(name = "password", required = true) String password
 
@@ -135,7 +134,7 @@ public class MemberResource {
         //获取域名
         StringBuffer requestURL = request.getRequestURL();
         String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
-        return memberServiceResource.memberLogin(rc, agent, url, username, password, code);
+        return memberServiceResource.memberLogin(rc, agent, url, username, password);
     }
 
     /**
@@ -542,6 +541,18 @@ public class MemberResource {
     public String memberCenterDetail() {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberCenterDetail(rc);
+    }
+
+    /**
+     * @return
+     * @Doc     刷新会员的余额和未读消息
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/refresh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String refresh() {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.getMemberInfo(rc);
     }
 
 }

@@ -54,6 +54,7 @@ public class UserException extends ExceptionFactor {
     public static final CommonException MEMBER_UPDATE_FAIL = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 5, HttpServletResponse.SC_OK, "member info update fail!", "会员信息更新失败.");
 
+
     /**
      * 会员层级更新失败
      */
@@ -170,5 +171,9 @@ public class UserException extends ExceptionFactor {
     public static final CommonException ILLEGAL_SOURCE_URL = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 24, HttpServletResponse.SC_OK, "illegal source url!", "无效的请求来源.");
 
-
+    /**
+     * 会员信息更新失败
+     */
+    public static final CommonException MEMBER_INFO_FAIL = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 25, HttpServletResponse.SC_OK, "member get info fail!", "获取会员信息失败.");
 }

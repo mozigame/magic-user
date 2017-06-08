@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.core.tools.MD5Util;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.AgentResourceService;
@@ -237,23 +238,28 @@ public class AgentResource {
      * @return
      * @Doc 代理申请--前端页面
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/apply", method = RequestMethod.POST)
     @ResponseBody
     public String apply(
             HttpServletRequest request,
-            @RequestParam(name = "account") String account,
-            @RequestParam(name = "password") String password,
-            @RequestParam(name = "realname") String realname,
-            @RequestParam(name = "telephone") String telephone,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "bankCardNo") String bankCardNo,
-            @RequestParam(name = "bank") String bank,
-            @RequestParam(name = "bankDeposit") String bankDeposit
+            @RequestParam(name = "account",required = true) String account,
+            @RequestParam(name = "password",required = true) String password,
+            @RequestParam(name = "paymentPassword",required = true) String paymentPassword,
+            @RequestParam(name = "realname",required = true) String realname,
+            @RequestParam(name = "telephone",required = true) String telephone,
+            @RequestParam(name = "email",required = false,defaultValue = "") String email,
+            @RequestParam(name = "bankCardNo",required = true) String bankCardNo,
+            @RequestParam(name = "bank",required = true) String bank,
+            @RequestParam(name = "bankDeposit",required = true) String bankDeposit,
+            @RequestParam(name = "province",required = false,defaultValue = "") String province,
+            @RequestParam(name = "city",required = false,defaultValue = "") String city,
+            @RequestParam(name = "weixin",required = false,defaultValue = "") String weixin,
+            @RequestParam(name = "qq",required = false,defaultValue = "") String qq
 
     ) {
-        //
-        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password, realname, telephone, email, bankCardNo, bank, bankDeposit);
+        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password,paymentPassword,
+                realname, telephone, email, bankCardNo, bank, bankDeposit,province,city,weixin,qq);
     }
 
     /**
@@ -276,7 +282,9 @@ public class AgentResource {
 
         return agentResourceService.agentApplyList(RequestContext.getRequestContext(), account, status, page, count);
     }
-
+//    public static void main(String[] args){
+//        System.out.println(MD5Util.md5Digest("123456".getBytes()));
+//    }
     /**
      * @param account 账号
      * @param status  状态
