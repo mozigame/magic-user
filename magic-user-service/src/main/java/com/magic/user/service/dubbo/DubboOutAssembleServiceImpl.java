@@ -187,11 +187,13 @@ public class DubboOutAssembleServiceImpl {
 
 
 
-
+    //TODO 方法要加注释，要说明方法的意图
     public Long getNoReadMessageCount(long uid) {
+        //TODO 凡是调用第三方接口，必须try..catch  而外层进行调用时，则不需要再try了
         return msgDubboService.getNoReadMessageCount(uid);
     }
 
+    //TODO 同上
     public List<String> getRegisterParamserifyVRole(Long ownerId, int type) {
         return registerDubboService.getRequired(ownerId,type);
     }
