@@ -26,4 +26,11 @@
     <!-- 配置层级dubbo -->
     <dubbo:reference id="userLevelService" interface="com.magic.bc.query.service.UserLevelService" timeout="15000"
                      retries="0" check="false"/>
+
+    <!-- 配置层级dubbo -->
+    <dubbo:reference id="registerDubboService" interface="com.magic.config.service.RegisterDubboService" timeout="15000"
+                     retries="0" check="false"/>
+    <!-- 配置层级dubbo -->
+    <dubbo:reference id="msgDubboService" interface="com.magic.cms.service.MsgDubboService" timeout="15000"
+                     retries="0" check="false"/>
 </beans>

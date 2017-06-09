@@ -22,6 +22,9 @@
         <result column="create_time" jdbcType="BIGINT" property="createTime"/>
         <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
+
+        <result column="weixin" jdbcType="VARCHAR" property="weixin"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
     </resultMap>
 
     <!-- 新增代理申请--><!--used-->
@@ -41,8 +44,9 @@
           create_time,
           bank_card_no,
           bank,
-          bank_deposit
-
+          bank_deposit,
+          weixin,
+          qq
           )
         values (
           #{username},
@@ -59,7 +63,9 @@
           #{createTime},
           #{bankCardNo},
           #{bank},
-          #{bankDeposit}
+          #{bankDeposit},
+          #{weixin},
+          #{qq}
         )
     </insert>
 
@@ -80,7 +86,9 @@
         email,
         bank_card_no,
         bank,
-        bank_deposit
+        bank_deposit,
+        weixin,
+        qq
         from t_agent_apply
         WHERE id=#{id}
 

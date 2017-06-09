@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.magic.api.commons.ApiLogger;
 import com.magic.bc.query.service.AgentSchemeService;
 import com.magic.bc.query.service.UserLevelService;
+import com.magic.bc.query.vo.UserLevelVo;
+import com.magic.cms.service.MsgDubboService;
 import com.magic.config.service.DomainDubboService;
+import com.magic.config.service.RegisterDubboService;
 import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
@@ -40,6 +43,12 @@ public class DubboOutAssembleServiceImpl {
     @Resource
     private UserLevelService userLevelService;
 
+    @Resource
+    private MsgDubboService msgDubboService;
+
+    @Resource
+    private RegisterDubboService registerDubboService;
+
     private static final Map<Long, String> EMPTY_MAP = new HashMap<>();
 
     /**
@@ -63,7 +72,7 @@ public class DubboOutAssembleServiceImpl {
      */
     public OwnerInfo getOwnerInfoByDomain(String sourceUrl) {
         try {
-            return domainDubboService.getOwnerInfoByDomain(sourceUrl);
+           return domainDubboService.getOwnerInfoByDomain(sourceUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -160,5 +169,30 @@ public class DubboOutAssembleServiceImpl {
             ApiLogger.error(String.format("get levels error. ids: %s", JSON.toJSONString(ids)), e);
         }
         return EMPTY_MAP;
+    }
+
+    /**
+     * 获取层级映射列表
+     * @param ownerId
+     * @return
+     */
+    public List<UserLevelVo> getLevelListSimple(Long ownerId) {
+        try {
+            return userLevelService.getUserLevel(ownerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
+    public Long getNoReadMessageCount(long uid) {
+        return msgDubboService.getNoReadMessageCount(uid);
+    }
+
+    public List<String> getRegisterParamserifyVRole(Long ownerId, int type) {
+        return registerDubboService.getRequired(ownerId,type);
     }
 }

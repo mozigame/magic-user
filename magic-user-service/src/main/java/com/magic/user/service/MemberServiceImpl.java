@@ -47,10 +47,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean saveMember(Member member) {
         Long result = memberDbService.insert(member);
-        if (Optional.ofNullable(result).filter(resultValue -> resultValue > 0).isPresent()){
+        boolean temp = Optional.ofNullable(result).filter(resultValue -> resultValue > 0).isPresent();
+        if (temp){
             countRedisStorageService.incrMember(member.getOwnerId());
         }
-        return memberDbService.insert(member) > 0;
+        return temp;
     }
 
 }

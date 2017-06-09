@@ -58,6 +58,8 @@ public class Member implements Serializable{
 
     private String qq;   //qq
 
+    private String paymentPassword;//支付密码
+
     private String temp1;
 
     private String temp2;
@@ -270,5 +272,13 @@ public class Member implements Serializable{
 
     public void setQq(String qq) {
         this.qq = qq;
+    }
+
+    public String getPaymentPassword() {
+        return paymentPassword;
+    }
+
+    public void setPaymentPassword(String paymentPassword) {
+        this.paymentPassword = paymentPassword;
     }
 }

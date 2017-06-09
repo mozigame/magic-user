@@ -3,6 +3,7 @@ package com.magic.user.resource.service;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.po.DownLoadFile;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -110,7 +111,20 @@ public interface AgentResourceService {
      * @return
      * @Doc 添加代理申请
      */
-    String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit);
+    String agentApply(RequestContext rc, HttpServletRequest request,
+            String account,
+            String password,
+            String paymentPassword,
+            String realname,
+            String telephone,
+            String email,
+            String bankCardNo,
+            String bank,
+            String bankDeposit,
+            String province,
+            String city,
+            String weixin,
+            String qq);
 
     /**
      * @param rc
