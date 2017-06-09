@@ -43,4 +43,11 @@ public interface AccountDubboService {
      * @return
      */
     Map<Long, OwnerStaticInfo> getOwnerStaticInfo(Collection<Long> ownerIds);
+
+    /**
+     * 检查uid是否登录，是否禁用
+     * @param uid
+     * @return
+     */
+    Member checkMemberLogin(long uid);
 }
