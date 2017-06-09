@@ -5,10 +5,12 @@ import com.magic.user.enums.CurrencyType;
 import com.magic.user.enums.DeleteStatus;
 import com.magic.user.enums.GeneraType;
 
+import java.io.Serializable;
+
 /**
  * @Doc 会员
  */
-public class Member {
+public class Member implements Serializable{
 
     private Long memberId; //会员id
 

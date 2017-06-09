@@ -1,14 +1,23 @@
 package com.magic.user.service.dubbo;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
+import com.magic.config.thrift.base.EGResp;
+import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.User;
+import com.magic.user.enums.AccountStatus;
+import com.magic.user.exception.UserException;
 import com.magic.user.po.OwnerStaticInfo;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
+import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.storage.CountRedisStorageService;
 import com.magic.user.util.PasswordCapture;
 import org.springframework.stereotype.Service;
@@ -35,6 +44,9 @@ public class AccountDubboServiceImpl implements AccountDubboService {
     private AccountIdMappingService accountIdMappingService;
     @Resource
     private CountRedisStorageService countRedisStorageService;
+    @Resource
+    private ThriftOutAssembleServiceImpl thriftOutAssembleService;
+
 
     /**
      * {@inheritDoc}
@@ -83,6 +95,48 @@ public class AccountDubboServiceImpl implements AccountDubboService {
             map.put(ownerId, info);
         }
         return map;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Member checkMemberLogin(long uid) {
+        boolean result = checkLogin(uid);
+        if (!result){
+            ApiLogger.error(String.format("member not logined uid: %d", uid));
+            return null;
+        }
+        Member member = memberService.getMemberById(uid);
+        if (!Optional.ofNullable(member).filter(status -> status.getStatus() == AccountStatus.enable).isPresent()){
+            ApiLogger.error(String.format("member was disable. uid: %d, member: %s", uid, JSON.toJSONString(member)));
+            return null;
+        }
+        return member;
+    }
+
+    /**
+     * 检查登录状态
+     * @param uid
+     * @return
+     */
+    private boolean checkLogin(long uid) {
+        String body = assembleVerifyBody(uid);
+        EGResp resp = thriftOutAssembleService.memberLoginVerify(body, UserContants.CALLER);
+        return Optional.ofNullable(resp).filter(response -> response.getCode() == 0x3333).isPresent();
+    }
+
+    /**
+     * 组装登陆校验passport 请求body
+     *
+     * @param uid 用户ID
+     * @return
+     */
+    private String assembleVerifyBody(long uid) {
+        JSONObject object = new JSONObject();
+        object.put("userId", uid);
+        object.put("operatorTime", System.currentTimeMillis());
+        return object.toJSONString();
     }
 
 
