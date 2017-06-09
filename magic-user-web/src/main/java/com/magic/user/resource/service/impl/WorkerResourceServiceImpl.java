@@ -105,7 +105,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         List<WorkerVo> workerVos = Lists.newArrayList();
         for (User user : users) {
             WorkerVo vo = new WorkerVo();
-            vo.setId(user.getId());
+            vo.setId(user.getUserId());
             vo.setAccount(user.getUsername());
             vo.setRealname(user.getRealname());
             vo.setStatus(user.getStatus().value());
