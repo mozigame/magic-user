@@ -809,31 +809,6 @@ public class MemberResourceServiceImpl {
         return JSON.toJSONString(result);
     }
 
-    /**
-     * 组装会员层级映射列表
-     * @param ownerId
-     * @return
-     */
-    private List<MemberLevelListVo> getMemberLevelListSimple(Long ownerId) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ownerId", ownerId);
-        EGResp resp = thriftOutAssembleService.findLevelListSimple(jsonObject.toJSONString(), "account");
-        //TODO 确定resp的code
-        if (resp != null && resp.getData() != null) {
-            List<MemberLevelListVo> memberLevelListVos = new ArrayList<>();
-            JSONArray array = JSONArray.parseArray(resp.getData());
-            for (Object object : array) {
-                JSONObject jsonObject1 = JSON.parseObject(JSON.toJSONString(object));
-                MemberLevelListVo memberLevelListVo = new MemberLevelListVo();
-                memberLevelListVo.setId(jsonObject1.getInteger("id"));
-                memberLevelListVo.setName(jsonObject1.getString("name"));
-                memberLevelListVos.add(memberLevelListVo);
-            }
-            return memberLevelListVos;
-        }
-        return null;
-    }
-
 
     /**
      * 状态变更
