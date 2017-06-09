@@ -15,6 +15,7 @@ import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.utils.StringUtils;
+import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
@@ -801,37 +802,11 @@ public class MemberResourceServiceImpl {
         if (operaUser == null) {
             return UserContants.EMPTY_LIST;
         }
-        SimpleListResult<List<MemberLevelListVo>> result = new SimpleListResult<>();
-        //TODO jason dubbo
-        List<MemberLevelListVo> list = getMemberLevelListSimple(operaUser.getOwnerId());
+        SimpleListResult<List<UserLevelVo>> result = new SimpleListResult<>();
+        //TODO andy dubbo
+        List<UserLevelVo> list = dubboOutAssembleService.getLevelListSimple(operaUser.getOwnerId());
         result.setList(list != null ? list : new ArrayList<>());
-//        return JSON.toJSONString(result);
-
-        //TODO 假数据
-        return "{\n" +
-                "    \"list\": [\n" +
-                "        {\n" +
-                "            \"id\": 1001,\n" +
-                "            \"name\": \"未分层\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 1002,\n" +
-                "            \"name\": \"VIP1\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 1003,\n" +
-                "            \"name\": \"VIP2\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 1004,\n" +
-                "            \"name\": \"VIP3\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 1005,\n" +
-                "            \"name\": \"VIP4\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
+        return JSON.toJSONString(result);
     }
 
     /**
