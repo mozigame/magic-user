@@ -4,6 +4,7 @@ import com.magic.user.entity.Member;
 import com.magic.user.entity.User;
 import com.magic.user.po.OwnerStaticInfo;
 import com.magic.user.vo.MemberConditionVo;
+import com.magic.user.vo.MemberInfoVo;
 
 import java.util.Collection;
 import java.util.Map;
@@ -53,9 +54,9 @@ public interface AccountDubboService {
     Member checkMemberLogin(long uid);
 
     /**
-     *  根据会员ID获取会员的会员mongo对象（主要包含会员的基本信息和会员层级、存款金额、取款金额及相应的次数）
+     *  获取会员的股东ID，业主ID及层级信息
      * @param memberId
      * @return
      */
-    MemberConditionVo getMemberConditionByMemberId(long memberId);
+    MemberInfoVo getMemberInfo(long memberId);
 }

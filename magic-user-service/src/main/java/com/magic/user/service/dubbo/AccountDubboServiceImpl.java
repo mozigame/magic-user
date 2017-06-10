@@ -18,6 +18,7 @@ import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.storage.CountRedisStorageService;
 import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.MemberConditionVo;
+import com.magic.user.vo.MemberInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -142,8 +143,26 @@ public class AccountDubboServiceImpl implements AccountDubboService {
      * {@inheritDoc}
      */
     @Override
-    public MemberConditionVo getMemberConditionByMemberId(long memberId) {
-        return memberMongoService.get(memberId);
+    public MemberInfoVo getMemberInfo(long memberId) {
+        MemberConditionVo mcv = memberMongoService.get(memberId);
+        MemberInfoVo result = assembleMemberInfoVo(mcv);
+        return result;
+    }
+
+    /**
+     * 组装登会员的股东ID，业主ID及层级信息
+     * @param mcv
+     * @return
+     */
+    private MemberInfoVo assembleMemberInfoVo(MemberConditionVo mcv) {
+        if(mcv == null){
+            return null;
+        }
+        MemberInfoVo result = new MemberInfoVo();
+        result.setLevel(mcv.getLevel());
+        result.setStockId(mcv.getStockId());
+        result.setOwnerId(mcv.getOwnerId());
+        return result;
     }
 
 }
