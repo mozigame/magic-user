@@ -54,8 +54,6 @@ public class StockholderResource {
             HttpServletResponse response
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-        //todo 自定义user
-        rc.setUid(105094L);
         DownLoadFile downLoadFile = stockResourceService.listExport(rc);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {

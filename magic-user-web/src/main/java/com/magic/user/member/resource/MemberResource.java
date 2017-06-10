@@ -235,8 +235,6 @@ public class MemberResource {
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-        //todo 自定义user
-        rc.setUid(105094L);
         DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
@@ -407,8 +405,6 @@ public class MemberResource {
             @RequestParam(name = "lock", required = false, defaultValue = "1") int lock
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-        //todo 自定义user
-        rc.setUid(105094L);
         DownLoadFile downLoadFile = memberServiceResource.memberLevelListExport(rc, lock);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {

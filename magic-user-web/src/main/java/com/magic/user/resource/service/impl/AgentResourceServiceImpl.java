@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -634,33 +635,20 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     //TODO 流程有待确认
     //1.url获取ownerId
     //2.ownerId + ownername 获取 stockId
-    //todo 参数单独一行展示，方法加上注释就行
-    //todo 缺少对必填参数的校验
     @Override
-    public String agentApply(RequestContext rc, HttpServletRequest request,
-        String account,
-        String password,
-        String paymentPassword,
-        String realname,
-        String telephone,
-        String email,
-        String bankCardNo,
-        String bank,
-        String bankDeposit,
-        String province,
-        String city,
-        String weixin,
-        String qq
-    ) {
-        if (!checkRegisterParam(account,password,paymentPassword)) {
-            throw UserException.ILLEGAL_PARAMETERS;
-        }
+    public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String paymentPassword, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String province, String city, String weixin, String qq) {
         StringBuffer url = request.getRequestURL();
         String resourceUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).append("/").toString();
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(resourceUrl);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
+
+        //校验用户名、密码、支付密码的格式及其他非空参数
+        if (!checkRegisterParam(account,password,paymentPassword,ownerInfo.getOwnerId(),AccountType.agent.value(),email,province,city,weixin,qq)) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+
         long stockId = accountIdMappingService.getUid(ownerInfo.getOwnerId(), ownerInfo.getOwnerName());
         User stockUser = userService.get(stockId);
         if (stockUser == null) {
@@ -679,10 +667,54 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return UserContants.EMPTY_STRING;
     }
 
-    //TODO 判断会出现NULLPOINTEXCEPTION
-    private boolean checkRegisterParam(String account, String password, String paymentPassword) {
-        if(account.length() < 6 || account.length() > 16 || password.length() != 32 || paymentPassword.length() != 32){
+    /**
+     * 校验用户名、密码、支付密码的格式及其他非空参数
+     *
+     * @param account
+     * @param password
+     * @param paymentPassword
+     * @param ownerId
+     * @param type
+     * @param email
+     * @param province
+     * @param city
+     * @param weixin
+     * @param qq
+     * @return
+     */
+    private boolean checkRegisterParam(String account, String password, String paymentPassword, long ownerId,int type,String email,String province,String city,String weixin,String qq) {
+        //校验用户名和密码
+        if(account.length() < 6 || account.length() > 16 || password.length() != 32){
             return false;
+        }
+        //校验其他注册参数
+        List<String> list = dubboOutAssembleService.getMustRegisterarameters(ownerId,type);
+        if(list != null && list.size() > 0){
+            if(list.contains("email")){
+                if(!StringUtils.isNotEmpty(email)){
+                    return false;
+                }
+            }
+            if(list.contains("province")){
+                if(!StringUtils.isNotEmpty(province)){
+                    return false;
+                }
+            }
+            if(list.contains("city")){
+                if(!StringUtils.isNotEmpty(city)){
+                    return false;
+                }
+            }
+            if(list.contains("weixin")){
+                if(!StringUtils.isNotEmpty(weixin)){
+                    return false;
+                }
+            }
+            if(list.contains("qq")){
+                if(!StringUtils.isNotEmpty(qq)){
+                    return false;
+                }
+            }
         }
         return true;
     }

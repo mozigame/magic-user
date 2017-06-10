@@ -137,8 +137,6 @@ public class MemInfoResource {
             @RequestParam(name = "account", required = false, defaultValue = "") String account
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-        //todo
-        rc.setUid(105094L);
         DownLoadFile downLoadFile = infoResourceService.modifyListExport(rc, type, account);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {

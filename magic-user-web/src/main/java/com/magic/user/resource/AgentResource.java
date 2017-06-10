@@ -69,8 +69,6 @@ public class AgentResource {
             @RequestParam(name = "condition", required = false,defaultValue = "{}") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-        //todo 自定义user
-        rc.setUid(105094L);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
@@ -300,8 +298,6 @@ public class AgentResource {
             @RequestParam(name = "status", required = false, defaultValue = "-1") Integer status
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-        //todo 自定义user
-        rc.setUid(105094L);
         DownLoadFile downLoadFile = agentResourceService.reviewListExport(rc, account, status);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {

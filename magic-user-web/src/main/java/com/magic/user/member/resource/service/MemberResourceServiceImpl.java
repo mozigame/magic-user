@@ -789,6 +789,7 @@ public class MemberResourceServiceImpl {
         //TODO andy dubbo 查询表数据，生成excel的zip，并返回zip byte[]
         byte[] content = new byte[5];
         List<MemberLevelListVo> list = new ArrayList<>();
+
         downLoadFile.setContent(ExcelUtil.memberLevelListExport(list, filename));
         return downLoadFile;
     }

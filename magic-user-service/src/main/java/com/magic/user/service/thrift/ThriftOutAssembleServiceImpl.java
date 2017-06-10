@@ -209,7 +209,7 @@ public class ThriftOutAssembleServiceImpl {
     }
 
     /**
-     * 添加代理参数配置
+     * 更新代理参数配置
      * @param body
      * @param caller
      * @return
