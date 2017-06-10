@@ -6,7 +6,7 @@ package com.magic.user.vo;
 public class MemberCenterDetailVo {
     private String username = "无";//账号
     private String currency = "人民币";
-    private String lastLoginTime;//最后登录时间
+    private String lastLoginTime ="";//最后登录时间
     private String bankCardNo = "";//银行卡号
     private String realname = "无";//真实姓名
     private String telephone = "无";//手机号码

@@ -172,8 +172,13 @@ public class UserException extends ExceptionFactor {
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 24, HttpServletResponse.SC_OK, "illegal source url!", "无效的请求来源.");
 
     /**
-     * 会员信息更新失败
+     * 获取会员信息失败
      */
     public static final CommonException MEMBER_INFO_FAIL = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 25, HttpServletResponse.SC_OK, "member get info fail!", "获取会员信息失败.");
+     /**
+     * 会员账号被禁用
+     */
+    public static final CommonException MEMBER_ACCOUNT_DISABLED = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 25, HttpServletResponse.SC_OK, "member account is disabled!", "会员账号被禁用.");
 }

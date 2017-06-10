@@ -13,13 +13,11 @@ import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.exception.UserException;
 import com.magic.user.po.OwnerStaticInfo;
-import com.magic.user.service.AccountIdMappingService;
-import com.magic.user.service.LoginService;
-import com.magic.user.service.MemberService;
-import com.magic.user.service.UserService;
+import com.magic.user.service.*;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.storage.CountRedisStorageService;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.vo.MemberConditionVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -46,7 +44,8 @@ public class AccountDubboServiceImpl implements AccountDubboService {
     private CountRedisStorageService countRedisStorageService;
     @Resource
     private ThriftOutAssembleServiceImpl thriftOutAssembleService;
-
+    @Resource
+    private MemberMongoService memberMongoService;
 
     /**
      * {@inheritDoc}
@@ -139,5 +138,12 @@ public class AccountDubboServiceImpl implements AccountDubboService {
         return object.toJSONString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MemberConditionVo getMemberConditionByMemberId(long memberId) {
+        return memberMongoService.get(memberId);
+    }
 
 }

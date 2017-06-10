@@ -13,6 +13,7 @@ import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.service.java.UuidService;
+import com.magic.user.enums.AccountType;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -74,13 +75,9 @@ public class DubboOutAssembleServiceImpl {
         try {
            return domainDubboService.getOwnerInfoByDomain(sourceUrl);
         } catch (Exception e) {
-            e.printStackTrace();
+            ApiLogger.error(String.format("Failed to get the owner information. sourceUrl: %s", sourceUrl), e);
         }
-        // todo 自己固定一个业主信息
-        OwnerInfo ownerInfo = new OwnerInfo();
-        ownerInfo.setOwnerId(10001L);
-        ownerInfo.setOwnerName("owner2");
-        return ownerInfo;
+        return null;
     }
 
     /**
@@ -186,11 +183,19 @@ public class DubboOutAssembleServiceImpl {
     }
 
 
-
-    //TODO 方法要加注释，要说明方法的意图
-    public Long getNoReadMessageCount(long uid) {
-        //TODO 凡是调用第三方接口，必须try..catch  而外层进行调用时，则不需要再try了
-        return msgDubboService.getNoReadMessageCount(uid);
+    /**
+     * 获取会员的未读消息数量
+     * @param uid
+     * @return
+     */
+    public long getNoReadMessageCount(long uid) {
+        long result = 0;
+        try {
+            result = msgDubboService.getNoReadMessageCount(uid);
+        } catch (Exception e) {
+            ApiLogger.error("failed to get membership number of unread messages!",e);
+        }
+        return result;
     }
 
     /**
@@ -200,6 +205,19 @@ public class DubboOutAssembleServiceImpl {
      * @return
      */
     public List<String> getMustRegisterarameters(Long ownerId, int type) {
-        return registerDubboService.getRequired(ownerId,type);
+        if(type == AccountType.member.value()){
+            type = 1;//会员
+        }else if(type == AccountType.agent.value()){
+            type = 2;//代理
+        }else{
+            return null;
+        }
+        List<String> result = null;
+        try {
+            result = registerDubboService.getRequired(ownerId,type);
+        } catch (Exception e) {
+            ApiLogger.error("获取注册时设置的必填项失败", e);
+        }
+        return result;
     }
 }

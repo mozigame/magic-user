@@ -7,7 +7,6 @@ import com.magic.api.commons.core.tools.HeaderUtil;
 import com.magic.user.member.resource.service.MemberResourceServiceImpl;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.RegisterReq;
-import com.magic.user.vo.MemberCenterDetailVo;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
 import java.net.URLEncoder;
 
 /**
@@ -42,6 +41,17 @@ public class MemberResource {
      * @param proCode
      * @param username
      * @param password
+     * @param paymentPassword
+     * @param telephone
+     * @param email
+     * @param bank
+     * @param realname
+     * @param bankCardNo
+     * @param bankDeposit
+     * @param province
+     * @param city
+     * @param weixin
+     * @param qq
      * @return
      */
     @Access(type = Access.AccessType.PUBLIC)
@@ -76,6 +86,7 @@ public class MemberResource {
 
     /**
      * 组装注册请求数据
+     *
      * @param proCode
      * @param username
      * @param password
@@ -119,6 +130,7 @@ public class MemberResource {
      * @param password
      * @return
      */
+
     @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
