@@ -174,7 +174,13 @@ public class DubboOutAssembleServiceImpl {
         return msgDubboService.getNoReadMessageCount(uid);
     }
 
-    public List<String> getRegisterParamserifyVRole(Long ownerId, int type) {
+    /**
+     * 获取注册时设置的必填项
+     * @param ownerId
+     * @param type
+     * @return
+     */
+    public List<String> getMustRegisterarameters(Long ownerId, int type) {
         return registerDubboService.getRequired(ownerId,type);
     }
 }

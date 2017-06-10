@@ -55,7 +55,7 @@ public class AgentResource {
         String result = agentResourceService.findByPage(RequestContext.getRequestContext(), condition, page, count);
         return result;
     }
-
+    
     /**
      * @param condition 检索条件
      * @return

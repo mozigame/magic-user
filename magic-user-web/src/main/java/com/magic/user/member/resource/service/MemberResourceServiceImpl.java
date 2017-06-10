@@ -1094,7 +1094,7 @@ public class MemberResourceServiceImpl {
             return false;
         }
         //校验其他注册参数
-        List<String> list = dubboOutAssembleService.getRegisterParamserifyVRole(ownerId,type);
+        List<String> list = dubboOutAssembleService.getMustRegisterarameters(ownerId,type);
         if(list != null && list.size() > 0){
             for (String name : list) {
                 try {
@@ -1593,6 +1593,11 @@ public class MemberResourceServiceImpl {
         }
     }
 
+    /**
+     * 获取会员的余额和未读消息
+     * @param rc
+     * @return
+     */
     public String getMemberInfo(RequestContext rc) {
 
         Long message = 0L;
