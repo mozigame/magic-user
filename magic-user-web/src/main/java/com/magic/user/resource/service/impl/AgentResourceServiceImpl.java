@@ -634,6 +634,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     //TODO 流程有待确认
     //1.url获取ownerId
     //2.ownerId + ownername 获取 stockId
+    //todo 参数单独一行展示，方法加上注释就行
+    //todo 缺少对必填参数的校验
     @Override
     public String agentApply(RequestContext rc, HttpServletRequest request,
         String account,
@@ -677,6 +679,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return UserContants.EMPTY_STRING;
     }
 
+    //TODO 判断会出现NULLPOINTEXCEPTION
     private boolean checkRegisterParam(String account, String password, String paymentPassword) {
         if(account.length() < 6 || account.length() > 16 || password.length() != 32 || paymentPassword.length() != 32){
             return false;

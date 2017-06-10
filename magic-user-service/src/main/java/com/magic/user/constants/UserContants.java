@@ -12,6 +12,7 @@ public class UserContants {
     public static final String EMPTY_LIST = "{\"list\":[]}";//空list
 
     public static final String SPLIT_LINE = "-";    //业主id与用户账号连接符
+    public static final String CALLER = "account"; //调用方
 
     public enum CUSTOMER_MQ_TAG {
         USER_ID_MAPPING_ADD,    //添加id映射表

@@ -15,6 +15,7 @@ import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.utils.StringUtils;
+import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
@@ -801,62 +802,11 @@ public class MemberResourceServiceImpl {
         if (operaUser == null) {
             return UserContants.EMPTY_LIST;
         }
-        SimpleListResult<List<MemberLevelListVo>> result = new SimpleListResult<>();
-        //TODO jason dubbo
-        List<MemberLevelListVo> list = getMemberLevelListSimple(operaUser.getOwnerId());
+        SimpleListResult<List<UserLevelVo>> result = new SimpleListResult<>();
+        //TODO andy dubbo
+        List<UserLevelVo> list = dubboOutAssembleService.getLevelListSimple(operaUser.getOwnerId());
         result.setList(list != null ? list : new ArrayList<>());
-//        return JSON.toJSONString(result);
-
-        //TODO 假数据
-        return "{\n" +
-                "    \"list\": [\n" +
-                "        {\n" +
-                "            \"id\": 1001,\n" +
-                "            \"name\": \"未分层\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 1002,\n" +
-                "            \"name\": \"VIP1\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 1003,\n" +
-                "            \"name\": \"VIP2\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 1004,\n" +
-                "            \"name\": \"VIP3\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 1005,\n" +
-                "            \"name\": \"VIP4\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
-    }
-
-    /**
-     * 组装会员层级映射列表
-     * @param ownerId
-     * @return
-     */
-    private List<MemberLevelListVo> getMemberLevelListSimple(Long ownerId) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ownerId", ownerId);
-        EGResp resp = thriftOutAssembleService.findLevelListSimple(jsonObject.toJSONString(), "account");
-        //TODO 确定resp的code
-        if (resp != null && resp.getData() != null) {
-            List<MemberLevelListVo> memberLevelListVos = new ArrayList<>();
-            JSONArray array = JSONArray.parseArray(resp.getData());
-            for (Object object : array) {
-                JSONObject jsonObject1 = JSON.parseObject(JSON.toJSONString(object));
-                MemberLevelListVo memberLevelListVo = new MemberLevelListVo();
-                memberLevelListVo.setId(jsonObject1.getInteger("id"));
-                memberLevelListVo.setName(jsonObject1.getString("name"));
-                memberLevelListVos.add(memberLevelListVo);
-            }
-            return memberLevelListVos;
-        }
-        return null;
+        return JSON.toJSONString(result);
     }
 
 
@@ -1079,6 +1029,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private boolean checkRegisterParam(RegisterReq req,Long ownerId,int type) {
+        //todo 判断的意义？？？
         if(type == AccountType.member.value()){
             type = 1;
         }else if(type == AccountType.agent.value()){
@@ -1087,6 +1038,7 @@ public class MemberResourceServiceImpl {
             return false;
         }
         //校验用户名和密码
+        //TODO ？？ paymentPassword
         if (!Optional.ofNullable(req)
                 .filter(request -> request.getUsername() != null && req.getUsername().length() >= 6 && req.getUsername().length() <= 16)
                 .filter(request -> request.getPassword() != null && request.getPassword().length() == 32 && req.getPaymentPassword().length() == 32)
@@ -1099,6 +1051,7 @@ public class MemberResourceServiceImpl {
             for (String name : list) {
                 try {
                     Field field = req.getClass().getField(name);
+                    //TODO ？？？
                     field.setAccessible(true);
                     field.setAccessible(true);
                     if(field.get(req) == null) {
@@ -1151,9 +1104,10 @@ public class MemberResourceServiceImpl {
         }
         JSONObject object = JSONObject.parseObject(resp.getData());
         long uid = object.getLongValue("uid");
-        //查询会员是否被停用
+        //查询会员是否被停用 //TODO morton 需要先检测member是否为null，
         Member member = memberService.getMemberById(uid);
         if(member.getStatus() == AccountStatus.disable){
+            //TODO 此处不能抛USERNAME_NOT_EXIST异常，新增账号被禁用的异常
             throw UserException.USERNAME_NOT_EXIST;
         }
         if (!Optional.ofNullable(member).isPresent()){
@@ -1161,7 +1115,7 @@ public class MemberResourceServiceImpl {
         }
         String token = object.getString("token");
         sendLoginMessage(member, rc);
-        //组装返回数据（需参考前端页面）
+        //组装返回数据（需参考前端页面）//TODO 单独抽离方法出来组装返回数据
         LoginSuccessInfoVo result = new LoginSuccessInfoVo();
         result.setId(uid);
         result.setUsername(member.getUsername());
@@ -1179,8 +1133,8 @@ public class MemberResourceServiceImpl {
             message = dubboOutAssembleService.getNoReadMessageCount(uid);
 
         } catch (Exception e) {
-            ApiLogger.error("查询会员余额或未读消息数量失败!");
-            e.printStackTrace();
+            //TODO 日志不采用中文
+            ApiLogger.error("查询会员余额或未读消息数量失败!", e);
         }
         result.setMessage(message);
         result.setBalance(balance);
@@ -1546,6 +1500,7 @@ public class MemberResourceServiceImpl {
 
         MemberCenterDetailVo memberCenterDetailVo = new MemberCenterDetailVo();
         SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
+        //TODO 登录时间有就有，没有就没有，不需要赋值为注册时间
         if (subAccount != null && subAccount.getLastTime() != 0) {
             memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(subAccount.getLastTime()),DateUtil.formatDefaultTimestamp));
         }else{//如果查询不到登陆信息就取该用户的注册时间为最后登陆时间
@@ -1599,19 +1554,20 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String getMemberInfo(RequestContext rc) {
-
+        //TODO 用基础类型 long
         Long message = 0L;
-        String balance = "0";;
+        String balance = "0";
         try {
             message = dubboOutAssembleService.getNoReadMessageCount(rc.getUid());
             EGResp capitalResp = thriftOutAssembleService.getMemberCapital("{\"memberId\":" + rc.getUid() + "}", "account");
             if (capitalResp != null && capitalResp.getData() != null) {
                 JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
+                //TODO 需要确保"balance"存在的前提下，才进行赋值
                 balance = capitalData.getString("balance");
             }
         } catch (Exception e) {
-            ApiLogger.error("获取会员余额或未读消息数失败");
-            e.printStackTrace();
+            //TODO 不需要throw， 日志不能为中文
+            ApiLogger.error("获取会员余额或未读消息数失败", e);
             throw UserException.MEMBER_INFO_FAIL;
         }
 

@@ -410,7 +410,7 @@
         type
         from t_user_info
         WHERE owner_id=#{ownerId}
-        AND type = 4  --4代表子账号
+        AND type = 4
         <if test="account != null and account != ''">
           and username=#{account}
         </if>
@@ -432,7 +432,7 @@
           count(id)
         from t_user_info
         WHERE owner_id=#{ownerId}
-        AND type = 4  --4代表子账号
+        AND type = 4
         <if test="account != null and account != ''">
             and username=#{account}
         </if>

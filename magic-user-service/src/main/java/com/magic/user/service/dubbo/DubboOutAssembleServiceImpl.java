@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.magic.api.commons.ApiLogger;
 import com.magic.bc.query.service.AgentSchemeService;
 import com.magic.bc.query.service.UserLevelService;
+import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.cms.service.MsgDubboService;
 import com.magic.config.service.DomainDubboService;
 import com.magic.config.service.RegisterDubboService;
@@ -170,7 +171,25 @@ public class DubboOutAssembleServiceImpl {
         return EMPTY_MAP;
     }
 
+    /**
+     * 获取层级映射列表
+     * @param ownerId
+     * @return
+     */
+    public List<UserLevelVo> getLevelListSimple(Long ownerId) {
+        try {
+            return userLevelService.getUserLevel(ownerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+    //TODO 方法要加注释，要说明方法的意图
     public Long getNoReadMessageCount(long uid) {
+        //TODO 凡是调用第三方接口，必须try..catch  而外层进行调用时，则不需要再try了
         return msgDubboService.getNoReadMessageCount(uid);
     }
 
