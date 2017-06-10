@@ -182,7 +182,6 @@ public class DubboOutAssembleServiceImpl {
         return null;
     }
 
-
     /**
      * 获取会员的未读消息数量
      * @param uid

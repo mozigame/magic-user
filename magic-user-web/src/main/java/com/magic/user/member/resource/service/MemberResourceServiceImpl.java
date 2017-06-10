@@ -1110,7 +1110,7 @@ public class MemberResourceServiceImpl {
 
         String token = object.getString("token");
         long message = dubboOutAssembleService.getNoReadMessageCount(uid);
-        EGResp capitalResp = thriftOutAssembleService.getMemberCapital("{\"memberId\":" + uid + "}", "account");s
+        EGResp capitalResp = thriftOutAssembleService.getMemberCapital("{\"memberId\":" + uid + "}", "account");
 
         String result = assembleLoginResult(uid,member.getUsername(),token,message,capitalResp);
         sendLoginMessage(member, rc);
