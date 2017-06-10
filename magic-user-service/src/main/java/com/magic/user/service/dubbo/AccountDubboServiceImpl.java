@@ -134,7 +134,7 @@ public class AccountDubboServiceImpl implements AccountDubboService {
      */
     private String assembleVerifyBody(Member member) {
         JSONObject object = new JSONObject();
-        object.put("userId", member.getUsername());
+        object.put("userId", member.getMemberId());
         object.put("username", member.getUsername());
         return object.toJSONString();
     }
