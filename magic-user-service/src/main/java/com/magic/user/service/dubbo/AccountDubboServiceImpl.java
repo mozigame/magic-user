@@ -102,14 +102,14 @@ public class AccountDubboServiceImpl implements AccountDubboService {
      */
     @Override
     public Member checkMemberLogin(long uid) {
-        boolean result = checkLogin(uid);
-        if (!result){
-            ApiLogger.error(String.format("member not logined uid: %d", uid));
-            return null;
-        }
         Member member = memberService.getMemberById(uid);
         if (!Optional.ofNullable(member).filter(status -> status.getStatus() == AccountStatus.enable).isPresent()){
             ApiLogger.error(String.format("member was disable. uid: %d, member: %s", uid, JSON.toJSONString(member)));
+            return null;
+        }
+        boolean result = checkLogin(member);
+        if (!result){
+            ApiLogger.error(String.format("member not logined uid: %d", uid));
             return null;
         }
         return member;
@@ -117,11 +117,11 @@ public class AccountDubboServiceImpl implements AccountDubboService {
 
     /**
      * 检查登录状态
-     * @param uid
+     * @param member
      * @return
      */
-    private boolean checkLogin(long uid) {
-        String body = assembleVerifyBody(uid);
+    private boolean checkLogin(Member member) {
+        String body = assembleVerifyBody(member);
         EGResp resp = thriftOutAssembleService.memberLoginVerify(body, UserContants.CALLER);
         return Optional.ofNullable(resp).filter(response -> response.getCode() == 0x3333).isPresent();
     }
@@ -129,13 +129,13 @@ public class AccountDubboServiceImpl implements AccountDubboService {
     /**
      * 组装登陆校验passport 请求body
      *
-     * @param uid 用户ID
+     * @param member 用户
      * @return
      */
-    private String assembleVerifyBody(long uid) {
+    private String assembleVerifyBody(Member member) {
         JSONObject object = new JSONObject();
-        object.put("userId", uid);
-        object.put("operatorTime", System.currentTimeMillis());
+        object.put("userId", member.getUsername());
+        object.put("username", member.getUsername());
         return object.toJSONString();
     }
 

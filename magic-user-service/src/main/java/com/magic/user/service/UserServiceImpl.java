@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long getWorkerCount(Long ownerId, String account, String realname, Integer roleId) {
         Long count = (Long) agentDbService.get("getWorkerCount", new String[]{"ownerId", "account", "realname", "roleId"}, new Object[]{ownerId, account, realname, roleId});
-        return count == null ? 0 : count;
+        return count == null ? Long.valueOf(0) : count;
     }
 
 
