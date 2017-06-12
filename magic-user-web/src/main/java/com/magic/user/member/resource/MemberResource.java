@@ -289,7 +289,7 @@ public class MemberResource {
      * @Doc 会员详情信息查询
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/detail", method = RequestMethod.GET)
+    @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
             @RequestParam(name = "id", required = true) long id
@@ -305,7 +305,7 @@ public class MemberResource {
      * @Doc 会员登录密码重置
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/back/password/reset", method = RequestMethod.POST)
+    @RequestMapping(value = "/back/password/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String backPasswordRest(
             @RequestParam(name = "id", required = true) long id,
@@ -321,7 +321,7 @@ public class MemberResource {
      * @Doc 会员强制下线
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/force/logout", method = RequestMethod.POST)
+    @RequestMapping(value = "/force/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String forceLogout(
             @RequestParam(name = "id") long id
@@ -341,7 +341,7 @@ public class MemberResource {
      * @Doc 会员基础信息修改
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String update(
             @RequestParam(name = "id", required = true) long id,
@@ -363,7 +363,7 @@ public class MemberResource {
      */
     @Deprecated
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/level/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/level/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String levelUpdate(
             @RequestParam(name = "id", required = true) long id,
@@ -381,7 +381,7 @@ public class MemberResource {
      * @Doc 会员层级列表
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/level/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/level/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String levelList(
             @RequestParam(name = "lock", required = false, defaultValue = "1") int lock,
@@ -431,7 +431,7 @@ public class MemberResource {
      * @Doc 层级映射列表
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/level/list/simple", method = RequestMethod.GET)
+    @RequestMapping(value = "/level/list/simple", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String levelListSpecial() {
         RequestContext rc = RequestContext.getRequestContext();
@@ -446,7 +446,7 @@ public class MemberResource {
      * @Doc 某层级下会员列表
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/level/list/special", method = RequestMethod.GET)
+    @RequestMapping(value = "/level/list/special", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String levelListSpecial(
             @RequestParam(name = "condition") String condition,
@@ -498,7 +498,7 @@ public class MemberResource {
      * @return
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/disable", method = RequestMethod.POST)
+    @RequestMapping(value = "/disable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String statusUpdate(
             @RequestParam(name = "id", required = true) Long id,

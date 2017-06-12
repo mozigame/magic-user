@@ -110,7 +110,7 @@ public class MemInfoResource {
      * @Doc 修改记录查询
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/modify/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/modify/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String modifyList(
             @RequestParam(name = "type", required = false, defaultValue = "-1") Integer type,

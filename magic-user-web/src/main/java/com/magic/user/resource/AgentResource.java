@@ -9,6 +9,7 @@ import com.magic.user.bean.AgentCondition;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.AgentResourceService;
 import com.magic.user.util.PasswordCapture;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,7 +45,7 @@ public class AgentResource {
      * @Doc 代理列表
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String list(
             @RequestParam(name = "condition", required = false) String condition,
@@ -108,7 +109,7 @@ public class AgentResource {
      * @Doc 手动添加代理
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String add(
             HttpServletRequest request,
@@ -138,7 +139,7 @@ public class AgentResource {
      * @Doc 代理详情
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/detail", method = RequestMethod.GET)
+    @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
             @RequestParam(name = "id") Long id
@@ -153,7 +154,7 @@ public class AgentResource {
      * @Doc 获取代理下的域名
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/domain", method = RequestMethod.GET)
+    @RequestMapping(value = "/domain", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String domain(
             @RequestParam(name = "id") Long id
@@ -170,7 +171,7 @@ public class AgentResource {
      * @Doc 代理密码重置
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/password/reset", method = RequestMethod.POST)
+    @RequestMapping(value = "/password/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String passwordRest(
             @RequestParam(name = "id") Long id,
@@ -191,7 +192,7 @@ public class AgentResource {
      * @Doc 代理资料修改
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String update(
             @RequestParam(name = "id") Long id,
@@ -215,7 +216,7 @@ public class AgentResource {
      * @Doc 代理参数配置修改
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/settings", method = RequestMethod.POST)
+    @RequestMapping(value = "/settings", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String settings(
             @RequestParam(name = "id") Long id,
@@ -237,7 +238,7 @@ public class AgentResource {
      * @Doc 代理申请--前端页面
      */
     @Access(type = Access.AccessType.PUBLIC)
-    @RequestMapping(value = "/apply", method = RequestMethod.POST)
+    @RequestMapping(value = "/apply", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String apply(
             HttpServletRequest request,
@@ -269,7 +270,7 @@ public class AgentResource {
      * @Doc 获取代理审核列表
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/review/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/review/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String reviewList(
             @RequestParam(name = "account", required = false) String account,
@@ -325,7 +326,7 @@ public class AgentResource {
      * @Doc 代理审核基础信息    --代理审核页
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/detail/simple", method = RequestMethod.GET)
+    @RequestMapping(value = "/detail/simple", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detailSimple(
             @RequestParam(name = "id") Long id
@@ -353,7 +354,7 @@ public class AgentResource {
      * @Doc 代理审核/拒绝
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/review", method = RequestMethod.POST)
+    @RequestMapping(value = "/review", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String review(
             @RequestParam(name = "id") Long id,
@@ -384,7 +385,7 @@ public class AgentResource {
      * @Doc 查看代理审核信息
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/review/detail", method = RequestMethod.GET)
+    @RequestMapping(value = "/review/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String reviewDetail(
             @RequestParam(name = "id") Long id
@@ -399,7 +400,7 @@ public class AgentResource {
      * @Doc 启用禁用代理
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/disable", method = RequestMethod.POST)
+    @RequestMapping(value = "/disable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String review(
             @RequestParam(name = "id") Long id,
@@ -415,7 +416,7 @@ public class AgentResource {
      * @Doc 获取 方案，成本，手续，域名 列表
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/all/configs", method = RequestMethod.GET)
+    @RequestMapping(value = "/all/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String allConfigs() {
         return agentResourceService.allConfigs(RequestContext.getRequestContext());

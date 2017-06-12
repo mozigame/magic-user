@@ -3,6 +3,7 @@ package com.magic.user.resource;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.resource.service.WorkerResourceService;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +30,7 @@ public class WorkerResource {
      * @Doc 子账号列表，子账号只包括工作人员账号
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String list(
             @RequestParam(name = "account", required = false, defaultValue = "") String account,
@@ -50,7 +51,7 @@ public class WorkerResource {
      * @Doc 添加子账号
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String add(
             @RequestParam(name = "account") String account,
@@ -70,7 +71,7 @@ public class WorkerResource {
      * @return
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String update(
             @RequestParam(name = "userId") Long userId,
@@ -88,7 +89,7 @@ public class WorkerResource {
      * @return
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/update/status", method = RequestMethod.POST)
+    @RequestMapping(value = "/update/status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String updateStatus(
             @RequestParam(name = "userId") Long userId,
@@ -104,7 +105,7 @@ public class WorkerResource {
      * @return
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/detail", method = RequestMethod.GET)
+    @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
             @RequestParam(name = "userId") Long userId
@@ -120,7 +121,7 @@ public class WorkerResource {
      * @return
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/password/reset", method = RequestMethod.POST)
+    @RequestMapping(value = "/password/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String pwdReset(
             @RequestParam(name = "userId") Long userId,

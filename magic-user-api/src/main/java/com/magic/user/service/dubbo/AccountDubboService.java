@@ -59,4 +59,5 @@ public interface AccountDubboService {
      * @return
      */
     MemberInfoVo getMemberInfo(long memberId);
+
 }

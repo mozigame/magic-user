@@ -5,6 +5,7 @@ import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.StockResourceService;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,7 +38,7 @@ public class StockholderResource {
      * @Doc 股东列表
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String list() {
         return stockResourceService.findAllStock(RequestContext.getRequestContext());
@@ -80,7 +81,7 @@ public class StockholderResource {
      * @Doc 所属股东列表
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/list/simple", method = RequestMethod.GET)
+    @RequestMapping(value = "/list/simple", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String listSimple() {
         RequestContext rc = RequestContext.getRequestContext();
@@ -93,7 +94,7 @@ public class StockholderResource {
      * @Doc 股东详情
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/detail", method = RequestMethod.GET)
+    @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
             @RequestParam(name = "id") Long id
@@ -110,7 +111,7 @@ public class StockholderResource {
      * @Doc 股东密码重置
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/password/reset", method = RequestMethod.POST)
+    @RequestMapping(value = "/password/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String passwordReset(
             @RequestParam(name = "id") Long id,
@@ -131,7 +132,7 @@ public class StockholderResource {
      * @Doc 股东基础信息修改
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String update(
             @RequestParam(name = "id") Long id,
@@ -158,7 +159,7 @@ public class StockholderResource {
      * @Doc 新增股东
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String add(
             @RequestParam(name = "account") String account,
@@ -184,7 +185,7 @@ public class StockholderResource {
      * @Doc 启用停用股东
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/disable", method = RequestMethod.POST)
+    @RequestMapping(value = "/disable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String disable(
             @RequestParam(name = "id") Long id,

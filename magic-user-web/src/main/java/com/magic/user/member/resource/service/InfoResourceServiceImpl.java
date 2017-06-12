@@ -290,7 +290,7 @@ public class InfoResourceServiceImpl {
                 }
                 if (bankDeposit != null) {
                     newMap.put("bankDeposit", bankDeposit);
-                    newMap.put("bankDeposit", member.getBankDeposit());
+                    oldMap.put("bankDeposit", member.getBankDeposit());
                 }
                 userMap.put("userId", member.getMemberId());
                 userMap.put("username", member.getUsername());
