@@ -19,6 +19,7 @@ import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
 import com.magic.user.exception.UserException;
+import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.WorkerResourceService;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
@@ -77,6 +78,11 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         //todo 调用dubbo
         Map<Long, UserRoleVo> userRoleVoMap = permitDubboService.getUsersRole(userIds);
         return JSON.toJSONString(assemblePageBean(page,count, total, assembleWorkerVoList(users, loginMap, userRoleVoMap)));
+    }
+
+    @Override
+    public DownLoadFile workerListExport(RequestContext rc, String account, String realname, Integer roleId) {
+        return null;
     }
 
     /**

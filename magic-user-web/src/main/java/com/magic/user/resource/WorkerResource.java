@@ -1,8 +1,11 @@
 package com.magic.user.resource;
 
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.WorkerResourceService;
+import org.apache.http.protocol.ResponseServer;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * User: joey
@@ -40,6 +47,43 @@ public class WorkerResource {
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
         return workerResourceService.list(RequestContext.getRequestContext(), account, realname, roleId, page, count);
+    }
+
+    /**
+     * @param account  账号
+     * @param realname 姓名
+     * @return
+     * @Doc 子账号列表，子账号只包括工作人员账号
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/list/export", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public void list(
+            HttpServletResponse response,
+            @RequestParam(name = "account", required = false, defaultValue = "") String account,
+            @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
+            @RequestParam(name = "roleId", required = false) Integer roleId
+    ) throws Exception {
+        RequestContext rc = RequestContext.getRequestContext();
+        DownLoadFile downLoadFile = workerResourceService.workerListExport(rc, account, realname, roleId);
+        response.setCharacterEncoding("UTF-8");
+        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
+            String contnetDisposition = "attachment;filename=";
+            if (downLoadFile.getFilename() != null) {
+                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
+                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
+            }
+            response.setHeader("Content-Disposition", contnetDisposition);
+            ServletOutputStream outputStream = response.getOutputStream();
+            try {
+                outputStream.write(downLoadFile.getContent());
+            } catch (Exception e) {
+                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
+            } finally {
+                outputStream.flush();
+                outputStream.close();
+            }
+        }
     }
 
     /**
