@@ -222,7 +222,10 @@ public class AgentResource {
             @RequestParam(name = "id") Long id,
             @RequestParam(name = "returnScheme", required = false, defaultValue = "-1") Integer returnScheme,
             @RequestParam(name = "adminCost", required = false, defaultValue = "-1") Integer adminCost,
-            @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme
+            @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme,
+            @RequestParam(name = "discount", required = false, defaultValue = "-1") Integer discount,
+            @RequestParam(name = "cost", required = false, defaultValue = "-1") Integer cost
+
     ) {
         return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme);
     }
