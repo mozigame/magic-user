@@ -1388,7 +1388,6 @@ public class MemberResourceServiceImpl {
             return JSON.toJSONString(assemblePage(page, count, 0, null));
         }
         OnlineMemberConditon memberCondition = parseContion(condition, user);
-        memberCondition.setOwnerId(user.getOwnerId());
         long total = memberMongoService.getOnlineMemberCount(memberCondition);
         if (total <= 0) {
             return JSON.toJSONString(assemblePage(page, count, 0, null));
