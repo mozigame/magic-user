@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
+import com.magic.api.commons.tools.IPUtil;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
@@ -17,6 +18,7 @@ import com.magic.user.service.*;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.storage.CountRedisStorageService;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.util.UserUtil;
 import com.magic.user.vo.MemberConditionVo;
 import com.magic.user.vo.MemberInfoVo;
 import org.springframework.stereotype.Service;
@@ -154,7 +156,12 @@ public class AccountDubboServiceImpl implements AccountDubboService {
      */
     @Override
     public String getVerifyCode(String ip) {
-        return memberService.getVerifyCode(ip);
+        String code = UserUtil.checkCode();
+        boolean result = memberService.refreshCode(IPUtil.ipToLong(ip), code);
+        if (!result){
+            return "0000";
+        }
+        return code;
     }
 
     /**

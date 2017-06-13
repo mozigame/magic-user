@@ -40,6 +40,7 @@ import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
+import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
@@ -1079,9 +1080,12 @@ public class MemberResourceServiceImpl {
         if (!checkLoginReq(username, password)) {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
+        if (StringUtils.isEmpty(code)){
+            throw UserException.VERIFY_CODE_ERROR;
+        }
         String verifyCode = memberService.getVerifyCode(rc.getIp());
         if (StringUtils.isNotEmpty(verifyCode)){
-            if (!code.equals(code)){
+            if (!verifyCode.toUpperCase().equals(code.toUpperCase())){
                 throw UserException.VERIFY_CODE_ERROR;
             }
         }
@@ -1588,7 +1592,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String getCode(RequestContext rc) {
-        String code = checkCode();
+        String code = UserUtil.checkCode();
         long ip = IPUtil.ipToLong(rc.getIp());
         ApiLogger.info(String.format("refresh code. ip: %d, code: %s", ip, code));
         boolean result = memberService.refreshCode(ip, code);
@@ -1598,37 +1602,4 @@ public class MemberResourceServiceImpl {
         return "{\"code\":" + "\"" + code + "\"" + "+}";
     }
 
-    /**
-     * 按照一定的规则产生验证码
-     *
-     * @return
-     */
-    public static String checkCode() {
-        // 声明返回值
-        String temp = "";
-        // 使用随机生成器对象
-        Random rd = new Random();
-        // 验证码位数 4位
-        for (int i = 0; i < 4; i++) {
-            // 每一位 产生字母的规则的 随机数
-            int m = rd.nextInt(3); // 0 --1 2
-            // 每一位规则的生成器
-            switch (m) {
-                case 0: // 规则 a-z 65--90 25;
-                    char c1 = (char) (rd.nextInt(26) + 65);
-                    temp += c1;
-                    break;
-                case 1: // 规则 A-Z 97--122
-                    char c2 = (char) (rd.nextInt(26) + 97);
-                    temp += c2;
-                    break;
-                case 2: // 0--9;
-                    int num = rd.nextInt(10);
-                    temp += num;
-                    break;
-            }
-        }
-        // 返回
-        return temp;
-    }
 }
