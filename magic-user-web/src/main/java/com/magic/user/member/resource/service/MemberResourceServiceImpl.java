@@ -1453,6 +1453,7 @@ public class MemberResourceServiceImpl {
         } else {
             memberCondition.setOwnerId(uid);
         }
+        memberCondition.setOwnerId(user.getOwnerId());
         return memberCondition;
     }
 
