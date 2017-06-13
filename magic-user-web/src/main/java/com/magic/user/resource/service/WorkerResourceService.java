@@ -1,6 +1,7 @@
 package com.magic.user.resource.service;
 
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.user.po.DownLoadFile;
 
 /**
  * User: joey
@@ -17,6 +18,16 @@ public interface WorkerResourceService {
      * @return
      */
     String list(RequestContext rc, String account, String realname, Integer roleId, Integer page, Integer count);
+
+    /**
+     * @Doc 子账号列表
+     * @param account
+     * @param realname
+     * @return
+     */
+    DownLoadFile workerListExport(RequestContext rc, String account, String realname, Integer roleId);
+
+
 
     /**
      * @Doc 添加子账号
