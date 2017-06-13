@@ -1599,7 +1599,7 @@ public class MemberResourceServiceImpl {
         if (!result){
             throw UserException.GET_VERIFY_CODE_ERROR;
         }
-        return "{\"code\":" + "\"" + code + "\"" + "+}";
+        return "{\"code\":" + "\"" + code + "\"" + "}";
     }
 
 }
