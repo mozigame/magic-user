@@ -47,4 +47,20 @@ public interface MemberService {
      * @return
      */
     boolean saveMember(Member member);
+
+    /**
+     * 保存验证码
+     * @param ip
+     * @param code
+     * @return
+     */
+    boolean refreshCode(long ip, String code);
+
+    /**
+     * 获取验证码
+     *
+     * @param ip
+     * @return
+     */
+    String getVerifyCode(String ip);
 }

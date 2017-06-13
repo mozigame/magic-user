@@ -128,6 +128,7 @@ public class MemberResource {
      * @param response
      * @param username
      * @param password
+     * @param code
      * @return
      */
 
@@ -137,7 +138,8 @@ public class MemberResource {
     public String login(
             HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "username", required = true) String username,
-            @RequestParam(name = "password", required = true) String password
+            @RequestParam(name = "password", required = true) String password,
+            @RequestParam(name = "code", required = true) String code
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
@@ -146,7 +148,7 @@ public class MemberResource {
         //获取域名
         StringBuffer requestURL = request.getRequestURL();
         String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
-        return memberServiceResource.memberLogin(rc, agent, url, username, password);
+        return memberServiceResource.memberLogin(rc, agent, url, username, password, code);
     }
 
     /**
@@ -563,4 +565,16 @@ public class MemberResource {
         return memberServiceResource.getMemberInfo(rc);
     }
 
+    /**
+     * 获取验证码
+     *
+     * @return
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/code/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getCode() {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.getCode(rc);
+    }
 }

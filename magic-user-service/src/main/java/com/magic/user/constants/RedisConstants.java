@@ -149,6 +149,20 @@ public class RedisConstants {
     }
 
     /**
+     * 登录验证码
+     */
+    private static final String LOGIN_VERIFY_CODE = "ulvcode_";
+
+    /**
+     * 用户登录验证码
+     * @param ip
+     * @return
+     */
+    public static String assembleVerifyCode(long ip) {
+        return assemble(LOGIN_VERIFY_CODE, ip);
+    }
+
+    /**
      * 组装key
      *
      * @param pre

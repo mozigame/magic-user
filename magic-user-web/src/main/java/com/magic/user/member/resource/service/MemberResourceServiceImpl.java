@@ -14,6 +14,7 @@ import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.config.thrift.base.EGResp;
@@ -1071,11 +1072,18 @@ public class MemberResourceServiceImpl {
      * @param url      url
      * @param username 用户名
      * @param password 密码
+     * @param code 验证码
      * @return
      */
-    public String memberLogin(RequestContext rc, String agent, String url, String username, String password) {
+    public String memberLogin(RequestContext rc, String agent, String url, String username, String password, String code) {
         if (!checkLoginReq(username, password)) {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
+        }
+        String verifyCode = memberService.getVerifyCode(rc.getIp());
+        if (StringUtils.isNotEmpty(verifyCode)){
+            if (!code.equals(code)){
+                throw UserException.VERIFY_CODE_ERROR;
+            }
         }
         //根据url获取业主ID
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
@@ -1512,7 +1520,7 @@ public class MemberResourceServiceImpl {
             memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp));
         }
 
-        initMemberCenterDetailVo(memberCenterDetailVo,member);
+        initMemberCenterDetailVo(memberCenterDetailVo, member);
 
         return JSONObject.toJSONString(memberCenterDetailVo);
     }
@@ -1571,5 +1579,56 @@ public class MemberResourceServiceImpl {
             balance = "3000";
         }
         return "{\"message\":"+message+",\"balance\":\""+balance+"\"}";
+    }
+
+    /**
+     * 返回验证码
+     *
+     * @param rc
+     * @return
+     */
+    public String getCode(RequestContext rc) {
+        String code = checkCode();
+        long ip = IPUtil.ipToLong(rc.getIp());
+        ApiLogger.info(String.format("refresh code. ip: %d, code: %s", ip, code));
+        boolean result = memberService.refreshCode(ip, code);
+        if (!result){
+            throw UserException.GET_VERIFY_CODE_ERROR;
+        }
+        return "{\"code\":" + "\"" + code + "\"" + "+}";
+    }
+
+    /**
+     * 按照一定的规则产生验证码
+     *
+     * @return
+     */
+    public static String checkCode() {
+        // 声明返回值
+        String temp = "";
+        // 使用随机生成器对象
+        Random rd = new Random();
+        // 验证码位数 4位
+        for (int i = 0; i < 4; i++) {
+            // 每一位 产生字母的规则的 随机数
+            int m = rd.nextInt(3); // 0 --1 2
+            // 每一位规则的生成器
+            switch (m) {
+                case 0: // 规则 a-z 65--90 25;
+                    char c1 = (char) (rd.nextInt(26) + 65);
+                    temp += c1;
+                    break;
+                case 1: // 规则 A-Z 97--122
+                    char c2 = (char) (rd.nextInt(26) + 97);
+                    temp += c2;
+                    break;
+                case 2: // 0--9;
+                    int num = rd.nextInt(10);
+                    temp += num;
+                    break;
+            }
+        }
+        // 返回
+        return temp;
     }
 }

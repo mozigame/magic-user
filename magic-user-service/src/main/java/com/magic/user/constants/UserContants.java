@@ -13,6 +13,7 @@ public class UserContants {
 
     public static final String SPLIT_LINE = "-";    //业主id与用户账号连接符
     public static final String CALLER = "account"; //调用方
+    public static final int EXPIRE_TIME = 86400; //设置过期时间 1天
 
     public enum CUSTOMER_MQ_TAG {
         USER_ID_MAPPING_ADD,    //添加id映射表

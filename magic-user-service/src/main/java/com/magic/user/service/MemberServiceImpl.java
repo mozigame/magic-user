@@ -3,6 +3,7 @@ package com.magic.user.service;
 import com.magic.user.entity.Member;
 import com.magic.user.storage.CountRedisStorageService;
 import com.magic.user.storage.MemberDbService;
+import com.magic.user.storage.MemberRedisStorageService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -22,6 +23,8 @@ public class MemberServiceImpl implements MemberService {
     private MemberDbService memberDbService;
     @Resource
     private CountRedisStorageService countRedisStorageService;
+    @Resource
+    private MemberRedisStorageService memberRedisStorageService;
 
     @Override
     public Member getMemberById(Long id) {
@@ -52,6 +55,22 @@ public class MemberServiceImpl implements MemberService {
             countRedisStorageService.incrMember(member.getOwnerId());
         }
         return temp;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean refreshCode(long ip, String code) {
+        return memberRedisStorageService.refreshCode(ip, code);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getVerifyCode(String ip) {
+        return memberRedisStorageService.getVerifyCode(ip);
     }
 
 }

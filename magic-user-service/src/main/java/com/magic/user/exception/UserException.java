@@ -181,4 +181,17 @@ public class UserException extends ExceptionFactor {
      */
     public static final CommonException MEMBER_ACCOUNT_DISABLED = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 25, HttpServletResponse.SC_OK, "member account is disabled!", "会员账号被禁用.");
+
+    /**
+     * 获取验证码失败
+     */
+    public static final CommonException GET_VERIFY_CODE_ERROR = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 26, HttpServletResponse.SC_OK, "get verify code fail!", "获取验证码失败.");
+
+    /**
+     * 验证码错误
+     */
+    public static final CommonException VERIFY_CODE_ERROR = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 27, HttpServletResponse.SC_OK, "verify code error!", "验证码错误.");
+
 }

@@ -60,4 +60,11 @@ public interface AccountDubboService {
      */
     MemberInfoVo getMemberInfo(long memberId);
 
+    /**
+     * 获取验证码
+     *
+     * @param ip
+     * @return
+     */
+    String getVerifyCode(String ip);
 }
