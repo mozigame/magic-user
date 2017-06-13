@@ -1565,11 +1565,11 @@ public class MemberResourceServiceImpl {
         if (capitalResp != null && capitalResp.getData() != null) {
             JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
             balance = capitalData.getString("balance");
-            if(balance == null){
-                balance = "0";
-            }
         }
-
+        if (StringUtils.isEmpty(balance)){
+            //TODO 对接好数据后，修改为0
+            balance = "3000";
+        }
         return "{\"message\":"+message+",\"balance\":\""+balance+"\"}";
     }
 }
