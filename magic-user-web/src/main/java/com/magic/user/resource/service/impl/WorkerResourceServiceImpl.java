@@ -204,6 +204,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         user.setType(type);
         user.setUsername(account);
         user.setRealname(realname);
+        user.setRegisterTime(System.currentTimeMillis());
         return user;
     }
 
