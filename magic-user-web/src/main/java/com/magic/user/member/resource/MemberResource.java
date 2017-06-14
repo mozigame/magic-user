@@ -139,7 +139,7 @@ public class MemberResource {
             HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "username", required = true) String username,
             @RequestParam(name = "password", required = true) String password,
-            @RequestParam(name = "code", required = true) String code
+            @RequestParam(name = "code", required = false) String code
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
