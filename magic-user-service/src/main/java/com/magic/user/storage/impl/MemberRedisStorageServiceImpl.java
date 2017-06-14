@@ -3,10 +3,12 @@ package com.magic.user.storage.impl;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.codis.JedisFactory;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.constants.RedisConstants;
 import com.magic.user.constants.UserContants;
 import com.magic.user.storage.MemberRedisStorageService;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 
 import javax.annotation.Resource;
@@ -27,16 +29,18 @@ public class MemberRedisStorageServiceImpl implements MemberRedisStorageService{
      * {@inheritDoc}
      */
     @Override
-    public boolean refreshCode(long ip, String code) {
+    public boolean refreshCode(String clientId, String code) {
         try {
             Pipeline pipelined = jedisFactory.getInstance().pipelined();
-            String key = RedisConstants.assembleVerifyCode(ip);
-            pipelined.set(key, code);
+            String key = RedisConstants.assembleVerifyCode(clientId);
+            long expireTime = System.currentTimeMillis() + UserContants.VERIFY_CODE_VALID_TIME;
+            String value = code.concat(UserContants.SPLIT_LINE).concat(String.valueOf(expireTime));
+            pipelined.set(key, value);
             pipelined.expire(key, UserContants.EXPIRE_TIME);
             pipelined.sync();
             return true;
         }catch (Exception e){
-            ApiLogger.error(String.format("refresh code error. ip: %d, code: %s", ip, code), e);
+            ApiLogger.error(String.format("refresh code error. clientId: %s, code: %s", clientId, code), e);
         }
         return false;
     }
@@ -45,11 +49,17 @@ public class MemberRedisStorageServiceImpl implements MemberRedisStorageService{
      * {@inheritDoc}
      */
     @Override
-    public String getVerifyCode(String ip) {
+    public String getVerifyCode(String clientId) {
         try {
-            return jedisFactory.getInstance().get(RedisConstants.assembleVerifyCode(IPUtil.ipToLong(ip)));
+            Jedis instance = jedisFactory.getInstance();
+            String key = RedisConstants.assembleVerifyCode(clientId);
+            String value = instance.get(key);
+            if (StringUtils.isNotEmpty(value)){
+                instance.del(key);
+            }
+            return value;
         }catch (Exception e){
-            ApiLogger.error(String.format("get verify code from redis error. ip: %s", ip), e);
+            ApiLogger.error(String.format("get verify code from redis error. clientId: %s", clientId), e);
         }
         return null;
     }

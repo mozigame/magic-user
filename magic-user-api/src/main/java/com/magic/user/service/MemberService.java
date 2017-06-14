@@ -50,17 +50,17 @@ public interface MemberService {
 
     /**
      * 保存验证码
-     * @param ip
+     * @param clientId
      * @param code
      * @return
      */
-    boolean refreshCode(long ip, String code);
+    boolean refreshCode(String clientId, String code);
 
     /**
      * 获取验证码
      *
-     * @param ip
+     * @param clientId
      * @return
      */
-    String getVerifyCode(String ip);
+    String getVerifyCode(String clientId);
 }

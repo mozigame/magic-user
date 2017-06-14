@@ -152,19 +152,6 @@ public class AccountDubboServiceImpl implements AccountDubboService {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getVerifyCode(String ip) {
-        String code = UserUtil.checkCode();
-        boolean result = memberService.refreshCode(IPUtil.ipToLong(ip), code);
-        if (!result){
-            return "0000";
-        }
-        return code;
-    }
-
-    /**
      * 组装登会员的股东ID，业主ID及层级信息
      * @param mcv
      * @return

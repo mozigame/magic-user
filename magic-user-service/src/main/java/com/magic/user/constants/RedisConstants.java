@@ -155,11 +155,11 @@ public class RedisConstants {
 
     /**
      * 用户登录验证码
-     * @param ip
+     * @param clientId
      * @return
      */
-    public static String assembleVerifyCode(long ip) {
-        return assemble(LOGIN_VERIFY_CODE, ip);
+    public static String assembleVerifyCode(String clientId) {
+        return assemble(LOGIN_VERIFY_CODE, clientId);
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.magic.user.service;
 
+import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.entity.Member;
 import com.magic.user.storage.CountRedisStorageService;
 import com.magic.user.storage.MemberDbService;
@@ -61,16 +63,18 @@ public class MemberServiceImpl implements MemberService {
      * {@inheritDoc}
      */
     @Override
-    public boolean refreshCode(long ip, String code) {
-        return memberRedisStorageService.refreshCode(ip, code);
+    public boolean refreshCode(String clientId, String code) {
+        return memberRedisStorageService.refreshCode(clientId, code);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getVerifyCode(String ip) {
-        return memberRedisStorageService.getVerifyCode(ip);
+    public String getVerifyCode(String clientId) {
+        String result = memberRedisStorageService.getVerifyCode(clientId);
+        ApiLogger.info(String.format("get verify code. clientId: %s, result: %s", clientId, result));
+        return result;
     }
 
 }

@@ -45,6 +45,7 @@ import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -1083,12 +1084,14 @@ public class MemberResourceServiceImpl {
         if (StringUtils.isEmpty(code)){
             throw UserException.VERIFY_CODE_ERROR;
         }
-        /*String verifyCode = memberService.getVerifyCode(rc.getIp());
-        if (StringUtils.isNotEmpty(verifyCode)){
-            if (!verifyCode.toUpperCase().equals(code.toUpperCase())){
-                throw UserException.VERIFY_CODE_ERROR;
-            }
-        }*/
+        String clientId = getClientId(rc);
+        if (StringUtils.isEmpty(clientId)){
+            throw UserException.VERIFY_CODE_INVALID;
+        }
+        String verifyCodeAndExpireTime = memberService.getVerifyCode(clientId);
+        //验证码验证
+        checkVerifyCode(verifyCodeAndExpireTime, code);
+
         //根据url获取业主ID
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
@@ -1129,6 +1132,42 @@ public class MemberResourceServiceImpl {
         sendLoginMessage(member, rc);
 
         return result;
+    }
+
+    /**
+     * 验证码校验
+     *
+     * @param verifyCodeAndExpireTime
+     * @param code
+     */
+    private void checkVerifyCode(String verifyCodeAndExpireTime, String code) {
+        if (StringUtils.isEmpty(verifyCodeAndExpireTime)){
+            throw UserException.VERIFY_CODE_INVALID;
+        }
+        String[] split = verifyCodeAndExpireTime.split(UserContants.SPLIT_LINE);
+        if (split == null || split.length != 2){
+            throw UserException.VERIFY_CODE_INVALID;
+        }
+        String verifyCode = split[0];
+        long time;
+        try {
+            time = Long.parseLong(split[1]);
+        }catch (Exception e){
+            ApiLogger.error(String.format("parse verifycode of time error. msg: %s", e.getMessage()));
+            throw UserException.VERIFY_CODE_INVALID;
+        }
+        long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis > time){
+            ApiLogger.info(String.format("verify code expire. verifyCode: %s, code: %s, ctime: %d", verifyCodeAndExpireTime, code, currentTimeMillis));
+            throw UserException.VERIFY_CODE_INVALID;
+        }
+        if (StringUtils.isEmpty(verifyCode)){
+            ApiLogger.info(String.format("verify code empty. verifyCode: %s, code: %s, ctime: %d", verifyCodeAndExpireTime, code, currentTimeMillis));
+            throw UserException.VERIFY_CODE_INVALID;
+        }
+        if (!verifyCode.toUpperCase().equals(code.toUpperCase())){
+            throw UserException.VERIFY_CODE_ERROR;
+        }
     }
 
     /**
@@ -1592,14 +1631,41 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String getCode(RequestContext rc) {
+        String clientId = getClientId(rc);
+        if (StringUtils.isEmpty(clientId)){//初次请求，需要往cookie存入一份
+            clientId = rc.getRequest().getSession().getId();
+            if (StringUtils.isEmpty(clientId)){
+                clientId = UUIDUtil.getUUID();
+            }
+            rc.getResponse().addCookie(new Cookie(UserContants.CLIENT_ID, clientId));
+        }
         String code = UserUtil.checkCode();
-        long ip = IPUtil.ipToLong(rc.getIp());
-        ApiLogger.info(String.format("refresh code. ip: %d, code: %s", ip, code));
-        boolean result = memberService.refreshCode(ip, code);
+        ApiLogger.info(String.format("refresh code. clientId: %s, code: %s", clientId, code));
+        boolean result = memberService.refreshCode(clientId, code);
         if (!result){
             throw UserException.GET_VERIFY_CODE_ERROR;
         }
         return "{\"code\":" + "\"" + code + "\"" + "}";
+    }
+
+    /**
+     * 获取客户端ID
+     *
+     * @param rc
+     * @return
+     */
+    private String getClientId(RequestContext rc) {
+        Cookie[] cookies = rc.getRequest().getCookies();
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                String name = cookie.getName();
+                String value = cookie.getValue();
+                if (UserContants.CLIENT_ID.equals(name)) {
+                    return value;
+                }
+            }
+        }
+        return null;
     }
 
 }

@@ -139,7 +139,7 @@ public class MemberResource {
             HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "username", required = true) String username,
             @RequestParam(name = "password", required = true) String password,
-            @RequestParam(name = "code", required = false) String code
+            @RequestParam(name = "code", required = true) String code
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
@@ -570,7 +570,7 @@ public class MemberResource {
      *
      * @return
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/code/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String getCode() {

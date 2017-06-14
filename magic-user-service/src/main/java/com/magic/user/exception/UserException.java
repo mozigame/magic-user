@@ -194,4 +194,10 @@ public class UserException extends ExceptionFactor {
     public static final CommonException VERIFY_CODE_ERROR = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 27, HttpServletResponse.SC_OK, "verify code error!", "验证码错误.");
 
+    /**
+     * 验证码失效
+     */
+    public static final CommonException VERIFY_CODE_INVALID = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 28, HttpServletResponse.SC_OK, "verify code invalid!", "验证码失效.");
+
 }

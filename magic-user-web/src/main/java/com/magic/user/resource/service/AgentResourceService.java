@@ -61,7 +61,7 @@ public interface AgentResourceService {
 
 
     /**
-     * @param id
+     * @param rc
      * @return
      * @Doc 获取代理拥有的域名
      */
