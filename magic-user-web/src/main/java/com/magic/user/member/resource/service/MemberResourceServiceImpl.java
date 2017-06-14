@@ -468,6 +468,7 @@ public class MemberResourceServiceImpl {
         info.setStatus(member.getStatus().value());
         info.setShowStatus(member.getStatus().desc());
         info.setBankCardNo(member.getBankCardNo());
+        info.setTelephone(member.getTelephone());
         info.setType(AccountType.member.value());
         SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         if (subAccount != null) {
