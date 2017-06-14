@@ -332,8 +332,6 @@ public class MemberResourceServiceImpl {
      */
     public String memberDetails(RequestContext rc, long id) {
         Member member = memberService.getMemberById(id);
-        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
-
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
@@ -352,9 +350,14 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private MemberDetailVo assembleMemberDetail(Member member) {
+        /*最近登录信息*/
+        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         MemberDetailVo vo = new MemberDetailVo();
         ////会员基础信息
         vo.setBaseInfo(assembleMemberInfo(member));
+        if (subAccount != null) {
+            vo.getBaseInfo().setLastLoginIp(IPUtil.intToIp(subAccount.getLastIp()));
+        }
 
         /**
          * 会员优惠方案
