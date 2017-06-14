@@ -1083,12 +1083,12 @@ public class MemberResourceServiceImpl {
         if (StringUtils.isEmpty(code)){
             throw UserException.VERIFY_CODE_ERROR;
         }
-        String verifyCode = memberService.getVerifyCode(rc.getIp());
+        /*String verifyCode = memberService.getVerifyCode(rc.getIp());
         if (StringUtils.isNotEmpty(verifyCode)){
             if (!verifyCode.toUpperCase().equals(code.toUpperCase())){
                 throw UserException.VERIFY_CODE_ERROR;
             }
-        }
+        }*/
         //根据url获取业主ID
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
