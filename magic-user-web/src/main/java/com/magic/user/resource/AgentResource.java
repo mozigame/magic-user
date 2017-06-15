@@ -425,4 +425,14 @@ public class AgentResource {
         return agentResourceService.allConfigs(RequestContext.getRequestContext());
     }
 
+    /**
+     * @return
+     * @Doc 获取 方案，成本，手续列表
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String configs() {
+        return agentResourceService.configs(RequestContext.getRequestContext());
+    }
 }

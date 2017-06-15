@@ -645,7 +645,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //校验用户名、密码、支付密码的格式及其他非空参数
-        if (!checkRegisterParam(account,password,paymentPassword,ownerInfo.getOwnerId(),AccountType.agent.value(),email,province,city,weixin,qq)) {
+        if (!checkRegisterParam(account, password, paymentPassword, ownerInfo.getOwnerId(), AccountType.agent.value(), email, province, city, weixin, qq)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
 
@@ -660,7 +660,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         int ip = IPUtil.ipToInt(rc.getIp());
         AgentApply agentApply = assembleAgentApply(account, realname, PasswordCapture.getSaltPwd(password), stockId,
                 stockUser.getUsername(), ownerInfo.getOwnerId(), telephone, email, ReviewStatus.noReview, resourceUrl, ip,
-                System.currentTimeMillis(), bankCardNo, bank, bankDeposit,province,city,weixin,qq);
+                System.currentTimeMillis(), bankCardNo, bank, bankDeposit, province, city, weixin, qq);
         if (agentApplyService.add(agentApply) <= 0) {
             throw UserException.AGENT_APPLY_ADD_FAIL;
         }
@@ -682,36 +682,36 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @param qq
      * @return
      */
-    private boolean checkRegisterParam(String account, String password, String paymentPassword, long ownerId,int type,String email,String province,String city,String weixin,String qq) {
+    private boolean checkRegisterParam(String account, String password, String paymentPassword, long ownerId, int type, String email, String province, String city, String weixin, String qq) {
         //校验用户名和密码
-        if(account.length() < 6 || account.length() > 16 || password.length() != 32){
+        if (account.length() < 6 || account.length() > 16 || password.length() != 32) {
             return false;
         }
         //校验其他注册参数
-        List<String> list = dubboOutAssembleService.getMustRegisterarameters(ownerId,type);
-        if(list != null && list.size() > 0){
-            if(list.contains("email")){
-                if(!StringUtils.isNotEmpty(email)){
+        List<String> list = dubboOutAssembleService.getMustRegisterarameters(ownerId, type);
+        if (list != null && list.size() > 0) {
+            if (list.contains("email")) {
+                if (!StringUtils.isNotEmpty(email)) {
                     return false;
                 }
             }
-            if(list.contains("province")){
-                if(!StringUtils.isNotEmpty(province)){
+            if (list.contains("province")) {
+                if (!StringUtils.isNotEmpty(province)) {
                     return false;
                 }
             }
-            if(list.contains("city")){
-                if(!StringUtils.isNotEmpty(city)){
+            if (list.contains("city")) {
+                if (!StringUtils.isNotEmpty(city)) {
                     return false;
                 }
             }
-            if(list.contains("weixin")){
-                if(!StringUtils.isNotEmpty(weixin)){
+            if (list.contains("weixin")) {
+                if (!StringUtils.isNotEmpty(weixin)) {
                     return false;
                 }
             }
-            if(list.contains("qq")){
-                if(!StringUtils.isNotEmpty(qq)){
+            if (list.contains("qq")) {
+                if (!StringUtils.isNotEmpty(qq)) {
                     return false;
                 }
             }
@@ -735,7 +735,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      */
     private AgentApply assembleAgentApply(String username, String realname, String password, Long stockId, String stockName, Long ownerId, String telephone, String email,
                                           ReviewStatus status, String resourceUrl, Integer registerIp, Long createTime,
-                                          String bankCardNo, String bank, String bankDeposit,String province, String city, String weixin, String qq) {
+                                          String bankCardNo, String bank, String bankDeposit, String province, String city, String weixin, String qq) {
         AgentApply apply = new AgentApply();
         apply.setUsername(username);
         apply.setRealname(realname);
@@ -1072,6 +1072,18 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         result.put("agentConfig", map);
         List<OwnerDomainVo> allDomains = dubboOutAssembleService.queryAllDomainList(user.getOwnerId());
         result.put("domains", allDomains);
+        return result.toJSONString();
+    }
+
+    @Override
+    public String configs(RequestContext rc) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        JSONObject result = new JSONObject();
+        Map<String, Object> map = dubboOutAssembleService.agentSchemeList(user.getOwnerId());
+        result.put("agentConfig", map);
         return result.toJSONString();
     }
 

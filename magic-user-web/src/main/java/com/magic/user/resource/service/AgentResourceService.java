@@ -197,5 +197,11 @@ public interface AgentResourceService {
      * @return
      */
     String allConfigs(RequestContext rc);
+    /**
+     * 获取 方案，成本，手续列表
+     * @param rc
+     * @return
+     */
+    String configs(RequestContext rc);
 
 }
