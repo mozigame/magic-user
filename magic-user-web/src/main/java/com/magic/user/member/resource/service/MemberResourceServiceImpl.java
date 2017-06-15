@@ -1635,13 +1635,9 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String getCode(RequestContext rc) {
-        String clientId = getClientId(rc);
-        if (StringUtils.isEmpty(clientId)){//初次请求，需要往cookie存入一份
-            clientId = rc.getRequest().getSession().getId();
-            if (StringUtils.isEmpty(clientId)){
-                clientId = UUIDUtil.getUUID();
-            }
-            rc.getResponse().addCookie(new Cookie(UserContants.CLIENT_ID, clientId));
+        String clientId  = rc.getRequest().getSession().getId();
+        if (StringUtils.isEmpty(clientId)){
+            clientId = UUIDUtil.getUUID();
         }
         String code = UserUtil.checkCode();
         ApiLogger.info(String.format("refresh code. clientId: %s, code: %s", clientId, code));
@@ -1649,6 +1645,7 @@ public class MemberResourceServiceImpl {
         if (!result){
             throw UserException.GET_VERIFY_CODE_ERROR;
         }
+        rc.getResponse().addCookie(new Cookie(UserContants.CLIENT_ID, clientId));
         return "{\"code\":" + "\"" + code + "\"" + "}";
     }
 
