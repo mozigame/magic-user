@@ -1672,4 +1672,50 @@ public class MemberResourceServiceImpl {
         return null;
     }
 
+    /**
+     * 会员资金概况
+     *
+     * @param rc
+     * @param memberId
+     * @return
+     */
+    public String fundProfileRefresh(RequestContext rc, Long memberId) {
+        if (!Optional.ofNullable(memberId).filter(value -> value > 0).isPresent()){
+            throw UserException.ILLEGAL_MEMBER;
+        }
+        /**
+         * 会员资金概况
+         */
+        MemberFundInfo memberFundInfoObj;
+        FundProfile fundProfile = new FundProfile();
+        //TODO 2、kevin 根据会员ID查询会员资金概括
+        String capitalBody = "{\"memberId\":" + memberId + "}";
+        EGResp capitalResp = thriftOutAssembleService.getMemberCapital(capitalBody, "account");
+        //TODO 确定resp的code
+        if (capitalResp != null && capitalResp.getData() != null) {
+            JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
+            fundProfile.setSyncTime(capitalData.getString("syncTime"));
+            memberFundInfoObj = new MemberFundInfo();
+            memberFundInfoObj.setBalance(capitalData.getString("balance"));
+            memberFundInfoObj.setLastDeposit(capitalData.getString("lastDeposit"));
+            memberFundInfoObj.setLastWithdraw(capitalData.getString("lastWithdraw"));
+            //TODO 存款总金额、取款总金额、存款总次数、取款总次数在mongo中获取
+
+        } else {
+            //TODO 假数据去掉
+            String memberFundInfo = "{\n" +
+                    "\t\"balance\": \"1805.50\",\n" +
+                    "\t\"depositNumbers\": 15,\n" +
+                    "\t\"depositTotalMoney\": \"29006590\",\n" +
+                    "\t\"lastDeposit\": \"1200\",\n" +
+                    "\t\"withdrawNumbers\": 10,\n" +
+                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
+                    "\t\"lastWithdraw\": \"2500\"\n" +
+                    "}";
+            memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
+            fundProfile.setSyncTime("2017-05-31 09:12:36");
+        }
+        fundProfile.setInfo(memberFundInfoObj);
+        return JSON.toJSONString(fundProfile);
+    }
 }

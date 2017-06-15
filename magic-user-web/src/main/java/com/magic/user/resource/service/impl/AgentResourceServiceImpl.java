@@ -2,6 +2,7 @@ package com.magic.user.resource.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPObject;
 import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
@@ -688,7 +689,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             return false;
         }
         //校验其他注册参数
-        List<String> list = dubboOutAssembleService.getMustRegisterarameters(ownerId,type);
+        List<String> list = dubboOutAssembleService.getMustRegisterarameters(ownerId, type);
         if(list != null && list.size() > 0){
             if(list.contains("email")){
                 if(!StringUtils.isNotEmpty(email)){
@@ -1073,6 +1074,30 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         List<OwnerDomainVo> allDomains = dubboOutAssembleService.queryAllDomainList(user.getOwnerId());
         result.put("domains", allDomains);
         return result.toJSONString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String fundProfileRefresh(RequestContext requestContext, Long id) {
+        if (!Optional.ofNullable(id).filter(value -> value > 0).isPresent()){
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        String fundProfile = "{\n" +
+                "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
+                "    \"info\": {\n" +
+                "        \"members\": 550,\n" +
+                "        \"depositMembers\": 420,\n" +
+                "        \"depositTotalMoney\": \"290065901\",\n" +
+                "        \"withdrawTotalMoney\": \"245001201\",\n" +
+                "        \"betTotalMoney\": \"209000671\",\n" +
+                "        \"betEffMoney\": \"190076891\",\n" +
+                "        \"gains\": \"49087633\"\n" +
+                "    }\n" +
+                "}";
+        JSONObject object = JSONObject.parseObject(fundProfile);
+        return JSON.toJSONString(object);
     }
 
     /**

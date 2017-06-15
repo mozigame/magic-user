@@ -136,6 +136,20 @@ public class AgentResource {
     /**
      * @param id 代理ID
      * @return
+     * @Doc 资金概况刷新
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/fund/refresh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String fundRefresh(
+            @RequestParam(name = "id") Long id
+    ) {
+        return agentResourceService.fundProfileRefresh(RequestContext.getRequestContext(), id);
+    }
+
+    /**
+     * @param id 代理ID
+     * @return
      * @Doc 代理详情
      */
     @Access(type = Access.AccessType.COMMON)

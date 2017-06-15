@@ -300,6 +300,22 @@ public class MemberResource {
         return memberServiceResource.memberDetails(rc, id);
     }
 
+
+    /**
+     * @param id 会员id
+     * @return
+     * @Doc 会员资金概况刷新
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/fund/refresh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String detail(
+            @RequestParam(name = "id", required = true) Long id
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.fundProfileRefresh(rc, id);
+    }
+
     /**
      * @param id       会员ID
      * @param password 新密码

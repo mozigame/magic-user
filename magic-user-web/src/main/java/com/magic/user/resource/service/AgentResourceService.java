@@ -198,4 +198,11 @@ public interface AgentResourceService {
      */
     String allConfigs(RequestContext rc);
 
+    /**
+     * 资金概况
+     * @param requestContext
+     * @param id
+     * @return
+     */
+    String fundProfileRefresh(RequestContext requestContext, Long id);
 }
