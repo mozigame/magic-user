@@ -39,6 +39,7 @@ import com.magic.user.po.RegisterReq;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
+import com.magic.user.util.CodeImageUtil;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
@@ -380,15 +381,7 @@ public class MemberResourceServiceImpl {
 
         } else {
             //TODO 假数据去掉
-            String preferScheme = "{\n" +
-                    "\"level\": 1,\n" +
-                    "\"showLevel\": \"未分层\",\n" +
-                    "\"onlineDiscount\": \"100返10\",\n" +
-                    "\"depositFee\": \"无\",\n" +
-                    "\"withdrawFee\": \"无\",\n" +
-                    "\"returnWater\": \"返水基本1\",\n" +
-                    "\"depositDiscountScheme\": \"100返10\"\n" +
-                    "}";
+            String preferScheme = "";
             memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
         }
         vo.setPreferScheme(memberPreferScheme);
@@ -414,15 +407,7 @@ public class MemberResourceServiceImpl {
 
         } else {
             //TODO 假数据去掉
-            String memberFundInfo = "{\n" +
-                    "\t\"balance\": \"1805.50\",\n" +
-                    "\t\"depositNumbers\": 15,\n" +
-                    "\t\"depositTotalMoney\": \"29006590\",\n" +
-                    "\t\"lastDeposit\": \"1200\",\n" +
-                    "\t\"withdrawNumbers\": 10,\n" +
-                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
-                    "\t\"lastWithdraw\": \"2500\"\n" +
-                    "}";
+            String memberFundInfo = "";
             memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
             fundProfile.setSyncTime("2017-05-31 09:12:35");
         }
@@ -433,21 +418,13 @@ public class MemberResourceServiceImpl {
         /**
          * TODO 3.sundy 根据会员ID查询投注记录
          */
-        String memberBetHistory = "{\n" +
-                "\t\"totalMoney\": \"29000\",\n" +
-                "\t\"effMoney\": \"28000\",\n" +
-                "\t\"gains\": \"18000\"\n" +
-                "}";
+        String memberBetHistory = "";
         MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
         vo.setBetHistory(memberBetHistoryObj);
         /**
          * TODO 4.sundy 根据会员ID查询优惠记录
          */
-        String memberDiscountHistory = "{\n" +
-                "\t\"totalMoney\": \"1350\",\n" +
-                "\t\"numbers\": 98,\n" +
-                "\t\"returnWaterTotalMoney\": \"1450\"\n" +
-                "}";
+        String memberDiscountHistory = "";
         MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
         vo.setDiscountHistory(memberDiscountHistoryObj);
         return vo;
@@ -1632,21 +1609,20 @@ public class MemberResourceServiceImpl {
      * 返回验证码
      *
      * @param rc
+     * @param code
      * @return
      */
-    public String getCode(RequestContext rc) {
+    public String saveCode(RequestContext rc, String code) {
         String clientId  = rc.getRequest().getSession().getId();
         if (StringUtils.isEmpty(clientId)){
             clientId = UUIDUtil.getUUID();
         }
-        String code = UserUtil.checkCode();
         ApiLogger.info(String.format("refresh code. clientId: %s, code: %s", clientId, code));
         boolean result = memberService.refreshCode(clientId, code);
         if (!result){
             throw UserException.GET_VERIFY_CODE_ERROR;
         }
-        rc.getResponse().addCookie(new Cookie(UserContants.CLIENT_ID, clientId));
-        return "{\"code\":" + "\"" + code + "\"" + "}";
+        return clientId;
     }
 
     /**
