@@ -381,7 +381,15 @@ public class MemberResourceServiceImpl {
 
         } else {
             //TODO 假数据去掉
-            String preferScheme = "";
+            String preferScheme = "{\n" +
+                    "\"level\": 1,\n" +
+                    "\"showLevel\": \"未分层\",\n" +
+                    "\"onlineDiscount\": \"100返10\",\n" +
+                    "\"depositFee\": \"无\",\n" +
+                    "\"withdrawFee\": \"无\",\n" +
+                    "\"returnWater\": \"返水基本1\",\n" +
+                    "\"depositDiscountScheme\": \"100返10\"\n" +
+                    "}";
             memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
         }
         vo.setPreferScheme(memberPreferScheme);
@@ -407,7 +415,15 @@ public class MemberResourceServiceImpl {
 
         } else {
             //TODO 假数据去掉
-            String memberFundInfo = "";
+            String memberFundInfo = "{\n" +
+                    "\t\"balance\": \"1805.50\",\n" +
+                    "\t\"depositNumbers\": 15,\n" +
+                    "\t\"depositTotalMoney\": \"29006590\",\n" +
+                    "\t\"lastDeposit\": \"1200\",\n" +
+                    "\t\"withdrawNumbers\": 10,\n" +
+                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
+                    "\t\"lastWithdraw\": \"2500\"\n" +
+                    "}";
             memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
             fundProfile.setSyncTime("2017-05-31 09:12:35");
         }
@@ -418,13 +434,21 @@ public class MemberResourceServiceImpl {
         /**
          * TODO 3.sundy 根据会员ID查询投注记录
          */
-        String memberBetHistory = "";
+        String memberBetHistory = "{\n" +
+                "\t\"totalMoney\": \"29000\",\n" +
+                "\t\"effMoney\": \"28000\",\n" +
+                "\t\"gains\": \"18000\"\n" +
+                "}";
         MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
         vo.setBetHistory(memberBetHistoryObj);
         /**
          * TODO 4.sundy 根据会员ID查询优惠记录
          */
-        String memberDiscountHistory = "";
+        String memberDiscountHistory = "{\n" +
+                "\t\"totalMoney\": \"1350\",\n" +
+                "\t\"numbers\": 98,\n" +
+                "\t\"returnWaterTotalMoney\": \"1450\"\n" +
+                "}";
         MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
         vo.setDiscountHistory(memberDiscountHistoryObj);
         return vo;
