@@ -48,7 +48,7 @@ public class StockholderResource {
      * @return
      * @Doc 股东列表导出
      */
-    @Access(type = Access.AccessType.PUBLIC)
+    @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/list/export", method = RequestMethod.GET)
     @ResponseBody
     public void listExport(
