@@ -55,16 +55,18 @@ public class WorkerResource {
      * @return
      * @Doc 子账号列表，子账号只包括工作人员账号
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/list/export", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public void list(
             HttpServletResponse response,
             @RequestParam(name = "account", required = false, defaultValue = "") String account,
             @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
-            @RequestParam(name = "roleId", required = false) Integer roleId
+            @RequestParam(name = "roleId", required = false) Integer roleId,
+            @RequestParam(name = "userId") Long userId
     ) throws Exception {
         RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
         DownLoadFile downLoadFile = workerResourceService.workerListExport(rc, account, realname, roleId);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {

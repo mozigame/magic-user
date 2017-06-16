@@ -48,13 +48,15 @@ public class StockholderResource {
      * @return
      * @Doc 股东列表导出
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/list/export", method = RequestMethod.GET)
     @ResponseBody
     public void listExport(
-            HttpServletResponse response
+            HttpServletResponse response,
+            @RequestParam(name = "userId") Long userId
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
         DownLoadFile downLoadFile = stockResourceService.listExport(rc);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
@@ -136,7 +138,7 @@ public class StockholderResource {
     @ResponseBody
     public String update(
             @RequestParam(name = "id") Long id,
-            @RequestParam(name = "realname",required = false) String realname,
+            @RequestParam(name = "realname", required = false) String realname,
             @RequestParam(name = "telephone", required = false) String telephone,
             @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "bankCardNo", required = false) String bankCardNo,
@@ -144,7 +146,7 @@ public class StockholderResource {
             @RequestParam(name = "status", required = false) Integer status
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return stockResourceService.update(rc, id,realname, telephone, email, bankCardNo, bank, status);
+        return stockResourceService.update(rc, id, realname, telephone, email, bankCardNo, bank, status);
     }
 
     /**

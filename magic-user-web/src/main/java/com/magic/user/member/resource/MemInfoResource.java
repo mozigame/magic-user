@@ -134,9 +134,11 @@ public class MemInfoResource {
     public void modifyListExport(
             HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "type", required = false, defaultValue = "-1") Integer type,
-            @RequestParam(name = "account", required = false, defaultValue = "") String account
+            @RequestParam(name = "account", required = false, defaultValue = "") String account,
+            @RequestParam(name = "userId") Long userId
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
         DownLoadFile downLoadFile = infoResourceService.modifyListExport(rc, type, account);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {

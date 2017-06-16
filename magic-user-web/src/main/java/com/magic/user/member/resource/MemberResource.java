@@ -237,9 +237,11 @@ public class MemberResource {
     @ResponseBody
     public void listExport(
             HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
@@ -423,9 +425,11 @@ public class MemberResource {
     @ResponseBody
     public void levelListExport(
             HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "lock", required = false, defaultValue = "1") int lock
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.memberLevelListExport(rc, lock);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
@@ -488,9 +492,11 @@ public class MemberResource {
     @ResponseBody
     public void levelListSpecialExport(
             HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {

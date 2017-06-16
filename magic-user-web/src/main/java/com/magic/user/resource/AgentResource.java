@@ -67,9 +67,11 @@ public class AgentResource {
     @ResponseBody
     public void listExport(
             HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false,defaultValue = "{}") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
@@ -312,9 +314,11 @@ public class AgentResource {
     public void reviewListExport(
             HttpServletResponse response,
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false, defaultValue = "-1") Integer status
+            @RequestParam(name = "status", required = false, defaultValue = "-1") Integer status,
+            @RequestParam(name = "userId") Long userId
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.reviewListExport(rc, account, status);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
