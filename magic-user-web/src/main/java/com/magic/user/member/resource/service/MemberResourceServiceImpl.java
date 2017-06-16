@@ -39,6 +39,7 @@ import com.magic.user.po.RegisterReq;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
+import com.magic.user.util.CodeImageUtil;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
@@ -1632,21 +1633,20 @@ public class MemberResourceServiceImpl {
      * 返回验证码
      *
      * @param rc
+     * @param code
      * @return
      */
-    public String getCode(RequestContext rc) {
+    public String saveCode(RequestContext rc, String code) {
         String clientId  = rc.getRequest().getSession().getId();
         if (StringUtils.isEmpty(clientId)){
             clientId = UUIDUtil.getUUID();
         }
-        String code = UserUtil.checkCode();
         ApiLogger.info(String.format("refresh code. clientId: %s, code: %s", clientId, code));
         boolean result = memberService.refreshCode(clientId, code);
         if (!result){
             throw UserException.GET_VERIFY_CODE_ERROR;
         }
-        rc.getResponse().addCookie(new Cookie(UserContants.CLIENT_ID, clientId));
-        return "{\"code\":" + "\"" + code + "\"" + "}";
+        return clientId;
     }
 
     /**

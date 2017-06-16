@@ -4,9 +4,11 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.core.tools.HeaderUtil;
+import com.magic.user.constants.UserContants;
 import com.magic.user.member.resource.service.MemberResourceServiceImpl;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.RegisterReq;
+import com.magic.user.util.CodeImageUtil;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -589,8 +592,19 @@ public class MemberResource {
     @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/code/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public String getCode() {
+    public void getCode(HttpServletRequest request, HttpServletResponse response,
+                        @RequestParam(name = "width", required = false, defaultValue = "200") Integer width,
+                        @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException{
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.getCode(rc);
+        response.setHeader("Pragma", "No-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
+        response.setContentType("image/jpeg");
+
+        String code = CodeImageUtil.generateVerifyCode(UserContants.VERIFY_CODE_LENGTH);
+        String clientId = memberServiceResource.saveCode(rc, code);
+        response.addCookie(new Cookie(UserContants.CLIENT_ID, clientId));
+
+        CodeImageUtil.outputImage(width, height, response.getOutputStream(), code);
     }
 }

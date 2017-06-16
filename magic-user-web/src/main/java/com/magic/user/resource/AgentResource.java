@@ -158,7 +158,6 @@ public class AgentResource {
     public String detail(
             @RequestParam(name = "id") Long id
     ) {
-
         return agentResourceService.getDetail(RequestContext.getRequestContext(), id);
     }
 
