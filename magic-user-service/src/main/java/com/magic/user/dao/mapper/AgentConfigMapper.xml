@@ -61,8 +61,8 @@
             <if test="cost != null and cost > 0">
                 cost = #{cost},
             </if>
-            <if test="domains != null and domains != ''">
-                domains = #{domains},
+            <if test="domain != null and domain != ''">
+                domain = #{domain},
             </if>
         </set>
         WHERE agent_id=#{agentId}
