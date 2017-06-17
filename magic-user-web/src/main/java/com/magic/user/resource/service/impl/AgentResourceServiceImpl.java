@@ -627,16 +627,35 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.ILLEGAL_USER;
         }
 
-        AgentConfig agentConfig = new AgentConfig(agentId, returnScheme, adminCost, feeScheme);
+        AgentConfig agentConfig = assembleUpdateAgentConfig(agentId, returnScheme, adminCost, feeScheme, discount,cost, domain);
         if (!agentConfigService.update(agentConfig)) {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
     }
 
-//    private AgentConfig assembleUpdateAgentConfig(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain) {
-//        if (StringUtils.isNotBlank())
-//    }
+    /**
+     * 修改代理参数配置
+     * @param agentId
+     * @param returnScheme
+     * @param adminCost
+     * @param feeScheme
+     * @param discount
+     * @param cost
+     * @param domain
+     * @return
+     */
+    private AgentConfig assembleUpdateAgentConfig(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain) {
+        AgentConfig config = new AgentConfig();
+        config.setAgentId(agentId);
+        config.setReturnSchemeId(returnScheme);
+        config.setAdminCostId(adminCost);
+        config.setFeeId(feeScheme);
+        config.setDiscount(discount);
+        config.setCost(cost);
+        config.setDomain(domain);
+        return config;
+    }
 
     //TODO 流程有待确认
     //1.url获取ownerId
