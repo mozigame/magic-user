@@ -229,6 +229,7 @@ public class AgentResource {
      * @param feeScheme    手续费方案ID
      * @param discount     优惠扣除 默认1 1不选 2勾选
      * @param cost         返水成本 默认1 1不选 2勾选
+     * @param domain       域名,www.123.com,233.abc.com
      * @return
      * @Doc 代理参数配置修改
      */
@@ -242,10 +243,10 @@ public class AgentResource {
             @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme,
             @RequestParam(name = "discount", required = false, defaultValue = "-1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "-1") Integer cost,
-            @RequestParam(name = "domain", required = false, defaultValue = "") String domain
+            @RequestParam(name = "domains", required = false, defaultValue = "") String domains
 
     ) {
-        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domain);
+        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domains);
     }
 
     /**
