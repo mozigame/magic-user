@@ -267,6 +267,7 @@ public class StockResourceServiceImpl implements StockResourceService {
     @Override
     public String add(RequestContext rc, String account, String password, String realname,String bankCardNo, String bankDeposit, String bank,
                       String telephone, Integer currencyType, String email, Integer sex) {
+
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
@@ -345,6 +346,7 @@ public class StockResourceServiceImpl implements StockResourceService {
      */
     @Override
     public String updateStatus(RequestContext rc, Long id, Integer status) {
+
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
