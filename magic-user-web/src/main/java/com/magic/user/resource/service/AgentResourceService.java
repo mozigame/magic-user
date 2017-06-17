@@ -98,7 +98,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 修改代理配置信息
      */
-    String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme);
+    String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme,Integer discount,Integer cost, String domain);
 
     /**
      * @param rc
