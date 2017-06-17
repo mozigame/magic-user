@@ -1656,15 +1656,10 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private String getClientId(RequestContext rc) {
-        Cookie[] cookies = rc.getRequest().getCookies();
-        if (cookies != null && cookies.length > 0) {
-            for (Cookie cookie : cookies) {
-                String name = cookie.getName();
-                String value = cookie.getValue();
-                if (UserContants.CLIENT_ID.equals(name)) {
-                    return value;
-                }
-            }
+        try {
+            return rc.getRequest().getHeader(UserContants.X_VERIFY_CODE);
+        }catch (Exception e){
+            ApiLogger.error("get verify code from header error.", e);
         }
         return null;
     }
