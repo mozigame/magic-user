@@ -159,25 +159,20 @@ public class MemberResource {
     /**
      * 密码重置
      *
-     * @param request
-     * @param response
-     * @param username
      * @param oldPassword
      * @param newPassword
      * @return
      */
-    @Access(type = Access.AccessType.PUBLIC)
+    @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/password/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String reset(
-            HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(name = "username", required = true) String username,
             @RequestParam(name = "oldPassword", required = true) String oldPassword,
             @RequestParam(name = "newPassword", required = true) String newPassword
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.memberPasswordReset(rc, username, oldPassword, newPassword);
+        return memberServiceResource.memberPasswordReset(rc, oldPassword, newPassword);
     }
 
     /**
