@@ -621,7 +621,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme) {
+    public String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain) {
         User agentUser = userService.get(agentId);
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
@@ -633,6 +633,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         return UserContants.EMPTY_STRING;
     }
+
+//    private AgentConfig assembleUpdateAgentConfig(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain) {
+//        if (StringUtils.isNotBlank())
+//    }
 
     //TODO 流程有待确认
     //1.url获取ownerId
@@ -1094,7 +1098,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      */
     @Override
     public String fundProfileRefresh(RequestContext requestContext, Long id) {
-        if (!Optional.ofNullable(id).filter(value -> value > 0).isPresent()){
+        if (!Optional.ofNullable(id).filter(value -> value > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         String fundProfile = "{\n" +

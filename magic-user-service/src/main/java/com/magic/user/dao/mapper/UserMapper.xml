@@ -209,7 +209,7 @@
           realname,
           telephone,
           bank_card_no bankCardNo,
-          bank bank
+          bank bank,
           bank_deposit bankDeposit,
           email,
           register_ip registerIp,
