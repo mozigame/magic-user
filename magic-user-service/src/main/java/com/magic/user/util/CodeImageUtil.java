@@ -1,14 +1,14 @@
 package com.magic.user.util;
 
+import org.apache.commons.codec.binary.Base64;
+import sun.misc.BASE64Encoder;
+
 import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -55,14 +55,13 @@ public class CodeImageUtil {
      * 输出随机验证码图片流,并返回验证码值
      * @param w
      * @param h
-     * @param os
      * @param verifySize
      * @return
      * @throws IOException
      */
-    public static String outputVerifyImage(int w, int h, ServletOutputStream os, int verifySize) throws IOException{
+    public static String outputVerifyImage(int w, int h, int verifySize) throws IOException{
         String verifyCode = generateVerifyCode(verifySize);
-        outputImage(w, h, os, verifyCode);
+        outputImage(w, h, verifyCode);
         return verifyCode;
     }
 
@@ -70,11 +69,10 @@ public class CodeImageUtil {
      * 输出指定验证码图片流
      * @param w
      * @param h
-     * @param os
      * @param code
      * @throws IOException
      */
-    public static void outputImage(int w, int h, ServletOutputStream os, String code) throws IOException{
+    public static String outputImage(int w, int h, String code) throws IOException{
         int verifySize = code.length();
         BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Random rand = new Random();
@@ -134,7 +132,10 @@ public class CodeImageUtil {
         }
 
         g2.dispose();
-        ImageIO.write(image, "jpg", os);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", out);
+        byte[] b = out.toByteArray();
+        return Base64.encodeBase64String(b);
     }
 
     private static Color getRandColor(int fc, int bc) {

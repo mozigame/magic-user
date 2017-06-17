@@ -1,5 +1,6 @@
 package com.magic.user.member.resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
@@ -598,19 +599,26 @@ public class MemberResource {
     @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/code/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public void getCode(HttpServletRequest request, HttpServletResponse response,
+    public String getCode(
                         @RequestParam(name = "width", required = false, defaultValue = "200") Integer width,
                         @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException{
         RequestContext rc = RequestContext.getRequestContext();
-        response.setHeader("Pragma", "No-cache");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setDateHeader("Expires", 0);
-        response.setContentType("image/jpeg");
-
         String code = CodeImageUtil.generateVerifyCode(UserContants.VERIFY_CODE_LENGTH);
         String clientId = memberServiceResource.saveCode(rc, code);
-        response.addCookie(new Cookie(UserContants.CLIENT_ID, clientId));
+        String base64Code = CodeImageUtil.outputImage(width, height, code);
+        return assembleResult(clientId, base64Code);
+    }
 
-        CodeImageUtil.outputImage(width, height, response.getOutputStream(), code);
+    /**
+     * 组装返回数据
+     * @param clientId
+     * @param base64Code
+     * @return
+     */
+    private String assembleResult(String clientId, String base64Code) {
+        JSONObject object = new JSONObject();
+        object.put("clientId", clientId);
+        object.put("code", base64Code);
+        return object.toJSONString();
     }
 }
