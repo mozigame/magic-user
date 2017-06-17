@@ -127,6 +127,7 @@ public class MemberResource {
 
     /**
      * 会员登陆
+     *
      * @param request
      * @param response
      * @param username
@@ -223,6 +224,7 @@ public class MemberResource {
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
+        ApiLogger.info("/member/list , condition :" + condition);
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberList(rc, condition, page, count);
     }
@@ -254,9 +256,9 @@ public class MemberResource {
             ServletOutputStream outputStream = response.getOutputStream();
             try {
                 outputStream.write(downLoadFile.getContent());
-            }catch (Exception e){
+            } catch (Exception e) {
                 ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
-            }finally {
+            } finally {
                 outputStream.flush();
                 outputStream.close();
             }
@@ -287,7 +289,6 @@ public class MemberResource {
 //            e.printStackTrace();
 //        }
 //    }
-
 
 
     /**
@@ -382,7 +383,7 @@ public class MemberResource {
      * @param id    会员ID
      * @param level 层级ID
      * @return
-     * @Doc 会员层级修改,前端直接进行页面跳转
+     * @Doc 会员层级修改, 前端直接进行页面跳转
      */
     @Deprecated
     @Access(type = Access.AccessType.COMMON)
@@ -520,7 +521,8 @@ public class MemberResource {
 
     /**
      * 会员停用/启用
-     * @param id 会员id
+     *
+     * @param id     会员id
      * @param status 1 启用 2禁用
      * @return
      */
@@ -568,7 +570,7 @@ public class MemberResource {
 
     /**
      * @return
-     * @Doc     获取会员中心详情信息
+     * @Doc 获取会员中心详情信息
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/center/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -580,7 +582,7 @@ public class MemberResource {
 
     /**
      * @return
-     * @Doc     刷新会员的余额和未读消息
+     * @Doc 刷新会员的余额和未读消息
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/refresh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -600,7 +602,7 @@ public class MemberResource {
     @ResponseBody
     public void getCode(HttpServletRequest request, HttpServletResponse response,
                         @RequestParam(name = "width", required = false, defaultValue = "200") Integer width,
-                        @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException{
+                        @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache");
