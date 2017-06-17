@@ -387,6 +387,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         vo.setGeneralizeCode(generalizeCode);
         vo.setStockId(stockId);
         vo.setOwnerId(ownerId);
+        vo.setRegisterTime(System.currentTimeMillis());
         return vo;
     }
 
