@@ -14,7 +14,7 @@ public class UserContants {
     public static final String SPLIT_LINE = "-";    //业主id与用户账号连接符
     public static final String CALLER = "account"; //调用方
     public static final int EXPIRE_TIME = 86400; //设置过期时间 1天
-    public static final String CLIENT_ID = "clientId";//客户端ID
+    public static final String X_VERIFY_CODE = "clientId";//客户端ID
     public static final int VERIFY_CODE_VALID_TIME = 300000;//验证码有效期 5分钟
     public static final int VERIFY_CODE_LENGTH = 4;//验证码长度
 
@@ -25,5 +25,4 @@ public class UserContants {
         AGENT_CONDITION_ADD;   //添加代理基础信息到mongo
 
     }
-
 }
