@@ -1,5 +1,6 @@
 package com.magic.user.resource;
 
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.core.tools.HeaderUtil;
@@ -56,6 +57,7 @@ public class UserLoginResource {
         //获取域名
         StringBuffer requestURL = request.getRequestURL();
         String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
+        ApiLogger.info("/user/login url : " + url);
         return userLoginResourceService.login(rc, agent, url, username, password, code);
     }
 
@@ -80,6 +82,7 @@ public class UserLoginResource {
 
     /**
      * 检查用户登录状态
+     *
      * @return
      */
     @Access(type = Access.AccessType.COMMON)

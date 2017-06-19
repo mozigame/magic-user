@@ -55,10 +55,9 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
      */
     @Override
     public String login(RequestContext rc, String agent, String url, String username, String password, String code) {
-        //todo
-//        if (!checkLoginReq(username, password)) {
-//            throw UserException.ILLEGAL_PARAMETERS;
-//        }
+        if (!checkLoginReq(username, password)) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
