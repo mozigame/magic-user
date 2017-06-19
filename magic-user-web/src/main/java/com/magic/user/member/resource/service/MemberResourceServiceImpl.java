@@ -1280,11 +1280,15 @@ public class MemberResourceServiceImpl {
      * @param newPassword 新密码
      * @return
      */
-    public String memberPasswordReset(RequestContext rc, String username, String oldPassword, String newPassword) {
-        if (!checkResetParams(username, oldPassword, newPassword)) {
+    public String memberPasswordReset(RequestContext rc, String oldPassword, String newPassword) {
+        if (!checkResetParams(oldPassword, newPassword)) {
             throw UserException.PASSWORD_RESET_FAIL;
         }
-        String body = assembleResetBody(rc, username, oldPassword, newPassword);
+        Member member = memberService.getMemberById(rc.getUid());
+        if (!Optional.ofNullable(member).isPresent()){
+            throw UserException.ILLEGAL_MEMBER;
+        }
+        String body = assembleResetBody(rc, member.getUsername(), oldPassword, newPassword);
         EGResp resp = thriftOutAssembleService.memberPasswordReset(body, "account");
         if (resp == null) {
             throw UserException.PASSWORD_RESET_FAIL;
@@ -1323,15 +1327,11 @@ public class MemberResourceServiceImpl {
     /**
      * 密码重置参数检测
      *
-     * @param username
      * @param oldPassword
      * @param newPassword
      * @return
      */
-    private boolean checkResetParams(String username, String oldPassword, String newPassword) {
-        if (StringUtils.isEmpty(username) || username.length() < 6 || username.length() > 16) {
-            return false;
-        }
+    private boolean checkResetParams(String oldPassword, String newPassword) {
         if (StringUtils.isEmpty(oldPassword) || oldPassword.length() != 32) {
             return false;
         }
@@ -1690,15 +1690,10 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private String getClientId(RequestContext rc) {
-        Cookie[] cookies = rc.getRequest().getCookies();
-        if (cookies != null && cookies.length > 0) {
-            for (Cookie cookie : cookies) {
-                String name = cookie.getName();
-                String value = cookie.getValue();
-                if (UserContants.CLIENT_ID.equals(name)) {
-                    return value;
-                }
-            }
+        try {
+            return rc.getRequest().getHeader(UserContants.X_VERIFY_CODE);
+        }catch (Exception e){
+            ApiLogger.error("get verify code from header error.", e);
         }
         return null;
     }

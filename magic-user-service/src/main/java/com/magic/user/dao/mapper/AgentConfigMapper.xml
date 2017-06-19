@@ -46,14 +46,23 @@
     <update id="update" parameterType="AgentConfig">
         UPDATE t_agent_config_info
         <set>
-            <if test="returnSchemeId != null">
+            <if test="returnSchemeId != null and returnSchemeId > 0">
                 return_scheme_id = #{returnSchemeId},
             </if>
-            <if test="adminCostId != null">
+            <if test="adminCostId != null and adminCostId > 0">
                 admin_cost_id = #{adminCostId},
             </if>
-            <if test="feeId != null">
+            <if test="feeId != null and feeId > 0">
                 fee_id = #{feeId},
+            </if>
+            <if test="discount != null and discount > 0">
+                discount = #{discount},
+            </if>
+            <if test="cost != null and cost > 0">
+                cost = #{cost},
+            </if>
+            <if test="domain != null and domain != ''">
+                domain = #{domain},
             </if>
         </set>
         WHERE agent_id=#{agentId}

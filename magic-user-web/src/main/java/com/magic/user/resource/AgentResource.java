@@ -56,7 +56,7 @@ public class AgentResource {
         String result = agentResourceService.findByPage(RequestContext.getRequestContext(), condition, page, count);
         return result;
     }
-    
+
     /**
      * @param condition 检索条件
      * @return
@@ -68,7 +68,7 @@ public class AgentResource {
     public void listExport(
             HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "condition", required = false,defaultValue = "{}") String condition
+            @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
@@ -227,6 +227,9 @@ public class AgentResource {
      * @param returnScheme 退佣方案ID
      * @param adminCost    行政成本ID
      * @param feeScheme    手续费方案ID
+     * @param discount     优惠扣除 默认1 1不选 2勾选
+     * @param cost         返水成本 默认1 1不选 2勾选
+     * @param domain       域名,www.123.com,233.abc.com
      * @return
      * @Doc 代理参数配置修改
      */
@@ -239,10 +242,11 @@ public class AgentResource {
             @RequestParam(name = "adminCost", required = false, defaultValue = "-1") Integer adminCost,
             @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme,
             @RequestParam(name = "discount", required = false, defaultValue = "-1") Integer discount,
-            @RequestParam(name = "cost", required = false, defaultValue = "-1") Integer cost
+            @RequestParam(name = "cost", required = false, defaultValue = "-1") Integer cost,
+            @RequestParam(name = "domains", required = false, defaultValue = "") String domains
 
     ) {
-        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme);
+        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domains);
     }
 
     /**
@@ -302,6 +306,7 @@ public class AgentResource {
 //    public static void main(String[] args){
 //        System.out.println(MD5Util.md5Digest("123456".getBytes()));
 //    }
+
     /**
      * @param account 账号
      * @param status  状态
@@ -361,8 +366,8 @@ public class AgentResource {
      * @param realname     真实姓名
      * @param telephone    手机号码
      * @param bankCardNo   银行卡号
-     * @param bank   银行名称
-     * @param bankDeposit   开户行
+     * @param bank         银行名称
+     * @param bankDeposit  开户行
      * @param email        电子邮箱
      * @param returnScheme 返佣方案
      * @param adminCost    行政成本

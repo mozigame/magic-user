@@ -65,19 +65,19 @@
     <!--新增用户--><!--used-->
     <insert id="insert" parameterType="User">
         INSERT INTO t_user_info(
-        <if test="username != null ">
+        <if test="username != null and username!='' ">
             username,
         </if>
-        <if test="realname != null">
+        <if test="realname != null and realname !=''">
             realname,
         </if>
-        <if test="telephone != null">
+        <if test="telephone != null and telephone !=''">
             telephone,
         </if>
         <if test="currencyType != null">
             currency_type,
         </if>
-        <if test="email != null">
+        <if test="email != null and email != ''">
             email,
         </if>
         <if test="registerTime != null">
@@ -86,7 +86,7 @@
         <if test="registerIp != null ">
             register_ip,
         </if>
-        <if test="generalizeCode != null ">
+        <if test="generalizeCode != null and generalizeCode !=''">
             generalize_code,
         </if>
         <if test="gender != null">
@@ -95,19 +95,19 @@
         <if test="status != null ">
             status,
         </if>
-        <if test="bankCardNo != null">
+        <if test="bankCardNo != null and bankCardNo !='' ">
             bank_card_no,
         </if>
-        <if test="bank != null">
+        <if test="bank != null and bank != ''">
             bank,
         </if>
-        <if test="bankDeposit != null">
+        <if test="bankDeposit != null and bankDeposit != ''">
             bank_deposit,
         </if>
         <if test="ownerId  != null">
             owner_id,
         </if>
-        <if test="ownerName  != null">
+        <if test="ownerName  != null and ownerName  != ''">
             owner_name,
         </if>
         <if test="isDelete != null ">
@@ -119,19 +119,19 @@
         user_id
         )
         VALUES(
-        <if test="username != null ">
+        <if test="username != null and username != ''">
             #{username},
         </if>
-        <if test="realname != null">
+        <if test="realname != null and realname != ''">
             #{realname},
         </if>
-        <if test="telephone != null">
+        <if test="telephone != null and telephone != ''">
             #{telephone},
         </if>
         <if test="currencyType != null">
             #{currencyType,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
-        <if test="email != null">
+        <if test="email != null and email != ''">
             #{email},
         </if>
         <if test="registerTime != null">
@@ -140,7 +140,7 @@
         <if test="registerIp != null ">
             #{registerIp},
         </if>
-        <if test="generalizeCode != null ">
+        <if test="generalizeCode != null and generalizeCode !='' ">
             #{generalizeCode},
         </if>
         <if test="gender != null">
@@ -149,19 +149,19 @@
         <if test="status != null ">
             #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
         </if>
-        <if test="bankCardNo != null">
+        <if test="bankCardNo != null and bankCardNo != ''">
             #{bankCardNo},
         </if>
-        <if test="bank != null">
+        <if test="bank != null and bank != ''">
             #{bank},
         </if>
-        <if test="bankDeposit != null">
+        <if test="bankDeposit != null and bankDeposit != ''">
             #{bankDeposit},
         </if>
         <if test="ownerId  != null">
             #{ownerId},
         </if>
-        <if test="ownerName  != null">
+        <if test="ownerName  != null and ownerName  != ''">
             #{ownerName},
         </if>
         <if test="isDelete != null ">
@@ -209,6 +209,8 @@
           realname,
           telephone,
           bank_card_no bankCardNo,
+          bank bank,
+          bank_deposit bankDeposit,
           email,
           register_ip registerIp,
           register_time registerTime,
@@ -225,22 +227,25 @@
     <update id="update" parameterType="User">
         UPDATE t_user_info
         <set>
-            <if test="realname != null">
+            <if test="realname != null and realname != ''">
                 realname = #{realname},
             </if>
-            <if test="telephone != null">
+            <if test="telephone != null and telephone !=''">
                 telephone = #{telephone},
             </if>
-            <if test="email != null">
+            <if test="email != null and email != ''">
                 email = #{email},
             </if>
-            <if test="bankCardNo != null">
+            <if test="bankCardNo != null and bankCardNo != ''">
                 bank_card_no = #{bankCardNo},
             </if>
-            <if test="bank != null">
+            <if test="bank != null and bank != ''">
                 bank = #{bank},
             </if>
-            <if test="status != null ">
+            <if test="bankDeposit != null and bankDeposit !=''">
+                bank_deposit = #{bankDeposit},
+            </if>
+            <if test="status != null and status > -1">
                 status = #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
             </if>
         </set>
@@ -320,28 +325,6 @@
         </choose>
     </select>
 
-
-    <!--新增代理-->
-    <insert id="addAgent" parameterType="User">
-        INSERT INTO t_user_info
-          (user_id,username,realname,telephone,bank_card_no,email,register_time,register_ip,generalize_code,status,owner_id,owner_name,type)
-        VALUES(
-        #{userId},
-        #{username},
-        #{realname},
-        #{telephone},
-        #{bankCardNo},
-        #{email},
-        #{registerTime},
-        #{registerIp},
-        #{generalizeCode},
-        #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
-        #{ownerId},
-        #{ownerName},
-        #{type,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler}
-        )
-    </insert>
-
     <!--代理详情--><!-- used -->
     <select id="agentDetail" resultType="com.magic.user.vo.AgentInfoVo">
         SELECT
@@ -386,6 +369,8 @@
             status,
             currency_type,
             bank_card_no,
+            bank,
+            bank_deposit,
             owner_id,
             owner_name,
             is_delete,

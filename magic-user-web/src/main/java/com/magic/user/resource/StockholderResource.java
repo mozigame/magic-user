@@ -3,6 +3,8 @@ package com.magic.user.resource;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.user.enums.AccountStatus;
+import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.StockResourceService;
 import org.springframework.http.MediaType;
@@ -194,6 +196,9 @@ public class StockholderResource {
             @RequestParam(name = "status") Integer status
     ) {
         RequestContext rc = RequestContext.getRequestContext();
+        if (AccountStatus.parse(status) == null) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
         return stockResourceService.updateStatus(rc, id, status);
     }
 

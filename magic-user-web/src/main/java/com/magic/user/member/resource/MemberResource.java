@@ -1,5 +1,6 @@
 package com.magic.user.member.resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
@@ -126,6 +127,7 @@ public class MemberResource {
 
     /**
      * 会员登陆
+     *
      * @param request
      * @param response
      * @param username
@@ -156,25 +158,20 @@ public class MemberResource {
     /**
      * 密码重置
      *
-     * @param request
-     * @param response
-     * @param username
      * @param oldPassword
      * @param newPassword
      * @return
      */
-    @Access(type = Access.AccessType.PUBLIC)
+    @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/password/reset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String reset(
-            HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(name = "username", required = true) String username,
             @RequestParam(name = "oldPassword", required = true) String oldPassword,
             @RequestParam(name = "newPassword", required = true) String newPassword
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.memberPasswordReset(rc, username, oldPassword, newPassword);
+        return memberServiceResource.memberPasswordReset(rc, oldPassword, newPassword);
     }
 
     /**
@@ -222,6 +219,7 @@ public class MemberResource {
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
+        ApiLogger.info("/member/list , condition :" + condition);
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberList(rc, condition, page, count);
     }
@@ -253,9 +251,9 @@ public class MemberResource {
             ServletOutputStream outputStream = response.getOutputStream();
             try {
                 outputStream.write(downLoadFile.getContent());
-            }catch (Exception e){
+            } catch (Exception e) {
                 ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
-            }finally {
+            } finally {
                 outputStream.flush();
                 outputStream.close();
             }
@@ -286,7 +284,6 @@ public class MemberResource {
 //            e.printStackTrace();
 //        }
 //    }
-
 
 
     /**
@@ -381,7 +378,7 @@ public class MemberResource {
      * @param id    会员ID
      * @param level 层级ID
      * @return
-     * @Doc 会员层级修改,前端直接进行页面跳转
+     * @Doc 会员层级修改, 前端直接进行页面跳转
      */
     @Deprecated
     @Access(type = Access.AccessType.COMMON)
@@ -519,7 +516,8 @@ public class MemberResource {
 
     /**
      * 会员停用/启用
-     * @param id 会员id
+     *
+     * @param id     会员id
      * @param status 1 启用 2禁用
      * @return
      */
@@ -615,7 +613,7 @@ public class MemberResource {
 
     /**
      * @return
-     * @Doc     获取会员中心详情信息
+     * @Doc 获取会员中心详情信息
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/center/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -627,7 +625,7 @@ public class MemberResource {
 
     /**
      * @return
-     * @Doc     刷新会员的余额和未读消息
+     * @Doc 刷新会员的余额和未读消息
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/refresh", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -645,19 +643,26 @@ public class MemberResource {
     @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/code/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public void getCode(HttpServletRequest request, HttpServletResponse response,
+    public String getCode(
                         @RequestParam(name = "width", required = false, defaultValue = "200") Integer width,
-                        @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException{
+                        @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-        response.setHeader("Pragma", "No-cache");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setDateHeader("Expires", 0);
-        response.setContentType("image/jpeg");
-
         String code = CodeImageUtil.generateVerifyCode(UserContants.VERIFY_CODE_LENGTH);
         String clientId = memberServiceResource.saveCode(rc, code);
-        response.addCookie(new Cookie(UserContants.CLIENT_ID, clientId));
+        String base64Code = CodeImageUtil.outputImage(width, height, code);
+        return assembleResult(clientId, base64Code);
+    }
 
-        CodeImageUtil.outputImage(width, height, response.getOutputStream(), code);
+    /**
+     * 组装返回数据
+     * @param clientId
+     * @param base64Code
+     * @return
+     */
+    private String assembleResult(String clientId, String base64Code) {
+        JSONObject object = new JSONObject();
+        object.put("clientId", clientId);
+        object.put("code", base64Code);
+        return object.toJSONString();
     }
 }
