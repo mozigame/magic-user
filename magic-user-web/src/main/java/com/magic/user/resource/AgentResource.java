@@ -262,7 +262,7 @@ public class AgentResource {
             HttpServletRequest request,
             @RequestParam(name = "account",required = true) String account,
             @RequestParam(name = "password",required = true) String password,
-            @RequestParam(name = "paymentPassword",required = true) String paymentPassword,
+           // @RequestParam(name = "paymentPassword",required = true) String paymentPassword,
             @RequestParam(name = "realname",required = true) String realname,
             @RequestParam(name = "telephone",required = true) String telephone,
             @RequestParam(name = "email",required = false,defaultValue = "") String email,
@@ -275,7 +275,7 @@ public class AgentResource {
             @RequestParam(name = "qq",required = false,defaultValue = "") String qq
 
     ) {
-        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password,paymentPassword,
+        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password,//paymentPassword,
                 realname, telephone, email, bankCardNo, bank, bankDeposit,province,city,weixin,qq);
     }
 

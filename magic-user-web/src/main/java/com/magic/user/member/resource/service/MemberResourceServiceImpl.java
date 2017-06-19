@@ -1453,6 +1453,40 @@ public class MemberResourceServiceImpl {
     }
 
     /**
+     * 在线会员列表导出
+     * @param rc
+     * @param loginStartTime
+     * @param loginEndTime
+     * @param registerStartTime
+     * @param registerEndTime
+     */
+    public DownLoadFile onlineListExport(RequestContext rc,Long loginStartTime,Long loginEndTime,Long registerStartTime,Long registerEndTime) {
+        long uid = rc.getUid();
+        User user = userService.getUserById(uid);
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.ONLINE_MEMBER_LIST);
+        DownLoadFile downLoadFile = new DownLoadFile();
+        downLoadFile.setFilename(filename);
+        byte[] content = new byte[0];
+
+        OnlineMemberConditon memberCondition = parseContion(null, user);
+        List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, null, null);
+
+        //查询表数据，生成excel的zip，并返回zip byte[]
+        content = ExcelUtil.onLineMemberListExport(list, filename);
+        downLoadFile.setContent(content);
+        return downLoadFile;
+    }
+
+
+    /**
      * 组装在线会员列表
      *
      * @param list
