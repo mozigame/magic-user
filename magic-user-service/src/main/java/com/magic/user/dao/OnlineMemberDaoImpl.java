@@ -118,19 +118,21 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
                 query.addCriteria(new Criteria("status").is(status));
             }
             Long loginStartTime = condition.getLoginStartTime();
-            if (loginStartTime != null && loginStartTime > 0){
-                query.addCriteria(new Criteria("loginTime").gte(loginStartTime));
-            }
             Long loginEndTime = condition.getLoginEndTime();
-            if (loginEndTime != null && loginEndTime > 0){
+            if (loginStartTime != null && loginStartTime > 0 && loginEndTime != null && loginEndTime > 0) {
+                query.addCriteria(new Criteria("loginTime").gte(loginStartTime).lte(loginEndTime));
+            } else if (loginStartTime != null && loginStartTime > 0 ){
+                query.addCriteria(new Criteria("loginTime").gte(loginStartTime));
+            } else if (loginEndTime != null && loginEndTime > 0) {
                 query.addCriteria(new Criteria("loginTime").lte(loginEndTime));
             }
             Long registerStartTime = condition.getRegisterStartTime();
-            if (registerStartTime != null && registerStartTime > 0){
-                query.addCriteria(new Criteria("registerTime").gte(registerStartTime));
-            }
             Long registerEndTime = condition.getRegisterEndTime();
-            if (registerEndTime != null && registerEndTime > 0){
+            if (registerStartTime != null && registerStartTime > 0 && registerEndTime != null && registerEndTime > 0){
+                query.addCriteria(new Criteria("registerTime").gte(registerStartTime).lte(registerEndTime));
+            } else if (registerStartTime != null && registerStartTime > 0) {
+                query.addCriteria(new Criteria("registerTime").gte(registerStartTime));
+            } else if (registerEndTime != null && registerEndTime > 0) {
                 query.addCriteria(new Criteria("registerTime").lte(registerEndTime));
             }
         }
