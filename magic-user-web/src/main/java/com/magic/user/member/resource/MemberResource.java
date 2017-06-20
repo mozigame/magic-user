@@ -566,14 +566,16 @@ public class MemberResource {
     @ResponseBody
     public void onlineListExport(
             HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(name = "loginStartTime", required = false) Long loginStartTime,
-            @RequestParam(name = "loginEndTime", required = false) Long loginEndTime,
-            @RequestParam(name = "registerStartTime", required = false) Long registerStartTime,
-            @RequestParam(name = "registerEndTime", required = false) Long registerEndTime
+            @RequestParam(name = "userId", required = true) Long userId,
+//            @RequestParam(name = "loginStartTime", required = false) Long loginStartTime,
+//            @RequestParam(name = "loginEndTime", required = false) Long loginEndTime,
+//            @RequestParam(name = "registerStartTime", required = false) Long registerStartTime,
+//            @RequestParam(name = "registerEndTime", required = false) Long registerEndTime
+            @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-
-        DownLoadFile downLoadFile = memberServiceResource.onlineListExport(rc,loginStartTime,loginEndTime,registerStartTime,registerEndTime);
+        rc.setUid(userId);
+        DownLoadFile downLoadFile = memberServiceResource.onlineListExport(rc,condition /*loginStartTime,loginEndTime,registerStartTime,registerEndTime*/);
         response.setCharacterEncoding("UTF-8");
         if(downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0){
             String contnetDisposition = "attachment;filename=";

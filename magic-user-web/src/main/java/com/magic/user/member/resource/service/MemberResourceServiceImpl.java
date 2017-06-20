@@ -1275,7 +1275,6 @@ public class MemberResourceServiceImpl {
      * 密码重置
      *
      * @param rc          RequestContext
-     * @param username    用户号
      * @param oldPassword 旧密码
      * @param newPassword 新密码
      * @return
@@ -1455,12 +1454,11 @@ public class MemberResourceServiceImpl {
     /**
      * 在线会员列表导出
      * @param rc
-     * @param loginStartTime
-     * @param loginEndTime
-     * @param registerStartTime
-     * @param registerEndTime
+     * @param condition
+     * @return
      */
-    public DownLoadFile onlineListExport(RequestContext rc,Long loginStartTime,Long loginEndTime,Long registerStartTime,Long registerEndTime) {
+    public DownLoadFile onlineListExport(RequestContext rc,String condition
+                                         /*Long loginStartTime,Long loginEndTime,Long registerStartTime,Long registerEndTime*/) {
         long uid = rc.getUid();
         User user = userService.getUserById(uid);
         if (user == null) {
@@ -1476,11 +1474,15 @@ public class MemberResourceServiceImpl {
         downLoadFile.setFilename(filename);
         byte[] content = new byte[0];
 
-        OnlineMemberConditon memberCondition = parseContion(null, user);
+        OnlineMemberConditon memberCondition = parseContion(condition, user);
+//        memberCondition.setLoginStartTime(loginStartTime);
+//        memberCondition.setLoginEndTime(loginEndTime);
+//        memberCondition.setRegisterStartTime(registerStartTime);
+//        memberCondition.setRegisterEndTime(registerEndTime);
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, null, null);
-
+        List<OnLineMemberVo> members = (List<OnLineMemberVo>) assembleOnlineMemberVo(list);
         //查询表数据，生成excel的zip，并返回zip byte[]
-        content = ExcelUtil.onLineMemberListExport(list, filename);
+        content = ExcelUtil.onLineMemberListExport(members, filename);
         downLoadFile.setContent(content);
         return downLoadFile;
     }

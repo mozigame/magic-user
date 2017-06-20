@@ -360,7 +360,7 @@ public class ExcelUtil {
      * @param filename
      * @return
      */
-    public static byte[] onLineMemberListExport(List<OnLineMember> list, String filename) {
+    public static byte[] onLineMemberListExport(List<OnLineMemberVo> list, String filename) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
         try{
             //创建Excel工作薄
@@ -411,14 +411,23 @@ public class ExcelUtil {
 
             //表头创建完成
             for(int i=0 ;i < list.size(); i++){
-                OnLineMember vo = list.get(i);
+                OnLineMemberVo vo = list.get(i);
                 Row row = sheet.createRow(i + 1);
                 row.createCell(0).setCellValue(i + 1);
                 row.createCell(1).setCellValue(vo.getAccount());
-                row.createCell(2).setCellValue(vo.getLoginTime());
-                row.createCell(3).setCellValue(vo.getLoginIp());
-                row.createCell(4).setCellValue(vo.getRegisterTime());
-                row.createCell(5).setCellValue(vo.getRegisterIp());
+                if(vo.getLoginTime() != null){
+                    row.createCell(2).setCellValue(vo.getLoginTime());
+                }
+                if(vo.getLoginIp() != null){
+                    row.createCell(3).setCellValue(vo.getLoginIp());
+                }
+                if(vo.getRegisterTime() != null){
+                    row.createCell(4).setCellValue(vo.getRegisterTime());
+                }
+                if(vo.getRegisterIp() != null){
+                    row.createCell(5).setCellValue(vo.getRegisterIp());
+                }
+
             }
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             workbook.write(os);
