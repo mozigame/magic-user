@@ -264,7 +264,7 @@ public class AgentResource {
     @ResponseBody
     public String apply(
             HttpServletRequest request,
-            @RequestParam(name = "account",required = true) String account,
+            @RequestParam(name = "username",required = true) String account,
             @RequestParam(name = "password",required = true) String password,
            // @RequestParam(name = "paymentPassword",required = true) String paymentPassword,
             @RequestParam(name = "realname",required = true) String realname,
