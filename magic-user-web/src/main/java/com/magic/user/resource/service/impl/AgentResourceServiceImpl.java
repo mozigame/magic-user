@@ -661,16 +661,21 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     //1.url获取ownerId
     //2.ownerId + ownername 获取 stockId
     @Override
-    public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password, String paymentPassword, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String province, String city, String weixin, String qq) {
+    public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password,//String paymentPassword,
+                             String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String province, String city, String weixin, String qq) {
         StringBuffer url = request.getRequestURL();
         String resourceUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).append("/").toString();
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(resourceUrl);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
+//            ownerInfo.setOwnerId(10001L);
+//            ownerInfo.setOwnerName("owner2");
         }
-
+        ownerInfo.setOwnerId(10001L);
+        ownerInfo.setOwnerName("owner2");
         //校验用户名、密码、支付密码的格式及其他非空参数
-        if (!checkRegisterParam(account, password, paymentPassword, ownerInfo.getOwnerId(), AccountType.agent.value(), email, province, city, weixin, qq)) {
+        if (!checkRegisterParam(account, password, //paymentPassword,
+                ownerInfo.getOwnerId(), AccountType.agent.value(), email, province, city, weixin, qq)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
 
@@ -697,7 +702,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      *
      * @param account
      * @param password
-     * @param paymentPassword
      * @param ownerId
      * @param type
      * @param email
@@ -707,7 +711,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @param qq
      * @return
      */
-    private boolean checkRegisterParam(String account, String password, String paymentPassword, long ownerId, int type, String email, String province, String city, String weixin, String qq) {
+    private boolean checkRegisterParam(String account, String password,// String paymentPassword,
+                                       long ownerId, int type, String email, String province, String city, String weixin, String qq) {
         //校验用户名和密码
         if (account.length() < 6 || account.length() > 16 || password.length() != 32) {
             return false;

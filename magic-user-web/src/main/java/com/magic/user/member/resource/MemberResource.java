@@ -79,7 +79,6 @@ public class MemberResource {
             @RequestParam(name = "qq", required = false, defaultValue = "") String qq
 
     ) {
-
         RequestContext rc = RequestContext.getRequestContext();
         //获取域名
         StringBuffer requestURL = request.getRequestURL();
@@ -549,6 +548,56 @@ public class MemberResource {
     ) {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.onlineList(rc, condition, page, count);
+    }
+
+    /**
+     *
+     * @param request
+     * @param response
+     * @param loginStartTime
+     * @param loginEndTime
+     * @param registerStartTime
+     * @param registerEndTime
+     * @throws IOException
+     * @Doc 在线会员列表导出
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/online/listExport", method = RequestMethod.GET)
+    @ResponseBody
+    public void onlineListExport(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "userId", required = true) Long userId,
+//            @RequestParam(name = "loginStartTime", required = false) Long loginStartTime,
+//            @RequestParam(name = "loginEndTime", required = false) Long loginEndTime,
+//            @RequestParam(name = "registerStartTime", required = false) Long registerStartTime,
+//            @RequestParam(name = "registerEndTime", required = false) Long registerEndTime
+            @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
+    ) throws IOException {
+        RequestContext rc = RequestContext.getRequestContext();
+        rc.setUid(userId);
+        DownLoadFile downLoadFile = memberServiceResource.onlineListExport(rc,condition /*loginStartTime,loginEndTime,registerStartTime,registerEndTime*/);
+        response.setCharacterEncoding("UTF-8");
+        if(downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0){
+            String contnetDisposition = "attachment;filename=";
+            if (downLoadFile.getFilename() != null) {
+                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
+                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
+            }
+            response.setHeader("Content-Disposition", contnetDisposition);
+            ServletOutputStream outputStream = response.getOutputStream();
+            try {
+                outputStream.write(downLoadFile.getContent());
+            } catch (Exception e) {
+                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
+            } finally {
+                try {
+                    outputStream.flush();
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
