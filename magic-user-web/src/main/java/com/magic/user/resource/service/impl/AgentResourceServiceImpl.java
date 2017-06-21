@@ -668,11 +668,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(resourceUrl);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
-//            ownerInfo.setOwnerId(10001L);
-//            ownerInfo.setOwnerName("owner2");
         }
-        ownerInfo.setOwnerId(10001L);
-        ownerInfo.setOwnerName("owner2");
+
         //校验用户名、密码、支付密码的格式及其他非空参数
         if (!checkRegisterParam(account, password, //paymentPassword,
                 ownerInfo.getOwnerId(), AccountType.agent.value(), email, province, city, weixin, qq)) {

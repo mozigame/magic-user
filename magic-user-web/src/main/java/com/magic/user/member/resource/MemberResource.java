@@ -649,6 +649,7 @@ public class MemberResource {
                         @RequestParam(name = "width", required = false, defaultValue = "200") Integer width,
                         @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
+        ApiLogger.info("url:" + rc.getRequest().getServerName());
         String code = CodeImageUtil.generateVerifyCode(UserContants.VERIFY_CODE_LENGTH);
         String clientId = memberServiceResource.saveCode(rc, code);
         String base64Code = CodeImageUtil.outputImage(width, height, code);
