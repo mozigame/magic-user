@@ -1,13 +1,17 @@
 package com.magic.user.service.thrift;
 
+import com.alibaba.fastjson.JSON;
+import com.magic.api.commons.ApiLogger;
 import com.magic.commons.enginegw.service.ThriftFactory;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
+import com.magic.user.constants.UserContants;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * User: joey
@@ -220,9 +224,6 @@ public class ThriftOutAssembleServiceImpl {
         return thriftFactory.call(req, caller);
     }
 
-
-
-
     /**
      * 组装thrift请求对象
      *
@@ -240,4 +241,22 @@ public class ThriftOutAssembleServiceImpl {
         req.setBody(body);
         return req;
     }
+
+    /**
+     * 注册支付账号
+     *
+     * @param body
+     * @return
+     */
+    public boolean registerPaymentAcccount(String body){
+        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300002, body);
+        try {
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            return Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent();
+        }catch (Exception e){
+            ApiLogger.error(String.format("register payment account error. req: %s", JSON.toJSONString(req)), e);
+        }
+        return false;
+    }
+
 }

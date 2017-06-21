@@ -30,6 +30,7 @@
                 <ref bean="agentStatusUpdateSuccessMongoConsumer"></ref>
                 <ref bean="masterAddOwnerSuccessConsumer"></ref>
                 <ref bean="memberLoginRedisCountConsumer"/>
+                <ref bean="v1memberRegisterSucessThriftConsumer"/>
             </list>
         </constructor-arg>
         <constructor-arg index="1" value="${mq.all.consumer.nameserver}"/>
