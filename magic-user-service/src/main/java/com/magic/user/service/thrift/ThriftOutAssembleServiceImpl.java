@@ -129,7 +129,7 @@ public class ThriftOutAssembleServiceImpl {
         String balance = "0";
         try {
             EGResp call = thriftFactory.call(req, UserContants.CALLER);
-            if (Optional.ofNullable(call).isPresent()){
+            if (Optional.ofNullable(call).filter(code -> code.getCode() == 0).isPresent()){
                 JSONObject data = JSONObject.parseObject(call.getData());
                 long value = data.getLongValue("Balance");
                 balance = String.valueOf(NumberUtil.fenToYuan(value));
