@@ -6,6 +6,8 @@ package com.magic.user.entity;
 public class AgentConfig {
     private Integer id;
 
+    private Long ownerId;   //业主id
+
     private Long agentId;  //代理id
 
     private Integer returnSchemeId; //退佣方案id
@@ -42,6 +44,14 @@ public class AgentConfig {
         this.adminCostId = adminCostId;
         this.feeId = feeId;
         this.domain = domain;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Integer getId() {
