@@ -124,7 +124,7 @@ public class ThriftOutAssembleServiceImpl {
      * @return
      */
     public String getMemberBalance(long uid) {
-        String body = "{\"UserId\":" + uid + ",\"Flag:\"" + 1 + "}";
+        String body = "{\"UserId\":" + uid + ",\"Flag\":" + 1 + "}";
         EGReq req = assembleEGReq(CmdType.SETTLE, 0x300001, body);
         String balance = "0";
         try {
