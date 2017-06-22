@@ -187,7 +187,7 @@ public class ThriftOutAssembleServiceImpl {
      */
     public EGResp getMemberPrivilege(String body, String caller) {
         //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x500040, body);
         return thriftFactory.call(req, caller);
     }
 
@@ -199,7 +199,7 @@ public class ThriftOutAssembleServiceImpl {
      */
     public EGResp findLevelList(String body, String caller) {
         //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x100005, body);
         return thriftFactory.call(req, caller);
     }
 
@@ -210,8 +210,7 @@ public class ThriftOutAssembleServiceImpl {
      * @return
      */
     public EGResp findLevelListSimple(String body, String caller) {
-        //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x500029, body);
         return thriftFactory.call(req, caller);
     }
 
@@ -223,7 +222,7 @@ public class ThriftOutAssembleServiceImpl {
      */
     public EGResp findReturnWaters(String body, String caller) {
         //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x100005, body);
         return thriftFactory.call(req, caller);
     }
 
@@ -235,7 +234,7 @@ public class ThriftOutAssembleServiceImpl {
      */
     public EGResp addAgentConfig(String body, String caller) {
         //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.CONFIG, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x500041, body);
         return thriftFactory.call(req, caller);
     }
 
@@ -247,7 +246,7 @@ public class ThriftOutAssembleServiceImpl {
      */
     public EGResp updateAgentConfig(String body, String caller) {
         //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.CONFIG, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x500042, body);
         return thriftFactory.call(req, caller);
     }
 
