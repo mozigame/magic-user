@@ -1,7 +1,10 @@
 package com.magic.user.service.thrift;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.tools.NumberUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.commons.enginegw.service.ThriftFactory;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
@@ -110,9 +113,34 @@ public class ThriftOutAssembleServiceImpl {
      * @return
      */
     public EGResp getMemberCapital(String body, String caller) {
-        //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300001, body);
         return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 获取会员余额
+     * @param uid
+     *
+     * @return
+     */
+    public String getMemberBalance(long uid) {
+        String body = "{\"UserId\":" + uid + ",\"Flag:\"" + 1 + "}";
+        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300001, body);
+        String balance = "0";
+        try {
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            if (Optional.ofNullable(call).isPresent()){
+                JSONObject data = JSONObject.parseObject(call.getData());
+                long value = data.getLongValue("Balance");
+                balance = String.valueOf(NumberUtil.fenToYuan(value));
+            }
+        }catch (Exception e){
+            ApiLogger.error(String.format("get user balance error. uid: %d", uid), e);
+        }
+        if (!StringUtils.isEmpty(balance)){
+            balance = "0";
+        }
+        return balance;
     }
 
     /**
