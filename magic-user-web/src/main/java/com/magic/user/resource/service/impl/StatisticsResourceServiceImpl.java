@@ -17,6 +17,8 @@ import com.magic.user.vo.StatisticsInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -84,9 +86,17 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
         //String data = resp.data;
         //String result = "{\"creditLimit\":\"822,121,121\",\"creditLimited\":\"123,1231,12\",\"time\":\""+System.currentTimeMillis()+"\"}";
         OwnerCreaditLimitVo result = new OwnerCreaditLimitVo();
-        result.setCreaditLimit("923,1231,12");
-        result.setCreaditLimited("123,1231,12");
-        result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
+        Format fm =new DecimalFormat("#,###.00");
+        double d  = (double)((Math.random()*9+1)*3000000000d);
+        result.setCreaditLimit(fm.format(d));
+        result.setCreaditLimited(fm.format(d-120000));
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.HOUR_OF_DAY,-12);
+        result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cal.getTime()));
         return JSONObject.toJSONString(result);
     }
+
 }
