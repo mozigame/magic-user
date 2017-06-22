@@ -1130,10 +1130,7 @@ public class MemberResourceServiceImpl {
         }
 
         String token = object.getString("token");
-        long message = dubboOutAssembleService.getNoReadMessageCount(uid);
-        EGResp capitalResp = thriftOutAssembleService.getMemberCapital("{\"memberId\":" + uid + "}", "account");
-
-        String result = assembleLoginResult(uid,member.getUsername(),token,message,capitalResp);
+        String result = assembleLoginResult(uid, member.getUsername(), token);
         sendLoginMessage(member, rc);
 
         return result;
@@ -1185,23 +1182,15 @@ public class MemberResourceServiceImpl {
      * @param capitalResp 从中解析出账户余额
      * @return
      */
-    private String assembleLoginResult(long uid, String username, String token, long message, EGResp capitalResp) {
+    private String assembleLoginResult(long uid, String username, String token) {
         LoginSuccessInfoVo loginInfo = new LoginSuccessInfoVo();
         loginInfo.setId(uid);
         loginInfo.setUsername(username);
         loginInfo.setToken(token);
+        long message = dubboOutAssembleService.getNoReadMessageCount(uid);
         loginInfo.setMessage(message);
-        if (capitalResp != null && capitalResp.getData() != null) {
-            JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
-            if(capitalData.getString("balance") != null){
-                loginInfo.setBalance(capitalData.getString("balance"));
-            }else{
-                loginInfo.setBalance("0");
-            }
-        }else{
-            loginInfo.setBalance("0");
-        }
-
+        String balance = thriftOutAssembleService.getMemberBalance(uid);
+        loginInfo.setBalance(balance);
         return JSONObject.toJSONString(loginInfo);
     }
 
@@ -1652,16 +1641,7 @@ public class MemberResourceServiceImpl {
      */
     public String getMemberInfo(RequestContext rc) {
         long message = dubboOutAssembleService.getNoReadMessageCount(rc.getUid());
-        String balance = null;
-        EGResp capitalResp = thriftOutAssembleService.getMemberCapital("{\"memberId\":" + rc.getUid() + "}", "account");
-        if (capitalResp != null && capitalResp.getData() != null) {
-            JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
-            balance = capitalData.getString("balance");
-        }
-        if (StringUtils.isEmpty(balance)){
-            //TODO 对接好数据后，修改为0
-            balance = "3000";
-        }
+        String balance = thriftOutAssembleService.getMemberBalance(rc.getUid());
         return "{\"message\":"+message+",\"balance\":\""+balance+"\"}";
     }
 

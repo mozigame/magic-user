@@ -57,8 +57,11 @@ public class MemberRegisterSucessThriftConsumer implements Consumer{
     private String assembleBody(Member member) {
         JSONObject body = new JSONObject();
         body.put("UserId", member.getMemberId());
+        body.put("UserName", member.getUsername());
         body.put("AgentId", member.getAgentId());
+        body.put("AgentName", member.getAgentUsername());
         body.put("OwnerId", member.getOwnerId());
+        body.put("OwnerName", member.getOwnerUsername());
         body.put("BankCode", member.getBank() == null ? "" : member.getBank());
         body.put("BankCardNum", member.getBankCardNo() == null ? "" : member.getBankCardNo());
         body.put("BankCardHolder", member.getBankDeposit() == null ? "" : member.getBankDeposit());
