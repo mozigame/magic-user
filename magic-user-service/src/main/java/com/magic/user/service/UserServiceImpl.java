@@ -62,8 +62,8 @@ public class UserServiceImpl implements UserService {
     public boolean update(User user) {
         boolean result = stockDbService.update(user) > 0;
         if (result) {
-            if (!userRedisStorageService.updateUser(user)) {
-                ApiLogger.warn("update user info to redis error,userId:" + user.getUserId());
+            if (!userRedisStorageService.delUser(user.getUserId())) {
+                ApiLogger.warn("delete user info to redis error,userId:" + user.getUserId());
             }
         }
         return result;
