@@ -137,7 +137,7 @@ public class ThriftOutAssembleServiceImpl {
         }catch (Exception e){
             ApiLogger.error(String.format("get user balance error. uid: %d", uid), e);
         }
-        if (!StringUtils.isEmpty(balance)){
+        if (StringUtils.isEmpty(balance)){
             balance = "0";
         }
         return balance;
