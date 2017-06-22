@@ -608,11 +608,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         user.setEmail(email);
         user.setBankCardNo(bankCardNo);
         user.setBank(bank);
+
     }
 
     /**
      * {@inheritDoc}
-     *
+     *修改代理参数配置
      * @param rc
      * @param agentId
      * @param returnScheme
@@ -635,7 +636,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     }
 
     /**
-     * 修改代理参数配置
+     * 组装代理参数配置
      * @param agentId
      * @param returnScheme
      * @param adminCost
@@ -663,8 +664,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     @Override
     public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password,//String paymentPassword,
                              String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String province, String city, String weixin, String qq) {
-        StringBuffer url = request.getRequestURL();
-        String resourceUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).append("/").toString();
+        String resourceUrl = rc.getRequest().getHeader("Origin");
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(resourceUrl);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;

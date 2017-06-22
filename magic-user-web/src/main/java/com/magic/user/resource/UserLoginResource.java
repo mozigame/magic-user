@@ -55,8 +55,7 @@ public class UserLoginResource {
         //获取浏览器、操作系统名称等数据
         String agent = request.getHeader(HeaderUtil.USER_AGENT);
         //获取域名
-        StringBuffer requestURL = request.getRequestURL();
-        String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
+        String url = rc.getRequest().getHeader("Origin");
         ApiLogger.info("/user/login url : " + url);
         return userLoginResourceService.login(rc, agent, url, username, password, code);
     }

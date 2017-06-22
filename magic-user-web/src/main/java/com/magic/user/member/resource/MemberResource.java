@@ -81,8 +81,7 @@ public class MemberResource {
     ) {
         RequestContext rc = RequestContext.getRequestContext();
         //获取域名
-        StringBuffer requestURL = request.getRequestURL();
-        String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
+        String url = rc.getRequest().getHeader("Origin");
         RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
         return memberServiceResource.memberRegister(rc, url, req);
     }
@@ -150,8 +149,7 @@ public class MemberResource {
         //获取浏览器、操作系统名称等数据
         String agent = request.getHeader(HeaderUtil.USER_AGENT);
         //获取域名
-        StringBuffer requestURL = request.getRequestURL();
-        String url = requestURL.delete(requestURL.length() - request.getRequestURI().length(), requestURL.length()).toString();
+        String url = rc.getRequest().getHeader("Origin");
         return memberServiceResource.memberLogin(rc, agent, url, username, password, code);
     }
 
