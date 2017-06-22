@@ -42,11 +42,19 @@ public class StatisticsResource {
     }
 
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/getOwnerAccountimit", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/getOwnerAccountLimit", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String getOwnerAccountimit(){
         RequestContext rc = RequestContext.getRequestContext();
         return statisticsResourceService.getOwnerAccountLimit(rc);
+    }
+
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/getOwnerNotReadNotice", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getOwnerNotReadNotice(){
+        RequestContext rc = RequestContext.getRequestContext();
+        return statisticsResourceService.getOwnerNotReadNotice(rc);
     }
 
 }

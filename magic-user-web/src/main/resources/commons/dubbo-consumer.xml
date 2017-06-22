@@ -33,4 +33,7 @@
     <!-- 配置层级dubbo -->
     <dubbo:reference id="msgDubboService" interface="com.magic.cms.service.MsgDubboService" timeout="15000"
                      retries="0" check="false"/>
+    <!-- 配置层级dubbo -->
+    <dubbo:reference id="bulletinMsgDubboService" interface="com.magic.cms.service.BulletinMsgDubboService" timeout="15000"
+                     retries="0" check="false"/>
 </beans>
