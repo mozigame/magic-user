@@ -91,5 +91,4 @@ public class UserLoginResource {
         RequestContext rc = RequestContext.getRequestContext();
         return userLoginResourceService.verify(rc);
     }
-
 }
