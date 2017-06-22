@@ -2,8 +2,10 @@ package com.magic.user.resource.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.SimpleListResult;
+import com.magic.cms.service.BulletinMsgDubboService;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.User;
@@ -37,6 +39,8 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
     private StatisticsService statisticsService;
     @Resource
     private ThriftOutAssembleServiceImpl thriftOutAssembleService;
+    @Resource
+    private BulletinMsgDubboService bulletinMsgDubboService;
 
     /**
      * {@inheritDoc}
@@ -97,6 +101,20 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
         cal.add(Calendar.HOUR_OF_DAY,-12);
         result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cal.getTime()));
         return JSONObject.toJSONString(result);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getOwnerNotReadNotice(RequestContext rc) {
+        String result = null;
+        try {
+            result = bulletinMsgDubboService.getMaxNoticeId(rc.getUid())+"";
+        } catch (Exception e) {
+            ApiLogger.error("get owner not to read notice failed ! uid: %s"+rc.getUid());
+        }
+        return result;
     }
 
 }
