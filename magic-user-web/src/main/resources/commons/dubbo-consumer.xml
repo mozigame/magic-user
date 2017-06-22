@@ -5,7 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans.xsd        http://code.alibabatech.com/schema/dubbo        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
     <dubbo:application name="${dubbo.application.provider.name}"/>
-    <dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}"/>
+    <dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}" file="${catalina.home}/dubbo-registry/magic-user.properties"/>
     <dubbo:protocol port="${dubbo.port}"/>
 
     <!-- 在此配置consumer的信息 -->

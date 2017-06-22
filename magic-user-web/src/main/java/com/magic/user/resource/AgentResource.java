@@ -229,7 +229,7 @@ public class AgentResource {
      * @param feeScheme    手续费方案ID
      * @param discount     优惠扣除 默认1 1不选 2勾选
      * @param cost         返水成本 默认1 1不选 2勾选
-     * @param domain       域名,www.123.com,233.abc.com
+     * @param domains       域名,www.123.com,233.abc.com
      * @return
      * @Doc 代理参数配置修改
      */
