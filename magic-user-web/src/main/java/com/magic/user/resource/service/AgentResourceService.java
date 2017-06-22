@@ -114,7 +114,7 @@ public interface AgentResourceService {
     String agentApply(RequestContext rc, HttpServletRequest request,
             String account,
             String password,
-            String paymentPassword,
+            //String paymentPassword,
             String realname,
             String telephone,
             String email,

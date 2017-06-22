@@ -264,23 +264,23 @@ public class AgentResource {
     @ResponseBody
     public String apply(
             HttpServletRequest request,
-            @RequestParam(name = "account", required = true) String account,
-            @RequestParam(name = "password", required = true) String password,
-            @RequestParam(name = "paymentPassword", required = true) String paymentPassword,
-            @RequestParam(name = "realname", required = true) String realname,
-            @RequestParam(name = "telephone", required = true) String telephone,
-            @RequestParam(name = "email", required = false, defaultValue = "") String email,
-            @RequestParam(name = "bankCardNo", required = true) String bankCardNo,
-            @RequestParam(name = "bank", required = true) String bank,
-            @RequestParam(name = "bankDeposit", required = true) String bankDeposit,
-            @RequestParam(name = "province", required = false, defaultValue = "") String province,
-            @RequestParam(name = "city", required = false, defaultValue = "") String city,
-            @RequestParam(name = "weixin", required = false, defaultValue = "") String weixin,
-            @RequestParam(name = "qq", required = false, defaultValue = "") String qq
+            @RequestParam(name = "username",required = true) String account,
+            @RequestParam(name = "password",required = true) String password,
+           // @RequestParam(name = "paymentPassword",required = true) String paymentPassword,
+            @RequestParam(name = "realname",required = true) String realname,
+            @RequestParam(name = "telephone",required = true) String telephone,
+            @RequestParam(name = "email",required = false,defaultValue = "") String email,
+            @RequestParam(name = "bankCardNo",required = true) String bankCardNo,
+            @RequestParam(name = "bank",required = true) String bank,
+            @RequestParam(name = "bankDeposit",required = true) String bankDeposit,
+            @RequestParam(name = "province",required = false,defaultValue = "") String province,
+            @RequestParam(name = "city",required = false,defaultValue = "") String city,
+            @RequestParam(name = "weixin",required = false,defaultValue = "") String weixin,
+            @RequestParam(name = "qq",required = false,defaultValue = "") String qq
 
     ) {
-        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password, paymentPassword,
-                realname, telephone, email, bankCardNo, bank, bankDeposit, province, city, weixin, qq);
+        return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password,//paymentPassword,
+                realname, telephone, email, bankCardNo, bank, bankDeposit,province,city,weixin,qq);
     }
 
     /**

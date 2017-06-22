@@ -1,13 +1,20 @@
 package com.magic.user.service.thrift;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.tools.NumberUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.commons.enginegw.service.ThriftFactory;
 import com.magic.config.thrift.base.CmdType;
 import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
+import com.magic.user.constants.UserContants;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * User: joey
@@ -106,9 +113,34 @@ public class ThriftOutAssembleServiceImpl {
      * @return
      */
     public EGResp getMemberCapital(String body, String caller) {
-        //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300001, body);
         return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 获取会员余额
+     * @param uid
+     *
+     * @return
+     */
+    public String getMemberBalance(long uid) {
+        String body = "{\"UserId\":" + uid + ",\"Flag\":" + 1 + "}";
+        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300001, body);
+        String balance = "0";
+        try {
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            if (Optional.ofNullable(call).filter(code -> code.getCode() == 0).isPresent()){
+                JSONObject data = JSONObject.parseObject(call.getData());
+                long value = data.getLongValue("Balance");
+                balance = String.valueOf(NumberUtil.fenToYuan(value));
+            }
+        }catch (Exception e){
+            ApiLogger.error(String.format("get user balance error. uid: %d", uid), e);
+        }
+        if (StringUtils.isEmpty(balance)){
+            balance = "0";
+        }
+        return balance;
     }
 
     /**
@@ -219,9 +251,6 @@ public class ThriftOutAssembleServiceImpl {
         return thriftFactory.call(req, caller);
     }
 
-
-
-
     /**
      * 组装thrift请求对象
      *
@@ -238,5 +267,34 @@ public class ThriftOutAssembleServiceImpl {
         req.setHeader(header);
         req.setBody(body);
         return req;
+    }
+
+    /**
+     * 注册支付账号
+     *
+     * @param body
+     * @return
+     */
+    public boolean registerPaymentAcccount(String body){
+        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300002, body);
+        try {
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            return Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent();
+        }catch (Exception e){
+            ApiLogger.error(String.format("register payment account error. req: %s", JSON.toJSONString(req)), e);
+        }
+        return false;
+    }
+
+    /**
+     * 获取业主平台的授信额度和已用额度
+     * @param body
+     * @param caller
+     * @return
+     */
+    public EGResp getOwnerAccountLimit(String body,String caller){
+        //TODO 修改cmdType 和 cmd值
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        return thriftFactory.call(req, caller);
     }
 }

@@ -1,18 +1,25 @@
 package com.magic.user.resource.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.SimpleListResult;
+import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.User;
 import com.magic.user.resource.service.StatisticsResourceService;
 import com.magic.user.service.StatisticsService;
 import com.magic.user.service.UserService;
+import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.UserUtil;
+import com.magic.user.vo.OwnerCreaditLimitVo;
 import com.magic.user.vo.StatisticsInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -28,6 +35,8 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
     private UserService userService;
     @Resource
     private StatisticsService statisticsService;
+    @Resource
+    private ThriftOutAssembleServiceImpl thriftOutAssembleService;
 
     /**
      * {@inheritDoc}
@@ -65,4 +74,29 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
         vo.setActiveList(map.values());
         return vo;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getOwnerAccountLimit(RequestContext rc) {
+        long uid = rc.getUid();
+        // -todo 调kaven的thrift接口
+        //EGResp resp = thriftOutAssembleService.getOwnerAccountLimit("{\"uid\":"+uid+"}","account");
+        //String data = resp.data;
+        //String result = "{\"creditLimit\":\"822,121,121\",\"creditLimited\":\"123,1231,12\",\"time\":\""+System.currentTimeMillis()+"\"}";
+        OwnerCreaditLimitVo result = new OwnerCreaditLimitVo();
+
+        Format fm =new DecimalFormat("#,###.00");
+        double d  = (double)((Math.random()*9+1)*3000000000d);
+        result.setCreaditLimit(fm.format(d));
+        result.setCreaditLimited(fm.format(d-120000));
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.HOUR_OF_DAY,-12);
+        result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cal.getTime()));
+        return JSONObject.toJSONString(result);
+    }
+
 }

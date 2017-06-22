@@ -3,6 +3,7 @@ package com.magic.user.util;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.user.entity.AccountOperHistory;
+import com.magic.user.po.OnLineMember;
 import com.magic.user.vo.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -26,6 +27,7 @@ public class ExcelUtil {
 
 
     public static final String MEMBER_LIST = "会员列表";
+    public static final String ONLINE_MEMBER_LIST = "在线会员列表";
     public static final String MEMBER_LEVEL_LIST = "会员层级列表";
     public static final String AGENT_LIST = "代理列表";
     public static final String AGENT_REVIEW_LIST = "代理审核列表";
@@ -342,6 +344,90 @@ public class ExcelUtil {
                 row.createCell(6).setCellValue(vo.getRegisterTime());
                 row.createCell(7).setCellValue(vo.getLastLoginTime());
                 row.createCell(8).setCellValue(vo.getShowStatus());
+            }
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            workbook.write(os);
+            byte[] bytes = os.toByteArray();
+            return bytes;
+        }catch (Exception e){
+            ApiLogger.error("生成在线会员列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
+            return null;
+        }
+    }
+    /**
+     * @Doc 组装在线会员列表导出数据
+     * @param list
+     * @param filename
+     * @return
+     */
+    public static byte[] onLineMemberListExport(List<OnLineMemberVo> list, String filename) {
+        ApiLogger.info("开始生成Excel!fileName:".concat(filename));
+        try{
+            //创建Excel工作薄
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            //创建工作表，可指定工作表名称
+            Sheet sheet = workbook.createSheet();
+            //工作表表头
+            Row head = sheet.createRow(0);
+            //设置居中
+            CellStyle style = workbook.createCellStyle();
+            style.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+            //head.setRowStyle(style);
+            //创建单元格,并设置单元格格式和内容
+            Cell id = head.createCell(0);
+            id.setCellStyle(style);
+            id.setCellType(XSSFCell.CELL_TYPE_STRING);
+            id.setCellValue("序号");
+
+            Cell memberName = head.createCell(1);
+            memberName.setCellStyle(style);
+            memberName.setCellType(XSSFCell.CELL_TYPE_STRING);
+            memberName.setCellValue("会员账号");
+
+            Cell loginTime = head.createCell(2);
+            loginTime.setCellStyle(style);
+            loginTime.setCellType(XSSFCell.CELL_TYPE_STRING);
+            loginTime.setCellValue("登入时间");
+
+            Cell loginIp = head.createCell(3);
+            loginIp.setCellStyle(style);
+            loginIp.setCellType(XSSFCell.CELL_TYPE_STRING);
+            loginIp.setCellValue("登入IP");
+
+            Cell registerTime = head.createCell(4);
+            registerTime.setCellStyle(style);
+            registerTime.setCellType(XSSFCell.CELL_TYPE_STRING);
+            registerTime.setCellValue("注册时间");
+
+            Cell registerIp = head.createCell(5);
+            registerIp.setCellStyle(style);
+            registerIp.setCellType(XSSFCell.CELL_TYPE_STRING);
+            registerIp.setCellValue("注册IP");
+
+//            Cell info = head.createCell(6);
+//            info.setCellStyle(style);
+//            info.setCellType(XSSFCell.CELL_TYPE_STRING);
+//            info.setCellValue("备注");
+
+            //表头创建完成
+            for(int i=0 ;i < list.size(); i++){
+                OnLineMemberVo vo = list.get(i);
+                Row row = sheet.createRow(i + 1);
+                row.createCell(0).setCellValue(i + 1);
+                row.createCell(1).setCellValue(vo.getAccount());
+                if(vo.getLoginTime() != null){
+                    row.createCell(2).setCellValue(vo.getLoginTime());
+                }
+                if(vo.getLoginIp() != null){
+                    row.createCell(3).setCellValue(vo.getLoginIp());
+                }
+                if(vo.getRegisterTime() != null){
+                    row.createCell(4).setCellValue(vo.getRegisterTime());
+                }
+                if(vo.getRegisterIp() != null){
+                    row.createCell(5).setCellValue(vo.getRegisterIp());
+                }
+
             }
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             workbook.write(os);

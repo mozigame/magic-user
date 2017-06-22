@@ -111,7 +111,6 @@ public class StockResourceServiceImpl implements StockResourceService {
         return JSON.toJSONString(simpleListResult);
     }
 
-
     /**
      * @param rc
      * @param id
