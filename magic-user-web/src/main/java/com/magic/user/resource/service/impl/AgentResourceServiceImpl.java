@@ -147,6 +147,17 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             vo.setWithdrawTotalMoney(av.getWithdrawMoney());
             //vo.setReviewer("jess");
             //vo.setReviewTime("2017-03-01 16:43:22");
+            if(vo.getReviewTime() != null){
+                vo.setReviewTime(DateUtil.formatDateTime(new Date(new Long(vo.getReviewTime())), DateUtil.formatDefaultTimestamp));
+            }else{
+                vo.setReviewTime("");
+            }
+            if(vo.getStoreMembers() == null){
+                vo.setStoreMembers(0);
+            }
+            if(vo.getReviewer() == null){
+                vo.setReviewer("");
+            }
             vo.setRegisterTime(DateUtil.formatDateTime(new Date(new Long(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
         }
         return users;
