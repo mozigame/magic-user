@@ -644,7 +644,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!agentConfigService.update(agentConfig)) {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
-        EGResp resp = thriftOutAssembleService.addAgentConfig(assembleConfigUpdBody(agentId, returnScheme, adminCost, feeScheme, discount,cost), "account");
+        EGResp resp = thriftOutAssembleService.updateAgentConfig(assembleConfigUpdBody(agentId, returnScheme, adminCost, feeScheme, discount,cost), "account");
         if (resp == null || resp.getCode() != 0) {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
