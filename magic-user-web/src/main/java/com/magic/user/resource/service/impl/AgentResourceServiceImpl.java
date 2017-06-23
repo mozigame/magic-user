@@ -365,6 +365,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         vo.setStockId(stockId);
         vo.setOwnerId(ownerId);
         vo.setRegisterTime(System.currentTimeMillis());
+        vo.setUpdateTime(vo.getRegisterTime());
         return vo;
     }
 
