@@ -479,9 +479,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         JSONObject object = new JSONObject();
         object.put("agentId", id);
         EGResp resp = thriftOutAssembleService.getAgentConfig(object.toJSONString(), "account");
+        System.out.println(resp.getData());
         if (resp != null && resp.getCode() == 0) {
+
             agentConfig = JSONObject.parseObject(resp.getData(), AgentConfigVo.class);
         }
+        ApiLogger.info(JSONObject.toJSONString(agentConfig));
         result.put("baseInfo", agentVo);
         result.put("settings", agentConfig);
         if (!isReview) {
