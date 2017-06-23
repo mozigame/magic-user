@@ -17,6 +17,7 @@ public class MemberConditionVo {
     private Long stockId;   //股东id
     private Long ownerId;   //业主id
     private Long registerTime;  //注册时间
+    private Long updateTime;    //修改时间
     private Integer status; //状态
     private Integer level;  //层级
     private Integer depositCount;//存款次数
@@ -143,5 +144,13 @@ public class MemberConditionVo {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public Long getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
     }
 }

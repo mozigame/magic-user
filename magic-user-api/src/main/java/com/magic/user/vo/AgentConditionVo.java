@@ -14,6 +14,7 @@ public class AgentConditionVo {
     private Long stockId;   //股东id
     private Long ownerId;   //业主id
     private Long registerTime;  //注册时间
+    private Long updateTime;    //修改时间
     private String generalizeCode;  //推广码
     private Integer members;    //会员数
     private Long depositMoney;//所有会员存款总额
@@ -106,5 +107,13 @@ public class AgentConditionVo {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public Long getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
     }
 }

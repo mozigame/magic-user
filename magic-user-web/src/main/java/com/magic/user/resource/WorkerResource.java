@@ -42,7 +42,7 @@ public class WorkerResource {
     public String list(
             @RequestParam(name = "account", required = false, defaultValue = "") String account,
             @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
-            @RequestParam(name = "roleId", required = false) Integer roleId,
+            @RequestParam(name = "roleId", required = false, defaultValue = "-1") Integer roleId,
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
@@ -121,8 +121,8 @@ public class WorkerResource {
     @ResponseBody
     public String update(
             @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "realname", required = false) String realname,
-            @RequestParam(name = "roleId", required = false) Integer roleId
+            @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
+            @RequestParam(name = "roleId", required = false, defaultValue = "-1") Integer roleId
     ) {
         return workerResourceService.update(RequestContext.getRequestContext(), userId, realname, roleId);
     }

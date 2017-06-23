@@ -219,28 +219,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             downLoadFile.setContent(content);
             return downLoadFile;
         }
-        //1、如果代理账号不为空，直接查询代理信息
-        if (StringUtils.isNotBlank(userCondition.getAccount())) {
-            long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), userCondition.getAccount());
-            if (agentId <= 0) {
-                downLoadFile.setContent(content);
-                return downLoadFile;
-            }
-            //1.2、如果推广码不为空，验证推广码是否正确
-            if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {
-                User agentUser = userService.get(agentId);
-                if (!agentUser.getGeneralizeCode().equals(userCondition.getPromotionCode())) {
-                    downLoadFile.setContent(content);
-                    return downLoadFile;
-                }
-            }
-        } else if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {  //2、如果代理账号为空，推广代码不为空，查询代理
-            User agentUser = userService.getUserByCode(userCondition.getPromotionCode());
-            if (agentUser == null || agentUser.getOwnerId() != operaUser.getOwnerId()) {
-                downLoadFile.setContent(content);
-                return downLoadFile;
-            }
-        }
         //3、条件查询mongo中的代理，组装id
         List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, null, null);
         //todo 将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
@@ -387,6 +365,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         vo.setStockId(stockId);
         vo.setOwnerId(ownerId);
         vo.setRegisterTime(System.currentTimeMillis());
+        vo.setUpdateTime(vo.getRegisterTime());
         return vo;
     }
 

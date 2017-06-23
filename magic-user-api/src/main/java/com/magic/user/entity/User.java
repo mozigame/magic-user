@@ -51,6 +51,8 @@ public class User implements Serializable{
 
     private AccountType type;   //账号类型
 
+    private Integer roleId; //角色id
+
     private String temp1;   //预留字符
 
     private String temp2;
@@ -298,5 +300,13 @@ public class User implements Serializable{
 
     public void setQq(String qq) {
         this.qq = qq;
+    }
+
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 }

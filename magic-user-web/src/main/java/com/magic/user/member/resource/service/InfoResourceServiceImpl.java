@@ -7,6 +7,7 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.AccountOperHistory;
@@ -454,32 +455,8 @@ public class InfoResourceServiceImpl {
         if (!sets.contains(accountType)) {
             return false;
         }
-        if (realname != null && realname.length() == 0) {
-            return false;
-        }
-        if (telephone != null && telephone.length() == 0) {
-            return false;
-        }
-        if (email != null && email.length() == 0) {
-            return false;
-        }
-        if (bankCardNo != null && bankCardNo.length() == 0) {
-            return false;
-        }
-        if (bank != null && bank.length() == 0) {
-            return false;
-        }
-        if (bankDeposit != null && bankDeposit.length() == 0) {
-            return false;
-        }
-        if (loginPassword != null && loginPassword.length() == 0) {
-            return false;
-        }
-        if (paymentPassword != null && paymentPassword.length() == 0) {
-            return false;
-        }
-        if (realname == null && telephone == null && email == null && bankCardNo == null
-                && bank == null && bankDeposit == null && loginPassword == null && paymentPassword == null) {
+        if (realname.length() == 0 && telephone.length() == 0 && email.length() == 0 && bankCardNo.length() == 0
+                && bank.length() == 0 && bankDeposit.length() == 0 && loginPassword.length() == 0 && paymentPassword.length() == 0) {
             return false;
         }
         return true;

@@ -116,6 +116,9 @@
         <if test="type != null ">
             type,
         </if>
+        <if test="roleId != null and roleId > 0">
+            role_id,
+        </if>
         user_id
         )
         VALUES(
@@ -169,6 +172,9 @@
         </if>
         <if test="type != null">
             #{type,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
+        </if>
+        <if test="roleId != null and roleId > 0">
+            #{roleId},
         </if>
         #{userId}
 
@@ -245,8 +251,11 @@
             <if test="bankDeposit != null and bankDeposit !=''">
                 bank_deposit = #{bankDeposit},
             </if>
-            <if test="status != null and status > -1">
+            <if test="status != null and status > 0">
                 status = #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
+            </if>
+            <if test="roleId != null and roleId > 0">
+                role_id = #{roleId}
             </if>
         </set>
         WHERE user_id=#{userId}
