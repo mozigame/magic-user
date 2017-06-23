@@ -90,26 +90,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!checkAgentCondition(userCondition)) {
             return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
         }
-        //1、如果代理账号不为空，直接查询代理信息
-        if (StringUtils.isNotBlank(userCondition.getAccount())) {
-            long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), userCondition.getAccount());
-            if (agentId <= 0) {
-                return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
-            }
-            //1.2、如果推广码不为空，验证推广码是否正确
-            if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {
-                User agentUser = userService.get(agentId);
-                if (!agentUser.getGeneralizeCode().equals(userCondition.getPromotionCode())) {
-                    return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
-                }
-            }
-        } else if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {  //2、如果代理账号为空，推广代码不为空，查询代理
-            User agentUser = userService.getUserByCode(userCondition.getPromotionCode());
-            if (agentUser == null || agentUser.getOwnerId().longValue() != operaUser.getOwnerId().longValue()) {
-                return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
-            }
-        }
-
         long totalCount = agentMongoService.getCount(userCondition);
         if (totalCount <= 0) {
             return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
@@ -490,12 +470,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         JSONObject object = new JSONObject();
         object.put("agentId", id);
         EGResp resp = thriftOutAssembleService.getAgentConfig(object.toJSONString(), "account");
-        System.out.println(resp.getData());
         if (resp != null && resp.getCode() == 0) {
-
             agentConfig = JSONObject.parseObject(resp.getData(), AgentConfigVo.class);
         }
-        ApiLogger.info(JSONObject.toJSONString(agentConfig));
         result.put("baseInfo", agentVo);
         result.put("settings", agentConfig);
         if (!isReview) {
@@ -981,7 +958,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 throw UserException.AGENT_REVIEW_FAIL;
             }
             //代理审核历史记录，可以通过mq处理
-            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(), opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
+            AgentReview agentReview = assembleAgentReview(id, 0L, agentApply.getUsername(), rc.getUid(), opera.getUsername(), opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
             sendAgentReviewMq(agentReview);
         } else if (reviewStatus == ReviewStatus.pass.value()) {//2、通过，修改申请状态，增加审核信息，增加代理信息
             //TODO 校验是参数
@@ -999,10 +976,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             if (agentApplyService.updateStatus(id, reviewStatus) <= 0) {
                 throw UserException.AGENT_REVIEW_FAIL;
             }
-            AgentReview agentReview = assembleAgentReview(id, realname, rc.getUid(), opera.getUsername(), opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
+            long userId = dubboOutAssembleService.assignUid();
+            AgentReview agentReview = assembleAgentReview(id, userId, agentApply.getUsername(), rc.getUid(), opera.getUsername(), opera.getOwnerId(), ReviewStatus.parse(reviewStatus), System.currentTimeMillis());
             sendAgentReviewMq(agentReview);
 
-            long userId = dubboOutAssembleService.assignUid();
             if (userId <= 0) {
                 throw UserException.ILLEGAL_USER;
             }
@@ -1064,6 +1041,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
     /**
      * @param agentApplyId
+     * @param agentId
      * @param agentName
      * @param operUserId
      * @param operUserName
@@ -1072,9 +1050,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 组装代理审核对象
      */
-    private AgentReview assembleAgentReview(Long agentApplyId, String agentName, Long operUserId, String operUserName, Long ownerId, ReviewStatus status, Long createTime) {
+    private AgentReview assembleAgentReview(Long agentApplyId, Long agentId, String agentName, Long operUserId, String operUserName, Long ownerId, ReviewStatus status, Long createTime) {
         AgentReview review = new AgentReview();
         review.setAgentApplyId(agentApplyId);
+        review.setAgentId(agentId);
         review.setAgentName(agentName);
         review.setOperUserId(operUserId);
         review.setOperUserName(operUserName);

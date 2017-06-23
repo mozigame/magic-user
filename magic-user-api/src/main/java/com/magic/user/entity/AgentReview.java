@@ -22,6 +22,8 @@ public class AgentReview {
 
     private Long createTime;    //操作时间
 
+    private Long agentId;   //代理id，代理申请成功时使用
+
     public AgentReview() {
 
     }
@@ -97,5 +99,13 @@ public class AgentReview {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public Long getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(Long agentId) {
+        this.agentId = agentId;
     }
 }
