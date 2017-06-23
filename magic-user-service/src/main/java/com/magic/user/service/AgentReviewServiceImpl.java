@@ -20,6 +20,6 @@ public class AgentReviewServiceImpl implements AgentReviewService {
     @Override
     public boolean add(AgentReview agentReview) {
         Long result = agentReviewDbService.insert(agentReview);
-        return (result == null || result <=0 ) ? false : true;
+        return !(result == null || result <=0 );
     }
 }

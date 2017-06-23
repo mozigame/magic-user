@@ -307,17 +307,17 @@
         from t_user_info u LEFT JOIN t_owner_stock_agent_member os
         on(u.user_id = os.agent_id)
         LEFT JOIN t_agent_review ar
-        on (u.user_id=ar.oper_user_id)
+        on(u.user_id = ar.agent_id and ar.agent_id > 0)
 
         <choose>
             <when test="ids != null and ids.size > 0">
                 WHERE
-                u.user_id in
+                u.type=3
+                AND u.user_id in
                 <foreach collection="ids" item="id" open="(" close=")"
-                         separator=",">
+                separator=",">
                     #{id}
                 </foreach>
-                AND u.type=3
             </when>
             <otherwise>
                 WHERE u.type=3

@@ -1,5 +1,6 @@
 package com.magic.user.dao;
 
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.vo.AgentConditionVo;
 import org.springframework.data.domain.PageRequest;
@@ -130,6 +131,12 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
             }
             if (userCondition.getStatus() != null && userCondition.getStatus() > 0) {
                 query.addCriteria(new Criteria("status").is(userCondition.getStatus()));
+            }
+            if (StringUtils.isNotBlank(userCondition.getPromotionCode())) {
+                query.addCriteria(new Criteria("generalizeCode").is(userCondition.getPromotionCode()));
+            }
+            if (StringUtils.isNotBlank(userCondition.getAccount())) {
+                query.addCriteria(new Criteria("agentName").is(userCondition.getAccount()));
             }
         }
         return query;

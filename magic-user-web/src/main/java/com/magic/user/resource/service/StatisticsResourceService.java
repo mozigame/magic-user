@@ -18,4 +18,18 @@ public interface StatisticsResourceService {
      * @return
      */
     String statisMemberLogins(RequestContext rc, Long startTime, Long endTime);
+
+    /**
+     * 获取业主平台的授信额度和已用额度
+     * @param rc
+     * @return
+     */
+    String getOwnerAccountLimit(RequestContext rc);
+
+    /**
+     * 获取业主未读公告信息
+     * @param rc
+     * @return
+     */
+    String getOwnerNotReadNotice(RequestContext rc);
 }
