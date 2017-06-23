@@ -16,7 +16,6 @@ import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.service.AgentSchemeService;
-import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.enums.LoginStatus;
@@ -30,7 +29,6 @@ import com.magic.user.po.RegisterReq;
 import com.magic.user.resource.service.AgentResourceService;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
-import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.*;
@@ -65,8 +63,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private AgentMongoService agentMongoService;
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
-    @Resource
-    private ThriftOutAssembleServiceImpl thriftOutAssembleService;
+
 
     /**
      * {@inheritDoc}
@@ -116,12 +113,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         //3、条件查询mongo中的代理，组装id
         List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, page, count);
-        //todo 将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
+        //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
         List<Long> agentIds = Lists.newArrayList();
+        Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
         for (AgentConditionVo vo : agentConditionVoList) {
             agentIds.add(vo.getAgentId());
+            map.put(vo.getAgentId(),vo);
         }
-        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds));
+        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map);
         if (list != null && list.size() > 0) {
             return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
         }
@@ -134,16 +133,17 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 封装代理列表
      */
-    private List<AgentInfoVo> assembleAgentList(List<AgentInfoVo> users) {
+    private List<AgentInfoVo> assembleAgentList(List<AgentInfoVo> users,Map<Long,AgentConditionVo> map) {
         for (AgentInfoVo vo : users) {
+            AgentConditionVo av = map.get(vo.getId());
             vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
-            //todo 会员数量，储值会员数量，存款金额，取款金额，审核人，审核时间
-            vo.setMembers(1000);
-            vo.setStoreMembers(1000);
-            vo.setDepositTotalMoney(1000L);
-            vo.setWithdrawTotalMoney(2450L);
-            vo.setReviewer("jess");
-            vo.setReviewTime("2017-03-01 16:43:22");
+            // 会员数量，存款金额，取款金额
+            vo.setMembers(av.getMembers());
+            //vo.setStoreMembers(1000);
+            vo.setDepositTotalMoney(av.getDepositMoney());
+            vo.setWithdrawTotalMoney(av.getWithdrawMoney());
+            //vo.setReviewer("jess");
+            //vo.setReviewTime("2017-03-01 16:43:22");
             vo.setRegisterTime(DateUtil.formatDateTime(new Date(new Long(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
         }
         return users;
@@ -251,10 +251,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, null, null);
         //todo 将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
         List<Long> agentIds = Lists.newArrayList();
+        Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
         for (AgentConditionVo vo : agentConditionVoList) {
             agentIds.add(vo.getAgentId());
+            map.put(vo.getAgentId(),vo);
         }
-        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds));
+        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
         content = ExcelUtil.agentListExport(list, filename);
         downLoadFile.setContent(content);
@@ -327,7 +329,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         String domainSpit = StringUtils.arrayToStrSplit(domain);
 
         //mq 处理 4、添加代理配置
-        AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
+        AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
         //mq 处理 5、添加业主股东代理id映射信息
         OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
         //mq 处理 6、将代理基础信息放入mongo
@@ -422,9 +424,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 组装添加的代理配置对象
      */
-    private AgentConfig assembleAgentConfig(long ownerId,Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain, Integer discount, Integer cost) {
+    private AgentConfig assembleAgentConfig(Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain, Integer discount, Integer cost) {
         AgentConfig agentConfig = new AgentConfig();
-        agentConfig.setOwnerId(ownerId);
         agentConfig.setAgentId(agentId);
         agentConfig.setReturnSchemeId(returnSchemeId);
         agentConfig.setAdminCostId(adminCostId);
@@ -470,13 +471,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.ILLEGAL_USER;
         }
         assembleAgentDetail(agentVo, isReview);
-        AgentConfigVo agentConfig = null;
-        JSONObject object = new JSONObject();
-        object.put("agentId", id);
-        EGResp resp = thriftOutAssembleService.getAgentConfig(object.toJSONString(), "account");
-        if (resp != null && resp.getCode() == 0) {
-            agentConfig = JSONObject.parseObject(resp.getData(), AgentConfigVo.class);
-        }
+        //todo 代理参数配置名称获取 andy 调用接口
+        AgentConfigVo agentConfig = agentConfigService.findByAgentId(id);
+        assembleAgentConfigVo(agentConfig);
         result.put("baseInfo", agentVo);
         result.put("settings", agentConfig);
         if (!isReview) {
@@ -496,6 +493,18 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             result.put("fundProfile", JSONObject.parseObject(fundProfile));
         }
         return result;
+    }
+
+    /**
+     * 组装代理配置信息
+     *
+     * @param vo
+     */
+    private void assembleAgentConfigVo(AgentConfigVo vo) {
+        //todo 代理参数配置名称通过jason thrift调用
+        vo.setReturnSchemeName("退佣方案1");
+        vo.setAdminCostName("行政成本1");
+        vo.setFeeSchemeName("手续费1");
     }
 
     @Override
@@ -628,10 +637,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!agentConfigService.update(agentConfig)) {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
-        EGResp resp = thriftOutAssembleService.addAgentConfig(assembleConfigUpdBody(agentId, returnScheme, adminCost, feeScheme, discount,cost), "account");
-        if (resp == null || resp.getCode() != 0) {
-            throw UserException.AGENT_CONFIG_UPDATE_FAIL;
-        }
         return UserContants.EMPTY_STRING;
     }
 
@@ -656,27 +661,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         config.setCost(cost);
         config.setDomain(domain);
         return config;
-    }
-
-    /**
-     * 组装代理参数修改的thrift body
-     * @param agentId
-     * @param returnScheme
-     * @param adminCost
-     * @param feeScheme
-     * @param discount
-     * @param cost
-     * @return
-     */
-    private String assembleConfigUpdBody(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost) {
-        JSONObject object = new JSONObject();
-        object.put("agentId", agentId);
-        object.put("returnScheme", returnScheme);
-        object.put("adminCost", adminCost);
-        object.put("feeScheme",feeScheme);
-        object.put("discount",discount);
-        object.put("cost",cost);
-        return object.toJSONString();
     }
 
     //TODO 流程有待确认
@@ -1008,7 +992,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 throw UserException.REGISTER_FAIL;
             }
             //mq 处理 4、添加代理配置
-            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost);
+            AgentConfig agentConfig = assembleAgentConfig(userId, returnScheme, adminCost, feeScheme, domain, discount, cost);
             //mq 处理 5、添加业主股东代理id映射信息
             OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
             //mq 处理 6、将代理基础信息放入mongo
