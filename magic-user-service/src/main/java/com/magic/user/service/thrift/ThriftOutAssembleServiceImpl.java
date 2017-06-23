@@ -140,6 +140,7 @@ public class ThriftOutAssembleServiceImpl {
         if (StringUtils.isEmpty(balance)){
             balance = "0";
         }
+        backMoney(uid);//回收资金
         return balance;
     }
 
@@ -250,6 +251,23 @@ public class ThriftOutAssembleServiceImpl {
         //TODO 修改cmdType 和 cmd值
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
         return thriftFactory.call(req, caller);
+    }
+
+    /**
+     * 资金回收
+     * @param uid
+     * @return
+     */
+    public boolean backMoney(long uid){
+        String body = "{\"userId\":" + uid + "}";
+        EGReq req = assembleEGReq(CmdType.GAME, 0x600003, body);
+        try {
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            return Optional.ofNullable(call).filter(code -> code.getCode() == 0).isPresent();
+        }catch (Exception e){
+            ApiLogger.error(String.format("back moeny error. uid: %d", uid), e);
+        }
+        return false;
     }
 
     /**
