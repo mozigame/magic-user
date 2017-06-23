@@ -21,6 +21,7 @@
         oper_user_name,
         owner_id,
         status,
+        agent_id,
         create_time
       )
       VALUES (
@@ -30,6 +31,7 @@
         #{operUserName},
         #{ownerId},
         #{status,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
+        #{agentId},
         #{createTime}
       )
     </insert>
