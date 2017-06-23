@@ -152,6 +152,19 @@ public class AccountDubboServiceImpl implements AccountDubboService {
     }
 
     /**
+     * {@inheritDoc}
+     * @param startTime
+     * @param endTime
+     * @param ownerId
+     * @return
+     */
+    @Override
+    public List<User> periodAgentList(Long startTime, Long endTime, Long ownerId) {
+        return userService.periodAgentList(startTime, endTime, ownerId);
+    }
+
+
+    /**
      * 组装登会员的股东ID，业主ID及层级信息
      * @param mcv
      * @return
