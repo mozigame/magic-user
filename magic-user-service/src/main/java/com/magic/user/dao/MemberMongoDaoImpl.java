@@ -133,22 +133,22 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
                 Long min = memberCondition.getDepositNumber().getMin();
                 Long max = memberCondition.getDepositNumber().getMax();
                 if (min != null && max != null) {
-                    query.addCriteria(new Criteria("depositNumber").gte(min).lte(max));
+                    query.addCriteria(new Criteria("depositCount").gte(min).lte(max));
                 } else if (min != null) {
-                    query.addCriteria(new Criteria("depositNumber").gte(min));
+                    query.addCriteria(new Criteria("depositCount").gte(min));
                 } else if (max != null) {
-                    query.addCriteria(new Criteria("depositNumber").lte(max));
+                    query.addCriteria(new Criteria("depositCount").lte(max));
                 }
             }
             if (memberCondition.getWithdrawNumber() != null) {
                 Long min = memberCondition.getWithdrawNumber().getMin();
                 Long max = memberCondition.getWithdrawNumber().getMax();
                 if (min != null && max != null) {
-                    query.addCriteria(new Criteria("withdrawNumber").gte(min).lte(max));
+                    query.addCriteria(new Criteria("withdrawCount").gte(min).lte(max));
                 } else if (min != null) {
-                    query.addCriteria(new Criteria("withdrawNumber").gte(min));
+                    query.addCriteria(new Criteria("withdrawCount").gte(min));
                 } else if (max != null) {
-                    query.addCriteria(new Criteria("withdrawNumber").lte(max));
+                    query.addCriteria(new Criteria("withdrawCount").lte(max));
                 }
             }
             Account account = memberCondition.getAccount();
