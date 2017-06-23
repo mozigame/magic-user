@@ -70,6 +70,7 @@ public class AgentResource {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
+        int x = 1/0;
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);

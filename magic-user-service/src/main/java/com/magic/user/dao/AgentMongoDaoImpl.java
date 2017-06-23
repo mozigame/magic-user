@@ -1,5 +1,6 @@
 package com.magic.user.dao;
 
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.vo.AgentConditionVo;
 import org.springframework.data.domain.PageRequest;
