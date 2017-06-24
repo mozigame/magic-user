@@ -476,6 +476,7 @@ public class MemberResourceServiceImpl {
         info.setTelephone(member.getTelephone());
         info.setType(AccountType.member.value());
         SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
+        info.setBank(member.getBank());
         if (subAccount != null) {
             info.setLastLoginIp(IPUtil.intToIp(subAccount.getLastIp()));
         }
@@ -1178,8 +1179,6 @@ public class MemberResourceServiceImpl {
      * @param uid
      * @param username
      * @param token
-     * @param message
-     * @param capitalResp 从中解析出账户余额
      * @return
      */
     private String assembleLoginResult(long uid, String username, String token) {

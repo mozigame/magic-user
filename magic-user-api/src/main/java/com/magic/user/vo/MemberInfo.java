@@ -22,6 +22,15 @@ public class MemberInfo {
     private String bankCardNo;//银行卡号
     private String lastLoginIp;//最近登入
     private Integer type;   // 类型
+    private String bank;//银行名称
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
 
     public Long getId() {
         return id;
