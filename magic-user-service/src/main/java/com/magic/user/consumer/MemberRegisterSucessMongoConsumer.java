@@ -77,6 +77,7 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
         vo.setAgentId(member.getAgentId());
         vo.setAgentName(member.getAgentUsername());
         vo.setRegisterTime(member.getRegisterTime());
+        vo.setUpdateTime(member.getRegisterTime());
         vo.setStatus(AccountStatus.enable.value());
         vo.setLevel(0);
         vo.setDepositCount(0);

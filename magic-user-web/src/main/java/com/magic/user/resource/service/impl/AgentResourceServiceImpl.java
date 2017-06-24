@@ -365,6 +365,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         vo.setStockId(stockId);
         vo.setOwnerId(ownerId);
         vo.setRegisterTime(System.currentTimeMillis());
+        vo.setUpdateTime(vo.getRegisterTime());
         return vo;
     }
 
@@ -444,7 +445,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.ILLEGAL_USER;
         }
         assembleAgentDetail(agentVo, isReview);
-        AgentConfigVo agentConfig = null;
+        AgentConfigVo agentConfig = new AgentConfigVo();
         JSONObject object = new JSONObject();
         object.put("agentId", id);
         EGResp resp = thriftOutAssembleService.getAgentConfig(object.toJSONString(), "account");

@@ -163,7 +163,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         }
         //添加账号信息
         //todo 子账号中需要冗余roleId,用于查询功能
-        User worker = assembleAddWorker(userId, operaUser.getOwnerId(), operaUser.getOwnerName(), AccountType.worker, account, realname);
+        User worker = assembleAddWorker(userId, operaUser.getOwnerId(), operaUser.getOwnerName(), AccountType.worker, account, realname, roleId);
         if (!userService.addWorker(worker)) {
             throw UserException.REGISTER_FAIL;
         }
@@ -196,7 +196,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
      * @param realname
      * @return
      */
-    private User assembleAddWorker(Long userId, Long ownerId, String ownerName, AccountType type, String account, String realname) {
+    private User assembleAddWorker(Long userId, Long ownerId, String ownerName, AccountType type, String account, String realname, Integer roleId) {
         User user = new User();
         user.setUserId(userId);
         user.setOwnerId(ownerId);
@@ -205,6 +205,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         user.setUsername(account);
         user.setRealname(realname);
         user.setRegisterTime(System.currentTimeMillis());
+        user.setRoleId(roleId);
         return user;
     }
 
@@ -242,6 +243,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             throw UserException.ILLEGAL_USER;
         }
         user.setRealname(realname);
+        user.setRoleId(roleId);
         //修改子账号
         if (!userService.update(user)) {
             throw UserException.USER_UPDATE_FAIL;
