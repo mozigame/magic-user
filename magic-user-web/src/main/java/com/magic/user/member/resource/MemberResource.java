@@ -81,7 +81,7 @@ public class MemberResource {
     ) {
         RequestContext rc = RequestContext.getRequestContext();
         //获取域名
-        String url = rc.getRequest().getHeader("Origin");
+        String url = rc.getOrigin();
         RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
         return memberServiceResource.memberRegister(rc, url, req);
     }
@@ -149,7 +149,7 @@ public class MemberResource {
         //获取浏览器、操作系统名称等数据
         String agent = request.getHeader(HeaderUtil.USER_AGENT);
         //获取域名
-        String url = rc.getRequest().getHeader("Origin");
+        String url = rc.getOrigin();
         return memberServiceResource.memberLogin(rc, agent, url, username, password, code);
     }
 
@@ -647,7 +647,7 @@ public class MemberResource {
                         @RequestParam(name = "width", required = false, defaultValue = "200") Integer width,
                         @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
-        ApiLogger.info("Origin:" + rc.getRequest().getHeader("Origin"));
+        ApiLogger.info("Origin:" + rc.getOrigin());
         String code = CodeImageUtil.generateVerifyCode(UserContants.VERIFY_CODE_LENGTH);
         String clientId = memberServiceResource.saveCode(rc, code);
         String base64Code = CodeImageUtil.outputImage(width, height, code);

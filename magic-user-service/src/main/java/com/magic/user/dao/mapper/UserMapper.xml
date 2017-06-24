@@ -387,6 +387,37 @@
             from t_user_info
         WHERE generalize_code=#{proCode}
     </select>
+
+    <!-- 获取周期内的代理列表 -->
+    <select id="periodAgentList" resultMap="baseResultMap">
+      SELECT
+            id,
+            user_id,
+            realname,
+            username,
+            register_time,
+            generalize_code,
+            status,
+            currency_type,
+            bank_card_no,
+            bank,
+            bank_deposit,
+            owner_id,
+            owner_name,
+            type
+            from t_user_info
+        WHERE type = 3
+        <if test="startTime != null and startTime > 0">
+            and register_time > #{startTime}
+        </if>
+        <if test="endTime != null and endTime > 0">
+            and register_time <![CDATA[ <= #{endTime} ]]>
+        </if>
+        <if test="ownerId != null and ownerId > 0">
+            and owner_id = #{ownerId}
+        </if>
+
+    </select>
     <!--###########   代理操作   #############-->
 
     <!--##############   子账号   #################-->

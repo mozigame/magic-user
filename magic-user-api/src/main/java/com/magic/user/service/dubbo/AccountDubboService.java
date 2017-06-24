@@ -7,6 +7,7 @@ import com.magic.user.vo.MemberConditionVo;
 import com.magic.user.vo.MemberInfoVo;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,5 +60,14 @@ public interface AccountDubboService {
      * @return
      */
     MemberInfoVo getMemberInfo(long memberId);
+
+    /**
+     * 获取一定周期内的代理列表
+     * @param startTime
+     * @param endTime
+     * @param ownerId
+     * @return
+     */
+    List<User> periodAgentList(Long startTime, Long endTime, Long ownerId);
 
 }

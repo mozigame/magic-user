@@ -7,6 +7,7 @@ import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.LoginHistory;
+import com.magic.user.entity.User;
 import com.magic.user.enums.LoginType;
 import com.magic.user.service.LoginHistoryService;
 import com.magic.user.service.LoginHistoryServiceImpl;
@@ -32,12 +33,12 @@ public class UserLoginSuccessConsumer implements Consumer {
     private LoginHistoryService loginHistoryService;
 
     @Override
-
     public boolean doit(String topic, String tags, String key, String msg) {
         ApiLogger.info(String.format("user login success mq consumer start. key:%s, msg:%s", key, msg));
         try {
             JSONObject object = JSONObject.parseObject(msg);
-            Long userId = object.getLongValue("userId");
+            User user = JSONObject.parseObject(object.getString("user"), User.class);
+            Long userId = user.getUserId();
             Long createTime = object.getLongValue("createTime");
             Integer requestIp = object.getIntValue("requestIp");
             String platform = object.getString("platform");

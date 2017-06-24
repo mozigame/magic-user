@@ -101,6 +101,11 @@ public class UserServiceImpl implements UserService {
         return count == null ? Long.valueOf(0) : count;
     }
 
+    @Override
+    public List<User> periodAgentList(Long startTime, Long endTime, Long ownerId) {
+        return agentDbService.find("periodAgentList", new String[]{"startTime", "endTime", "ownerId"}, new Object[]{startTime, endTime, ownerId});
+    }
+
 
     @Override
     public List<AgentInfoVo> findAgents(List<Long> ids) {

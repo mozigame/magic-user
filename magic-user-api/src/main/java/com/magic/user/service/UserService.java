@@ -128,4 +128,13 @@ public interface UserService {
      * @return
      */
     Long getWorkerCount(Long ownerId, String account, String realname, Integer roleId);
+
+    /**
+     * 获取一定周期内的代理列表
+     * @param startTime
+     * @param endTime
+     * @param ownerId
+     * @return
+     */
+    List<User> periodAgentList(Long startTime, Long endTime, Long ownerId);
 }
