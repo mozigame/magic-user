@@ -149,7 +149,7 @@ public class MemberResource {
         //获取浏览器、操作系统名称等数据
         String agent = request.getHeader(HeaderUtil.USER_AGENT);
         //获取域名
-        String url = rc.getRequest().getHeader("Origin");
+        String url = rc.getOrigin();
         return memberServiceResource.memberLogin(rc, agent, url, username, password, code);
     }
 
