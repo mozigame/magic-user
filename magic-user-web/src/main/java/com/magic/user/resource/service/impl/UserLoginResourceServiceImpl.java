@@ -88,7 +88,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         }
 
         int ip = IPUtil.ipToInt(rc.getIp());
-        sendLoginHistory(userId, System.currentTimeMillis(), ip, LoginType.login, agent);
+        sendLoginHistory(loginUser, System.currentTimeMillis(), ip, LoginType.login, agent);
         String token = MauthUtil.createOld(userId, System.currentTimeMillis());
         JSONObject result = new JSONObject();
         result.put("token", token);
@@ -117,7 +117,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         if (userId <= 0) {
             throw UserException.USERNAME_NOT_EXIST;
         }
-        sendLoginHistory(userId, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), LoginType.logout, agent);
+        sendLoginHistory(user, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), LoginType.logout, agent);
         return UserContants.EMPTY_STRING;
     }
 
@@ -144,25 +144,25 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
     }
 
     /**
-     * @param userId
+     * @param user
      * @param createTime
      * @param requestIp
      * @param loginType
      * @param platform
      * @Doc 发送用户登录历史到mq
      */
-    private void sendLoginHistory(Long userId, Long createTime, Integer requestIp, LoginType loginType, String platform) {
+    private void sendLoginHistory(User user, Long createTime, Integer requestIp, LoginType loginType, String platform) {
         JSONObject object = new JSONObject();
-        object.put("userId", userId);
+        object.put("user", user);
         object.put("createTime", createTime);
         object.put("requestIp", requestIp);
         object.put("loginType", loginType.value());
         object.put("platform", platform);
         if (loginType == LoginType.login) {
-            producer.send(Topic.USER_LOGIN_SUCCESS, userId + "", object.toJSONString());
+            producer.send(Topic.USER_LOGIN_SUCCESS, user.getUserId() + "", object.toJSONString());
         }
         if (loginType == LoginType.logout) {
-            producer.send(Topic.USER_LOGOUT_SUCCESS, userId + "", object.toJSONString());
+            producer.send(Topic.USER_LOGOUT_SUCCESS, user.getUserId() + "", object.toJSONString());
         }
     }
 }
