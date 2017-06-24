@@ -57,7 +57,7 @@ public class UserLoginResource {
         String fromURL = request.getHeader("Referer");
         System.out.println("来源于："+fromURL);
         //获取域名
-        String url = rc.getRequest().getHeader("Origin");
+        String url = rc.getOrigin();;
         ApiLogger.info("/user/login url : " + url);
         return userLoginResourceService.login(rc, agent, url, username, password, code);
     }
