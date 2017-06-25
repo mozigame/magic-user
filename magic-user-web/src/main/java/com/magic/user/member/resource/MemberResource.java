@@ -162,7 +162,7 @@ public class MemberResource {
      * @return
      */
 
-    @Access(type = Access.AccessType.COOKIE)
+    /*@Access(type = Access.AccessType.COOKIE)
     @RequestMapping(value = "/inner/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String login(
@@ -177,7 +177,7 @@ public class MemberResource {
         //获取域名
         String url = rc.getOrigin();
         return memberServiceResource.memberLogin(rc, agent, url, username, password);
-    }
+    }*/
 
     /**
      * 密码重置
