@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -579,10 +578,7 @@ public class MemberResource {
      *
      * @param request
      * @param response
-     * @param loginStartTime
      * @param loginEndTime
-     * @param registerStartTime
-     * @param registerEndTime
      * @throws IOException
      * @Doc 在线会员列表导出
      */
