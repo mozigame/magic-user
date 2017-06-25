@@ -314,4 +314,21 @@ public class ThriftOutAssembleServiceImpl {
         EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
         return thriftFactory.call(req, caller);
     }
+
+    /**
+     * 设置会员层级
+     *
+     * @param body
+     * @return
+     */
+    public boolean settingLevel(String body){
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x800001, body);
+        try {
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            return Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent();
+        }catch (Exception e){
+            ApiLogger.error(String.format("setting member level error. req: %s", JSON.toJSONString(req)), e);
+        }
+        return false;
+    }
 }

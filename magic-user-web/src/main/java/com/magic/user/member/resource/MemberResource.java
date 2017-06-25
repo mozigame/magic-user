@@ -154,6 +154,33 @@ public class MemberResource {
     }
 
     /**
+     * 会员登陆 -- 无需验证
+     *
+     * @param request
+     * @param response
+     * @param username
+     * @param password
+     * @return
+     */
+
+    @Access(type = Access.AccessType.COOKIE)
+    @RequestMapping(value = "/inner/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String login(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "username", required = true) String username,
+            @RequestParam(name = "password", required = true) String password,
+
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        //获取浏览器、操作系统名称等数据
+        String agent = request.getHeader(HeaderUtil.USER_AGENT);
+        //获取域名
+        String url = rc.getOrigin();
+        return memberServiceResource.memberLogin(rc, agent, url, username, password);
+    }
+
+    /**
      * 密码重置
      *
      * @param oldPassword
