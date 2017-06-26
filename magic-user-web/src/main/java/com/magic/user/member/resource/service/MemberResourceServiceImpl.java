@@ -377,12 +377,13 @@ public class MemberResourceServiceImpl {
         ApiLogger.info(JSONObject.toJSONString(privilegeResp.getData()));
         if (privilegeResp != null && privilegeResp.getData() != null) {
             JSONObject privilegeData = JSONObject.parseObject(privilegeResp.getData());
+            JSONObject data = privilegeData.getJSONObject("data");
             memberPreferScheme = new MemberPreferScheme();
-            memberPreferScheme.setLevel(privilegeData.getInteger("level"));
-            memberPreferScheme.setShowLevel(privilegeData.getString("showLevel"));
-            memberPreferScheme.setOnlineDiscount(privilegeData.getString("onlineDiscount"));
-            memberPreferScheme.setReturnWater(privilegeData.getString("returnWater"));
-            memberPreferScheme.setDepositDiscountScheme(privilegeData.getString("depositDiscountScheme"));
+            memberPreferScheme.setLevel(data.getInteger("level"));
+            memberPreferScheme.setShowLevel(data.getString("showLevel"));
+            memberPreferScheme.setOnlineDiscount(data.getString("onlineDiscount"));
+            memberPreferScheme.setReturnWater(data.getString("returnWater"));
+            memberPreferScheme.setDepositDiscountScheme(data.getString("depositDiscountScheme"));
         } else {
             //TODO 假数据去掉
 //            String preferScheme = "{\n" +
