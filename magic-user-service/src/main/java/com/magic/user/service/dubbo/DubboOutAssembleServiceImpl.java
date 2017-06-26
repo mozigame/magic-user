@@ -13,6 +13,8 @@ import com.magic.config.vo.OwnerInfo;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.service.java.UuidService;
+import com.magic.tethys.user.api.entity.UserPass;
+import com.magic.tethys.user.api.service.dubbo.TethysUserDubboService;
 import com.magic.user.enums.AccountType;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +51,9 @@ public class DubboOutAssembleServiceImpl {
 
     @Resource
     private RegisterDubboService registerDubboService;
+
+    @Resource
+    private TethysUserDubboService tethysUserDubboService;
 
     private static final Map<Long, String> EMPTY_MAP = new HashMap<>();
 
@@ -192,7 +197,7 @@ public class DubboOutAssembleServiceImpl {
         try {
             result = msgDubboService.getNoReadMessageCount(uid);
         } catch (Exception e) {
-            ApiLogger.error("failed to get membership number of unread messages!",e);
+            ApiLogger.error("failed to get membership number of unread messages!", e);
         }
         return result;
     }
@@ -213,10 +218,52 @@ public class DubboOutAssembleServiceImpl {
         }
         List<String> result = null;
         try {
-            result = registerDubboService.getRequired(ownerId,type);
+            result = registerDubboService.getRequired(ownerId, type);
         } catch (Exception e) {
             ApiLogger.error("获取注册时设置的必填项失败", e);
         }
         return result;
+    }
+
+    /**
+     * 更新支付密码
+     *
+     * @param uid
+     * @param password
+     * @return
+     */
+    public boolean updateUserPaymentPassword(long uid, String password) {
+        try {
+            UserPass userPass = new UserPass();
+            userPass.setUserId(uid);
+            userPass.setTradePass(password);
+            tethysUserDubboService.updateUserPaidPwd(userPass);
+            return true;
+        }catch (Exception e){
+            ApiLogger.error(String.format("update user payment password error. uid: %d, paymentPassword: %s", uid, password), e);
+        }
+        return false;
+    }
+
+    /**
+     * 保存会员支付密码
+     *
+     * @param uid
+     * @param ownerId
+     * @param paymentPassword
+     * @return
+     */
+    public boolean insertUserPaymentPassword(long uid, long ownerId, String paymentPassword) {
+        try {
+            UserPass userPass = new UserPass();
+            userPass.setUserId(uid);
+            userPass.setTradePass(paymentPassword);
+            userPass.setOwnerId(ownerId);
+            tethysUserDubboService.insertUserPwd(userPass);
+            return true;
+        }catch (Exception e){
+            ApiLogger.error(String.format("insert user payment password error. uid: %d, ownerId: %d , paymentPassword: %s", uid, ownerId, paymentPassword), e);
+        }
+        return false;
     }
 }
