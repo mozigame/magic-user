@@ -594,6 +594,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      */
     @Override
     public String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain) {
+        if (checkUpdateAgentConfig(returnScheme, adminCost, feeScheme, discount, cost, domain)) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
         User agentUser = userService.get(agentId);
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
@@ -608,6 +611,13 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
         return UserContants.EMPTY_STRING;
+    }
+
+    private boolean checkUpdateAgentConfig(Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain) {
+        if (returnScheme < 0 && adminCost < 0 && feeScheme < 0 && discount < 0 && cost < 0 && StringUtils.isBlank(domain)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -646,11 +656,21 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private String assembleConfigUpdBody(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost) {
         JSONObject object = new JSONObject();
         object.put("agentId", agentId);
-        object.put("returnScheme", returnScheme);
-        object.put("adminCost", adminCost);
-        object.put("feeScheme",feeScheme);
-        object.put("discount",discount);
-        object.put("cost",cost);
+        if (returnScheme >0) {
+            object.put("returnScheme", returnScheme);
+        }
+        if (adminCost > 0) {
+            object.put("adminCost", adminCost);
+        }
+        if (feeScheme > 0) {
+            object.put("feeScheme",feeScheme);
+        }
+        if (discount > 0) {
+            object.put("discount",discount);
+        }
+        if (cost > 0) {
+            object.put("cost",cost);
+        }
         return object.toJSONString();
     }
 
