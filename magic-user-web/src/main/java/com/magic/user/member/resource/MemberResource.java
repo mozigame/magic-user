@@ -658,6 +658,18 @@ public class MemberResource {
     }
 
     /**
+     * @return
+     * @Doc 获取会员的交易记录
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/memberTradingRecord", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String memberTradingRecord(@RequestParam(name = "memberId", required = true) Long memberId) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberTradingRecord(rc,memberId);
+    }
+
+    /**
      * 获取验证码
      *
      * @return

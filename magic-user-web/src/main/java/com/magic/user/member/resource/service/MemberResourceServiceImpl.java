@@ -338,9 +338,11 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_MEMBER;
         }
         //TODO 1.jason 根据会员ID查询会员优惠方案
+
         //TODO 2.kevin 根据会员ID查询会员资金概括
 
         //TODO 3.sundy 根据会员ID查询投注记录
+
         //TODO 4.sundy 根据会员ID查询优惠记录
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
@@ -1796,5 +1798,16 @@ public class MemberResourceServiceImpl {
         fundProfile.setInfo(memberFundInfoObj);
         return JSON.toJSONString(fundProfile);
     }
+    /**
+     *获取会员的交易记录
+     * @param rc
+     * @param memberId
+     * @return
+     */
+    public String memberTradingRecord(RequestContext rc, Long memberId) {
 
+        //TODO Joey 从mongo里面查询
+        return "{\"username\":merry,\"withdrawInfo\":{\"withdrawSumNumber\":100,\"withdrawSumMoney\":20000,\"withdrawNearTime\":1200,\"withdrawBig\":200000}," +
+                "\"depositInfo\":{\"depositSumNumber\":100,\"depositSumMoney\":20000,\"depositNearTime\":1200,\"depositBig\":200000}}";
+    }
 }
