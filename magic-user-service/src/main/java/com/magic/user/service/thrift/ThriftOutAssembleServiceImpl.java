@@ -322,7 +322,7 @@ public class ThriftOutAssembleServiceImpl {
      * @return
      */
     public boolean settingLevel(String body){
-        EGReq req = assembleEGReq(CmdType.CONFIG, 0x800001, body);
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x500081, body);
         try {
             EGResp call = thriftFactory.call(req, UserContants.CALLER);
             return Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent();
