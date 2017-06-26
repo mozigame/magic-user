@@ -884,10 +884,12 @@ public class MemberResourceServiceImpl {
      * @param rc  RequestContext
      * @param url 注册来源
      * @param req 注册请求数据
+     * @param verifyCode 验证码
      * @return
      */
-    public String memberRegister(RequestContext rc, String url, RegisterReq req) {
-
+    public String memberRegister(RequestContext rc, String url, RegisterReq req, String verifyCode) {
+        //验证码校验
+        verifyCode(rc, verifyCode);
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
@@ -1091,23 +1093,12 @@ public class MemberResourceServiceImpl {
         if (!checkLoginReq(username, password)) {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
-        if (StringUtils.isEmpty(code)){
-            throw UserException.VERIFY_CODE_ERROR;
-        }
-        String clientId = getClientId(rc);
-        if (StringUtils.isEmpty(clientId)){
-            throw UserException.VERIFY_CODE_INVALID;
-        }
-        String verifyCodeAndExpireTime = memberService.getVerifyCode(clientId);
-        //验证码验证
-        checkVerifyCode(verifyCodeAndExpireTime, code);
-
+        verifyCode(rc, code);
         //根据url获取业主ID
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
-
         String body = assembleLoginBody(rc, ownerInfo.getOwnerId(), username, password, agent, url);
         EGResp resp = thriftOutAssembleService.memberLogin(body, "account");
         if (resp == null || resp.getCode() == 0x1011) {
@@ -1139,6 +1130,25 @@ public class MemberResourceServiceImpl {
         sendLoginMessage(member, rc);
 
         return result;
+    }
+
+    /**
+     * 验证码检测
+     *
+     * @param rc
+     * @param code
+     */
+    private void verifyCode(RequestContext rc, String code) {
+        if (StringUtils.isEmpty(code)){
+            throw UserException.VERIFY_CODE_ERROR;
+        }
+        String clientId = getClientId(rc);
+        if (StringUtils.isEmpty(clientId)){
+            throw UserException.VERIFY_CODE_INVALID;
+        }
+        String verifyCodeAndExpireTime = memberService.getVerifyCode(clientId);
+        //验证码验证
+        checkVerifyCode(verifyCodeAndExpireTime, code);
     }
 
     /**

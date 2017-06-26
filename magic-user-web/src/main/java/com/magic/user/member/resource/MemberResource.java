@@ -75,14 +75,15 @@ public class MemberResource {
             @RequestParam(name = "province", required = false, defaultValue = "") String province,
             @RequestParam(name = "city", required = false, defaultValue = "") String city,
             @RequestParam(name = "weixin", required = false, defaultValue = "") String weixin,
-            @RequestParam(name = "qq", required = false, defaultValue = "") String qq
+            @RequestParam(name = "qq", required = false, defaultValue = "") String qq,
+            @RequestParam(name = "code", required = true) String code
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
         //获取域名
         String url = rc.getOrigin();
         RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
-        return memberServiceResource.memberRegister(rc, url, req);
+        return memberServiceResource.memberRegister(rc, url, req, code);
     }
 
     /**
