@@ -369,9 +369,12 @@ public class MemberResourceServiceImpl {
         MemberPreferScheme memberPreferScheme = new MemberPreferScheme();
         //从mongo查询会员详情获取level
         MemberConditionVo mv = memberMongoService.get(member.getMemberId());
+        memberPreferScheme.setLevel(mv.getLevel());
         //会员优惠方案
         String privilegeBody = "{\"level\":" + mv.getLevel() + "}";
         EGResp privilegeResp = thriftOutAssembleService.getMemberPrivilege(privilegeBody, "account");
+        ApiLogger.info("========会员优惠方案=========");
+        ApiLogger.info(JSONObject.toJSONString(privilegeResp.getData()));
         if (privilegeResp != null && privilegeResp.getData() != null) {
             JSONObject privilegeData = JSONObject.parseObject(privilegeResp.getData());
             memberPreferScheme = new MemberPreferScheme();
@@ -812,7 +815,7 @@ public class MemberResourceServiceImpl {
             return UserContants.EMPTY_LIST;
         }
         SimpleListResult<List<UserLevelVo>> result = new SimpleListResult<>();
-        //TODO andy dubbo
+
         List<UserLevelVo> list = dubboOutAssembleService.getLevelListSimple(operaUser.getOwnerId());
         result.setList(list != null ? list : new ArrayList<>());
         return JSON.toJSONString(result);
