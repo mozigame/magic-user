@@ -240,6 +240,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- 资金 -->
+        <dependency>
+            <groupId>com.magic.tethys</groupId>
+            <artifactId>tethys-user-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 
