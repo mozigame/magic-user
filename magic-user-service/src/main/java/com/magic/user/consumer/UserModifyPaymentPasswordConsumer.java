@@ -30,9 +30,10 @@ public class UserModifyPaymentPasswordConsumer implements Consumer {
     public boolean doit(String topic, String tags, String key, String msg) {
         ApiLogger.info(String.format("payment pwd modify success mq consumer start. key:%s, msg:%s", key, msg));
         try {
-            JSONObject object = JSONObject.parseObject(msg);
+            /*JSONObject object = JSONObject.parseObject(msg);
 
-            return accountOperHistoryService.add(null) > 0;
+            return accountOperHistoryService.add(null) > 0;*/
+            return true;
         } catch (Exception e) {
             ApiLogger.error(String.format("payment pwd modify success mq consumer error. key:%s, msg:%s", key, msg), e);
         }

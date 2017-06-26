@@ -20,7 +20,7 @@ import java.util.Optional;
  * @date 2017/6/21
  */
 @Component("memberRegisterSucessSettingLevelConsumer")
-@ConsumerConfig(consumerName = "v1memberRegisterSucessThriftConsumer", topic =  Topic.MEMBER_REGISTER_SUCCESS)
+@ConsumerConfig(consumerName = "v1memberRegisterSucessSettingLevelConsumer", topic =  Topic.MEMBER_REGISTER_SUCCESS)
 public class MemberRegisterSucessSettingLevelConsumer implements Consumer{
 
     @Resource
