@@ -680,7 +680,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     @Override
     public String agentApply(RequestContext rc, HttpServletRequest request, String account, String password,//String paymentPassword,
                              String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String province, String city, String weixin, String qq) {
-        String resourceUrl = rc.getRequest().getHeader("Origin");
+        String resourceUrl = rc.getOrigin();
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(resourceUrl);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;

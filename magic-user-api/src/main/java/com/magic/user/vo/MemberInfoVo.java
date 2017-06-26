@@ -1,12 +1,14 @@
 package com.magic.user.vo;
 
+import java.io.Serializable;
+
 /**
  * MemberInfoVo
  *
  * @author morton
  * @date 2017/6/10
  */
-public class MemberInfoVo {
+public class MemberInfoVo implements Serializable{
 
     private Long stockId;   //股东id
     private Long ownerId;   //业主id
