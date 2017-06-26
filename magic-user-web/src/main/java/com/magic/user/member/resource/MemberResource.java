@@ -221,7 +221,6 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberList(rc, condition, page, count);
     }
-
     /**
      * @param condition 检索条件
      * @return
