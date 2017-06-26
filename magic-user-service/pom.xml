@@ -12,7 +12,6 @@
     <artifactId>magic-user-service</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>com.magic</groupId>
             <artifactId>magic-user-api</artifactId>

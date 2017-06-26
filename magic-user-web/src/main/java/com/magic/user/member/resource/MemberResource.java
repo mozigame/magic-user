@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -76,14 +75,15 @@ public class MemberResource {
             @RequestParam(name = "province", required = false, defaultValue = "") String province,
             @RequestParam(name = "city", required = false, defaultValue = "") String city,
             @RequestParam(name = "weixin", required = false, defaultValue = "") String weixin,
-            @RequestParam(name = "qq", required = false, defaultValue = "") String qq
+            @RequestParam(name = "qq", required = false, defaultValue = "") String qq,
+            @RequestParam(name = "code", required = true) String code
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
         //获取域名
         String url = rc.getOrigin();
         RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
-        return memberServiceResource.memberRegister(rc, url, req);
+        return memberServiceResource.memberRegister(rc, url, req, code);
     }
 
     /**
@@ -151,6 +151,33 @@ public class MemberResource {
         //获取域名
         String url = rc.getOrigin();
         return memberServiceResource.memberLogin(rc, agent, url, username, password, code);
+    }
+
+    /**
+     * 会员登陆 -- 无需验证
+     *
+     * @param request
+     * @param response
+     * @param username
+     * @param password
+     * @return
+     */
+
+    @Access(type = Access.AccessType.COOKIE)
+    @RequestMapping(value = "/inner/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String login(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "username", required = true) String username,
+            @RequestParam(name = "password", required = true) String password
+
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        //获取浏览器、操作系统名称等数据
+        String agent = request.getHeader(HeaderUtil.USER_AGENT);
+        //获取域名
+        String url = rc.getOrigin();
+        return memberServiceResource.memberLogin(rc, agent, url, username, password);
     }
 
     /**
@@ -551,10 +578,6 @@ public class MemberResource {
      *
      * @param request
      * @param response
-     * @param loginStartTime
-     * @param loginEndTime
-     * @param registerStartTime
-     * @param registerEndTime
      * @throws IOException
      * @Doc 在线会员列表导出
      */
