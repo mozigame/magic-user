@@ -1805,9 +1805,9 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberTradingRecord(RequestContext rc, Long memberId) {
-
-        //TODO Joey 从mongo里面查询
-        return "{\"username\":\"merry\",\"withdrawInfo\":{\"withdrawSumNumber\":100,\"withdrawSumMoney\":20000,\"withdrawNearTime\":1200,\"withdrawBig\":200000}," +
-                "\"depositInfo\":{\"depositSumNumber\":100,\"depositSumMoney\":20000,\"depositNearTime\":1200,\"depositBig\":200000}}";
+        MemberConditionVo mv = memberMongoService.get(memberId);
+        return JSONObject.toJSONString(mv);
+//        return "{\"username\":\"merry\",\"withdrawInfo\":{\"withdrawSumNumber\":100,\"withdrawSumMoney\":20000,\"withdrawNearTime\":1200,\"withdrawBig\":200000}," +
+//                "\"depositInfo\":{\"depositSumNumber\":100,\"depositSumMoney\":20000,\"depositNearTime\":1200,\"depositBig\":200000}}";
     }
 }
