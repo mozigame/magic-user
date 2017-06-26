@@ -87,7 +87,6 @@ public class StockResourceServiceImpl implements StockResourceService {
         downLoadFile.setFilename(filename);
         List<StockInfoVo> list = userService.findAllStock(operaUser.getOwnerId());
         assembleStockList(list);
-        //TODO 查询表数据，生成excel的zip，并返回zip byte[]
         byte[] content = ExcelUtil.stockListExport(list, filename);
         downLoadFile.setContent(content);
         return downLoadFile;
