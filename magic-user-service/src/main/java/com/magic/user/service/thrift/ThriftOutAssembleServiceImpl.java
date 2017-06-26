@@ -187,7 +187,6 @@ public class ThriftOutAssembleServiceImpl {
      * @return
      */
     public EGResp getMemberPrivilege(String body, String caller) {
-        //TODO 修改cmdType 和 cmd值
         EGReq req = assembleEGReq(CmdType.CONFIG, 0x500040, body);
         return thriftFactory.call(req, caller);
     }

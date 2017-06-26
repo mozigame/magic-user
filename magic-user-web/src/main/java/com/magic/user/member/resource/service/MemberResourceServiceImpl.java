@@ -366,11 +366,12 @@ public class MemberResourceServiceImpl {
         /**
          * 会员优惠方案
          */
-        MemberPreferScheme memberPreferScheme;
-        //todo 1、会员优惠方案去 jason 那边拿取
-        String privilegeBody = "{\"memberId\":" + member.getMemberId() + "}";
+        MemberPreferScheme memberPreferScheme = new MemberPreferScheme();
+        //从mongo查询会员详情获取level
+        MemberConditionVo mv = memberMongoService.get(member.getMemberId());
+        //会员优惠方案
+        String privilegeBody = "{\"level\":" + mv.getLevel() + "}";
         EGResp privilegeResp = thriftOutAssembleService.getMemberPrivilege(privilegeBody, "account");
-        //TODO 确定resp的code
         if (privilegeResp != null && privilegeResp.getData() != null) {
             JSONObject privilegeData = JSONObject.parseObject(privilegeResp.getData());
             memberPreferScheme = new MemberPreferScheme();
@@ -379,20 +380,18 @@ public class MemberResourceServiceImpl {
             memberPreferScheme.setOnlineDiscount(privilegeData.getString("onlineDiscount"));
             memberPreferScheme.setReturnWater(privilegeData.getString("returnWater"));
             memberPreferScheme.setDepositDiscountScheme(privilegeData.getString("depositDiscountScheme"));
-            //TODO 出款手续费、入款手续费 再次确定
-
         } else {
             //TODO 假数据去掉
-            String preferScheme = "{\n" +
-                    "\"level\": 1,\n" +
-                    "\"showLevel\": \"未分层\",\n" +
-                    "\"onlineDiscount\": \"100返10\",\n" +
-                    "\"depositFee\": \"无\",\n" +
-                    "\"withdrawFee\": \"无\",\n" +
-                    "\"returnWater\": \"返水基本1\",\n" +
-                    "\"depositDiscountScheme\": \"100返10\"\n" +
-                    "}";
-            memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
+//            String preferScheme = "{\n" +
+//                    "\"level\": 1,\n" +
+//                    "\"showLevel\": \"未分层\",\n" +
+//                    "\"onlineDiscount\": \"100返10\",\n" +
+//                    "\"depositFee\": \"无\",\n" +
+//                    "\"withdrawFee\": \"无\",\n" +
+//                    "\"returnWater\": \"返水基本1\",\n" +
+//                    "\"depositDiscountScheme\": \"100返10\"\n" +
+//                    "}";
+//          memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
         }
         vo.setPreferScheme(memberPreferScheme);
 
