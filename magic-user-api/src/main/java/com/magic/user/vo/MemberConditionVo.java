@@ -27,8 +27,8 @@ public class MemberConditionVo {
     private Integer currencyType;   //币种
     private Long lastDepositMoney;   //最近存款
     private Long lastWithdrawMoney;  //最近提款
-    private Long maxDepositMoney;   //最大存款额
-    private Long maxWithdrawMoney;   //最大取款额
+    private Integer maxDepositMoney;   //最大存款额
+    private Integer maxWithdrawMoney;   //最大取款额
 
     public String getId() {
         return id;
@@ -174,19 +174,19 @@ public class MemberConditionVo {
         this.lastWithdrawMoney = lastWithdrawMoney;
     }
 
-    public Long getMaxDepositMoney() {
+    public Integer getMaxDepositMoney() {
         return maxDepositMoney;
     }
 
-    public void setMaxDepositMoney(Long maxDepositMoney) {
+    public void setMaxDepositMoney(Integer maxDepositMoney) {
         this.maxDepositMoney = maxDepositMoney;
     }
 
-    public Long getMaxWithdrawMoney() {
+    public Integer getMaxWithdrawMoney() {
         return maxWithdrawMoney;
     }
 
-    public void setMaxWithdrawMoney(Long maxWithdrawMoney) {
+    public void setMaxWithdrawMoney(Integer maxWithdrawMoney) {
         this.maxWithdrawMoney = maxWithdrawMoney;
     }
 }

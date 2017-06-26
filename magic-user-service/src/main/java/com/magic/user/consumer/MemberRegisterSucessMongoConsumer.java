@@ -84,6 +84,10 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
         vo.setWithdrawCount(0);
         vo.setWithdrawMoney(0L);
         vo.setDepositMoney(0L);
+        vo.setLastDepositMoney(0L);
+        vo.setLastWithdrawMoney(0L);
+        vo.setMaxDepositMoney(0);
+        vo.setMaxWithdrawMoney(0);
         vo.setCurrencyType(CurrencyType.CNY.value());
         vo.setOwnerId(member.getOwnerId());
         vo.setStockId(member.getStockId());
