@@ -165,4 +165,9 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         return query;
     }
 
+    public boolean updateLevel(long memberId, int level) {
+        Query query = new Query(new Criteria("memberId").is(memberId));
+        Update update = new Update().set("level", level);
+        return super.update(query, update) != null;
+    }
 }

@@ -612,18 +612,16 @@ public class MemberResourceServiceImpl {
      * 会员层级更新
      *
      * @param rc
-     * @param id
+     * @param memberId
      * @param level
      * @return
      */
-    @Deprecated
-    public String updateLevel(RequestContext rc, long id, int level) {
-        Member member = memberService.getMemberById(id);
+    public String updateLevel(RequestContext rc, long memberId, int level) {
+        Member member = memberService.getMemberById(memberId);
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
-        //TODO andy dubbo
-        boolean result = false;
+        boolean result = memberMongoService.updateLevel(memberId,level);
         if (!result) {
             throw UserException.MEMBER_LEVEL_UPDATE_FAIL;
         }

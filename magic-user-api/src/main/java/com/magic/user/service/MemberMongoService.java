@@ -90,4 +90,12 @@ public interface MemberMongoService {
      * @return
      */
     long getCount(MemberCondition memberCondition);
+
+    /**
+     * @Doc 更新会员层级
+     * @param memberId
+     * @param level
+     * @return
+     */
+    boolean updateLevel(long memberId, int level);
 }

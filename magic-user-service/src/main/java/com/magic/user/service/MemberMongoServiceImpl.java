@@ -170,4 +170,20 @@ public class MemberMongoServiceImpl implements MemberMongoService {
         }
         return 0;
     }
+
+    /**
+     * {@inheritDoc}
+     * @param memberId
+     * @param level
+     * @return
+     */
+    @Override
+    public boolean updateLevel(long memberId, int level) {
+        try {
+            return memberMongoDao.updateLevel(memberId,level);
+        }catch (Exception e){
+            ApiLogger.error(String.format("update member level failed memberId:%d,level:%d ", memberId,level), e);
+        }
+        return false;
+    }
 }

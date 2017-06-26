@@ -83,4 +83,6 @@ public abstract class BaseMongoDAOImpl<T> implements BaseMongoDAO<T>{
     private Class<T> getEntityClass(){
         return ReflectionUtils.getSuperClassGenricType(getClass());
     }
+
+
 }
