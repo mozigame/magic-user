@@ -342,6 +342,7 @@
             u.`status` status,
             u.realname realname,
             (SELECT username from t_user_info where user_id=os.stock_id) holderName,
+            os.stock_id holder,
             u.register_time registerTime,
             u.register_ip registerIp,
             l.last_login_ip lastLoginIp,
@@ -351,7 +352,8 @@
             u.email email,
             u.bank_card_no bankCardNo,
             u.bank bank,
-            u.bank_deposit bankDeposit
+            u.bank_deposit bankDeposit,
+            type
           from t_user_info u
           LEFT JOIN t_owner_stock_agent_member os
           on(u.user_id = os.agent_id)

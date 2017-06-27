@@ -11,9 +11,7 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.DateUtil;
-import com.magic.api.commons.tools.IPUtil;
-import com.magic.api.commons.tools.UUIDUtil;
+import com.magic.api.commons.tools.*;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.service.AgentSchemeService;
 import com.magic.config.thrift.base.EGResp;
@@ -432,8 +430,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        JSONObject result = getAgentInfoVo(id, false);
-        return result.toJSONString();
+        return getAgentInfoVo(id, false);
     }
 
     /**
@@ -443,42 +440,69 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @param isReview 是否是审核通过的信息
      * @return
      */
-    private JSONObject getAgentInfoVo(Long id, boolean isReview) {
-        JSONObject result = new JSONObject();
+    private String getAgentInfoVo(Long id, boolean isReview) {
         AgentInfoVo agentVo = userService.getAgentDetail(id);
         if (agentVo == null) {
             throw UserException.ILLEGAL_USER;
         }
         assembleAgentDetail(agentVo, isReview);
-        AgentConfigVo agentConfig = new AgentConfigVo();
-        JSONObject object = new JSONObject();
-        object.put("agentId", id);
-        EGResp resp = thriftOutAssembleService.getAgentConfig(object.toJSONString(), "account");
-        if (resp != null && resp.getCode() == 0) {
-            agentConfig = JSONObject.parseObject(resp.getData(), AgentConfigVo.class);
-        }
-        result.put("baseInfo", agentVo);
-        result.put("settings", agentConfig);
+        AgentDetailVo agentDetailVo = new AgentDetailVo();
+        agentDetailVo.setBaseInfo(agentVo);
+        agentDetailVo.setSettings(thriftOutAssembleService.getAgentConfig(id));
         if (!isReview) {
-//            String fundProfile = "{\n" +
-//                    "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
-//                    "    \"info\": {\n" +
-//                    "        \"members\": 490,\n" +
-//                    "        \"depositMembers\": 410,\n" +
-//                    "        \"depositTotalMoney\": \"29006590\",\n" +
-//                    "        \"withdrawTotalMoney\": \"24500120\",\n" +
-//                    "        \"betTotalMoney\": \"20900067\",\n" +
-//                    "        \"betEffMoney\": \"19007689\",\n" +
-//                    "        \"gains\": \"4908763\"\n" +
-//                    "    }\n" +
-//                    "}";
-            ProxyCurrentOperaton p = oceanusProviderDubboService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
-            JSONObject obj = new JSONObject();
-            obj.put("syncTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            obj.put("info",p);
-            result.put("fundProfile", p);
+            ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
+            FundProfile<AgentFundInfo> profile = new FundProfile<>();
+            profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+            profile.setInfo(assembleFundProfile(p));
+            agentDetailVo.setFundProfile(profile);
         }
-        return result;
+        return JSON.toJSONString(agentDetailVo);
+    }
+
+    /**
+     * 组装数据
+     *
+     * @param operaton
+     * @return
+     */
+    private AgentFundInfo assembleFundProfile(ProxyCurrentOperaton operaton) {
+        AgentFundInfo agentFundInfo = new AgentFundInfo();
+        int members = 0;//会员数量
+        int depositMembers = 0;//存款会员数量
+        String depositTotalMoney = "0";//存款金额
+        String withdrawTotalMoney = "0";//取款金额
+        String betTotalMoney = "0";//总投注额
+        String betEffMoney = "0";//总有效投注额
+        String gains = "0";//损益
+        if (Optional.ofNullable(operaton).filter(membersValue -> membersValue.getMembers() != null && membersValue.getMembers() > 0).isPresent()){
+            members = operaton.getMembers().intValue();
+        }
+        if (Optional.ofNullable(operaton).filter(depositMembersValue -> depositMembersValue.getDepositMembers() != null && depositMembersValue.getDepositMembers() > 0).isPresent()){
+            depositMembers = operaton.getDepositMembers().intValue();
+        }
+        if (Optional.ofNullable(operaton).filter(depositTotalMoneyValue -> depositTotalMoneyValue.getDepositTotalMoney() != null && depositTotalMoneyValue.getDepositTotalMoney() > 0).isPresent()){
+            depositTotalMoney = String.valueOf(NumberUtil.fenToYuan(operaton.getDepositTotalMoney()));
+        }
+        if (Optional.ofNullable(operaton).filter(withdrawTotalMoneyValue -> withdrawTotalMoneyValue.getWithdrawTotalMoney() != null && withdrawTotalMoneyValue.getWithdrawTotalMoney() > 0).isPresent()){
+            withdrawTotalMoney = String.valueOf(NumberUtil.fenToYuan(operaton.getWithdrawTotalMoney()));
+        }
+        if (Optional.ofNullable(operaton).filter(betTotalMoneyValue -> betTotalMoneyValue.getBetTotalMoney() != null && betTotalMoneyValue.getBetTotalMoney() > 0).isPresent()){
+            betTotalMoney = String.valueOf(NumberUtil.fenToYuan(operaton.getBetTotalMoney()));
+        }
+        if (Optional.ofNullable(operaton).filter(betEffMoneyValue -> betEffMoneyValue.getBetEffMoney() != null && betEffMoneyValue.getBetEffMoney() > 0).isPresent()){
+            betEffMoney = String.valueOf(NumberUtil.fenToYuan(operaton.getBetEffMoney()));
+        }
+        if (Optional.ofNullable(operaton).filter(gainsValue -> gainsValue.getGains() != null && gainsValue.getGains() > 0).isPresent()){
+            gains = String.valueOf(NumberUtil.fenToYuan(operaton.getGains()));
+        }
+        agentFundInfo.setMembers(members);
+        agentFundInfo.setDepositMembers(depositMembers);
+        agentFundInfo.setDepositTotalMoney(depositTotalMoney);
+        agentFundInfo.setWithdrawTotalMoney(withdrawTotalMoney);
+        agentFundInfo.setBetTotalMoney(betTotalMoney);
+        agentFundInfo.setBetEffMoney(betEffMoney);
+        agentFundInfo.setGains(gains);
+        return agentFundInfo;
     }
 
     @Override
@@ -614,9 +638,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!agentConfigService.update(agentConfig)) {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
-        EGResp resp = thriftOutAssembleService.updateAgentConfig(assembleConfigUpdBody(agentId, returnScheme, adminCost, feeScheme, discount,cost), "account");
-        if (resp == null || resp.getCode() != 0) {
-            throw UserException.AGENT_CONFIG_UPDATE_FAIL;
+        if (!(returnScheme < 0 && adminCost < 0 && feeScheme < 0 && discount < 0 && cost < 0)) {
+            EGResp resp = thriftOutAssembleService.updateAgentConfig(assembleConfigUpdBody(agentId, returnScheme, adminCost, feeScheme, discount,cost), "account");
+            if (resp == null || resp.getCode() != 0) {
+                throw UserException.AGENT_CONFIG_UPDATE_FAIL;
+            }
         }
         return UserContants.EMPTY_STRING;
     }
@@ -915,8 +941,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         } else if (baseInfo.getStatus() == ReviewStatus.pass.value()) {
             long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), baseInfo.getAccount());
             if (agentId > 0) {
-                JSONObject jsonObject = getAgentInfoVo(agentId, true);
-                return jsonObject.toJSONString();
+                return JSON.toJSONString(getAgentInfoVo(agentId, true));
             }
         }
         return UserContants.EMPTY_STRING;
