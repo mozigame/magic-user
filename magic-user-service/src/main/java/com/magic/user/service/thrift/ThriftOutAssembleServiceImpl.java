@@ -11,6 +11,7 @@ import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
+import com.magic.user.vo.AgentConfigVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -171,13 +172,21 @@ public class ThriftOutAssembleServiceImpl {
     /**调用Jason Thrift接口**/
     /**
      * 获取代理参数配置信息
-     * @param body
-     * @param caller
+     * @param uid 代理id
      * @return
      */
-    public EGResp getAgentConfig(String body, String caller) {
+    public AgentConfigVo getAgentConfig(long uid) {
+        String body = "{\"agentId\":" + uid + "}";
         EGReq req = assembleEGReq(CmdType.CONFIG, 0x500043, body);
-        return thriftFactory.call(req, caller);
+        try {
+            EGResp resp = thriftFactory.call(req, UserContants.CALLER);
+            if (Optional.ofNullable(resp).filter(code -> code.getCode() == 0).isPresent()){
+                return JSONObject.parseObject(resp.getData(), AgentConfigVo.class);
+            }
+        }catch (Exception e){
+            ApiLogger.error(String.format("get agent config from thrift error. uid: %d", uid), e);
+        }
+        return null;
     }
 
     /**

@@ -11,6 +11,7 @@ import com.magic.config.service.RegisterDubboService;
 import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.oceanus.entity.Summary.OwnerCurrentOperation;
+import com.magic.oceanus.entity.Summary.ProxyCurrentOperaton;
 import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
@@ -284,6 +285,22 @@ public class DubboOutAssembleServiceImpl {
             return oceanusProviderDubboService.getShareholderOperation(uid);
         }catch (Exception e){
             ApiLogger.error(String.format("get shareholder error. uid: %d", uid), e);
+        }
+        return null;
+    }
+
+    /**
+     * 本期资金
+     *
+     * @param agentId
+     * @param stockId
+     * @return
+     */
+    public ProxyCurrentOperaton getProxyOperation(long agentId, long stockId){
+        try {
+            return oceanusProviderDubboService.getProxyOperation(agentId, stockId);
+        }catch (Exception e){
+            ApiLogger.error(String.format("get proxy operation error. agentId: %d, stockId: %d", agentId, stockId), e);
         }
         return null;
     }
