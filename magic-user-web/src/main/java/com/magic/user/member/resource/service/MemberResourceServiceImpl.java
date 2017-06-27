@@ -171,8 +171,8 @@ public class MemberResourceServiceImpl {
             MemberListVo memberRetWaterVo = memberRetWaterMap.get(memberConditionVoMap.get(member.getMemberId()).getLevel());
             if (memberRetWaterVo != null) {
                 memberListVo.setReturnWater(memberRetWaterVo.getReturnWater());
-                memberListVo.setReturnWaterName(memberRetWaterVo.getReturnWaterName());
-                memberListVo.setLevel(memberRetWaterVo.getLevel());
+                memberListVo.setReturnWaterName(memberRetWaterVo.getReturnWaterName() == null ? "":memberRetWaterVo.getReturnWaterName());
+                memberListVo.setLevel(memberRetWaterVo.getLevel() == null ? "":memberRetWaterVo.getLevel());
             } else {
                 //memberListVo.setReturnWater(1);
                 //memberListVo.setReturnWaterName("反水基本方案1");
@@ -225,9 +225,8 @@ public class MemberResourceServiceImpl {
     private Map<Integer, MemberListVo> getMemberReturnWater(Set<Integer> levelIds) {
         JSONObject memberRetWaterBody = new JSONObject();
         memberRetWaterBody.put("levels", levelIds);
-
         try {
-            EGResp retWaterResp = thriftOutAssembleService.getMemberBalances(memberRetWaterBody.toJSONString(), "account");
+            EGResp retWaterResp = thriftOutAssembleService.getMemberReturnWater(memberRetWaterBody.toJSONString(), "account");
             if (retWaterResp != null&& retWaterResp.getData()!= null) {
                 JSONArray balanceObj = JSONObject.parseArray(retWaterResp.getData());
                 Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
