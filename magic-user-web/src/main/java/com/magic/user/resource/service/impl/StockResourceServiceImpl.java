@@ -6,8 +6,10 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
+import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.tools.NumberUtil;
 import com.magic.oceanus.entity.Summary.OwnerCurrentOperation;
 import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.user.bean.AgentCondition;
@@ -28,6 +30,9 @@ import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.vo.FundProfile;
+import com.magic.user.vo.StockDetailVo;
+import com.magic.user.vo.StockFundInfo;
 import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * User: joey
@@ -128,24 +134,51 @@ public class StockResourceServiceImpl implements StockResourceService {
         }
         StockInfoVo stockDetail = userService.getStockDetail(id);
         assembleStockDetail(stockDetail);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("baseInfo", stockDetail);
-        OwnerCurrentOperation oco = oceanusProviderDubboService.getShareholderOperation(stockDetail.getId());
-//        String operation = "{\n" +
-//                "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
-//                "    \"info\": {\n" +
-//                "        \"bets\": 129000,\n" +
-//                "        \"notes\": 34560000,\n" +
-//                "        \"betTotalMoney\": \"80500000\",\n" +
-//                "        \"betEffMoney\": \"78966789\",\n" +
-//                "        \"gains\": \"5800000\"\n" +
-//                "    }\n" +
-//                "}";
-        JSONObject operation = new JSONObject();
-        operation.put("syncTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(oco.getSyncTime()));
-        operation.put("info",oco);
-        jsonObject.put("operation", operation);
-        return jsonObject.toJSONString();
+        StockDetailVo stockDetailVo = new StockDetailVo();
+        stockDetailVo.setBaseInfo(stockDetail);
+        OwnerCurrentOperation oco = dubboOutAssembleService.getShareholderOperation(stockDetail.getId());
+        FundProfile<StockFundInfo> profile = new FundProfile<>();
+        profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+        StockFundInfo info = assembleStockFundInfo(oco);
+        profile.setInfo(info);
+        stockDetailVo.setOperation(profile);
+        return JSON.toJSONString(stockDetailVo);
+    }
+
+    /**
+     * 组装股东数据
+     *
+     * @param oco
+     * @return
+     */
+    private StockFundInfo assembleStockFundInfo(OwnerCurrentOperation oco) {
+        StockFundInfo stockFundInfo = new StockFundInfo();
+        int bets = 0;
+        int notes = 0;
+        String betTotalMoney = "0";
+        String betEffMoney = "0";
+        String gains = "0";
+        if (Optional.ofNullable(oco).filter(betsValue -> betsValue.getBets() != null && betsValue.getBets() > 0).isPresent()){
+            bets = oco.getBets();
+        }
+        if (Optional.ofNullable(oco).filter(notesValue -> notesValue.getNotes() != null && notesValue.getNotes() > 0).isPresent()){
+            notes = oco.getNotes();
+        }
+        if (Optional.ofNullable(oco).filter(betTotalMoneyValue -> betTotalMoneyValue.getBetTotalMoney() != null && betTotalMoneyValue.getBetTotalMoney() > 0).isPresent()){
+            betTotalMoney = String.valueOf(NumberUtil.fenToYuan(oco.getBetTotalMoney()));
+        }
+        if (Optional.ofNullable(oco).filter(betEffMoneyValue -> betEffMoneyValue.getBetEffMoney() != null && betEffMoneyValue.getBetEffMoney() > 0).isPresent()){
+            betEffMoney = String.valueOf(NumberUtil.fenToYuan(oco.getBetEffMoney()));
+        }
+        if (Optional.ofNullable(oco).filter(gainsValue -> gainsValue.getGains() != null && gainsValue.getGains() > 0).isPresent()){
+            gains = String.valueOf(NumberUtil.fenToYuan(oco.getGains()));
+        }
+        stockFundInfo.setBets(bets);
+        stockFundInfo.setNotes(notes);
+        stockFundInfo.setBetTotalMoney(betTotalMoney);
+        stockFundInfo.setBetEffMoney(betEffMoney);
+        stockFundInfo.setGains(gains);
+        return stockFundInfo;
     }
 
     /**

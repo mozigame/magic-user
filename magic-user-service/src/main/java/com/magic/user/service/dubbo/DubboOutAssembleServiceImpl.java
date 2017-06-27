@@ -10,6 +10,8 @@ import com.magic.config.service.DomainDubboService;
 import com.magic.config.service.RegisterDubboService;
 import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
+import com.magic.oceanus.entity.Summary.OwnerCurrentOperation;
+import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.service.java.UuidService;
@@ -54,6 +56,9 @@ public class DubboOutAssembleServiceImpl {
 
     @Resource
     private TethysUserDubboService tethysUserDubboService;
+
+    @Resource
+    private OceanusProviderDubboService oceanusProviderDubboService;
 
     private static final Map<Long, String> EMPTY_MAP = new HashMap<>();
 
@@ -265,5 +270,21 @@ public class DubboOutAssembleServiceImpl {
             ApiLogger.error(String.format("insert user payment password error. uid: %d, ownerId: %d , paymentPassword: %s", uid, ownerId, paymentPassword), e);
         }
         return false;
+    }
+
+
+    /**
+     * 获取股东资金概况
+     *
+     * @param uid
+     * @return
+     */
+    public OwnerCurrentOperation getShareholderOperation(long uid){
+        try {
+            return oceanusProviderDubboService.getShareholderOperation(uid);
+        }catch (Exception e){
+            ApiLogger.error(String.format("get shareholder error. uid: %d", uid), e);
+        }
+        return null;
     }
 }
