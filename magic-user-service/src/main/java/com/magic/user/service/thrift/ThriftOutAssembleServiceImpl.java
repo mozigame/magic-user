@@ -12,7 +12,9 @@ import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
 import com.magic.user.vo.AgentConfigVo;
+import com.magic.user.vo.MemberPreferScheme;
 import org.springframework.stereotype.Service;
+import sun.applet.AppletIOException;
 
 import javax.annotation.Resource;
 import java.util.Optional;
@@ -190,14 +192,43 @@ public class ThriftOutAssembleServiceImpl {
     }
 
     /**
-     * 查询某个会员的优惠方案
-     * @param body
-     * @param caller
+     * 查询会员层级对应的优惠方案
+     *
+     * @param level
      * @return
      */
-    public EGResp getMemberPrivilege(String body, String caller) {
-        EGReq req = assembleEGReq(CmdType.CONFIG, 0x500040, body);
-        return thriftFactory.call(req, caller);
+    public MemberPreferScheme getMemberPrivilege(Integer level) {
+        String body = "{\"level\":" + level + "}";
+        try {
+            EGReq req = assembleEGReq(CmdType.CONFIG, 0x500040, body);
+            EGResp resp = thriftFactory.call(req, UserContants.CALLER);
+            if (Optional.ofNullable(resp).filter(code -> code.getCode() == 0).isPresent()){
+                return assembleMemberPreferScheme(resp.getData());
+            }
+        }catch (Exception e){
+            ApiLogger.error(String.format("get member privilege error."));
+        }
+        return null;
+    }
+
+    /**
+     * 组装数据
+     * @param data
+     * @return
+     */
+    private MemberPreferScheme assembleMemberPreferScheme(String data) {
+        MemberPreferScheme scheme = new MemberPreferScheme();
+        try {
+            JSONObject object = JSONObject.parseObject(data);
+            scheme.setLevel(object.getInteger("level"));
+            scheme.setShowLevel(object.getString("showLevel"));
+            scheme.setOnlineDiscount(object.getString("onlineDiscount"));
+            scheme.setReturnWater(object.getString("returnWater"));
+            scheme.setDepositDiscountScheme(object.getString("depositDiscountScheme"));
+        }catch (Exception e){
+            ApiLogger.error(String.format("assemble member prefer scheme error. data: %s", data), e);
+        }
+        return scheme;
     }
 
     /**
