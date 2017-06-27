@@ -385,7 +385,6 @@ public class MemberResourceServiceImpl {
             memberPreferScheme.setReturnWater(data.getString("returnWater"));
             memberPreferScheme.setDepositDiscountScheme(data.getString("depositDiscountScheme"));
         } else {
-            //TODO 假数据去掉
 //            String preferScheme = "{\n" +
 //                    "\"level\": 1,\n" +
 //                    "\"showLevel\": \"未分层\",\n" +
@@ -647,8 +646,9 @@ public class MemberResourceServiceImpl {
             return UserContants.EMPTY_LIST;
         }
         SimpleListResult<List<MemberLevelListVo>> result = new SimpleListResult<>();
-        //TODO jason dubbo
+
         List<MemberLevelListVo> list = getMemberLevelList(operaUser.getOwnerId(), lock, page, count);
+
         result.setList(list != null ? list : new ArrayList<>());
 //        return JSON.toJSONString(result);
         //TODO 假数据
