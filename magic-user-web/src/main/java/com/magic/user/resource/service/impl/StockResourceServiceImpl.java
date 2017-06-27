@@ -159,10 +159,10 @@ public class StockResourceServiceImpl implements StockResourceService {
         String betEffMoney = "0";
         String gains = "0";
         if (Optional.ofNullable(oco).filter(betsValue -> betsValue.getBets() != null && betsValue.getBets() > 0).isPresent()){
-            bets = oco.getBets();
+            bets = oco.getBets().intValue();
         }
         if (Optional.ofNullable(oco).filter(notesValue -> notesValue.getNotes() != null && notesValue.getNotes() > 0).isPresent()){
-            notes = oco.getNotes();
+            notes = oco.getNotes().intValue();
         }
         if (Optional.ofNullable(oco).filter(betTotalMoneyValue -> betTotalMoneyValue.getBetTotalMoney() != null && betTotalMoneyValue.getBetTotalMoney() > 0).isPresent()){
             betTotalMoney = String.valueOf(NumberUtil.fenToYuan(oco.getBetTotalMoney()));
