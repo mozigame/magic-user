@@ -418,8 +418,6 @@ public class MemberResource {
 
     /**
      * @param lock  是否锁定分层  默认1 1：非锁定 2锁定
-     * @param page  当前页
-     * @param count 每页数据量
      * @return
      * @Doc 会员层级列表
      */
@@ -427,16 +425,16 @@ public class MemberResource {
     @RequestMapping(value = "/level/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String levelList(
-            @RequestParam(name = "lock", required = false, defaultValue = "1") int lock,
-            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(name = "count", required = false, defaultValue = "10") int count
+            @RequestParam(name = "lock", required = false, defaultValue = "1") int lock
+//            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+//            @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.memberLevelList(rc, lock, page, count);
+        return memberServiceResource.memberLevelList(rc, lock);
     }
 
     /**
-     * @param lock 是否锁定分层  默认1 1：非锁定 2锁定
+     * @param lock 是否锁定分层  默认1 0：非锁定 1锁定
      * @return
      * @Doc 会员层级列表导出
      */

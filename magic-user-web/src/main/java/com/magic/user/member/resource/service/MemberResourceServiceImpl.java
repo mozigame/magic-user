@@ -656,17 +656,15 @@ public class MemberResourceServiceImpl {
      *
      * @param rc    RequestContext
      * @param lock  是否锁定 1：非锁定 2锁定
-     * @param page  页码
-     * @param count 每页数据量
      * @return
      */
-    public String memberLevelList(RequestContext rc, int lock, int page, int count) {
+    public String memberLevelList(RequestContext rc, int lock) {
         User operaUser = userService.get(rc.getUid());
         if (operaUser == null) {
             return UserContants.EMPTY_LIST;
         }
         SimpleListResult<List<MemberLevelListVo>> result = new SimpleListResult<>();
-        List<MemberLevelListVo> list = getMemberLevelList(operaUser.getOwnerId(), lock, page, count);
+        List<MemberLevelListVo> list = getMemberLevelList(operaUser.getOwnerId(), lock);
         result.setList(list != null ? list : new ArrayList<>());
         return JSON.toJSONString(result);
 //        return "{\n" +
@@ -784,7 +782,7 @@ public class MemberResourceServiceImpl {
      * @param lock
      * @return
      */
-    private List<MemberLevelListVo> getMemberLevelList(Long ownerId, Integer lock, Integer page, Integer count) {
+    private List<MemberLevelListVo> getMemberLevelList(Long ownerId, Integer lock) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ownerId", ownerId);
         jsonObject.put("isLocked", lock);
@@ -837,9 +835,13 @@ public class MemberResourceServiceImpl {
         String filename = ExcelUtil.assembleFileName(uid, ExcelUtil.MEMBER_LEVEL_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
         downLoadFile.setFilename(filename);
-        //TODO andy dubbo 查询表数据，生成excel的zip，并返回zip byte[]
-        byte[] content = new byte[5];
-        List<MemberLevelListVo> list = new ArrayList<>();
+
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        List<MemberLevelListVo> list = getMemberLevelList(operaUser.getOwnerId(), lock);
 
         downLoadFile.setContent(ExcelUtil.memberLevelListExport(list, filename));
         return downLoadFile;
