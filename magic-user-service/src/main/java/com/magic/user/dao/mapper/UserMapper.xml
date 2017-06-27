@@ -469,6 +469,22 @@
         </if>
     </select>
 
+    <!--修改子账号-->
+    <select id="updateWorker" resultType="java.lang.Long">
+        UPDATE
+        t_user_info
+        <set>
+            <if test="param.realname != null and param.realname != ''">
+                realname = #{param.realname},
+            </if>
+            <if test="param.roleId != null and param.roleId > 0">
+                role_id = #{param.roleId}
+            </if>
+        </set>
+        WHERE user_id=#{param.userId}
+
+    </select>
+
 
     <!--##############   子账号   #################-->
 

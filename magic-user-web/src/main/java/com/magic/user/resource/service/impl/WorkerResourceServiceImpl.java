@@ -245,7 +245,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         user.setRealname(realname);
         user.setRoleId(roleId);
         //修改子账号
-        if (!userService.update(user)) {
+        if (!userService.updateWorker(user)) {
             throw UserException.USER_UPDATE_FAIL;
         }
         //修改角色

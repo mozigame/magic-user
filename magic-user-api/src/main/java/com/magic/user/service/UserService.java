@@ -96,6 +96,13 @@ public interface UserService {
     boolean update(User user);
 
     /**
+     * 修改子账号
+     * @param user
+     * @return
+     */
+    boolean updateWorker(User user);
+
+    /**
      * @param user
      * @return
      * @Doc 添加股东

@@ -70,6 +70,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean updateWorker(User user) {
+        boolean result = stockDbService.update("updateWorker",new String[]{"param"}, user) > 0;
+        if (result) {
+            if (!userRedisStorageService.delUser(user.getUserId())) {
+                ApiLogger.warn("delete user info to redis error,userId:" + user.getUserId());
+            }
+        }
+        return result;
+    }
+
+    @Override
     public boolean addStock(User user) {
         Long result = stockDbService.insert(user);
         if (Optional.ofNullable(result).filter(resultValue -> resultValue > 0).isPresent()){//添加成功，redis计数
