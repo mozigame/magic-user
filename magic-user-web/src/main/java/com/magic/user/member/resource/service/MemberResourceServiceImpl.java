@@ -770,10 +770,11 @@ public class MemberResourceServiceImpl {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ownerId", ownerId);
         jsonObject.put("lock", lock);
-        jsonObject.put("page", page);
-        jsonObject.put("count", count);
+//        jsonObject.put("page", page);
+//        jsonObject.put("count", count);
         EGResp resp = thriftOutAssembleService.findLevelList(jsonObject.toJSONString(), "account");
-        //TODO 确定resp的code
+        ApiLogger.info("==========thrift获取层级列表============");
+        ApiLogger.info(JSONObject.toJSONString(resp.getData()));
         if (resp != null && resp.getData() != null) {
             List<MemberLevelListVo> memberLevelListVos = new ArrayList<>();
             JSONArray array = JSONArray.parseArray(resp.getData());
