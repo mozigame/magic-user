@@ -154,7 +154,7 @@ public class ThriftOutAssembleServiceImpl {
      * @return
      */
     public EGResp getMemberBalances(String body, String caller) {
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x300015, body);
+        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300015, body);
         return thriftFactory.call(req, caller);
     }
 
