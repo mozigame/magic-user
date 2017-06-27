@@ -594,7 +594,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      */
     @Override
     public String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain) {
-        if (checkUpdateAgentConfig(returnScheme, adminCost, feeScheme, discount, cost, domain)) {
+        if (!checkUpdateAgentConfig(returnScheme, adminCost, feeScheme, discount, cost, domain)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         User agentUser = userService.get(agentId);
