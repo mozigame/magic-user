@@ -769,7 +769,7 @@ public class MemberResourceServiceImpl {
     private List<MemberLevelListVo> getMemberLevelList(Long ownerId, Integer lock, Integer page, Integer count) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ownerId", ownerId);
-        jsonObject.put("lock", lock);
+        jsonObject.put("isLocked", lock);
 //        jsonObject.put("page", page);
 //        jsonObject.put("count", count);
         EGResp resp = thriftOutAssembleService.findLevelList(jsonObject.toJSONString(), "account");
