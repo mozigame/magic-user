@@ -117,7 +117,6 @@ public class MemberResourceServiceImpl {
         }
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
-        //todo 组装mongo中拿取的列表
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
     }
@@ -128,21 +127,23 @@ public class MemberResourceServiceImpl {
      * @param memberConditionVos
      * @return
      */
-    //TODO 调整，避免空指针
+    //
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
         Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
+        Set<Integer> levels = new HashSet<Integer>();
         for (MemberConditionVo vo : memberConditionVos) {
             memberConditionVoMap.put(vo.getMemberId(), vo);
+            levels.add(vo.getLevel());
         }
         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
         List<Member> members = memberService.findMemberByIds(memberConditionVoMap.keySet());
         //2、获取会员最近登录信息
         Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(memberConditionVoMap.keySet());
-        //3.获取会员层级、余额列表
+        //3.获取余额列表
         Map<Long, MemberListVo> memberBalanceLevelVoMap = getMemberBalances(memberConditionVoMap.keySet());
         //4.获取会员反水方案列表
-        Map<Integer, MemberListVo> memberRetWaterMap = getMemberReturnWater(memberConditionVoMap.keySet());
+        Map<Integer, MemberListVo> memberRetWaterMap = getMemberReturnWater(levels);
         for (Member member : members) {
             MemberListVo memberListVo = new MemberListVo();
             memberListVo.setId(member.getMemberId());
@@ -158,32 +159,32 @@ public class MemberResourceServiceImpl {
                     memberListVo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp));
                 }
             } else {
-                //todo 假数据删除
-                memberListVo.setLastLoginTime("2017-04-17 18:03:22");
+                memberListVo.setLastLoginTime("");
             }
-            //todo 1、会员层级、余额在 kevin 拿取
+            //1、余额在 kevin 拿取
             MemberListVo memberBalanceLevelVo = memberBalanceLevelVoMap.get(member.getMemberId());
             if (memberBalanceLevelVo != null) {
-                memberListVo.setLevel(memberBalanceLevelVo.getLevel());
+                //memberListVo.setLevel(memberBalanceLevelVo.getLevel());
                 memberListVo.setBalance(memberBalanceLevelVo.getBalance());
             } else {
-                //TODO 假数据删除
-                memberListVo.setLevel("未分层");
-                memberListVo.setBalance("29843.23");
+                //memberListVo.setLevel("未分层");
+                memberListVo.setBalance("");
             }
-            //todo 2、当前反水方案在 jason 拿取,根据层级id获取
+
+            //2、当前反水方案在 luis 拿取,根据层级id获取
             MemberListVo memberRetWaterVo = memberRetWaterMap.get(memberConditionVoMap.get(member.getMemberId()).getLevel());
             if (memberRetWaterVo != null) {
                 memberListVo.setReturnWater(memberRetWaterVo.getReturnWater());
                 memberListVo.setReturnWaterName(memberRetWaterVo.getReturnWaterName());
+                memberListVo.setLevel(memberRetWaterVo.getLevel());
             } else {
-                memberListVo.setReturnWater(1);
-                memberListVo.setReturnWaterName("反水基本方案1");
+                //memberListVo.setReturnWater(1);
+                //memberListVo.setReturnWaterName("反水基本方案1");
             }
 
             memberListVos.add(memberListVo);
         }
-        //TODO foreach list for item
+
         return memberListVos;
     }
 
@@ -194,21 +195,23 @@ public class MemberResourceServiceImpl {
      */
     private Map<Long, MemberListVo> getMemberBalances(Collection<Long> ids) {
         JSONObject memberBalanceBody = new JSONObject();
-        memberBalanceBody.put("memberIds", ids);
-        EGResp balanceResp = thriftOutAssembleService.getMemberBalances(memberBalanceBody.toJSONString(), "account");
-        //TODO 判断resp的code
-        if (balanceResp != null && balanceResp.getData()!= null) {
-            JSONArray balanceObj = JSONObject.parseArray(balanceResp.getData());
-            Map<Long, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
-            for (Object object : balanceObj) {
-                JSONObject jsonObject = (JSONObject) object;
-                MemberListVo vo = new MemberListVo();
-                vo.setId(jsonObject.getLong("id"));
-                vo.setLevel(jsonObject.getString("level"));
-                vo.setBalance(jsonObject.getString("balance"));
-                memberBalanceLevelVoMap.put(jsonObject.getLong("id"), vo);
+        memberBalanceBody.put("UserIds", ids);
+        try {
+            EGResp balanceResp = thriftOutAssembleService.getMemberBalances(memberBalanceBody.toJSONString(), "account");
+            if (balanceResp != null && balanceResp.getData()!= null) {
+                JSONArray balanceObj = JSONObject.parseArray(balanceResp.getData());
+                Map<Long, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
+                for (Object object : balanceObj) {
+                    JSONObject jsonObject = (JSONObject) object;
+                    MemberListVo vo = new MemberListVo();
+                    vo.setId(jsonObject.getLong("UserId"));
+                    vo.setBalance(jsonObject.getString("Balance"));
+                    memberBalanceLevelVoMap.put(jsonObject.getLong("UserId"), vo);
+                }
+                return memberBalanceLevelVoMap;
             }
-            return memberBalanceLevelVoMap;
+        }catch (Exception e){
+            ApiLogger.error("get member balance list failed !",e);
         }
         return new HashMap<>();
     }
@@ -218,22 +221,28 @@ public class MemberResourceServiceImpl {
      * @param levelIds
      * @return
      */
-    private Map<Integer, MemberListVo> getMemberReturnWater(Collection<Long> levelIds) {
+    private Map<Integer, MemberListVo> getMemberReturnWater(Set<Integer> levelIds) {
         JSONObject memberRetWaterBody = new JSONObject();
-        memberRetWaterBody.put("level", levelIds);
-        EGResp retWaterResp = thriftOutAssembleService.getMemberBalances(memberRetWaterBody.toJSONString(), "account");
-        //TODO 判断resp的code
-        if (retWaterResp != null&& retWaterResp.getData()!= null) {
-            JSONArray balanceObj = JSONObject.parseArray(retWaterResp.getData());
-            Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
-            for (Object object : balanceObj) {
-                JSONObject jsonObject = (JSONObject) object;
-                MemberListVo vo = new MemberListVo();
-                vo.setReturnWater(jsonObject.getInteger("returnWater"));
-                vo.setReturnWaterName(jsonObject.getString("returnWaterName"));
-                memberBalanceLevelVoMap.put(jsonObject.getInteger("level"), vo);
+        memberRetWaterBody.put("levels", levelIds);
+
+        try {
+            EGResp retWaterResp = thriftOutAssembleService.getMemberBalances(memberRetWaterBody.toJSONString(), "account");
+            if (retWaterResp != null&& retWaterResp.getData()!= null) {
+                JSONArray balanceObj = JSONObject.parseArray(retWaterResp.getData());
+                Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
+                for (Object object : balanceObj) {
+                    JSONObject jsonObject = (JSONObject) object;
+                    MemberListVo vo = new MemberListVo();
+                    vo.setReturnWater(jsonObject.getInteger("returnWater"));
+                    vo.setReturnWaterName(jsonObject.getString("returnWaterName"));
+                    vo.setLevel(jsonObject.getString("showLevel"));
+
+                    memberBalanceLevelVoMap.put(jsonObject.getInteger("level"), vo);
+                }
+                return memberBalanceLevelVoMap;
             }
-            return memberBalanceLevelVoMap;
+        }catch (Exception e){
+            ApiLogger.error("get member return water failed!",e);
         }
         return new HashMap<>();
     }
@@ -343,19 +352,12 @@ public class MemberResourceServiceImpl {
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
-        //TODO 1.jason 根据会员ID查询会员优惠方案
-
-        //TODO 2.kevin 根据会员ID查询会员资金概括
-
-        //TODO 3.sundy 根据会员ID查询投注记录
-
-        //TODO 4.sundy 根据会员ID查询优惠记录
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
     }
 
     /**
-     * 组装会员详情 //TODO 暂未完成
+     * 组装会员详情
      *
      * @return
      */

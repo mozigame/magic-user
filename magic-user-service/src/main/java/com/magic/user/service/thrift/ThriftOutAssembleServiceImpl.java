@@ -152,8 +152,7 @@ public class ThriftOutAssembleServiceImpl {
      * @return
      */
     public EGResp getMemberBalances(String body, String caller) {
-        //TODO 修改cmdType 和 cmd值
-        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x100005, body);
+        EGReq req = assembleEGReq(CmdType.PASSPORT, 0x300015, body);
         return thriftFactory.call(req, caller);
     }
 
