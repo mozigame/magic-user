@@ -127,6 +127,7 @@ public class MemberResourceServiceImpl {
     //
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
         Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
+        Set<Integer> levels = new HashSet<Integer>();
         for (MemberConditionVo vo : memberConditionVos) {
             memberConditionVoMap.put(vo.getMemberId(), vo);
         }
@@ -367,7 +368,8 @@ public class MemberResourceServiceImpl {
         vo.setFundProfile(assembleFundProfile(mv, member));
         vo.setBetHistory(assembleBetHistory(member));
         vo.setDiscountHistory(assembleDiscountHistory(member));
-        return JSON.toJSONString(vo);
+        //return JSON.toJSONString(vo);
+        return vo;
     }
 
     /**
