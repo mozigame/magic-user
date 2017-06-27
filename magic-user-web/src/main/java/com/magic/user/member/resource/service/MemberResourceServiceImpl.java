@@ -201,7 +201,12 @@ public class MemberResourceServiceImpl {
                     JSONObject jsonObject = (JSONObject) object;
                     MemberListVo vo = new MemberListVo();
                     vo.setId(jsonObject.getLong("UserId"));
-                    vo.setBalance(jsonObject.getString("Balance"));
+                    vo.setBalance(
+                            String.valueOf(
+                                        jsonObject.getLong("Balance") == null ? "0":
+                                            NumberUtil.fenToYuan(jsonObject.getLong("Balance"))
+                            )
+                    );
                     memberBalanceLevelVoMap.put(jsonObject.getLong("UserId"), vo);
                 }
                 return memberBalanceLevelVoMap;
