@@ -11,10 +11,7 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.CommonDateParseUtil;
-import com.magic.api.commons.tools.DateUtil;
-import com.magic.api.commons.tools.IPUtil;
-import com.magic.api.commons.tools.UUIDUtil;
+import com.magic.api.commons.tools.*;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.config.thrift.base.EGResp;
@@ -130,10 +127,8 @@ public class MemberResourceServiceImpl {
     //
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
         Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
-        Set<Integer> levels = new HashSet<Integer>();
         for (MemberConditionVo vo : memberConditionVos) {
             memberConditionVoMap.put(vo.getMemberId(), vo);
-            levels.add(vo.getLevel());
         }
         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
@@ -365,121 +360,119 @@ public class MemberResourceServiceImpl {
         /*最近登录信息*/
         SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         MemberDetailVo vo = new MemberDetailVo();
-        ////会员基础信息
         vo.setBaseInfo(assembleMemberInfo(member));
-        if (subAccount != null) {
-            vo.getBaseInfo().setLastLoginIp(IPUtil.intToIp(subAccount.getLastIp()));
-        }
-
-        /**
-         * 会员优惠方案
-         */
-        MemberPreferScheme memberPreferScheme = new MemberPreferScheme();
         //从mongo查询会员详情
         MemberConditionVo mv = memberMongoService.get(member.getMemberId());
-        memberPreferScheme.setLevel(mv.getLevel());
-        //会员优惠方案
-        String privilegeBody = "{\"level\":" + mv.getLevel() + "}";
-        EGResp privilegeResp = thriftOutAssembleService.getMemberPrivilege(privilegeBody, "account");
-        ApiLogger.info("========会员优惠方案=========");
-        ApiLogger.info(JSONObject.toJSONString(privilegeResp.getData()));
-        if (privilegeResp != null && privilegeResp.getData() != null) {
-            JSONObject privilegeData = JSONObject.parseObject(privilegeResp.getData());
-            JSONObject data = privilegeData.getJSONObject("data");
-            memberPreferScheme = new MemberPreferScheme();
-            memberPreferScheme.setLevel(data.getInteger("level"));
-            memberPreferScheme.setShowLevel(data.getString("showLevel"));
-            memberPreferScheme.setOnlineDiscount(data.getString("onlineDiscount"));
-            memberPreferScheme.setReturnWater(data.getString("returnWater"));
-            memberPreferScheme.setDepositDiscountScheme(data.getString("depositDiscountScheme"));
-        } else {
-//            String preferScheme = "{\n" +
-//                    "\"level\": 1,\n" +
-//                    "\"showLevel\": \"未分层\",\n" +
-//                    "\"onlineDiscount\": \"100返10\",\n" +
-//                    "\"depositFee\": \"无\",\n" +
-//                    "\"withdrawFee\": \"无\",\n" +
-//                    "\"returnWater\": \"返水基本1\",\n" +
-//                    "\"depositDiscountScheme\": \"100返10\"\n" +
-//                    "}";
-//          memberPreferScheme = JSONObject.parseObject(preferScheme, MemberPreferScheme.class);
-        }
-        vo.setPreferScheme(memberPreferScheme);
-
-        /**
-         * 会员资金概况
-         */
-        MemberFundInfo memberFundInfo = new MemberFundInfo();
-        FundProfile fundProfile = new FundProfile();
-
-        String capitalBody = "{\"memberId\":" + member.getMemberId() + "}";
-//        EGResp capitalResp = thriftOutAssembleService.getMemberCapital(capitalBody, "account");
-//        if (capitalResp != null && capitalResp.getData() != null) {
-//            JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
-//            fundProfile.setSyncTime(capitalData.getString("syncTime"));
-//            memberFundInfoObj = new MemberFundInfo();
-//            memberFundInfoObj.setBalance(capitalData.getString("balance"));
-//            memberFundInfoObj.setLastDeposit(capitalData.getString("lastDeposit"));
-//            memberFundInfoObj.setLastWithdraw(capitalData.getString("lastWithdraw"));//
-//        } else {
-//            String memberFundInfo = "{\n" +
-//                    "\t\"balance\": \"1805.50\",\n" +
-//                    "\t\"depositNumbers\": 15,\n" +
-//                    "\t\"depositTotalMoney\": \"29006590\",\n" +
-//                    "\t\"lastDeposit\": \"1200\",\n" +
-//                    "\t\"withdrawNumbers\": 10,\n" +
-//                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
-//                    "\t\"lastWithdraw\": \"2500\"\n" +
-//                    "}";
-           // memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
-           // fundProfile.setSyncTime("2017-05-31 09:12:35");
-        //}
-
-        //余额
-        String balance = thriftOutAssembleService.getMemberBalance(mv.getMemberId());
-        memberFundInfo.setBalance(balance);
-
-        memberFundInfo.setDepositNumbers(mv.getDepositCount());//存款总次数
-        memberFundInfo.setDepositTotalMoney(mv.getDepositMoney().toString());//存款总金额
-        memberFundInfo.setLastDeposit(mv.getLastDepositMoney().toString());//最近存款
-        memberFundInfo.setWithdrawNumbers(mv.getWithdrawCount());//取款总次数
-        memberFundInfo.setWithdrawTotalMoney(mv.getWithdrawMoney().toString());//取款总金额
-        memberFundInfo.setLastWithdraw(mv.getLastWithdrawMoney().toString());//最近取款
-
-        fundProfile.setInfo(memberFundInfo);
-        vo.setFundProfile(fundProfile);
-        //查询会员投注记录
-        UserOrderRecord userOrderRecord = oceanusProviderDubboService.getMemberOperation(mv.getMemberId(),mv.getStockId());
-//        String memberBetHistory = "{\n" +
-//                "\t\"totalMoney\": \"29000\",\n" +
-//                "\t\"effMoney\": \"28000\",\n" +
-//                "\t\"gains\": \"18000\"\n" +
-//                "}";
-//        MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
-        MemberBetHistory memberBetHistoryObj = new MemberBetHistory();
-        memberBetHistoryObj.setEffMoney(userOrderRecord.getEffMoney().toString());
-        memberBetHistoryObj.setTotalMoney(userOrderRecord.getTotalMoney().toString());
-        memberBetHistoryObj.setGains(userOrderRecord.getGains().toString());
-        vo.setBetHistory(memberBetHistoryObj);
-        /**
-         * 查询优惠记录
-         */
-//        String memberDiscountHistory = "{\n" +
-//                "\t\"totalMoney\": \"1350\",\n" +
-//                "\t\"numbers\": 98,\n" +
-//                "\t\"returnWaterTotalMoney\": \"1450\"\n" +
-//                "}";
-        //MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
-        UserPreferentialRecord urr = oceanusProviderDubboService.getPreferentialOperation(mv.getMemberId(),mv.getStockId());
-        MemberDiscountHistory memberDiscountHistoryObj = new MemberDiscountHistory();
-        memberDiscountHistoryObj.setNumbers(urr.getNumbers().intValue());
-        memberDiscountHistoryObj.setReturnWaterTotalMoney(urr.getReturnWaterTotalMoney().toString());
-        memberDiscountHistoryObj.setTotalMoney(urr.getTotalMoney().toString());
-        vo.setDiscountHistory(memberDiscountHistoryObj);
-
-        return vo;
+        vo.setPreferScheme(getPreferScheme(mv));
+        vo.setFundProfile(assembleFundProfile(mv, member));
+        vo.setBetHistory(assembleBetHistory(member));
+        vo.setDiscountHistory(assembleDiscountHistory(member));
+        return JSON.toJSONString(vo);
     }
 
+    /**
+     * 优惠记录
+     *
+     * @param member
+     * @return
+     */
+    private MemberDiscountHistory assembleDiscountHistory(Member member) {
+        MemberDiscountHistory history = new MemberDiscountHistory();
+        UserPreferentialRecord operation = dubboOutAssembleService.getPreferentialOperation(member.getMemberId(), member.getStockId());
+        if (Optional.ofNullable(operation).isPresent()){
+            history.setNumbers(operation.getNumbers() == null ? 0 : operation.getNumbers().intValue());
+            history.setReturnWaterTotalMoney(operation.getReturnWaterTotalMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getReturnWaterTotalMoney())));
+            history.setTotalMoney(operation.getTotalMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getTotalMoney())));
+        }else {
+            history.setNumbers(0);
+            history.setReturnWaterTotalMoney("0");
+            history.setTotalMoney("0");
+        }
+        return history;
+    }
+
+    /**
+     * 投注记录
+     *
+     * @param member
+     * @return
+     */
+    private MemberBetHistory assembleBetHistory(Member member) {
+        MemberBetHistory history = new MemberBetHistory();
+        UserOrderRecord operation = dubboOutAssembleService.getMemberOperation(member.getMemberId(), member.getStockId());
+        if (Optional.ofNullable(operation).isPresent()){
+            history.setEffMoney(operation.getEffMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getEffMoney())));
+            history.setTotalMoney(operation.getTotalMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getTotalMoney())));
+            history.setGains(operation.getGains() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getGains())));
+        }else {
+            history.setEffMoney("0");
+            history.setGains("0");
+            history.setTotalMoney("0");
+        }
+        return history;
+    }
+
+    /**
+     * 组装会员资金概况
+     *
+     * @param mv
+     * @param member
+     * @return
+     */
+    private FundProfile assembleFundProfile(MemberConditionVo mv, Member member) {
+        FundProfile<MemberFundInfo> fundProfile = new FundProfile<>();
+        fundProfile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+        MemberFundInfo fundInfo = new MemberFundInfo();
+        fundInfo.setBalance(thriftOutAssembleService.getMemberBalance(member.getMemberId()));
+        if (Optional.ofNullable(mv).isPresent()){
+            fundInfo.setDepositNumbers(mv.getDepositCount() == null ? 0 : mv.getDepositCount());//存款总次数
+            fundInfo.setDepositTotalMoney(String.valueOf(mv.getDepositMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getDepositMoney())));//存款总金额
+            fundInfo.setLastDeposit(mv.getLastDepositMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(mv.getLastDepositMoney())));//最近存款
+            fundInfo.setWithdrawNumbers(mv.getWithdrawCount() == null ? 0 : mv.getWithdrawCount());//取款总次数
+            fundInfo.setWithdrawTotalMoney(mv.getWithdrawMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(mv.getWithdrawMoney())));//取款总金额
+            fundInfo.setLastWithdraw(mv.getLastWithdrawMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(mv.getLastWithdrawMoney())));//最近取款
+        }
+        fundProfile.setInfo(fundInfo);
+        return fundProfile;
+    }
+
+    /**
+     * 优惠方案
+     *
+     * @param mv
+     * @return
+     */
+    private MemberPreferScheme getPreferScheme(MemberConditionVo mv) {
+        MemberPreferScheme result = new MemberPreferScheme();
+        if (Optional.ofNullable(mv).isPresent()){
+            result = thriftOutAssembleService.getMemberPrivilege(mv.getLevel());
+        }
+        if (!Optional.ofNullable(result).isPresent()){
+            result = new MemberPreferScheme();
+            result.setLevel(0);
+            result.setShowLevel("无");
+            result.setOnlineDiscount("无");
+            result.setReturnWater("无");
+            result.setDepositDiscountScheme("无");
+        }else {
+            if (!Optional.ofNullable(result.getLevel()).isPresent()){
+                result.setLevel(0);
+            }
+            if (StringUtils.isEmpty(result.getShowLevel())){
+                result.setShowLevel("无");
+            }
+            if (StringUtils.isEmpty(result.getOnlineDiscount())){
+                result.setOnlineDiscount("无");
+            }
+            if (StringUtils.isEmpty(result.getReturnWater())){
+                result.setReturnWater("无");
+            }
+            if (StringUtils.isEmpty(result.getDepositDiscountScheme())){
+                result.setDepositDiscountScheme("无");
+            }
+        }
+        return result;
+    }
 
     /**
      * @Doc 组装会员基础信息中的会员信息
@@ -501,8 +494,9 @@ public class MemberResourceServiceImpl {
         info.setBankCardNo(member.getBankCardNo());
         info.setTelephone(member.getTelephone());
         info.setType(AccountType.member.value());
-        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         info.setBank(member.getBank());
+        /*最近登录信息*/
+        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         if (subAccount != null) {
             info.setLastLoginIp(IPUtil.intToIp(subAccount.getLastIp()));
         }

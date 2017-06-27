@@ -12,6 +12,8 @@ import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.oceanus.entity.Summary.OwnerCurrentOperation;
 import com.magic.oceanus.entity.Summary.ProxyCurrentOperaton;
+import com.magic.oceanus.entity.Summary.UserOrderRecord;
+import com.magic.oceanus.entity.Summary.UserPreferentialRecord;
 import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
@@ -301,6 +303,38 @@ public class DubboOutAssembleServiceImpl {
             return oceanusProviderDubboService.getProxyOperation(agentId, stockId);
         }catch (Exception e){
             ApiLogger.error(String.format("get proxy operation error. agentId: %d, stockId: %d", agentId, stockId), e);
+        }
+        return null;
+    }
+
+    /**
+     * 投注记录
+     *
+     * @param memberId
+     * @param stockId
+     * @return
+     */
+    public UserOrderRecord getMemberOperation(Long memberId, Long stockId){
+        try {
+            return oceanusProviderDubboService.getMemberOperation(memberId, stockId);
+        }catch (Exception e){
+            ApiLogger.error(String.format("get member operation error. memberId: %d, stockId: %d", memberId, stockId), e);
+        }
+        return null;
+    }
+
+    /**
+     * 优惠记录
+     *
+     * @param memberId
+     * @param stockId
+     * @return
+     */
+    public UserPreferentialRecord getPreferentialOperation(Long memberId, Long stockId){
+        try {
+            return oceanusProviderDubboService.getPreferentialOperation(memberId, stockId);
+        }catch (Exception e){
+            ApiLogger.error(String.format("get member prefer operation error. memberId: %d, stockId: %d", memberId, stockId), e);
         }
         return null;
     }
