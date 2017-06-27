@@ -800,7 +800,8 @@ public class MemberResourceServiceImpl {
                 MemberLevelListVo memberLevelListVo = new MemberLevelListVo();
                 memberLevelListVo.setId(js.getInteger("userLevel"));
                 memberLevelListVo.setName(js.getString("userLevelName"));
-                memberLevelListVo.setCreateTime(js.getString("createTime"));
+                memberLevelListVo.setCreateTime(
+                        CommonDateParseUtil.date2string(new Date(Long.valueOf(js.getString("createTime"))), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
                 memberLevelListVo.setReturnWater(js.getInteger("cbsId"));
                 memberLevelListVo.setReturnWaterName(js.getString("cbsName"));
                 memberLevelListVo.setDiscount(js.getInteger("dwdsId"));
