@@ -280,7 +280,7 @@ public class DubboOutAssembleServiceImpl {
      * @param uid
      * @return
      */
-    public OwnerCurrentOperation getShareholderOperation(long uid){
+    public OwnerCurrentOperation getShareholderOperation(Long uid){
         try {
             return oceanusProviderDubboService.getShareholderOperation(uid);
         }catch (Exception e){
@@ -296,7 +296,7 @@ public class DubboOutAssembleServiceImpl {
      * @param stockId
      * @return
      */
-    public ProxyCurrentOperaton getProxyOperation(long agentId, long stockId){
+    public ProxyCurrentOperaton getProxyOperation(Long agentId, Long stockId){
         try {
             return oceanusProviderDubboService.getProxyOperation(agentId, stockId);
         }catch (Exception e){
