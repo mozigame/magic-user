@@ -219,7 +219,8 @@ public class ThriftOutAssembleServiceImpl {
     private MemberPreferScheme assembleMemberPreferScheme(String data) {
         MemberPreferScheme scheme = new MemberPreferScheme();
         try {
-            JSONObject object = JSONObject.parseObject(data);
+            JSONObject objectData = JSONObject.parseObject(data);
+            JSONObject object = objectData.getJSONObject("data");
             scheme.setLevel(object.getInteger("level"));
             scheme.setShowLevel(object.getString("showLevel"));
             scheme.setOnlineDiscount(object.getString("onlineDiscount"));
