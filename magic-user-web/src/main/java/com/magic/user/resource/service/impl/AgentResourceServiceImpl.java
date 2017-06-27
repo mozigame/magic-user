@@ -19,6 +19,8 @@ import com.magic.bc.query.service.AgentSchemeService;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
+import com.magic.oceanus.entity.Summary.ProxyCurrentOperaton;
+import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.passport.enums.LoginStatus;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.constants.UserContants;
@@ -39,6 +41,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -67,6 +70,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
     @Resource
     private ThriftOutAssembleServiceImpl thriftOutAssembleService;
+    @Resource
+    private OceanusProviderDubboService oceanusProviderDubboService;
 
     /**
      * {@inheritDoc}
@@ -455,20 +460,23 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         result.put("baseInfo", agentVo);
         result.put("settings", agentConfig);
         if (!isReview) {
-            //TODO 本期资金状况
-            String fundProfile = "{\n" +
-                    "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
-                    "    \"info\": {\n" +
-                    "        \"members\": 490,\n" +
-                    "        \"depositMembers\": 410,\n" +
-                    "        \"depositTotalMoney\": \"29006590\",\n" +
-                    "        \"withdrawTotalMoney\": \"24500120\",\n" +
-                    "        \"betTotalMoney\": \"20900067\",\n" +
-                    "        \"betEffMoney\": \"19007689\",\n" +
-                    "        \"gains\": \"4908763\"\n" +
-                    "    }\n" +
-                    "}";
-            result.put("fundProfile", JSONObject.parseObject(fundProfile));
+//            String fundProfile = "{\n" +
+//                    "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
+//                    "    \"info\": {\n" +
+//                    "        \"members\": 490,\n" +
+//                    "        \"depositMembers\": 410,\n" +
+//                    "        \"depositTotalMoney\": \"29006590\",\n" +
+//                    "        \"withdrawTotalMoney\": \"24500120\",\n" +
+//                    "        \"betTotalMoney\": \"20900067\",\n" +
+//                    "        \"betEffMoney\": \"19007689\",\n" +
+//                    "        \"gains\": \"4908763\"\n" +
+//                    "    }\n" +
+//                    "}";
+            ProxyCurrentOperaton p = oceanusProviderDubboService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
+            JSONObject obj = new JSONObject();
+            obj.put("syncTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            obj.put("info",p);
+            result.put("fundProfile", p);
         }
         return result;
     }

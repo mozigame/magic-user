@@ -46,6 +46,13 @@
             <groupId>com.magic.commons</groupId>
             <artifactId>engine-gw</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.magic</groupId>
+            <artifactId>oceanus-api</artifactId>
+           <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- http -->
         <dependency>
             <groupId>com.magic.commons</groupId>

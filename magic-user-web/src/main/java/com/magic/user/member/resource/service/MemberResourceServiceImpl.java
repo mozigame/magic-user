@@ -19,6 +19,9 @@ import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerInfo;
+import com.magic.oceanus.entity.Summary.UserOrderRecord;
+import com.magic.oceanus.entity.Summary.UserPreferentialRecord;
+import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.passport.po.SubAccount;
 import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
@@ -82,6 +85,9 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
+
+    @Resource
+    private OceanusProviderDubboService oceanusProviderDubboService;
 
     /**
      * 会员列表
@@ -367,7 +373,7 @@ public class MemberResourceServiceImpl {
          * 会员优惠方案
          */
         MemberPreferScheme memberPreferScheme = new MemberPreferScheme();
-        //从mongo查询会员详情获取level
+        //从mongo查询会员详情
         MemberConditionVo mv = memberMongoService.get(member.getMemberId());
         memberPreferScheme.setLevel(mv.getLevel());
         //会员优惠方案
@@ -398,63 +404,77 @@ public class MemberResourceServiceImpl {
         }
         vo.setPreferScheme(memberPreferScheme);
 
-
         /**
          * 会员资金概况
          */
-        MemberFundInfo memberFundInfoObj;
+        MemberFundInfo memberFundInfo = new MemberFundInfo();
         FundProfile fundProfile = new FundProfile();
-        //TODO 2、kevin 根据会员ID查询会员资金概括
+
         String capitalBody = "{\"memberId\":" + member.getMemberId() + "}";
-        EGResp capitalResp = thriftOutAssembleService.getMemberCapital(capitalBody, "account");
-        //TODO 确定resp的code
-        if (capitalResp != null && capitalResp.getData() != null) {
-            JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
-            fundProfile.setSyncTime(capitalData.getString("syncTime"));
-            memberFundInfoObj = new MemberFundInfo();
-            memberFundInfoObj.setBalance(capitalData.getString("balance"));
-            memberFundInfoObj.setLastDeposit(capitalData.getString("lastDeposit"));
-            memberFundInfoObj.setLastWithdraw(capitalData.getString("lastWithdraw"));
-            //TODO 存款总金额、取款总金额、存款总次数、取款总次数在mongo中获取
+//        EGResp capitalResp = thriftOutAssembleService.getMemberCapital(capitalBody, "account");
+//        if (capitalResp != null && capitalResp.getData() != null) {
+//            JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
+//            fundProfile.setSyncTime(capitalData.getString("syncTime"));
+//            memberFundInfoObj = new MemberFundInfo();
+//            memberFundInfoObj.setBalance(capitalData.getString("balance"));
+//            memberFundInfoObj.setLastDeposit(capitalData.getString("lastDeposit"));
+//            memberFundInfoObj.setLastWithdraw(capitalData.getString("lastWithdraw"));//
+//        } else {
+//            String memberFundInfo = "{\n" +
+//                    "\t\"balance\": \"1805.50\",\n" +
+//                    "\t\"depositNumbers\": 15,\n" +
+//                    "\t\"depositTotalMoney\": \"29006590\",\n" +
+//                    "\t\"lastDeposit\": \"1200\",\n" +
+//                    "\t\"withdrawNumbers\": 10,\n" +
+//                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
+//                    "\t\"lastWithdraw\": \"2500\"\n" +
+//                    "}";
+           // memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
+           // fundProfile.setSyncTime("2017-05-31 09:12:35");
+        //}
 
-        } else {
-            //TODO 假数据去掉
-            String memberFundInfo = "{\n" +
-                    "\t\"balance\": \"1805.50\",\n" +
-                    "\t\"depositNumbers\": 15,\n" +
-                    "\t\"depositTotalMoney\": \"29006590\",\n" +
-                    "\t\"lastDeposit\": \"1200\",\n" +
-                    "\t\"withdrawNumbers\": 10,\n" +
-                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
-                    "\t\"lastWithdraw\": \"2500\"\n" +
-                    "}";
-            memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
-            fundProfile.setSyncTime("2017-05-31 09:12:35");
-        }
-        fundProfile.setInfo(memberFundInfoObj);
+        //余额
+        String balance = thriftOutAssembleService.getMemberBalance(mv.getMemberId());
+        memberFundInfo.setBalance(balance);
+
+        memberFundInfo.setDepositNumbers(mv.getDepositCount());//存款总次数
+        memberFundInfo.setDepositTotalMoney(mv.getDepositMoney().toString());//存款总金额
+        memberFundInfo.setLastDeposit(mv.getLastDepositMoney().toString());//最近存款
+        memberFundInfo.setWithdrawNumbers(mv.getWithdrawCount());//取款总次数
+        memberFundInfo.setWithdrawTotalMoney(mv.getWithdrawMoney().toString());//取款总金额
+        memberFundInfo.setLastWithdraw(mv.getLastWithdrawMoney().toString());//最近取款
+
+        fundProfile.setInfo(memberFundInfo);
         vo.setFundProfile(fundProfile);
-
-
-        /**
-         * TODO 3.sundy 根据会员ID查询投注记录
-         */
-        String memberBetHistory = "{\n" +
-                "\t\"totalMoney\": \"29000\",\n" +
-                "\t\"effMoney\": \"28000\",\n" +
-                "\t\"gains\": \"18000\"\n" +
-                "}";
-        MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
+        //查询会员投注记录
+        UserOrderRecord userOrderRecord = oceanusProviderDubboService.getMemberOperation(mv.getMemberId(),mv.getStockId());
+//        String memberBetHistory = "{\n" +
+//                "\t\"totalMoney\": \"29000\",\n" +
+//                "\t\"effMoney\": \"28000\",\n" +
+//                "\t\"gains\": \"18000\"\n" +
+//                "}";
+//        MemberBetHistory memberBetHistoryObj = JSONObject.parseObject(memberBetHistory, MemberBetHistory.class);
+        MemberBetHistory memberBetHistoryObj = new MemberBetHistory();
+        memberBetHistoryObj.setEffMoney(userOrderRecord.getEffMoney().toString());
+        memberBetHistoryObj.setTotalMoney(userOrderRecord.getTotalMoney().toString());
+        memberBetHistoryObj.setGains(userOrderRecord.getGains().toString());
         vo.setBetHistory(memberBetHistoryObj);
         /**
-         * TODO 4.sundy 根据会员ID查询优惠记录
+         * 查询优惠记录
          */
-        String memberDiscountHistory = "{\n" +
-                "\t\"totalMoney\": \"1350\",\n" +
-                "\t\"numbers\": 98,\n" +
-                "\t\"returnWaterTotalMoney\": \"1450\"\n" +
-                "}";
-        MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
+//        String memberDiscountHistory = "{\n" +
+//                "\t\"totalMoney\": \"1350\",\n" +
+//                "\t\"numbers\": 98,\n" +
+//                "\t\"returnWaterTotalMoney\": \"1450\"\n" +
+//                "}";
+        //MemberDiscountHistory memberDiscountHistoryObj = JSONObject.parseObject(memberDiscountHistory, MemberDiscountHistory.class);
+        UserPreferentialRecord urr = oceanusProviderDubboService.getPreferentialOperation(mv.getMemberId(),mv.getStockId());
+        MemberDiscountHistory memberDiscountHistoryObj = new MemberDiscountHistory();
+        memberDiscountHistoryObj.setNumbers(urr.getNumbers().intValue());
+        memberDiscountHistoryObj.setReturnWaterTotalMoney(urr.getReturnWaterTotalMoney().toString());
+        memberDiscountHistoryObj.setTotalMoney(urr.getTotalMoney().toString());
         vo.setDiscountHistory(memberDiscountHistoryObj);
+
         return vo;
     }
 

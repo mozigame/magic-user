@@ -42,4 +42,9 @@
     <!-- 资金duboo -->
     <dubbo:reference id="tethysUserDubboService" interface="com.magic.tethys.user.api.service.dubbo.TethysUserDubboService" timeout="15000"
                      retries="0" check="false"/>
+
+    <dubbo:reference id="oceanusProviderDubboService" interface="com.magic.oceanus.service.OceanusProviderDubboService" timeout="15000"
+                     retries="0" check="false"/>
+
+
 </beans>

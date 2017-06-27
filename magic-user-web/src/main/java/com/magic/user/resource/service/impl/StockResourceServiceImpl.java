@@ -8,6 +8,8 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.oceanus.entity.Summary.OwnerCurrentOperation;
+import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
@@ -30,6 +32,7 @@ import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +53,8 @@ public class StockResourceServiceImpl implements StockResourceService {
     private AccountIdMappingService accountIdMappingService;
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
-
+    @Resource
+    private OceanusProviderDubboService oceanusProviderDubboService;
     /**
      * @param rc
      * @return
@@ -126,18 +130,21 @@ public class StockResourceServiceImpl implements StockResourceService {
         assembleStockDetail(stockDetail);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("baseInfo", stockDetail);
-        //TODO go 获取当期运营概况
-        String operation = "{\n" +
-                "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
-                "    \"info\": {\n" +
-                "        \"bets\": 129000,\n" +
-                "        \"notes\": 34560000,\n" +
-                "        \"betTotalMoney\": \"80500000\",\n" +
-                "        \"betEffMoney\": \"78966789\",\n" +
-                "        \"gains\": \"5800000\"\n" +
-                "    }\n" +
-                "}";
-        jsonObject.put("operation", JSONObject.parseObject(operation));
+        OwnerCurrentOperation oco = oceanusProviderDubboService.getShareholderOperation(stockDetail.getId());
+//        String operation = "{\n" +
+//                "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
+//                "    \"info\": {\n" +
+//                "        \"bets\": 129000,\n" +
+//                "        \"notes\": 34560000,\n" +
+//                "        \"betTotalMoney\": \"80500000\",\n" +
+//                "        \"betEffMoney\": \"78966789\",\n" +
+//                "        \"gains\": \"5800000\"\n" +
+//                "    }\n" +
+//                "}";
+        JSONObject operation = new JSONObject();
+        operation.put("syncTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(oco.getSyncTime()));
+        operation.put("info",oco);
+        jsonObject.put("operation", operation);
         return jsonObject.toJSONString();
     }
 
