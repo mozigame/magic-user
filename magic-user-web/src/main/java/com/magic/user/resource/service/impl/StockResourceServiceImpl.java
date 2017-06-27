@@ -136,7 +136,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         assembleStockDetail(stockDetail);
         StockDetailVo stockDetailVo = new StockDetailVo();
         stockDetailVo.setBaseInfo(stockDetail);
-        OwnerCurrentOperation oco = dubboOutAssembleService.getShareholderOperation(stockDetail.getId());
+        OwnerCurrentOperation oco = dubboOutAssembleService.getShareholderOperation(id);
         FundProfile<StockFundInfo> profile = new FundProfile<>();
         profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
         StockFundInfo info = assembleStockFundInfo(oco);
