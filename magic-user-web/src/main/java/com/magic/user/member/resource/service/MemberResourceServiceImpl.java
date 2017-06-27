@@ -646,119 +646,117 @@ public class MemberResourceServiceImpl {
             return UserContants.EMPTY_LIST;
         }
         SimpleListResult<List<MemberLevelListVo>> result = new SimpleListResult<>();
-
         List<MemberLevelListVo> list = getMemberLevelList(operaUser.getOwnerId(), lock, page, count);
-
         result.setList(list != null ? list : new ArrayList<>());
-//        return JSON.toJSONString(result);
-        //TODO 假数据
-        return "{\n" +
-                "    \"list\": [\n" +
-                "        {\n" +
-                "            \"id\": 10001,\n" +
-                "            \"name\": \"VIP1\",\n" +
-                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-                "            \"members\": 4310,\n" +
-                "            \"condition\": {\n" +
-                "                \"depositNumbers\": 1,\n" +
-                "                \"depositTotalMoney\": \"1\",\n" +
-                "                \"maxDepositMoney\": \"0\",\n" +
-                "                \"withdrawNumbers\": 0,\n" +
-                "                \"withdrawTotalMoney\": \"0\"\n" +
-                "            },\n" +
-                "            \"returnWater\": 1,\n" +
-                "            \"returnWaterName\": \"返水方案1\",\n" +
-                "            \"discount\": 1,\n" +
-                "            \"discountName\": \"出入款优惠1\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 10002,\n" +
-                "            \"name\": \"VIP2\",\n" +
-                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-                "            \"members\": 4310,\n" +
-                "            \"condition\": {\n" +
-                "                \"depositNumbers\": 1,\n" +
-                "                \"depositTotalMoney\": \"1\",\n" +
-                "                \"maxDepositMoney\": \"0\",\n" +
-                "                \"withdrawNumbers\": 0,\n" +
-                "                \"withdrawTotalMoney\": \"0\"\n" +
-                "            },\n" +
-                "            \"returnWater\": 2,\n" +
-                "            \"returnWaterName\": \"返水方案2\",\n" +
-                "            \"discount\": 2,\n" +
-                "            \"discountName\": \"出入款优惠2\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 10003,\n" +
-                "            \"name\": \"VIP3\",\n" +
-                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-                "            \"members\": 4310,\n" +
-                "            \"condition\": {\n" +
-                "                \"depositNumbers\": 1,\n" +
-                "                \"depositTotalMoney\": \"1\",\n" +
-                "                \"maxDepositMoney\": \"0\",\n" +
-                "                \"withdrawNumbers\": 0,\n" +
-                "                \"withdrawTotalMoney\": \"0\"\n" +
-                "            },\n" +
-                "            \"returnWater\": 3,\n" +
-                "            \"returnWaterName\": \"返水方案3\",\n" +
-                "            \"discount\": 3,\n" +
-                "            \"discountName\": \"出入款优惠3\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 10004,\n" +
-                "            \"name\": \"VIP4\",\n" +
-                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-                "            \"members\": 4310,\n" +
-                "            \"condition\": {\n" +
-                "                \"depositNumbers\": 1,\n" +
-                "                \"depositTotalMoney\": \"1\",\n" +
-                "                \"maxDepositMoney\": \"0\",\n" +
-                "                \"withdrawNumbers\": 0,\n" +
-                "                \"withdrawTotalMoney\": \"0\"\n" +
-                "            },\n" +
-                "            \"returnWater\": 4,\n" +
-                "            \"returnWaterName\": \"返水方案4\",\n" +
-                "            \"discount\": 4,\n" +
-                "            \"discountName\": \"出入款优惠4\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 10005,\n" +
-                "            \"name\": \"VIP5\",\n" +
-                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-                "            \"members\": 4310,\n" +
-                "            \"condition\": {\n" +
-                "                \"depositNumbers\": 1,\n" +
-                "                \"depositTotalMoney\": \"1\",\n" +
-                "                \"maxDepositMoney\": \"0\",\n" +
-                "                \"withdrawNumbers\": 0,\n" +
-                "                \"withdrawTotalMoney\": \"0\"\n" +
-                "            },\n" +
-                "            \"returnWater\": 5,\n" +
-                "            \"returnWaterName\": \"返水方案5\",\n" +
-                "            \"discount\": 5,\n" +
-                "            \"discountName\": \"出入款优惠5\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": 10006,\n" +
-                "            \"name\": \"VIP6\",\n" +
-                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-                "            \"members\": 4310,\n" +
-                "            \"condition\": {\n" +
-                "                \"depositNumbers\": 1,\n" +
-                "                \"depositTotalMoney\": \"1\",\n" +
-                "                \"maxDepositMoney\": \"0\",\n" +
-                "                \"withdrawNumbers\": 0,\n" +
-                "                \"withdrawTotalMoney\": \"0\"\n" +
-                "            },\n" +
-                "            \"returnWater\": 6,\n" +
-                "            \"returnWaterName\": \"返水方案6\",\n" +
-                "            \"discount\": 6,\n" +
-                "            \"discountName\": \"出入款优惠6\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
-    }
+        return JSON.toJSONString(result);
+//        return "{\n" +
+//                "    \"list\": [\n" +
+//                "        {\n" +
+//                "            \"id\": 10001,\n" +
+//                "            \"name\": \"VIP1\",\n" +
+//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+//                "            \"members\": 4310,\n" +
+//                "            \"condition\": {\n" +
+//                "                \"depositNumbers\": 1,\n" +
+//                "                \"depositTotalMoney\": \"1\",\n" +
+//                "                \"maxDepositMoney\": \"0\",\n" +
+//                "                \"withdrawNumbers\": 0,\n" +
+//                "                \"withdrawTotalMoney\": \"0\"\n" +
+//                "            },\n" +
+//                "            \"returnWater\": 1,\n" +
+//                "            \"returnWaterName\": \"返水方案1\",\n" +
+//                "            \"discount\": 1,\n" +
+//                "            \"discountName\": \"出入款优惠1\"\n" +
+//                "        },\n" +
+//                "        {\n" +
+//                "            \"id\": 10002,\n" +
+//                "            \"name\": \"VIP2\",\n" +
+//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+//                "            \"members\": 4310,\n" +
+//                "            \"condition\": {\n" +
+//                "                \"depositNumbers\": 1,\n" +
+//                "                \"depositTotalMoney\": \"1\",\n" +
+//                "                \"maxDepositMoney\": \"0\",\n" +
+//                "                \"withdrawNumbers\": 0,\n" +
+//                "                \"withdrawTotalMoney\": \"0\"\n" +
+//                "            },\n" +
+//                "            \"returnWater\": 2,\n" +
+//                "            \"returnWaterName\": \"返水方案2\",\n" +
+//                "            \"discount\": 2,\n" +
+//                "            \"discountName\": \"出入款优惠2\"\n" +
+//                "        },\n" +
+//                "        {\n" +
+//                "            \"id\": 10003,\n" +
+//                "            \"name\": \"VIP3\",\n" +
+//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+//                "            \"members\": 4310,\n" +
+//                "            \"condition\": {\n" +
+//                "                \"depositNumbers\": 1,\n" +
+//                "                \"depositTotalMoney\": \"1\",\n" +
+//                "                \"maxDepositMoney\": \"0\",\n" +
+//                "                \"withdrawNumbers\": 0,\n" +
+//                "                \"withdrawTotalMoney\": \"0\"\n" +
+//                "            },\n" +
+//                "            \"returnWater\": 3,\n" +
+//                "            \"returnWaterName\": \"返水方案3\",\n" +
+//                "            \"discount\": 3,\n" +
+//                "            \"discountName\": \"出入款优惠3\"\n" +
+//                "        },\n" +
+//                "        {\n" +
+//                "            \"id\": 10004,\n" +
+//                "            \"name\": \"VIP4\",\n" +
+//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+//                "            \"members\": 4310,\n" +
+//                "            \"condition\": {\n" +
+//                "                \"depositNumbers\": 1,\n" +
+//                "                \"depositTotalMoney\": \"1\",\n" +
+//                "                \"maxDepositMoney\": \"0\",\n" +
+//                "                \"withdrawNumbers\": 0,\n" +
+//                "                \"withdrawTotalMoney\": \"0\"\n" +
+//                "            },\n" +
+//                "            \"returnWater\": 4,\n" +
+//                "            \"returnWaterName\": \"返水方案4\",\n" +
+//                "            \"discount\": 4,\n" +
+//                "            \"discountName\": \"出入款优惠4\"\n" +
+//                "        },\n" +
+//                "        {\n" +
+//                "            \"id\": 10005,\n" +
+//                "            \"name\": \"VIP5\",\n" +
+//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+//                "            \"members\": 4310,\n" +
+//                "            \"condition\": {\n" +
+//                "                \"depositNumbers\": 1,\n" +
+//                "                \"depositTotalMoney\": \"1\",\n" +
+//                "                \"maxDepositMoney\": \"0\",\n" +
+//                "                \"withdrawNumbers\": 0,\n" +
+//                "                \"withdrawTotalMoney\": \"0\"\n" +
+//                "            },\n" +
+//                "            \"returnWater\": 5,\n" +
+//                "            \"returnWaterName\": \"返水方案5\",\n" +
+//                "            \"discount\": 5,\n" +
+//                "            \"discountName\": \"出入款优惠5\"\n" +
+//                "        },\n" +
+//                "        {\n" +
+//                "            \"id\": 10006,\n" +
+//                "            \"name\": \"VIP6\",\n" +
+//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
+//                "            \"members\": 4310,\n" +
+//                "            \"condition\": {\n" +
+//                "                \"depositNumbers\": 1,\n" +
+//                "                \"depositTotalMoney\": \"1\",\n" +
+//                "                \"maxDepositMoney\": \"0\",\n" +
+//                "                \"withdrawNumbers\": 0,\n" +
+//                "                \"withdrawTotalMoney\": \"0\"\n" +
+//                "            },\n" +
+//                "            \"returnWater\": 6,\n" +
+//                "            \"returnWaterName\": \"返水方案6\",\n" +
+//                "            \"discount\": 6,\n" +
+//                "            \"discountName\": \"出入款优惠6\"\n" +
+//                "        }\n" +
+//                "    ]\n" +
+//                "}";
+//
+     }
 
     /**
      * 在jason thrift获取层级列表
@@ -769,16 +767,37 @@ public class MemberResourceServiceImpl {
     private List<MemberLevelListVo> getMemberLevelList(Long ownerId, Integer lock, Integer page, Integer count) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ownerId", ownerId);
-        jsonObject.put("lock", lock);
-        jsonObject.put("page", page);
-        jsonObject.put("count", count);
+        jsonObject.put("isLocked", lock);
+//        jsonObject.put("page", page);
+//        jsonObject.put("count", count);
         EGResp resp = thriftOutAssembleService.findLevelList(jsonObject.toJSONString(), "account");
-        //TODO 确定resp的code
+//        ApiLogger.info("==========thrift获取层级列表============");
+//        ApiLogger.info(JSONObject.toJSONString(resp.getData()));
         if (resp != null && resp.getData() != null) {
             List<MemberLevelListVo> memberLevelListVos = new ArrayList<>();
-            JSONArray array = JSONArray.parseArray(resp.getData());
+            JSONArray array = JSONObject.parseObject(resp.getData()).getJSONArray("userLevels");
             for (Object object : array) {
-                MemberLevelListVo memberLevelListVo = JSON.parseObject(JSON.toJSONString(object), MemberLevelListVo.class);
+                JSONObject js = (JSONObject)object;
+               // MemberLevelListVo memberLevelListVo = JSON.parseObject(JSON.toJSONString(object), MemberLevelListVo.class);
+                MemberLevelListVo memberLevelListVo = new MemberLevelListVo();
+                memberLevelListVo.setId(js.getInteger("userLevel"));
+                memberLevelListVo.setName(js.getString("userLevelName"));
+                memberLevelListVo.setCreateTime(js.getString("createTime"));
+                memberLevelListVo.setReturnWater(js.getInteger("cbsId"));
+                memberLevelListVo.setReturnWaterName(js.getString("cbsName"));
+                memberLevelListVo.setDiscount(js.getInteger("dwdsId"));
+                memberLevelListVo.setDiscountName(js.getString("dwdsName"));
+                memberLevelListVo.setMembers(js.getInteger("members"));
+
+                JSONObject condition = js.getJSONObject("condition");
+                LevelCondition llc = new LevelCondition();
+                llc.setDepositNumbers(condition.getInteger("depositTimes"));
+                llc.setDepositTotalMoney(condition.getString("despositTotalAmount"));
+                llc.setMaxDepositMoney(condition.getString("withdrawTotalAmount"));
+                llc.setWithdrawNumbers(condition.getInteger("withdrawalTimes"));
+                llc.setWithdrawTotalMoney(condition.getString("withdrawTotalAmount"));
+
+                memberLevelListVo.setCondition(llc);
                 memberLevelListVos.add(memberLevelListVo);
             }
             return memberLevelListVos;
