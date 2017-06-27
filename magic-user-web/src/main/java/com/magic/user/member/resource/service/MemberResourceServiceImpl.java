@@ -424,11 +424,35 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private MemberPreferScheme getPreferScheme(MemberConditionVo mv) {
+        MemberPreferScheme result = new MemberPreferScheme();
         if (Optional.ofNullable(mv).isPresent()){
-            MemberPreferScheme memberPrivilege = thriftOutAssembleService.getMemberPrivilege(mv.getLevel());
-            return memberPrivilege;
+            result = thriftOutAssembleService.getMemberPrivilege(mv.getLevel());
         }
-        return null;
+        if (!Optional.ofNullable(result).isPresent()){
+            result = new MemberPreferScheme();
+            result.setLevel(0);
+            result.setShowLevel("无");
+            result.setOnlineDiscount("无");
+            result.setReturnWater("无");
+            result.setDepositDiscountScheme("无");
+        }else {
+            if (!Optional.ofNullable(result.getLevel()).isPresent()){
+                result.setLevel(0);
+            }
+            if (StringUtils.isEmpty(result.getShowLevel())){
+                result.setShowLevel("无");
+            }
+            if (StringUtils.isEmpty(result.getOnlineDiscount())){
+                result.setOnlineDiscount("无");
+            }
+            if (StringUtils.isEmpty(result.getReturnWater())){
+                result.setReturnWater("无");
+            }
+            if (StringUtils.isEmpty(result.getDepositDiscountScheme())){
+                result.setDepositDiscountScheme("无");
+            }
+        }
+        return result;
     }
 
     /**
