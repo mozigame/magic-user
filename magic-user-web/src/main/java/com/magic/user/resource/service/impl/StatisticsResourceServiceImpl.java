@@ -96,10 +96,10 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
         result.setCreaditLimit(fm.format(d));
         result.setCreaditLimited(fm.format(d-120000));
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.HOUR_OF_DAY,-12);
-        result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cal.getTime()));
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(new Date());
+//        cal.add(Calendar.HOUR_OF_DAY,-12);
+        result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         return JSONObject.toJSONString(result);
     }
 

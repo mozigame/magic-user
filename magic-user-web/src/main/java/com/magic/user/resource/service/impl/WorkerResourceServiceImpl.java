@@ -7,10 +7,7 @@ import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.owner.entity.Role;
-import com.magic.owner.service.dubbo.PermitDubboService;
 import com.magic.owner.vo.UserRoleVo;
-import com.magic.passport.po.SubAccount;
-import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.service.java.UuidService;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
@@ -24,6 +21,8 @@ import com.magic.user.resource.service.WorkerResourceService;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.UserService;
+import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
+import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.WorkerVo;
 import org.springframework.stereotype.Service;
@@ -50,7 +49,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
     @Resource
     private LoginService loginService;
     @Resource
-    private PermitDubboService permitDubboService;
+    private DubboOutAssembleServiceImpl dubboOutAssembleService;
 
     /**
      * {@inheritDoc}
@@ -76,13 +75,36 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         }
         Map<Long, Login> loginMap = loginService.findByUserIds(userIds);
         //todo 调用dubbo
-        Map<Long, UserRoleVo> userRoleVoMap = permitDubboService.getUsersRole(userIds);
+        Map<Long, UserRoleVo> userRoleVoMap = dubboOutAssembleService.getUsersRole(userIds);
         return JSON.toJSONString(assemblePageBean(page,count, total, assembleWorkerVoList(users, loginMap, userRoleVoMap)));
     }
 
     @Override
     public DownLoadFile workerListExport(RequestContext rc, String account, String realname, Integer roleId) {
-        return null;
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.WORKER_LIST);
+        DownLoadFile downLoadFile = new DownLoadFile();
+        downLoadFile.setFilename(filename);
+
+        long total = userService.getWorkerCount(operaUser.getOwnerId(), account, realname, roleId);
+        if (total <= 0) {
+            return downLoadFile;
+        }
+        List<User> users = userService.findWorkers(operaUser.getOwnerId(), account, realname, roleId, null, null);
+        List<Long> userIds = Lists.newArrayList();
+        for (User user : users) {
+            userIds.add(user.getUserId());
+        }
+        Map<Long, Login> loginMap = loginService.findByUserIds(userIds);
+        //todo 调用dubbo
+        Map<Long, UserRoleVo> userRoleVoMap = dubboOutAssembleService.getUsersRole(userIds);
+        byte[] content = ExcelUtil.workerListExport(assembleWorkerVoList(users, loginMap, userRoleVoMap), filename);
+        downLoadFile.setContent(content);
+        return downLoadFile;
     }
 
     /**
@@ -167,7 +189,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         if (!userService.addWorker(worker)) {
             throw UserException.REGISTER_FAIL;
         }
-        if (!permitDubboService.updateUserRole(worker.getOwnerId(), worker.getUserId(), roleId)) {
+        if (!dubboOutAssembleService.updateUserRole(worker.getOwnerId(), worker.getUserId(), roleId)) {
             ApiLogger.error(String.format("add user role failed, userId:%d", userId));
         }
         return "{\"id\":" + userId + "}";
@@ -249,9 +271,10 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             throw UserException.USER_UPDATE_FAIL;
         }
         //修改角色
-        //todo 调用dubbo
-        if (!permitDubboService.updateUserRole(operaUser.getOwnerId(), userId, roleId)) {
-            throw UserException.USER_UPDATE_FAIL;
+        if (user.getRoleId() != null && !user.getRoleId().equals(roleId)) {
+            if (!dubboOutAssembleService.updateUserRole(operaUser.getOwnerId(), userId, roleId)) {
+                ApiLogger.error("update worker role failed, userId : " + userId);
+            }
         }
         return UserContants.EMPTY_STRING;
     }
@@ -297,7 +320,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             throw UserException.ILLEGAL_USER;
         }
         //todo 获取用户角色
-        Role userRoleInfo = permitDubboService.getUserRoleInfo(userId);
+        Role userRoleInfo = dubboOutAssembleService.getUserRoleInfo(userId);
         WorkerVo userVo = assembleUserDetail(user, userRoleInfo);
         return JSON.toJSONString(userVo);
     }

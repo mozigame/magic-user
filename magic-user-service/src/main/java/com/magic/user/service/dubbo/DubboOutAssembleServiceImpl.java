@@ -15,6 +15,9 @@ import com.magic.oceanus.entity.Summary.ProxyCurrentOperaton;
 import com.magic.oceanus.entity.Summary.UserOrderRecord;
 import com.magic.oceanus.entity.Summary.UserPreferentialRecord;
 import com.magic.oceanus.service.OceanusProviderDubboService;
+import com.magic.owner.entity.Role;
+import com.magic.owner.service.dubbo.PermitDubboService;
+import com.magic.owner.vo.UserRoleVo;
 import com.magic.passport.po.SubAccount;
 import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.service.java.UuidService;
@@ -62,6 +65,8 @@ public class DubboOutAssembleServiceImpl {
 
     @Resource
     private OceanusProviderDubboService oceanusProviderDubboService;
+    @Resource
+    private PermitDubboService permitDubboService;
 
     private static final Map<Long, String> EMPTY_MAP = new HashMap<>();
 
@@ -335,6 +340,50 @@ public class DubboOutAssembleServiceImpl {
             return oceanusProviderDubboService.getPreferentialOperation(memberId, stockId);
         }catch (Exception e){
             ApiLogger.error(String.format("get member prefer operation error. memberId: %d, stockId: %d", memberId, stockId), e);
+        }
+        return null;
+    }
+
+    /*********  权限  ********/
+    /**
+     * 批量获取用户的角色
+     * @return
+     */
+    public Map<Long, UserRoleVo> getUsersRole(Collection<Long> userIds) {
+        try {
+            return permitDubboService.getUsersRole(userIds);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 修改用户的角色
+     * @param ownerId
+     * @param userId
+     * @param roleId
+     * @return
+     */
+    public boolean updateUserRole(Long ownerId, Long userId, Integer roleId) {
+        try {
+            return permitDubboService.updateUserRole(ownerId,userId,roleId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 获取单个用户的角色
+     * @param userId
+     * @return
+     */
+    public Role getUserRoleInfo(Long userId) {
+        try {
+            permitDubboService.getUserRoleInfo(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

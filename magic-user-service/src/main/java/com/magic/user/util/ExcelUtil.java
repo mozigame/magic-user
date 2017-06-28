@@ -33,6 +33,7 @@ public class ExcelUtil {
     public static final String AGENT_REVIEW_LIST = "代理审核列表";
     public static final String STOCK_LIST = "股东列表";
     public static final String MODIFY_LIST = "资料修改记录";
+    public static final String WORKER_LIST="子账号列表";
 
     /**
      * @Doc 组装代理审核列表导出数据
@@ -599,6 +600,76 @@ public class ExcelUtil {
             return bytes;
         }catch (Exception e){
             ApiLogger.error("资料修改记录列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
+            return null;
+        }
+    }
+
+    /**
+     * @Doc 组装子账号列表导出数据
+     * @param list
+     * @param filename
+     * @return
+     */
+    public static byte[] workerListExport(List<WorkerVo> list, String filename) {
+        ApiLogger.info("开始生成Excel!fileName:".concat(filename));
+        try{
+            //创建Excel工作薄
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            //创建工作表，可指定工作表名称
+            Sheet sheet = workbook.createSheet();
+            //工作表表头
+            Row head = sheet.createRow(0);
+            //设置居中
+            CellStyle style = workbook.createCellStyle();
+            style.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+            //head.setRowStyle(style);
+            //创建单元格,并设置单元格格式和内容
+            Cell id = head.createCell(0);
+            id.setCellStyle(style);
+            id.setCellType(XSSFCell.CELL_TYPE_STRING);
+            id.setCellValue("序号");
+            Cell accunt = head.createCell(1);
+            accunt.setCellStyle(style);
+            accunt.setCellType(XSSFCell.CELL_TYPE_STRING);
+            accunt.setCellValue("子账号");
+            Cell realName = head.createCell(2);
+            realName.setCellStyle(style);
+            realName.setCellType(XSSFCell.CELL_TYPE_STRING);
+            realName.setCellValue("真实姓名");
+            Cell roleName = head.createCell(3);
+            roleName.setCellStyle(style);
+            roleName.setCellType(XSSFCell.CELL_TYPE_STRING);
+            roleName.setCellValue("所属角色");
+            Cell showStatus = head.createCell(4);
+            showStatus.setCellStyle(style);
+            showStatus.setCellType(XSSFCell.CELL_TYPE_STRING);
+            showStatus.setCellValue("状态");
+            Cell createTime = head.createCell(5);
+            createTime.setCellStyle(style);
+            createTime.setCellType(XSSFCell.CELL_TYPE_STRING);
+            createTime.setCellValue("创建时间");
+            Cell lastLoginTime = head.createCell(6);
+            lastLoginTime.setCellStyle(style);
+            lastLoginTime.setCellType(XSSFCell.CELL_TYPE_STRING);
+            lastLoginTime.setCellValue("最后登录时间");
+            //表头创建完成
+            for(int i=0 ;i < list.size(); i++){
+                WorkerVo vo = list.get(i);
+                Row row = sheet.createRow(i + 1);
+                row.createCell(0).setCellValue(i + 1);
+                row.createCell(1).setCellValue(vo.getAccount());
+                row.createCell(2).setCellValue(vo.getRealname());
+                row.createCell(3).setCellValue(vo.getRoleName());
+                row.createCell(4).setCellValue(vo.getShowStatus());
+                row.createCell(5).setCellValue(vo.getCreateTime());
+                row.createCell(6).setCellValue(vo.getLastLoginTime());
+            }
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            workbook.write(os);
+            byte[] bytes = os.toByteArray();
+            return bytes;
+        }catch (Exception e){
+            ApiLogger.error("子账号列表导出失败！data size:".concat(String.valueOf(list.size())).concat(",fileName:").concat(filename), e);
             return null;
         }
     }

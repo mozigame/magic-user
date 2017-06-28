@@ -15,6 +15,7 @@ import com.magic.user.entity.Member;
 import com.magic.user.vo.AgentConfigVo;
 import com.magic.user.vo.MemberPreferScheme;
 import org.springframework.stereotype.Service;
+import sun.applet.AppletIOException;
 
 import javax.annotation.Resource;
 import java.util.Optional;
@@ -401,5 +402,22 @@ public class ThriftOutAssembleServiceImpl {
         body.put("UserLevelId", level);
         body.put("members", new String[]{member.getUsername()});
         return body.toJSONString();
+    }
+
+    /**
+     * 组装会员反水记录列表
+     * @param body
+     * @param account
+     * @return
+     */
+    public EGResp getMemberReturnWater(String body, String account) {
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x500044, body);
+        try {
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            return call;
+        }catch (Exception e){
+            ApiLogger.error(String.format("setting member return water. req: %s", JSON.toJSONString(req)), e);
+        }
+        return null;
     }
 }

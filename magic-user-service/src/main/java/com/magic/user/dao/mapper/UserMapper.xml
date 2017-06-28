@@ -29,6 +29,7 @@
                 typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
         <result column="type" jdbcType="TINYINT" property="type"
                 typeHandler="com.magic.user.util.EnumKeyTypeHandler"/>
+        <result column="role_id" jdbcType="TINYINT" property="roleId" />
         <result column="temp1" jdbcType="VARCHAR" property="temp1"/>
         <result column="temp2" jdbcType="VARCHAR" property="temp2"/>
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
@@ -57,7 +58,8 @@
             weixin,
             qq,
             is_delete,
-            type
+            type,
+            role_id
             from t_user_info
         WHERE user_id=#{userId}
     </select>
