@@ -160,7 +160,6 @@ public class MemberResourceServiceImpl {
             memberListVo.setBalance(memberBalanceLevelVoMap.getOrDefault(member.getMemberId(), "0"));
 
             //2、当前反水方案在 luis 拿取,根据层级id获取
-            ApiLogger.info(String.format("member return water by level: %d", memberConditionVoMap.get(member.getMemberId()).getLevel()));
             MemberListVo memberRetWaterVo = memberRetWaterMap.get(memberConditionVoMap.get(member.getMemberId()).getLevel());
             if (memberRetWaterVo != null) {
                 memberListVo.setReturnWater(memberRetWaterVo.getReturnWater());
