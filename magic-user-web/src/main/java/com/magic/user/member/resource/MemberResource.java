@@ -244,7 +244,7 @@ public class MemberResource {
             @RequestParam(name = "page", required = false, defaultValue = "1") int page,
             @RequestParam(name = "count", required = false, defaultValue = "10") int count
     ) {
-        ApiLogger.info("/member/list , condition :" + condition);
+        //ApiLogger.info("/member/list , condition :" + condition);
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberList(rc, condition, page, count);
     }

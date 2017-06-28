@@ -175,7 +175,8 @@ public class MemberResourceServiceImpl {
                 memberListVo.setLevel(memberRetWaterVo.getLevel() == null ? "":memberRetWaterVo.getLevel());
             } else {
                 //memberListVo.setReturnWater(1);
-                //memberListVo.setReturnWaterName("反水基本方案1");
+                memberListVo.setReturnWaterName("");
+                memberListVo.setLevel("");
             }
 
             memberListVos.add(memberListVo);
