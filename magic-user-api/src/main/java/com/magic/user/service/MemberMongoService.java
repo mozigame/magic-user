@@ -39,6 +39,14 @@ public interface MemberMongoService {
     boolean saveOnlieMember(OnLineMember lineMember);
 
     /**
+     * 查询在线会员数
+     *
+     * @param memberId
+     * @return
+     */
+    OnLineMember getOnlineMember(Long memberId);
+
+    /**
      * 修改在线会员状态，ip，登录时间
      * @param memberId
      * @param ip

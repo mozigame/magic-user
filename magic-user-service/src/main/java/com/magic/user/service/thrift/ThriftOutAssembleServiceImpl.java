@@ -384,18 +384,65 @@ public class ThriftOutAssembleServiceImpl {
     /**
      * 设置会员层级
      *
-     * @param body
+     * @param member
      * @return
      */
-    public boolean settingLevel(String body){
+    public long settingLevel(Member member){
+        String body = assembleBody(member);
         EGReq req = assembleEGReq(CmdType.CONFIG, 0x500081, body);
         try {
+
             EGResp call = thriftFactory.call(req, UserContants.CALLER);
-            return Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent();
+            if (Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent()){
+                JSONObject object = JSONObject.parseObject(call.getData());
+                if (Optional.ofNullable(object).filter(level -> object.getLong("levelId") != null).isPresent()) {
+                    return object.getLongValue("lelve");
+                }
+            }
         }catch (Exception e){
             ApiLogger.error(String.format("setting member level error. req: %s", JSON.toJSONString(req)), e);
         }
-        return false;
+        return 0L;
+    }
+
+    /**
+     * 获取会员详情
+     *
+     * @param userId
+     * @return
+     */
+    public long getMemberLevel(Long userId){
+        String body = "{\"userId\":" + userId + "}";
+        EGReq req = assembleEGReq(CmdType.CONFIG, 0x500082, body);
+        try {
+
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            if (Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent()){
+                JSONObject object = JSONObject.parseObject(call.getData());
+                if (Optional.ofNullable(object).filter(level -> object.getLong("levelId") != null).isPresent()) {
+                    return object.getLongValue("lelve");
+                }
+            }
+        }catch (Exception e){
+            ApiLogger.error(String.format("get member level error. req: %s", JSON.toJSONString(req)), e);
+        }
+        return 0L;
+    }
+
+    /**
+     * 组装body
+     *
+     * @param member
+     * @return
+     */
+    private String assembleBody(Member member) {
+        JSONObject object = new JSONObject();
+        object.put("UserId", member.getMemberId());
+        object.put("UserName", member.getUsername());
+        object.put("OwnerId", member.getOwnerId());
+        object.put("AgentId", member.getAgentId());
+        object.put("RegisterTime", member.getRegisterTime());
+        return object.toJSONString();
     }
 
     /**
@@ -418,6 +465,7 @@ public class ThriftOutAssembleServiceImpl {
 
     /**
      * 组装请求数据
+     *
      * @param member
      * @param level
      * @return

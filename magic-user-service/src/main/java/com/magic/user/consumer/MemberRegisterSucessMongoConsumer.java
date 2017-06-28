@@ -12,10 +12,12 @@ import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.service.MemberMongoService;
+import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.vo.MemberConditionVo;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * MemberRegisterSucessMongoConsumer
@@ -29,18 +31,40 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
 
     @Resource
     private MemberMongoService memberMongoService;
+    @Resource
+    private ThriftOutAssembleServiceImpl thriftOutAssembleService;
 
     @Override
     public boolean doit(String topic, String tags, String key, String msg) {
         ApiLogger.info(String.format("member register sucess mongo mq consumer start. key:%s, msg:%s", key, msg));
         try {
             Member member = JSONObject.parseObject(msg, Member.class);
-            OnLineMember lineMember = parseOnlineMember(member);
-            MemberConditionVo vo = parseMemberConditionVo(member);
-            if (!memberMongoService.saveMemberInfo(vo)) {
-                return false;
+            boolean result;
+            OnLineMember onlineMember = memberMongoService.getOnlineMember(member.getMemberId());
+            if (!Optional.ofNullable(onlineMember).isPresent()){
+                OnLineMember lineMember = parseOnlineMember(member);
+                result = memberMongoService.saveOnlieMember(lineMember);
+                if (!result){
+                    return false;
+                }
             }
-            return memberMongoService.saveOnlieMember(lineMember);
+            MemberConditionVo conditionVo = memberMongoService.get(member.getMemberId());
+            if (!Optional.ofNullable(conditionVo).isPresent()){
+                MemberConditionVo vo = parseMemberConditionVo(member);
+                long level = thriftOutAssembleService.settingLevel(member);
+                if (level <= 0){
+                    level = thriftOutAssembleService.getMemberLevel(member.getMemberId());
+                }
+                if (level <= 0){
+                    return false;
+                }
+                vo.setLevel(level);
+                result = memberMongoService.saveMemberInfo(vo);
+                if (!result){
+                    return false;
+                }
+            }
+            return true;
         }catch (Exception e){
             ApiLogger.error(String.format("member register sucess mq consumer error. key:%s, msg:%s", key, msg), e);
         }
@@ -79,7 +103,6 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
         vo.setRegisterTime(member.getRegisterTime());
         vo.setUpdateTime(member.getRegisterTime());
         vo.setStatus(AccountStatus.enable.value());
-        vo.setLevel(0);
         vo.setDepositCount(0);
         vo.setWithdrawCount(0);
         vo.setWithdrawMoney(0L);
