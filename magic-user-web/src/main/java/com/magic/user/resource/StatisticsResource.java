@@ -54,7 +54,7 @@ public class StatisticsResource {
     @ResponseBody
     public String getOwnerNotReadNotice(){
         RequestContext rc = RequestContext.getRequestContext();
-        return statisticsResourceService.getOwnerNotReadNotice(rc);
+        return statisticsResourceService.getOwnerNotReadNotice(rc.getUid());
     }
 
 }

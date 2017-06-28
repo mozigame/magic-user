@@ -391,15 +391,17 @@ public class DubboOutAssembleServiceImpl {
         return null;
     }
 
-    public Long getownerLimit(long userId) {
+    public PrePaySchemeVo getOwnerLimit(long userId) {
         try {
             PrePaySchemeVo vo = prepaySchemeService.getOwnerPrePayScheme(userId);
-            if(vo.isValid()){
-                return vo.getBalance();
+            if(vo != null){
+                if(vo.isValid()){
+                    return vo;
+                }
             }
         }catch (Exception e){
-            ApiLogger.error("get  owner limit failed !");
+            ApiLogger.error("get  owner limit failed !",e);
         }
-        return 0L;
+        return null;
     }
 }

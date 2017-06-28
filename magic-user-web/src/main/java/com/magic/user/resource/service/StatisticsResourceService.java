@@ -28,8 +28,8 @@ public interface StatisticsResourceService {
 
     /**
      * 获取业主未读公告信息
-     * @param rc
+     * @param ownerId
      * @return
      */
-    String getOwnerNotReadNotice(RequestContext rc);
+    String getOwnerNotReadNotice(Long ownerId);
 }
