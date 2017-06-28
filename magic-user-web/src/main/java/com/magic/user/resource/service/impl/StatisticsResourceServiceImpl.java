@@ -107,12 +107,12 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
      * {@inheritDoc}
      */
     @Override
-    public String getOwnerNotReadNotice(RequestContext rc) {
+    public String getOwnerNotReadNotice(Long ownerId) {
         String result = null;
         try {
-            result = bulletinMsgDubboService.getMaxNoticeId(rc.getUid())+"";
+            result = bulletinMsgDubboService.getMaxNoticeId(ownerId)+"";
         } catch (Exception e) {
-            ApiLogger.error("get owner not to read notice failed ! uid: %s"+rc.getUid());
+            ApiLogger.error("get owner not to read notice failed ! ownerId: %s"+ownerId);
         }
         return result;
     }
