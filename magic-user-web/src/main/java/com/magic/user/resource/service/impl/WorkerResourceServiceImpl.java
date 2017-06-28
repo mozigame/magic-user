@@ -24,7 +24,9 @@ import com.magic.user.resource.service.WorkerResourceService;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
 import com.magic.user.service.UserService;
+import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.vo.StockInfoVo;
 import com.magic.user.vo.WorkerVo;
 import org.springframework.stereotype.Service;
 
@@ -82,7 +84,30 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
 
     @Override
     public DownLoadFile workerListExport(RequestContext rc, String account, String realname, Integer roleId) {
-        return null;
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.STOCK_LIST);
+        DownLoadFile downLoadFile = new DownLoadFile();
+        downLoadFile.setFilename(filename);
+
+        long total = userService.getWorkerCount(operaUser.getOwnerId(), account, realname, roleId);
+        if (total <= 0) {
+            return downLoadFile;
+        }
+        List<User> users = userService.findWorkers(operaUser.getOwnerId(), account, realname, roleId, null, null);
+        List<Long> userIds = Lists.newArrayList();
+        for (User user : users) {
+            userIds.add(user.getUserId());
+        }
+        Map<Long, Login> loginMap = loginService.findByUserIds(userIds);
+        //todo 调用dubbo
+        Map<Long, UserRoleVo> userRoleVoMap = permitDubboService.getUsersRole(userIds);
+        byte[] content = ExcelUtil.workerListExport(assembleWorkerVoList(users, loginMap, userRoleVoMap), filename);
+        downLoadFile.setContent(content);
+        return downLoadFile;
     }
 
     /**
