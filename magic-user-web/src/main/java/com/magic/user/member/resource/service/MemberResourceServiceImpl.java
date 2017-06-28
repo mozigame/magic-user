@@ -110,6 +110,7 @@ public class MemberResourceServiceImpl {
         }
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
+        ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
     }
