@@ -86,7 +86,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             throw UserException.ILLEGAL_USER;
         }
 
-        String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.STOCK_LIST);
+        String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.WORKER_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
         downLoadFile.setFilename(filename);
 

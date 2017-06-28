@@ -33,6 +33,7 @@ public class ExcelUtil {
     public static final String AGENT_REVIEW_LIST = "代理审核列表";
     public static final String STOCK_LIST = "股东列表";
     public static final String MODIFY_LIST = "资料修改记录";
+    public static final String WORKER_LIST="子账号列表";
 
     /**
      * @Doc 组装代理审核列表导出数据
