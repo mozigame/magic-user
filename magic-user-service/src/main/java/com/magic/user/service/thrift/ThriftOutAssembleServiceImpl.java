@@ -396,7 +396,7 @@ public class ThriftOutAssembleServiceImpl {
             if (Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent()){
                 JSONObject object = JSONObject.parseObject(call.getData());
                 if (Optional.ofNullable(object).filter(level -> object.getLong("levelId") != null).isPresent()) {
-                    return object.getLongValue("lelve");
+                    return object.getLongValue("levelId");
                 }
             }
         }catch (Exception e){
@@ -404,7 +404,7 @@ public class ThriftOutAssembleServiceImpl {
         }
         return 0L;
     }
-
+    
     /**
      * 获取会员详情
      *
