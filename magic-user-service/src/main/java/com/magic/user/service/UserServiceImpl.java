@@ -119,7 +119,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public long getUid(String account, int type) {
-        Long uid = (Long) userDbService.get("getUid",new String[]{"account","type"},new Object[]{account,true});
+        Long uid = (Long) userDbService.get("getUid",new String[]{"account","type"},new Object[]{account,type});
+        ApiLogger.info("uid:"+uid);
         return uid == null ? Long.valueOf(0) : uid;
     }
 
