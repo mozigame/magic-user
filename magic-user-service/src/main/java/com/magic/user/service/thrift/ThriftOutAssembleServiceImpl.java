@@ -224,7 +224,7 @@ public class ThriftOutAssembleServiceImpl {
      * @param level
      * @return
      */
-    public MemberPreferScheme getMemberPrivilege(Integer level) {
+    public MemberPreferScheme getMemberPrivilege(Long level) {
         String body = "{\"level\":" + level + "}";
         try {
             EGReq req = assembleEGReq(CmdType.CONFIG, 0x500040, body);

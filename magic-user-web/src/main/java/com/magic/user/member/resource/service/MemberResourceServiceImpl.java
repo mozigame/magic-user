@@ -123,7 +123,7 @@ public class MemberResourceServiceImpl {
     //
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
         Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
-        Set<Integer> levels = new HashSet<>();
+        Set<Long> levels = new HashSet<>();
         for (MemberConditionVo vo : memberConditionVos) {
             memberConditionVoMap.put(vo.getMemberId(), vo);
             levels.add(vo.getLevel());
@@ -178,7 +178,7 @@ public class MemberResourceServiceImpl {
      * @param levelIds
      * @return
      */
-    private Map<Integer, MemberListVo> getMemberReturnWater(Set<Integer> levelIds) {
+    private Map<Integer, MemberListVo> getMemberReturnWater(Set<Long> levelIds) {
         JSONObject memberRetWaterBody = new JSONObject();
         memberRetWaterBody.put("levels", levelIds);
         try {
