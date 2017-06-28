@@ -211,9 +211,6 @@ public class InfoResourceServiceImpl {
         }else{//股东和代理
             //Long uuid = accountIdMappingService.getUid(ownerId, account);
             uid = userService.getUid(account,type);
-            ApiLogger.info("type:"+type);
-            ApiLogger.info("account:"+account);
-            ApiLogger.info("uid:"+uid);
         }
         return uid;
     }

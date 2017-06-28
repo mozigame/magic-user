@@ -119,8 +119,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public long getUid(String account, int type) {
-        userDbService.get("getUid",new String[]{"account","type"},new Object[]{account,true});
-        return 0;
+        Long uid = (Long) userDbService.get("getUid",new String[]{"account","type"},new Object[]{account,true});
+        return uid == null ? Long.valueOf(0) : uid;
     }
 
 
