@@ -635,7 +635,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         AgentConfig agentConfig = assembleUpdateAgentConfig(agentId, returnScheme, adminCost, feeScheme, discount,cost, domain);
-        if (!agentConfigService.update(agentConfig)) {
+        if (StringUtils.isNotEmpty(domain) && !agentConfigService.update(agentConfig)) {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
         if (!(returnScheme < 0 && adminCost < 0 && feeScheme < 0 && discount < 0 && cost < 0)) {
