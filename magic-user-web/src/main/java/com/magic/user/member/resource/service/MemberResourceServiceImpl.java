@@ -616,12 +616,21 @@ public class MemberResourceServiceImpl {
      * @param level
      * @return
      */
-    public String updateLevel(RequestContext rc, long memberId, int level) {
+    public String updateLevel(RequestContext rc, Long memberId, Long level) {
+        if (!Optional.ofNullable(memberId).filter(id -> id > 0).isPresent()){
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        if (!Optional.ofNullable(level).filter(levelValue -> levelValue > 0).isPresent()){
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
         Member member = memberService.getMemberById(memberId);
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
-        boolean result = memberMongoService.updateLevel(memberId,level);
+        boolean result = thriftOutAssembleService.setMemberLevel(member, level);
+        if (result){
+            result = memberMongoService.updateLevel(member,level);
+        }
         if (!result) {
             throw UserException.MEMBER_LEVEL_UPDATE_FAIL;
         }

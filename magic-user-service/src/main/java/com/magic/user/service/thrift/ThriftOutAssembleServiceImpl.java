@@ -11,10 +11,10 @@ import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
+import com.magic.user.entity.Member;
 import com.magic.user.vo.AgentConfigVo;
 import com.magic.user.vo.MemberPreferScheme;
 import org.springframework.stereotype.Service;
-import sun.applet.AppletIOException;
 
 import javax.annotation.Resource;
 import java.util.Optional;
@@ -369,5 +369,37 @@ public class ThriftOutAssembleServiceImpl {
             ApiLogger.error(String.format("setting member level error. req: %s", JSON.toJSONString(req)), e);
         }
         return false;
+    }
+
+    /**
+     * 更新会员层级
+     *
+     * @param member
+     * @param level
+     * @return
+     */
+    public boolean setMemberLevel(Member member, Long level){
+        try {
+            String body = assembleBody(member, level);
+            EGResp call = thriftFactory.call(CmdType.CONFIG, 0x50002d, body, UserContants.CALLER);
+            return Optional.ofNullable(call).filter(code -> code.getCode() == 0).isPresent();
+        }catch (Exception e){
+            ApiLogger.error(String.format("set member level error. member: %s, level: %d", JSON.toJSONString(member), level), e);
+        }
+        return false;
+    }
+
+    /**
+     * 组装请求数据
+     * @param member
+     * @param level
+     * @return
+     */
+    private String assembleBody(Member member, Long level) {
+        JSONObject body = new JSONObject();
+        body.put("OwnerId", member.getOwnerId());
+        body.put("UserLevelId", level);
+        body.put("members", new String[]{member.getUsername()});
+        return body.toJSONString();
     }
 }

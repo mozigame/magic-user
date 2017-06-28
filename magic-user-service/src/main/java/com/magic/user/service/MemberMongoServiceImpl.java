@@ -6,6 +6,7 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.user.bean.MemberCondition;
 import com.magic.user.dao.MemberMongoDaoImpl;
 import com.magic.user.dao.OnlineMemberDaoImpl;
+import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.vo.MemberConditionVo;
@@ -173,16 +174,13 @@ public class MemberMongoServiceImpl implements MemberMongoService {
 
     /**
      * {@inheritDoc}
-     * @param memberId
-     * @param level
-     * @return
      */
     @Override
-    public boolean updateLevel(long memberId, int level) {
+    public boolean updateLevel(Member member, long level) {
         try {
-            return memberMongoDao.updateLevel(memberId,level);
+            return memberMongoDao.updateLevel(member.getMemberId(), level);
         }catch (Exception e){
-            ApiLogger.error(String.format("update member level failed memberId:%d,level:%d ", memberId,level), e);
+            ApiLogger.error(String.format("update member level failed memberId:%d, level:%d ", member.getMemberId(),level), e);
         }
         return false;
     }
