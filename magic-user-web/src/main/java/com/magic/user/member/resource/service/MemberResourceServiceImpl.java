@@ -130,6 +130,7 @@ public class MemberResourceServiceImpl {
         Set<Integer> levels = new HashSet<Integer>();
         for (MemberConditionVo vo : memberConditionVos) {
             memberConditionVoMap.put(vo.getMemberId(), vo);
+            levels.add(vo.getLevel());
         }
         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
@@ -228,6 +229,8 @@ public class MemberResourceServiceImpl {
         memberRetWaterBody.put("levels", levelIds);
         try {
             EGResp retWaterResp = thriftOutAssembleService.getMemberReturnWater(memberRetWaterBody.toJSONString(), "account");
+            ApiLogger.info("++++++="+retWaterResp.getData()+"++++++");
+            ApiLogger.info(retWaterResp.getData());
             if (retWaterResp != null&& retWaterResp.getData()!= null) {
                 JSONArray balanceObj = JSONObject.parseArray(retWaterResp.getData());
                 Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
@@ -240,6 +243,7 @@ public class MemberResourceServiceImpl {
 
                     memberBalanceLevelVoMap.put(jsonObject.getInteger("level"), vo);
                 }
+
                 return memberBalanceLevelVoMap;
             }
         }catch (Exception e){
