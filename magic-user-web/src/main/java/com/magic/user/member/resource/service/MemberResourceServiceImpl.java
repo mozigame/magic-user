@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.api.commons.core.tools.MD5Util;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
@@ -39,14 +38,11 @@ import com.magic.user.po.RegisterReq;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
-import com.magic.user.util.CodeImageUtil;
 import com.magic.user.util.ExcelUtil;
-import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -127,7 +123,7 @@ public class MemberResourceServiceImpl {
     //
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
         Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
-        Set<Integer> levels = new HashSet<Integer>();
+        Set<Integer> levels = new HashSet<>();
         for (MemberConditionVo vo : memberConditionVos) {
             memberConditionVoMap.put(vo.getMemberId(), vo);
             levels.add(vo.getLevel());
@@ -138,7 +134,7 @@ public class MemberResourceServiceImpl {
         //2、获取会员最近登录信息
         Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(memberConditionVoMap.keySet());
         //3.获取余额列表
-        Map<Long, MemberListVo> memberBalanceLevelVoMap = getMemberBalances(memberConditionVoMap.keySet());
+        Map<Long, String> memberBalanceLevelVoMap = thriftOutAssembleService.getMemberBalances(memberConditionVoMap.keySet());
         //4.获取会员反水方案列表
         Map<Integer, MemberListVo> memberRetWaterMap = getMemberReturnWater(levels);
         for (Member member : members) {
@@ -159,14 +155,7 @@ public class MemberResourceServiceImpl {
                 memberListVo.setLastLoginTime("");
             }
             //1、余额在 kevin 拿取
-            MemberListVo memberBalanceLevelVo = memberBalanceLevelVoMap.get(member.getMemberId());
-            if (memberBalanceLevelVo != null) {
-                //memberListVo.setLevel(memberBalanceLevelVo.getLevel());
-                memberListVo.setBalance(memberBalanceLevelVo.getBalance());
-            } else {
-                //memberListVo.setLevel("未分层");
-                memberListVo.setBalance("");
-            }
+            memberListVo.setBalance(memberBalanceLevelVoMap.getOrDefault(member.getMemberId(), "0"));
 
             //2、当前反水方案在 luis 拿取,根据层级id获取
             MemberListVo memberRetWaterVo = memberRetWaterMap.get(memberConditionVoMap.get(member.getMemberId()).getLevel());
@@ -175,48 +164,13 @@ public class MemberResourceServiceImpl {
                 memberListVo.setReturnWaterName(memberRetWaterVo.getReturnWaterName() == null ? "":memberRetWaterVo.getReturnWaterName());
                 memberListVo.setLevel(memberRetWaterVo.getLevel() == null ? "":memberRetWaterVo.getLevel());
             } else {
-                //memberListVo.setReturnWater(1);
                 memberListVo.setReturnWaterName("");
                 memberListVo.setLevel("");
             }
-
             memberListVos.add(memberListVo);
         }
 
         return memberListVos;
-    }
-
-    /**
-     * 获取会员的余额列表
-     * @param ids
-     * @return
-     */
-    private Map<Long, MemberListVo> getMemberBalances(Collection<Long> ids) {
-        JSONObject memberBalanceBody = new JSONObject();
-        memberBalanceBody.put("UserIds", ids);
-        try {
-            EGResp balanceResp = thriftOutAssembleService.getMemberBalances(memberBalanceBody.toJSONString(), "account");
-            if (balanceResp != null && balanceResp.getData()!= null) {
-                JSONArray balanceObj = JSONObject.parseArray(balanceResp.getData());
-                Map<Long, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
-                for (Object object : balanceObj) {
-                    JSONObject jsonObject = (JSONObject) object;
-                    MemberListVo vo = new MemberListVo();
-                    vo.setId(jsonObject.getLong("UserId"));
-                    vo.setBalance(
-                            String.valueOf(
-                                        jsonObject.getLong("Balance") == null ? "0":
-                                            NumberUtil.fenToYuan(jsonObject.getLong("Balance"))
-                            )
-                    );
-                    memberBalanceLevelVoMap.put(jsonObject.getLong("UserId"), vo);
-                }
-                return memberBalanceLevelVoMap;
-            }
-        }catch (Exception e){
-            ApiLogger.error("get member balance list failed !",e);
-        }
-        return new HashMap<>();
     }
 
     /**
@@ -367,8 +321,6 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private MemberDetailVo assembleMemberDetail(Member member) {
-        /*最近登录信息*/
-        SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         MemberDetailVo vo = new MemberDetailVo();
         vo.setBaseInfo(assembleMemberInfo(member));
         //从mongo查询会员详情
@@ -377,7 +329,6 @@ public class MemberResourceServiceImpl {
         vo.setFundProfile(assembleFundProfile(mv, member));
         vo.setBetHistory(assembleBetHistory(member));
         vo.setDiscountHistory(assembleDiscountHistory(member));
-        //return JSON.toJSONString(vo);
         return vo;
     }
 
