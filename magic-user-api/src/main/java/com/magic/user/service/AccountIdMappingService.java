@@ -24,4 +24,5 @@ public interface AccountIdMappingService {
      * @return
      */
     long add(OwnerAccountUser ownerAccountUser);
+
 }

@@ -2,6 +2,7 @@ package com.magic.user.member.resource.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
@@ -207,8 +208,10 @@ public class InfoResourceServiceImpl {
         if (accountType == AccountType.member) {
             uid = dubboOutAssembleService.getUid(ownerId, account);
             return uid;
+        }else{//股东和代理
+            //Long uuid = accountIdMappingService.getUid(ownerId, account);
+            uid = userService.getUid(account,type);
         }
-        uid = accountIdMappingService.getUid(ownerId, account);
         return uid;
     }
 

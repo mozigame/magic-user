@@ -63,7 +63,9 @@
             from t_user_info
         WHERE user_id=#{userId}
     </select>
-
+    <select id="getUid" resultType="java.lang.Long">
+        select user_id from t_user_info where username = #{account} and type = ${type}
+    </select>
     <!--新增用户--><!--used-->
     <insert id="insert" parameterType="User">
         INSERT INTO t_user_info(
