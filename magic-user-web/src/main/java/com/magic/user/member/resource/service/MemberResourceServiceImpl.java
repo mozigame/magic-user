@@ -137,7 +137,7 @@ public class MemberResourceServiceImpl {
         //3.获取余额列表
         Map<Long, String> memberBalanceLevelVoMap = thriftOutAssembleService.getMemberBalances(memberConditionVoMap.keySet());
         //4.获取会员反水方案列表
-        Map<Integer, MemberListVo> memberRetWaterMap = getMemberReturnWater(levels);
+        Map<Long, MemberListVo> memberRetWaterMap = getMemberReturnWater(levels);
         ApiLogger.info(String.format("get return water scheme. levels: %s, result: %s", JSON.toJSONString(levels), JSON.toJSONString(memberRetWaterMap)));
         for (Member member : members) {
             MemberListVo memberListVo = new MemberListVo();
@@ -181,7 +181,7 @@ public class MemberResourceServiceImpl {
      * @param levelIds
      * @return
      */
-    private Map<Integer, MemberListVo> getMemberReturnWater(Set<Long> levelIds) {
+    private Map<Long, MemberListVo> getMemberReturnWater(Set<Long> levelIds) {
         JSONObject memberRetWaterBody = new JSONObject();
         memberRetWaterBody.put("levels", levelIds);
         try {
@@ -190,14 +190,14 @@ public class MemberResourceServiceImpl {
                 JSONObject obj = JSONObject.parseObject(retWaterResp.getData());
                 if(obj != null && obj.getInteger("total") > 0){
                     JSONArray result = obj.getJSONArray("levels");
-                    Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
+                    Map<Long, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
                     for (Object object : result) {
                         JSONObject jsonObject = (JSONObject) object;
                         MemberListVo vo = new MemberListVo();
                         //vo.setReturnWater(jsonObject.getInteger("returnWater"));
                         vo.setReturnWaterName(jsonObject.getString("returnWater"));
                         vo.setLevel(jsonObject.getString("showLevel"));
-                        memberBalanceLevelVoMap.put(jsonObject.getInteger("level"), vo);
+                        memberBalanceLevelVoMap.put(jsonObject.getLong("level"), vo);
                     }
                     return memberBalanceLevelVoMap;
                 }
