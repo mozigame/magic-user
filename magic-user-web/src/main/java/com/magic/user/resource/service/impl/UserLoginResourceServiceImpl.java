@@ -117,7 +117,6 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
             }
         }
 
-
         //获取未读通知
         rc.setUid(userId);
         String nt = statisticsResourceService.getOwnerNotReadNotice(loginUser.getOwnerId());
