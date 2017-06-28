@@ -232,19 +232,20 @@ public class MemberResourceServiceImpl {
             ApiLogger.info("++++++="+retWaterResp.getData()+"++++++");
             ApiLogger.info(retWaterResp.getData());
             if (retWaterResp != null&& retWaterResp.getData()!= null) {
-                JSONArray balanceObj = JSONObject.parseArray(retWaterResp.getData());
-                Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
-                for (Object object : balanceObj) {
-                    JSONObject jsonObject = (JSONObject) object;
-                    MemberListVo vo = new MemberListVo();
-                    vo.setReturnWater(jsonObject.getInteger("returnWater"));
-                    vo.setReturnWaterName(jsonObject.getString("returnWaterName"));
-                    vo.setLevel(jsonObject.getString("showLevel"));
+                if(JSONObject.parseObject(retWaterResp.getData()).getInteger("total") > 0){
+                    JSONArray obj = JSONObject.parseObject(retWaterResp.getData()).getJSONArray("levels");
+                    Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
+                    for (Object object : obj) {
+                        JSONObject jsonObject = (JSONObject) object;
+                        MemberListVo vo = new MemberListVo();
+                        //vo.setReturnWater(jsonObject.getInteger("returnWater"));
+                        vo.setReturnWaterName(jsonObject.getString("returnWater"));
+                        vo.setLevel(jsonObject.getString("showLevel"));
 
-                    memberBalanceLevelVoMap.put(jsonObject.getInteger("level"), vo);
+                        memberBalanceLevelVoMap.put(jsonObject.getInteger("level"), vo);
+                    }
+                    return memberBalanceLevelVoMap;
                 }
-
-                return memberBalanceLevelVoMap;
             }
         }catch (Exception e){
             ApiLogger.error("get member return water failed!",e);
