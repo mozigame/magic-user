@@ -1,6 +1,7 @@
 package com.magic.user.resource.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.core.tools.MauthUtil;
 import com.magic.api.commons.mq.Producer;
@@ -103,7 +104,9 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         result.put("userId", userId);
 
         //获取授信额度
-        PrePaySchemeVo limitr = dubboOutAssembleService.getownerLimit(userId);
+        PrePaySchemeVo limitr = dubboOutAssembleService.getownerLimit(ownerInfo.getOwnerId());
+        ApiLogger.info("==limitr==="+ownerInfo.getOwnerId());
+        ApiLogger.info(limitr.toString());
         if(limitr != null){
             if(limitr.isValid()){
                 result.put("type",1);
@@ -115,11 +118,13 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
             }else{
                 result.put("type",0);
             }
+        }else{
+            result.put("type",0);
         }
 
         //获取未读通知
         rc.setUid(userId);
-        String nt = statisticsResourceService.getOwnerNotReadNotice(loginUser.getOwnerId());
+        String nt = statisticsResourceService.getOwnerNotReadNotice(ownerInfo.getOwnerId());
         Integer n =  Integer.parseInt(nt == null ? "0":nt);
 
         result.put("notReadNotice",n);
