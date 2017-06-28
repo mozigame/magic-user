@@ -232,10 +232,11 @@ public class MemberResourceServiceImpl {
             ApiLogger.info("++++++="+retWaterResp.getData()+"++++++");
             ApiLogger.info(retWaterResp.getData());
             if (retWaterResp != null&& retWaterResp.getData()!= null) {
-                if(JSONObject.parseObject(retWaterResp.getData()).getInteger("total") > 0){
-                    JSONArray obj = JSONObject.parseObject(retWaterResp.getData()).getJSONArray("levels");
+                JSONObject obj = JSONObject.parseObject(retWaterResp.getData());
+                if(obj.getInteger("Code") == 0 && obj.getInteger("total") > 0){
+                    JSONArray result = JSONObject.parseObject(retWaterResp.getData()).getJSONArray("levels");
                     Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
-                    for (Object object : obj) {
+                    for (Object object : result) {
                         JSONObject jsonObject = (JSONObject) object;
                         MemberListVo vo = new MemberListVo();
                         //vo.setReturnWater(jsonObject.getInteger("returnWater"));
