@@ -229,11 +229,9 @@ public class MemberResourceServiceImpl {
         memberRetWaterBody.put("levels", levelIds);
         try {
             EGResp retWaterResp = thriftOutAssembleService.getMemberReturnWater(memberRetWaterBody.toJSONString(), "account");
-            ApiLogger.info(retWaterResp.getData());
             if (retWaterResp != null&& retWaterResp.getData()!= null) {
                 JSONObject obj = JSONObject.parseObject(retWaterResp.getData());
-                if(obj.getInteger("Code") == 0 && obj.getInteger("total") > 0){
-                    ApiLogger.info(JSONObject.toJSONString(obj));
+                if(obj != null && obj.getInteger("total") > 0){
                     JSONArray result = obj.getJSONArray("levels");
                     Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
                     for (Object object : result) {
