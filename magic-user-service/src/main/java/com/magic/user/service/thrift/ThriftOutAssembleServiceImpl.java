@@ -1,6 +1,7 @@
 package com.magic.user.service.thrift;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.tools.NumberUtil;
@@ -11,13 +12,16 @@ import com.magic.config.thrift.base.EGHeader;
 import com.magic.config.thrift.base.EGReq;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.user.constants.UserContants;
+import com.magic.user.entity.Member;
 import com.magic.user.vo.AgentConfigVo;
 import com.magic.user.vo.MemberPreferScheme;
 import org.springframework.stereotype.Service;
-import sun.applet.AppletIOException;
 
 import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Optional;
+import java.util.Map;
 
 /**
  * User: joey
@@ -149,13 +153,37 @@ public class ThriftOutAssembleServiceImpl {
 
     /**
      * 获取会员的余额列表
-     * @param body
-     * @param caller
+     *
+     * @param ids
      * @return
      */
-    public EGResp getMemberBalances(String body, String caller) {
-        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300015, body);
-        return thriftFactory.call(req, caller);
+    public Map<Long, String> getMemberBalances(Collection<Long> ids) {
+        Map<Long, String> result = new HashMap<>();
+        JSONObject body = new JSONObject();
+        body.put("UserIds", ids);
+        try {
+            EGResp resp = thriftFactory.call(CmdType.SETTLE, 0x300015, body.toJSONString(), UserContants.CALLER);
+            if (!Optional.ofNullable(resp).filter(data -> data.getData() != null).isPresent()){
+                return result;
+            }
+            JSONArray array = JSONObject.parseArray(resp.getData());
+            if (!Optional.ofNullable(array).filter(size -> size.size() > 0).isPresent()) {
+                return result;
+            }
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                try {
+                    String balance = object.getLong("Balance") == null ? "0":
+                            String.valueOf(NumberUtil.fenToYuan(object.getLong("Balance")));
+                    result.put(object.getLong("UserId"), balance);
+                }catch (Exception e){
+                    ApiLogger.error(String.format("parse object to balance error. object: %s", JSON.toJSONString(object)));
+                }
+            }
+        }catch (Exception e){
+            ApiLogger.error(String.format("get member balances error. ids: %s", JSON.toJSONString(ids)), e);
+        }
+        return result;
     }
 
     /**
@@ -368,6 +396,38 @@ public class ThriftOutAssembleServiceImpl {
             ApiLogger.error(String.format("setting member level error. req: %s", JSON.toJSONString(req)), e);
         }
         return false;
+    }
+
+    /**
+     * 更新会员层级
+     *
+     * @param member
+     * @param level
+     * @return
+     */
+    public boolean setMemberLevel(Member member, Long level){
+        try {
+            String body = assembleBody(member, level);
+            EGResp call = thriftFactory.call(CmdType.CONFIG, 0x50002d, body, UserContants.CALLER);
+            return Optional.ofNullable(call).filter(code -> code.getCode() == 0).isPresent();
+        }catch (Exception e){
+            ApiLogger.error(String.format("set member level error. member: %s, level: %d", JSON.toJSONString(member), level), e);
+        }
+        return false;
+    }
+
+    /**
+     * 组装请求数据
+     * @param member
+     * @param level
+     * @return
+     */
+    private String assembleBody(Member member, Long level) {
+        JSONObject body = new JSONObject();
+        body.put("OwnerId", member.getOwnerId());
+        body.put("UserLevelId", level);
+        body.put("members", new String[]{member.getUsername()});
+        return body.toJSONString();
     }
 
     /**

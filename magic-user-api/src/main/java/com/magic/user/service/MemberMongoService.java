@@ -1,6 +1,7 @@
 package com.magic.user.service;
 
 import com.magic.user.bean.MemberCondition;
+import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.vo.AgentConditionVo;
@@ -93,9 +94,9 @@ public interface MemberMongoService {
 
     /**
      * @Doc 更新会员层级
-     * @param memberId
+     * @param member
      * @param level
      * @return
      */
-    boolean updateLevel(long memberId, int level);
+    boolean updateLevel(Member member, long level);
 }

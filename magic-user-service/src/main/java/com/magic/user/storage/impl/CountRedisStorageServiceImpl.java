@@ -116,7 +116,10 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
     public int getMembers(Long ownerId) {
         try {
             String key = RedisConstants.assembleOwnerMemberNum(ownerId);
-            return Integer.parseInt(jedisFactory.getInstance().get(key));
+            String value = jedisFactory.getInstance().get(key);
+            if (StringUtils.isNotEmpty(value)) {
+                return Integer.parseInt(value);
+            }
         }catch (Exception e){
             ApiLogger.error(String.format("get members of owner error. ownerId: %d", ownerId), e);
         }

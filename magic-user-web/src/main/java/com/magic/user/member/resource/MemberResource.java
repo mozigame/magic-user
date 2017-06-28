@@ -409,8 +409,8 @@ public class MemberResource {
     @RequestMapping(value = "/level/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String levelUpdate(
-            @RequestParam(name = "id", required = true) long id,
-            @RequestParam(name = "level", required = true) int level
+            @RequestParam(name = "id", required = true) Long id,
+            @RequestParam(name = "level", required = true) Long level
     ) {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.updateLevel(rc, id, level);
