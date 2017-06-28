@@ -16,6 +16,7 @@ import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.DeleteStatus;
 import com.magic.user.enums.LoginType;
 import com.magic.user.exception.UserException;
+import com.magic.user.resource.service.StatisticsResourceService;
 import com.magic.user.resource.service.UserLoginResourceService;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
@@ -45,6 +46,8 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
     @Resource
     private Producer producer;
+    @Resource
+    private StatisticsResourceService statisticsResourceService;
 
     /**
      * {@inheritDoc}
@@ -100,11 +103,17 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
 
         //获取授信额度
         Long limit = dubboOutAssembleService.getownerLimit(userId);
-        //获取要用额度 kaven
+        //-TODO 获取要用额度 kaven
         Long limited = 0L;
+        //获取未读通知
+        rc.setUid(userId);
+        String nt = statisticsResourceService.getOwnerNotReadNotice(rc);
+        Integer n =  Integer.parseInt(nt == null ? "0":nt);
         result.put("limit",String.valueOf(NumberUtil.fenToYuan(limit)));
         result.put("limited",String.valueOf(NumberUtil.fenToYuan(limited)));
+        result.put("notReadNotice",n);
         result.put("time",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
         return result.toJSONString();
     }
 
