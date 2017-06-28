@@ -204,15 +204,10 @@ public class InfoResourceServiceImpl {
      */
     private long getMemberId(int type, long ownerId, String account) {
         AccountType accountType = AccountType.parse(type);
-        long uid = 0;
         if (accountType == AccountType.member) {
-            uid = dubboOutAssembleService.getUid(ownerId, account);
-            return uid;
-        }else{//股东和代理
-            //Long uuid = accountIdMappingService.getUid(ownerId, account);
-            uid = userService.getUid(account,type);
+            return dubboOutAssembleService.getUid(ownerId, account);
         }
-        return uid;
+        return userService.getUid(account,type);
     }
 
     /**

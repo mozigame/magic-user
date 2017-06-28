@@ -6,6 +6,8 @@ import com.magic.api.commons.core.tools.MauthUtil;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.tools.NumberUtil;
+import com.magic.bc.query.service.PrepaySchemeService;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
@@ -21,6 +23,8 @@ import com.magic.user.util.PasswordCapture;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * User: joey
@@ -93,6 +97,14 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         JSONObject result = new JSONObject();
         result.put("token", token);
         result.put("userId", userId);
+
+        //获取授信额度
+        Long limit = dubboOutAssembleService.getownerLimit(userId);
+        //获取要用额度 kaven
+        Long limited = 0L;
+        result.put("limit",String.valueOf(NumberUtil.fenToYuan(limit)));
+        result.put("limited",String.valueOf(NumberUtil.fenToYuan(limited)));
+        result.put("time",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         return result.toJSONString();
     }
 
