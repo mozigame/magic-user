@@ -88,7 +88,10 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
     public int getStocks(Long ownerId) {
         try {
             String key = RedisConstants.assembleOwnerStockNum(ownerId);
-            return Integer.parseInt(jedisFactory.getInstance().get(key));
+            String value = jedisFactory.getInstance().get(key);
+            if (StringUtils.isNotEmpty(value)) {
+                return Integer.parseInt(value);
+            }
         }catch (Exception e){
             ApiLogger.error(String.format("get stocks of owner error. ownerId: %d", ownerId), e);
         }
@@ -102,7 +105,10 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
     public int getAgents(Long ownerId) {
         try {
             String key = RedisConstants.assembleOwnerAgentNum(ownerId);
-            return Integer.parseInt(jedisFactory.getInstance().get(key));
+            String value = jedisFactory.getInstance().get(key);
+            if (StringUtils.isNotEmpty(value)) {
+                return Integer.parseInt(value);
+            }
         }catch (Exception e){
             ApiLogger.error(String.format("get agents of owner error. ownerId: %d", ownerId), e);
         }
@@ -133,7 +139,10 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
     public int getWorkers(Long ownerId) {
         try {
             String key = RedisConstants.assembleOwnerWorkerNum(ownerId);
-            return Integer.parseInt(jedisFactory.getInstance().get(key));
+            String value = jedisFactory.getInstance().get(key);
+            if (StringUtils.isNotEmpty(value)){
+                return Integer.parseInt(value);
+            }
         }catch (Exception e){
             ApiLogger.error(String.format("get workers of owner error. ownerId: %d", ownerId), e);
         }
