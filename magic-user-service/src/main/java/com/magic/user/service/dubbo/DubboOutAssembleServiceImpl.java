@@ -391,7 +391,7 @@ public class DubboOutAssembleServiceImpl {
         return null;
     }
 
-    public PrePaySchemeVo getownerLimit(long userId) {
+    public PrePaySchemeVo getOwnerLimit(long userId) {
         try {
             PrePaySchemeVo vo = prepaySchemeService.getOwnerPrePayScheme(userId);
             if(vo != null){
