@@ -3,7 +3,9 @@ package com.magic.user.service.dubbo;
 import com.alibaba.fastjson.JSON;
 import com.magic.api.commons.ApiLogger;
 import com.magic.bc.query.service.AgentSchemeService;
+import com.magic.bc.query.service.PrepaySchemeService;
 import com.magic.bc.query.service.UserLevelService;
+import com.magic.bc.query.vo.PrePaySchemeVo;
 import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.cms.service.MsgDubboService;
 import com.magic.config.service.DomainDubboService;
@@ -67,7 +69,8 @@ public class DubboOutAssembleServiceImpl {
     private OceanusProviderDubboService oceanusProviderDubboService;
     @Resource
     private PermitDubboService permitDubboService;
-
+    @Resource
+    private PrepaySchemeService prepaySchemeService;
     private static final Map<Long, String> EMPTY_MAP = new HashMap<>();
 
     /**
@@ -386,5 +389,17 @@ public class DubboOutAssembleServiceImpl {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public Long getownerLimit(long userId) {
+        try {
+            PrePaySchemeVo vo = prepaySchemeService.getOwnerPrePayScheme(userId);
+            if(vo.isValid()){
+                return vo.getBalance();
+            }
+        }catch (Exception e){
+            ApiLogger.error("get  owner limit failed !");
+        }
+        return 0L;
     }
 }
