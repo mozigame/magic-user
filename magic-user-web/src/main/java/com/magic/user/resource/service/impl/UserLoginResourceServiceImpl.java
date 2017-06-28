@@ -104,16 +104,19 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
 
         //获取授信额度
         PrePaySchemeVo limitr = dubboOutAssembleService.getownerLimit(userId);
-        if(limitr.isValid()){
-            result.put("type",1);
-            result.put("limit",String.valueOf(NumberUtil.fenToYuan(limitr.getBalance())));
+        if(limitr != null){
+            if(limitr.isValid()){
+                result.put("type",1);
+                result.put("limit",String.valueOf(NumberUtil.fenToYuan(limitr.getBalance())));
 
-            //-TODO 获取要用额度 kaven
-            Long limited = 0L;
-            result.put("limited",String.valueOf(NumberUtil.fenToYuan(limited)));
-        }else{
-            result.put("type",0);
+                //-TODO 获取要用额度 kaven
+                Long limited = 0L;
+                result.put("limited",String.valueOf(NumberUtil.fenToYuan(limited)));
+            }else{
+                result.put("type",0);
+            }
         }
+
 
         //获取未读通知
         rc.setUid(userId);
