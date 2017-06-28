@@ -8,6 +8,7 @@ import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.NumberUtil;
 import com.magic.bc.query.service.PrepaySchemeService;
+import com.magic.bc.query.vo.PrePaySchemeVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
@@ -102,15 +103,23 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         result.put("userId", userId);
 
         //获取授信额度
-        Long limit = dubboOutAssembleService.getownerLimit(userId);
-        //-TODO 获取要用额度 kaven
-        Long limited = 0L;
+        PrePaySchemeVo limitr = dubboOutAssembleService.getownerLimit(userId);
+        if(limitr.isValid()){
+            result.put("type",1);
+            result.put("limit",String.valueOf(NumberUtil.fenToYuan(limitr.getBalance())));
+
+            //-TODO 获取要用额度 kaven
+            Long limited = 0L;
+            result.put("limited",String.valueOf(NumberUtil.fenToYuan(limited)));
+        }else{
+            result.put("type",0);
+        }
+
         //获取未读通知
         rc.setUid(userId);
         String nt = statisticsResourceService.getOwnerNotReadNotice(rc);
         Integer n =  Integer.parseInt(nt == null ? "0":nt);
-        result.put("limit",String.valueOf(NumberUtil.fenToYuan(limit)));
-        result.put("limited",String.valueOf(NumberUtil.fenToYuan(limited)));
+
         result.put("notReadNotice",n);
         result.put("time",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
