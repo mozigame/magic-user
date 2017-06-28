@@ -25,5 +25,4 @@ public interface AccountIdMappingService {
      */
     long add(OwnerAccountUser ownerAccountUser);
 
-    long getUid(Long ownerId, String account,Integer type);
 }

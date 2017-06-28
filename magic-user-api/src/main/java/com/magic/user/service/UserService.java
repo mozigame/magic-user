@@ -144,4 +144,12 @@ public interface UserService {
      * @return
      */
     List<User> periodAgentList(Long startTime, Long endTime, Long ownerId);
+
+    /**
+     * 获取股东或代理的编号
+     * @param account
+     * @param type
+     * @return
+     */
+    long getUid(String account, int type);
 }
