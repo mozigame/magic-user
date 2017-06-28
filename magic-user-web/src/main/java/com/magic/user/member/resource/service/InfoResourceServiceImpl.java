@@ -207,8 +207,9 @@ public class InfoResourceServiceImpl {
         if (accountType == AccountType.member) {
             uid = dubboOutAssembleService.getUid(ownerId, account);
             return uid;
+        }else{//股东和代理
+            uid = accountIdMappingService.getUid(ownerId, account);
         }
-        uid = accountIdMappingService.getUid(ownerId, account);
         return uid;
     }
 

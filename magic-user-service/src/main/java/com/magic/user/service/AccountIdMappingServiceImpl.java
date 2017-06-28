@@ -25,6 +25,12 @@ public class AccountIdMappingServiceImpl implements AccountIdMappingService {
     }
 
     @Override
+    public long getUid(Long ownerId, String account,Integer type) {
+        Long uid = (Long) ownerAccountUserDbService.get("getUid", new String[]{"account","type"}, new Object[]{ownerId + UserContants.SPLIT_LINE + account,type});
+        return uid == null ? 0 : uid;
+    }
+
+    @Override
     public long add(OwnerAccountUser ownerAccountUser) {
         Long result = ownerAccountUserDbService.insert(ownerAccountUser);
         return result == null ? 0 : result;
