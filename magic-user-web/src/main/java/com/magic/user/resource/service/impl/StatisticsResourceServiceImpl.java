@@ -89,21 +89,6 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
     @Override
     public String getOwnerAccountLimit(RequestContext rc) {
         long uid = rc.getUid();
-//        // -todo 调kaven的thrift接口
-//        //EGResp resp = thriftOutAssembleService.getOwnerAccountLimit("{\"uid\":"+uid+"}","account");
-//        //String data = resp.data;
-//        //String result = "{\"creditLimit\":\"822,121,121\",\"creditLimited\":\"123,1231,12\",\"time\":\""+System.currentTimeMillis()+"\"}";
-//        OwnerCreaditLimitVo result = new OwnerCreaditLimitVo();
-//
-//        Format fm =new DecimalFormat("#,###.00");
-//        double d  = (double)((Math.random()*9+1)*3000000000d);
-//        result.setCreaditLimit(fm.format(d));
-//        result.setCreaditLimited(fm.format(d-120000));
-//
-////        Calendar cal = Calendar.getInstance();
-////        cal.setTime(new Date());
-////        cal.add(Calendar.HOUR_OF_DAY,-12);
-//        result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         User user = userService.get(uid);
         //获取授信额度
         PrePaySchemeVo limitr = dubboOutAssembleService.getOwnerLimit(user.getOwnerId());
@@ -113,8 +98,7 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
                 result.put("type",1);
                 result.put("limit",String.valueOf(NumberUtil.fenToYuan(limitr.getBalance())));
 
-                //-TODO 获取要用额度 kaven
-                Long limited = 0L;
+                Long limited = thriftOutAssembleService.getOwnerLimited(user.getOwnerId());;
                 result.put("limited",String.valueOf(NumberUtil.fenToYuan(limited)));
             }else{
                 result.put("type",0);
