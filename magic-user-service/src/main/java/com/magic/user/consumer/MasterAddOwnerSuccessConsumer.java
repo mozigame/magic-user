@@ -52,7 +52,7 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
             JSONObject object = JSONObject.parseObject(msg);
             long ownerId = object.getLongValue("id");
             String ownerName = object.getString("account");
-            String password = PasswordCapture.getSaltPwd(object.getString("password"));
+            String password = object.getString("password");
             String realname = object.getString("realName");
             String telephone = object.getString("telephone");
             String email = object.getString("email");
@@ -128,6 +128,7 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
         ownerStockAgentMember.setAgentId(agentId);
         ownerStockAgentMember.setStockId(stockId);
         ownerStockAgentMember.setOwnerId(ownerId);
+        ownerStockAgentMember.setMemNumber(0);
         return ownerStockAgentMember;
     }
 
