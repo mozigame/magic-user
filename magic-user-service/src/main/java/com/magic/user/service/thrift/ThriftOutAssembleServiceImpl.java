@@ -501,12 +501,11 @@ public class ThriftOutAssembleServiceImpl {
         try {
             EGResp call = thriftFactory.call(req, UserContants.CALLER);
             if(call != null){
-                ApiLogger.info(call.getData());
-                return  Long.valueOf(call.getData());
+                return  Long.valueOf(JSONObject.parseObject(call.getData()).getString("Amount"));
             }
 
         }catch (Exception e){
-            ApiLogger.error(String.format("setting member return water. req: %s", JSON.toJSONString(req)), e);
+            ApiLogger.error(String.format("setting owner limit failed. req: %s", JSON.toJSONString(req)), e);
         }
         return result;
     }
