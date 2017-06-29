@@ -147,7 +147,6 @@ public class ThriftOutAssembleServiceImpl {
         if (StringUtils.isEmpty(balance)){
             balance = "0";
         }
-        backMoney(uid);//回收资金
         return balance;
     }
 
@@ -320,10 +319,11 @@ public class ThriftOutAssembleServiceImpl {
     /**
      * 资金回收
      * @param uid
+     * @param status 1同步 2异步
      * @return
      */
-    public boolean backMoney(long uid){
-        String body = "{\"userId\":" + uid + "}";
+    public boolean backMoney(long uid, int status){
+        String body = "{\"userId\":" + uid + ",\"status\":" + status + "}";
         EGReq req = assembleEGReq(CmdType.GAME, 0x600003, body);
         try {
             EGResp call = thriftFactory.call(req, UserContants.CALLER);
