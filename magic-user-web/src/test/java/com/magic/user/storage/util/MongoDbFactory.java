@@ -179,7 +179,7 @@ public class MongoDbFactory {
         vo.setAgentName("agent_test");
         vo.setRegisterTime(System.currentTimeMillis());
         vo.setStatus(AccountStatus.enable.value());
-        vo.setLevel(0);
+        vo.setLevel(0L);
         vo.setDepositCount(1000);
         vo.setWithdrawCount(1000);
         vo.setWithdrawMoney(10000L);

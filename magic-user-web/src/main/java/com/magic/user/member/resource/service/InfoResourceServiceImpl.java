@@ -10,6 +10,8 @@ import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.config.thrift.base.EGResp;
+import com.magic.tethys.user.api.entity.UserPass;
+import com.magic.tethys.user.api.service.dubbo.TethysUserDubboService;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.AccountOperHistory;
 import com.magic.user.entity.Member;
@@ -28,6 +30,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.net.InetAddress;
 import java.util.*;
 
 /**
@@ -66,7 +69,8 @@ public class InfoResourceServiceImpl {
     private MemberResourceServiceImpl memberResourceService;
     @Resource
     private AgentResourceService agentResourceService;
-
+    @Resource
+    private TethysUserDubboService tethysUserDubboService;
 
     private static HashSet<AccountType> sets = new HashSet<>();
 
@@ -297,22 +301,13 @@ public class InfoResourceServiceImpl {
                 userMap.put("ownerName", member.getOwnerUsername());
                 userMap.put("type", type);
                 userMap.put("operTime", System.currentTimeMillis());
-
             }
             if (loginPassword != null) {
-                //todo passport修改密码
-                //todo 如果成功修改，则添加
                 newMap.put("loginPassword", "password reset");
-            }
-            if (paymentPassword != null) {
-                //todo kevin
-                //todo 如果修改成功，则添加
-                newMap.put("paymentPassword", "password reset");
-                EGResp resp = thriftOutAssembleService.resetMemberPayPwd(assemblePayPwdBody(id, paymentPassword), "account");
-                //TODO 处理结果
-                if (resp != null) {
-
-                }
+                EGResp resp = thriftOutAssembleService.passwordReset(assembleLoginPwdBody(member.getMemberId(),member.getUsername(),
+                        loginPassword), "account");
+                ApiLogger.info("=========password reset========");
+                ApiLogger.info(resp.getData());
             }
             //todo 组织map
         } else {//代理或股东
@@ -364,6 +359,18 @@ public class InfoResourceServiceImpl {
             producer.send(Topic.USER_INFO_MODIFY_SUCCESS, String.valueOf(uid), object.toJSONString());
         }
         return UserContants.EMPTY_STRING;
+    }
+
+    private String assembleLoginPwdBody(Long userId,String username,String newPassword) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("userId",userId);
+        jsonObject.put("username",username);
+        jsonObject.put("newPassword",newPassword);
+
+        jsonObject.put("ip","127.0.0.1");
+        jsonObject.put("appId",10);
+        jsonObject.put("operatorTime",System.currentTimeMillis());
+        return jsonObject.toJSONString();
     }
 
     /**
