@@ -305,9 +305,9 @@ public class InfoResourceServiceImpl {
             if (loginPassword != null) {
                 newMap.put("loginPassword", "password reset");
                 EGResp resp = thriftOutAssembleService.passwordReset(assembleLoginPwdBody(member.getMemberId(),member.getUsername(),
-                        loginPassword), "account");
-                ApiLogger.info("=========password reset========");
-                ApiLogger.info(resp.getData());
+                        loginPassword,rc.getIp()), "account");
+               // ApiLogger.info("=========password reset========");
+                //ApiLogger.info(resp.getData());
             }
             //todo 组织map
         } else {//代理或股东
@@ -361,13 +361,13 @@ public class InfoResourceServiceImpl {
         return UserContants.EMPTY_STRING;
     }
 
-    private String assembleLoginPwdBody(Long userId,String username,String newPassword) {
+    private String assembleLoginPwdBody(Long userId,String username,String newPassword,String ip) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("userId",userId);
         jsonObject.put("username",username);
         jsonObject.put("newPassword",newPassword);
 
-        jsonObject.put("ip","127.0.0.1");
+        jsonObject.put("ip",ip);
         jsonObject.put("appId",10);
         jsonObject.put("operatorTime",System.currentTimeMillis());
         return jsonObject.toJSONString();
