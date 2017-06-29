@@ -17,7 +17,6 @@ import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.oceanus.entity.Summary.UserOrderRecord;
 import com.magic.oceanus.entity.Summary.UserPreferentialRecord;
-import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.passport.po.SubAccount;
 import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
@@ -35,7 +34,10 @@ import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.po.RegisterReq;
-import com.magic.user.service.*;
+import com.magic.user.service.AccountIdMappingService;
+import com.magic.user.service.MemberMongoService;
+import com.magic.user.service.MemberService;
+import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
@@ -46,10 +48,6 @@ import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
 
 /**
  * MemberResourceServiceImpl
@@ -67,9 +65,6 @@ public class MemberResourceServiceImpl {
     private UserService userService;
 
     @Resource
-    private LoginService loginService;
-
-    @Resource
     private AccountIdMappingService accountIdMappingService;
 
     @Resource
@@ -83,9 +78,6 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
-
-    @Resource
-    private OceanusProviderDubboService oceanusProviderDubboService;
 
     /**
      * 会员列表
@@ -1207,7 +1199,8 @@ public class MemberResourceServiceImpl {
         if(member.getStatus() == AccountStatus.disable){
             throw UserException.MEMBER_ACCOUNT_DISABLED;
         }
-
+        //异步回收资金
+        thriftOutAssembleService.backMoney(uid, 2);
         String token = object.getString("token");
         String result = assembleLoginResult(uid, member.getUsername(), token);
         sendLoginMessage(member, rc);
@@ -1794,6 +1787,8 @@ public class MemberResourceServiceImpl {
      */
     public String getMemberInfo(RequestContext rc) {
         long message = dubboOutAssembleService.getNoReadMessageCount(rc.getUid());
+        //同步回收
+        thriftOutAssembleService.backMoney(rc.getUid(), 1);
         String balance = thriftOutAssembleService.getMemberBalance(rc.getUid());
         return "{\"message\":"+message+",\"balance\":\""+balance+"\"}";
     }
