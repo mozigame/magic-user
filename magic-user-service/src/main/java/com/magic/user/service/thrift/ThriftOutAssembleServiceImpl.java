@@ -501,6 +501,9 @@ public class ThriftOutAssembleServiceImpl {
         try {
             EGResp call = thriftFactory.call(req, UserContants.CALLER);
             if(call != null){
+                ApiLogger.info("======call.getData()====");
+                ApiLogger.info(call.getData());
+                ApiLogger.info(JSONObject.parseObject(call.getData()).getString("Amount"));
                 return  Long.valueOf(JSONObject.parseObject(call.getData()).getString("Amount"));
             }
 
