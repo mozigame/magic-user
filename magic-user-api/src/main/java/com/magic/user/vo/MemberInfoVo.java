@@ -12,7 +12,7 @@ public class MemberInfoVo implements Serializable{
 
     private Long stockId;   //股东id
     private Long ownerId;   //业主id
-    private Integer level;  //层级
+    private Long level;  //层级
 
     public Long getStockId() {
         return stockId;
@@ -30,11 +30,11 @@ public class MemberInfoVo implements Serializable{
         this.ownerId = ownerId;
     }
 
-    public Integer getLevel() {
+    public Long getLevel() {
         return level;
     }
 
-    public void setLevel(Integer level) {
+    public void setLevel(Long level) {
         this.level = level;
     }
 }

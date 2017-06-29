@@ -110,6 +110,7 @@ public class MemberResourceServiceImpl {
         }
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
+        ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
     }
@@ -123,7 +124,7 @@ public class MemberResourceServiceImpl {
     //
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
         Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
-        Set<Integer> levels = new HashSet<>();
+        Set<Long> levels = new HashSet<>();
         for (MemberConditionVo vo : memberConditionVos) {
             memberConditionVoMap.put(vo.getMemberId(), vo);
             levels.add(vo.getLevel());
@@ -136,7 +137,8 @@ public class MemberResourceServiceImpl {
         //3.获取余额列表
         Map<Long, String> memberBalanceLevelVoMap = thriftOutAssembleService.getMemberBalances(memberConditionVoMap.keySet());
         //4.获取会员反水方案列表
-        Map<Integer, MemberListVo> memberRetWaterMap = getMemberReturnWater(levels);
+        Map<Long, MemberListVo> memberRetWaterMap = getMemberReturnWater(levels);
+        ApiLogger.info(String.format("get return water scheme. levels: %s, result: %s", JSON.toJSONString(levels), JSON.toJSONString(memberRetWaterMap)));
         for (Member member : members) {
             MemberListVo memberListVo = new MemberListVo();
             memberListVo.setId(member.getMemberId());
@@ -162,7 +164,7 @@ public class MemberResourceServiceImpl {
             if (memberRetWaterVo != null) {
                 memberListVo.setReturnWater(memberRetWaterVo.getReturnWater());
                 memberListVo.setReturnWaterName(memberRetWaterVo.getReturnWaterName() == null ? "":memberRetWaterVo.getReturnWaterName());
-                memberListVo.setLevel(memberRetWaterVo.getLevel() == null ? "":memberRetWaterVo.getLevel());
+                memberListVo.setLevel(memberRetWaterVo.getLevel() == null ? "": memberRetWaterVo.getLevel());
             } else {
                 memberListVo.setReturnWaterName("");
                 memberListVo.setLevel("");
@@ -178,7 +180,7 @@ public class MemberResourceServiceImpl {
      * @param levelIds
      * @return
      */
-    private Map<Integer, MemberListVo> getMemberReturnWater(Set<Integer> levelIds) {
+    private Map<Long, MemberListVo> getMemberReturnWater(Set<Long> levelIds) {
         JSONObject memberRetWaterBody = new JSONObject();
         memberRetWaterBody.put("levels", levelIds);
         try {
@@ -187,15 +189,14 @@ public class MemberResourceServiceImpl {
                 JSONObject obj = JSONObject.parseObject(retWaterResp.getData());
                 if(obj != null && obj.getInteger("total") > 0){
                     JSONArray result = obj.getJSONArray("levels");
-                    Map<Integer, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
+                    Map<Long, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
                     for (Object object : result) {
                         JSONObject jsonObject = (JSONObject) object;
                         MemberListVo vo = new MemberListVo();
                         //vo.setReturnWater(jsonObject.getInteger("returnWater"));
                         vo.setReturnWaterName(jsonObject.getString("returnWater"));
                         vo.setLevel(jsonObject.getString("showLevel"));
-
-                        memberBalanceLevelVoMap.put(jsonObject.getInteger("level"), vo);
+                        memberBalanceLevelVoMap.put(jsonObject.getLong("level"), vo);
                     }
                     return memberBalanceLevelVoMap;
                 }

@@ -72,6 +72,19 @@ public class MemberMongoServiceImpl implements MemberMongoService {
      * {@inheritDoc}
      */
     @Override
+    public OnLineMember getOnlineMember(Long memberId) {
+        try {
+            return onlineMemberDao.findById(memberId);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("get onlineMember error.memberId: %d",memberId), e);
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean updateLogin(Long memberId, String ip, Long loginTime) {
         try {
             return onlineMemberDao.updateStatus(memberId, new Integer(1), new Integer(2), loginTime, ip);

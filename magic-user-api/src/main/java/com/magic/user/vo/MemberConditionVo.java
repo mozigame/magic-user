@@ -19,7 +19,7 @@ public class MemberConditionVo {
     private Long registerTime;  //注册时间
     private Long updateTime;    //修改时间
     private Integer status; //状态
-    private Integer level;  //层级
+    private Long level;  //层级
     private Integer depositCount;//存款次数
     private Integer withdrawCount;//取款次数
     private Long depositMoney;//充值总额
@@ -78,11 +78,11 @@ public class MemberConditionVo {
         this.status = status;
     }
 
-    public Integer getLevel() {
+    public Long getLevel() {
         return level;
     }
 
-    public void setLevel(Integer level) {
+    public void setLevel(Long level) {
         this.level = level;
     }
 

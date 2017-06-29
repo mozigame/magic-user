@@ -1,5 +1,7 @@
 package com.magic.user.dao;
 
+import com.alibaba.fastjson.JSON;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
@@ -57,11 +59,12 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         if (memberCondition != null) {
             Query query = assembleQuery(memberCondition);
             if (page != null && count != null) {
-                query.skip((page - 1) * count );
+                query.skip((page - 1) * count);
                 query.limit(count);
                 query.with(new Sort(Sort.Direction.DESC, "registerTime"));
             }
             List<MemberConditionVo> result = super.find(query);
+            ApiLogger.info(String.format("get data from mongo. query: %s, result: %s", JSON.toJSONString(query), JSON.toJSONString(result)));
             return result;
         }
         return null;
