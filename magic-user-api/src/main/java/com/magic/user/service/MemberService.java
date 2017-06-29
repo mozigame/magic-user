@@ -1,11 +1,9 @@
 package com.magic.user.service;
 
 import com.magic.user.entity.Member;
-import com.magic.user.enums.AccountStatus;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * User: joey
@@ -25,7 +23,7 @@ public interface MemberService {
      * @param ids 会员ID
      * @return
      */
-    List<Member> findMemberByIds(Collection<Long> ids);
+    Map<Long, Member> findMemberByIds(Collection<Long> ids);
 
     /**
      * 更新会员数据
