@@ -45,6 +45,11 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 /**
  * MemberResourceServiceImpl
@@ -111,6 +116,9 @@ public class MemberResourceServiceImpl {
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
         ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
+        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
+            return JSON.toJSONString(assemblePageBean(page, count, 0, null));
+        }
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
     }
@@ -121,58 +129,120 @@ public class MemberResourceServiceImpl {
      * @param memberConditionVos
      * @return
      */
-    //
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
-        Map<Long, MemberConditionVo> memberConditionVoMap = new HashMap<>();
-        Set<Long> levels = new HashSet<>();
-        for (MemberConditionVo vo : memberConditionVos) {
-            memberConditionVoMap.put(vo.getMemberId(), vo);
-            levels.add(vo.getLevel());
-        }
+        Set<Long> memberIds = memberConditionVos.stream().map(MemberConditionVo::getMemberId).collect(Collectors.toSet());
         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
-        List<Member> members = memberService.findMemberByIds(memberConditionVoMap.keySet());
+        Map<Long, Member> members = memberService.findMemberByIds(memberIds);
+        ApiLogger.info(String.format("get members. ids: %s, result: %s",JSON.toJSONString(memberIds), JSON.toJSONString(members)));
+        if (!Optional.ofNullable(members).filter(size -> size.size() > 0).isPresent()){
+            return memberListVos;
+        }
         //2、获取会员最近登录信息
-        Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(memberConditionVoMap.keySet());
+        Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(memberIds);
         //3.获取余额列表
-        Map<Long, String> memberBalanceLevelVoMap = thriftOutAssembleService.getMemberBalances(memberConditionVoMap.keySet());
+        Map<Long, String> memberBalanceLevelVoMap = thriftOutAssembleService.getMemberBalances(memberIds);
         //4.获取会员反水方案列表
+        Set<Long> levels = memberConditionVos.stream().map(MemberConditionVo::getLevel).collect(Collectors.toSet());
         Map<Long, MemberListVo> memberRetWaterMap = getMemberReturnWater(levels);
         ApiLogger.info(String.format("get return water scheme. levels: %s, result: %s", JSON.toJSONString(levels), JSON.toJSONString(memberRetWaterMap)));
-        for (Member member : members) {
-            MemberListVo memberListVo = new MemberListVo();
-            memberListVo.setId(member.getMemberId());
-            memberListVo.setAccount(member.getUsername());
-            memberListVo.setAgentId(member.getAgentId());
-            memberListVo.setAgent(member.getAgentUsername());
-            memberListVo.setRegisterTime(DateUtil.formatDateTime(new Date(member.getRegisterTime()),DateUtil.formatDefaultTimestamp));
-            memberListVo.setStatus(member.getStatus().value());
-            memberListVo.setShowStatus(member.getStatus().desc());
-            if (subLogins != null) {
-                SubAccount subAccount = subLogins.get(member.getMemberId());
-                if (subAccount != null) {
-                    memberListVo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp));
-                }
-            } else {
-                memberListVo.setLastLoginTime("");
+        for (MemberConditionVo vo : memberConditionVos){
+            //1.组装基础信息
+            Member member = members.get(vo.getMemberId());
+            if (!Optional.ofNullable(member).isPresent()){
+                continue;
             }
-            //1、余额在 kevin 拿取
-            memberListVo.setBalance(memberBalanceLevelVoMap.getOrDefault(member.getMemberId(), "0"));
-
-            //2、当前反水方案在 luis 拿取,根据层级id获取
-            MemberListVo memberRetWaterVo = memberRetWaterMap.get(memberConditionVoMap.get(member.getMemberId()).getLevel());
-            if (memberRetWaterVo != null) {
-                memberListVo.setReturnWater(memberRetWaterVo.getReturnWater());
-                memberListVo.setReturnWaterName(memberRetWaterVo.getReturnWaterName() == null ? "":memberRetWaterVo.getReturnWaterName());
-                memberListVo.setLevel(memberRetWaterVo.getLevel() == null ? "": memberRetWaterVo.getLevel());
-            } else {
+            MemberListVo memberListVo = assembleMemberListVo(member);
+            //2.登录时间
+            memberListVo.setLastLoginTime(getLastLoginTime(vo.getMemberId(), subLogins));
+            //3.会员余额
+            memberListVo.setBalance(getMemberBalance(vo.getMemberId(), memberBalanceLevelVoMap));
+            //4.返水方案
+            MemberListVo returnWater = assembleMemberListVo(vo, memberRetWaterMap);
+            if (!Optional.ofNullable(returnWater).isPresent()){
+                memberListVo.setReturnWater(0);
                 memberListVo.setReturnWaterName("");
                 memberListVo.setLevel("");
+            }else {
+                memberListVo.setReturnWater(returnWater.getReturnWater());
+                memberListVo.setReturnWaterName(returnWater.getReturnWaterName());
+                memberListVo.setLevel(returnWater.getLevel());
             }
             memberListVos.add(memberListVo);
         }
-
         return memberListVos;
+    }
+
+    /**
+     * 组装返水方案
+     *
+     * @param vo
+     * @param memberRetWaterMap
+     * @return
+     */
+    private MemberListVo assembleMemberListVo(MemberConditionVo vo, Map<Long, MemberListVo> memberRetWaterMap) {
+        if (!Optional.ofNullable(memberRetWaterMap).filter(size -> size.size() > 0).isPresent()){
+            return null;
+        }
+        MemberListVo memberListVo = memberRetWaterMap.get(vo.getLevel());
+        if (!Optional.ofNullable(memberListVo).isPresent()){
+            return null;
+        }
+        MemberListVo result = new MemberListVo();
+        result.setReturnWater(memberListVo.getReturnWater());
+        result.setReturnWaterName(memberListVo.getReturnWaterName() == null ? "":memberListVo.getReturnWaterName());
+        result.setLevel(memberListVo.getLevel() == null ? "": memberListVo.getLevel());
+        return result;
+    }
+
+    /**
+     * 会员余额
+     *
+     * @param memberId
+     * @param map
+     * @return
+     */
+    private String getMemberBalance(Long memberId, Map<Long, String> map) {
+       if (!Optional.ofNullable(map).filter(size -> size.size() > 0).isPresent()){
+           return "0";
+       }
+       return map.getOrDefault(memberId, "0");
+    }
+
+    /**
+     * 获取登陆时间
+     *
+     * @param memberId
+     * @param subLogins
+     * @return
+     */
+    private String getLastLoginTime(Long memberId, Map<Long, SubAccount> subLogins) {
+        if (!Optional.ofNullable(subLogins).filter(size -> size.size() > 0).isPresent()){
+            return "";
+        }
+        SubAccount subAccount = subLogins.get(memberId);
+        if (!Optional.ofNullable(subAccount).filter(time -> time.getLastTime() > 0).isPresent()){
+            return "";
+        }
+        return DateUtil.formatDateTime(new Date(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp);
+    }
+
+    /**
+     * 组装基础信息
+     *
+     * @param member
+     * @return
+     */
+    private MemberListVo assembleMemberListVo(Member member) {
+        MemberListVo vo = new MemberListVo();
+        vo.setId(member.getMemberId());
+        vo.setAccount(member.getUsername());
+        vo.setAgentId(member.getAgentId());
+        vo.setAgent(member.getAgentUsername());
+        vo.setRegisterTime(DateUtil.formatDateTime(new Date(member.getRegisterTime()),DateUtil.formatDefaultTimestamp));
+        vo.setStatus(member.getStatus().value());
+        vo.setShowStatus(member.getStatus().desc());
+        return vo;
     }
 
     /**

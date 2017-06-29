@@ -11,7 +11,13 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 /**
  * User: joey
@@ -35,8 +41,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> findMemberByIds(Collection<Long> ids) {
-        return memberDbService.find("findMemberByIds", new String[]{"list"}, ids);
+    public Map<Long, Member> findMemberByIds(Collection<Long> ids) {
+        List<Member> members = memberDbService.find("findMemberByIds", new String[]{"list"}, ids);
+        if (Optional.ofNullable(members).isPresent()){
+            return members.stream().collect(Collectors.toMap(Member::getMemberId, (p) -> p));
+        }
+        return null;
     }
 
     @Override
