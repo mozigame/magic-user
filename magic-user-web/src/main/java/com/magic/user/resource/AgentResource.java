@@ -296,7 +296,7 @@ public class AgentResource {
     @ResponseBody
     public String reviewList(
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false, defaultValue = "1") Integer status,
+            @RequestParam(name = "status", required = false) Integer status,
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
