@@ -24,6 +24,7 @@ import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.vo.LoginResultVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -101,24 +102,21 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         int ip = IPUtil.ipToInt(rc.getIp());
         sendLoginHistory(loginUser, System.currentTimeMillis(), ip, LoginType.login, agent);
         String token = MauthUtil.createOld(userId, System.currentTimeMillis());
-        JSONObject result = new JSONObject();
-        result.put("token", token);
-        result.put("userId", userId);
+        LoginResultVo result = new LoginResultVo();
+        result.setToken(token);
+        result.setUserId(userId);
 
         //获取授信额度
-        PrePaySchemeVo limitr = dubboOutAssembleService.getOwnerLimit(ownerInfo.getOwnerId());
-        if(limitr != null){
-            if(limitr.isValid()){
-                result.put("type",1);
-                result.put("limit",String.valueOf(NumberUtil.fenToYuan(limitr.getBalance())));
+        PrePaySchemeVo limit = dubboOutAssembleService.getOwnerLimit(ownerInfo.getOwnerId());
+        result.setType(0);
+        if(limit != null){
+            if(limit.isValid()){
+                result.setType(1);
+                result.setLimit(String.valueOf(NumberUtil.fenToYuan(limit.getBalance())));
 
-                Long limitred = thriftOutAssembleService.getOwnerLimited(ownerInfo.getOwnerId());
-                result.put("limited",String.valueOf(NumberUtil.fenToYuan(limitred == null ? 0L : limitred)));
-            }else{
-                result.put("type",0);
+                Long limited = thriftOutAssembleService.getOwnerLimited(ownerInfo.getOwnerId());
+                result.setLimited(String.valueOf(NumberUtil.fenToYuan(limited == null ? 0L : limited)));
             }
-        }else{
-            result.put("type",0);
         }
 
         //获取未读通知
@@ -126,10 +124,10 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         String nt = statisticsResourceService.getOwnerNotReadNotice(ownerInfo.getOwnerId());
         Integer n =  Integer.parseInt(nt == null ? "0":nt);
 
-        result.put("notReadNotice",n);
-        result.put("time",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        result.setNotReadNotice(n);
+        result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
-        return result.toJSONString();
+        return JSONObject.toJSONString(result);
     }
 
     /**
