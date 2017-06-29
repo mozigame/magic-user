@@ -496,11 +496,11 @@ public class ThriftOutAssembleServiceImpl {
     }
 
     public Long getOwnerLimited(Long ownerId) {
-        Long result = null;
+        Long result = 0L;
         EGReq req = assembleEGReq(CmdType.SETTLE, 0x300016, "{\"OwnerId\":"+ownerId+"}");
         try {
             EGResp call = thriftFactory.call(req, UserContants.CALLER);
-            if(call != null){
+            if(Optional.ofNullable(call).filter(code -> code.getCode() == 0).isPresent()){
                 ApiLogger.info("======call.getData()====");
                 ApiLogger.info(call.getData());
                 ApiLogger.info(JSONObject.parseObject(call.getData()).getString("Amount"));

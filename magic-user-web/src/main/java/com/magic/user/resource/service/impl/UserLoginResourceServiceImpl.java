@@ -115,7 +115,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
                 result.setLimit(String.valueOf(NumberUtil.fenToYuan(limit.getBalance())));
 
                 Long limited = thriftOutAssembleService.getOwnerLimited(ownerInfo.getOwnerId());
-                result.setLimited(String.valueOf(NumberUtil.fenToYuan(limited == null ? 0L : limited)));
+                result.setLimited(String.valueOf(NumberUtil.fenToYuan(limited)));
             }
         }
 
