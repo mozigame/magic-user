@@ -22,6 +22,7 @@ import com.magic.user.resource.service.StatisticsResourceService;
 import com.magic.user.resource.service.UserLoginResourceService;
 import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
+import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.PasswordCapture;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +51,8 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
     private Producer producer;
     @Resource
     private StatisticsResourceService statisticsResourceService;
-
+    @Resource
+    private ThriftOutAssembleServiceImpl thriftOutAssembleService;
     /**
      * {@inheritDoc}
      *
@@ -110,8 +112,8 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
                 result.put("type",1);
                 result.put("limit",String.valueOf(NumberUtil.fenToYuan(limitr.getBalance())));
 
-                //-TODO 获取要用额度 kaven
-                result.put("limited",String.valueOf(NumberUtil.fenToYuan(0L)));
+                Long limitred = thriftOutAssembleService.getOwnerLimited(ownerInfo.getOwnerId());
+                result.put("limited",String.valueOf(NumberUtil.fenToYuan(limitred == null ? 0L : limitred)));
             }else{
                 result.put("type",0);
             }
