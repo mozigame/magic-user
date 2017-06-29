@@ -494,4 +494,20 @@ public class ThriftOutAssembleServiceImpl {
         }
         return null;
     }
+
+    public Long getOwnerLimited(Long ownerId) {
+        Long result = null;
+        EGReq req = assembleEGReq(CmdType.SETTLE, 0x300016, "{\"OwnerId\":"+ownerId+"}");
+        try {
+            EGResp call = thriftFactory.call(req, UserContants.CALLER);
+            if(call != null){
+                ApiLogger.info(call.getData());
+                return  Long.valueOf(call.getData());
+            }
+
+        }catch (Exception e){
+            ApiLogger.error(String.format("setting member return water. req: %s", JSON.toJSONString(req)), e);
+        }
+        return result;
+    }
 }
