@@ -14,12 +14,10 @@ import com.magic.user.entity.OwnerStockAgentMember;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
-import com.magic.user.service.AccountIdMappingService;
-import com.magic.user.service.LoginService;
-import com.magic.user.service.OwnerStockAgentService;
-import com.magic.user.service.UserService;
+import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.vo.AgentConditionVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -43,6 +41,8 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
     @Resource
     private OwnerStockAgentService ownerStockAgentService;
+    @Resource
+    private AgentMongoService agentMongoService;
 
     @Override
     public boolean doit(String topic, String tags, String key, String msg) {
@@ -95,6 +95,14 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
             if (!userService.addAgent(agentUser)) {
                 if (userService.get(agentId) == null) {
                     flag = false;
+                }
+            } else {
+                AgentConditionVo agentConditionVo = assembleAgentConditionVo(agentUser);
+                if (!agentMongoService.saveAgent(agentConditionVo)) {
+                    ApiLogger.error(String.format("agent add success mq consumer add agentConditionVo failed.agentId:%d", agentConditionVo.getAgentId()));
+                    if (agentMongoService.get(agentConditionVo.getAgentId()) == null) {
+                        return false;
+                    }
                 }
             }
             Login agentLogin = new Login(agentId, agentName, PasswordCapture.getSaltPwd(password));
@@ -165,6 +173,22 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
         user.setBank(bankName);
         user.setBankDeposit(bankDeposit);
         return user;
+    }
+
+    private AgentConditionVo assembleAgentConditionVo(User user) {
+        AgentConditionVo vo = new AgentConditionVo();
+        vo.setAgentId(user.getUserId());
+        vo.setAgentName(user.getUsername());
+        vo.setStatus(AccountStatus.enable.value());
+        vo.setDepositMoney(0L);
+        vo.setWithdrawMoney(0L);
+        vo.setMembers(0);
+        vo.setGeneralizeCode(user.getGeneralizeCode());
+        vo.setStockId(user.getOwnerId());
+        vo.setOwnerId(user.getOwnerId());
+        vo.setRegisterTime(System.currentTimeMillis());
+        vo.setUpdateTime(vo.getRegisterTime());
+        return vo;
     }
 
 
