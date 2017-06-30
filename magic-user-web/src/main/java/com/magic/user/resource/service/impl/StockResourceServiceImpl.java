@@ -6,6 +6,8 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
+import com.magic.api.commons.mq.Producer;
+import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.CommonDateParseUtil;
 import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
@@ -61,6 +63,8 @@ public class StockResourceServiceImpl implements StockResourceService {
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
     @Resource
     private OceanusProviderDubboService oceanusProviderDubboService;
+    @Resource
+    private Producer producer;
     /**
      * @param rc
      * @return
@@ -334,6 +338,8 @@ public class StockResourceServiceImpl implements StockResourceService {
         User stockUser = assembleStock(userId, realname, bankCardNo, bankDeposit, bank, account, telephone, email, AccountType.stockholder, GeneraType.parse(sex), CurrencyType.parse(currencyType), IPUtil.ipToInt(rc.getIp()), System.currentTimeMillis(), ownerId);
         if (!userService.addStock(stockUser)) {
             throw UserException.REGISTER_FAIL;
+        } else {
+            producer.send(Topic.MAGIC_OWNER_USER_ADD_SUCCESS, stockUser.getUserId() + "", JSON.toJSONString(stockUser));
         }
         JSONObject result = new JSONObject();
         result.put("id", userId);
