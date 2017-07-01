@@ -296,7 +296,7 @@ public class AgentResource {
     @ResponseBody
     public String reviewList(
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false, defaultValue = "1") Integer status,
+            @RequestParam(name = "status", required = false) Integer status,
             @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
@@ -456,5 +456,16 @@ public class AgentResource {
     @ResponseBody
     public String configs() {
         return agentResourceService.configs(RequestContext.getRequestContext());
+    }
+
+    /**
+     * @return
+     * @Doc 获取前端注册代理是的必填项
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/getAgentRegisterMustParam", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getAgentRegisterMustParam() {
+        return agentResourceService.getAgentRegisterMustParam(RequestContext.getRequestContext());
     }
 }

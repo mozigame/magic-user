@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * Time: 14:57
  */
 @Controller
-@RequestMapping("/v1/help")
+@RequestMapping("/v1/user/help")
 public class HelpResource {
 
     @Access(type = Access.AccessType.INTERNAL)

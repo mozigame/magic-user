@@ -211,4 +211,12 @@ public interface AgentResourceService {
      * @return
      */
     String fundProfileRefresh(RequestContext requestContext, Long id);
+
+    /**
+     *
+     * @param requestContext
+     * @return
+     * @Doc 获取前端注册代理是的必填项
+     */
+    String getAgentRegisterMustParam(RequestContext requestContext);
 }
