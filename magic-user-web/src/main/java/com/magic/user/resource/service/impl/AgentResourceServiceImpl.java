@@ -99,12 +99,17 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         //3、条件查询mongo中的代理，组装id
         List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, page, count);
+        ApiLogger.info("=======agentConditionVoList=======");
+        ApiLogger.info(JSON.toJSONString(agentConditionVoList));
         //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
         List<Long> agentIds = Lists.newArrayList();
         Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
         for (AgentConditionVo vo : agentConditionVoList) {
             agentIds.add(vo.getAgentId());
+            vo.setDepositMoney(NumberUtil.fenToYuan(vo.getDepositMoney()).longValue());
+            vo.setWithdrawMoney(NumberUtil.fenToYuan(vo.getWithdrawMoney()).longValue());
             map.put(vo.getAgentId(),vo);
+
         }
         List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map);
         if (list != null && list.size() > 0) {
@@ -122,14 +127,19 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private List<AgentInfoVo> assembleAgentList(List<AgentInfoVo> users,Map<Long,AgentConditionVo> map) {
         for (AgentInfoVo vo : users) {
             AgentConditionVo av = map.get(vo.getId());
-            vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
-            // 会员数量，存款金额，取款金额
-            vo.setMembers(av.getMembers());
-            //vo.setStoreMembers(1000);
-            vo.setDepositTotalMoney(av.getDepositMoney());
-            vo.setWithdrawTotalMoney(av.getWithdrawMoney());
-            //vo.setReviewer("jess");
-            //vo.setReviewTime("2017-03-01 16:43:22");
+            if(av != null){
+                vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
+                // 会员数量，存款金额，取款金额
+                vo.setMembers(av.getMembers());
+                vo.setDepositTotalMoney(av.getDepositMoney());
+                vo.setWithdrawTotalMoney(av.getWithdrawMoney());
+            }else{
+                vo.setShowStatus("");
+                // 会员数量，存款金额，取款金额
+                vo.setMembers(0);
+                vo.setDepositTotalMoney(0L);
+                vo.setWithdrawTotalMoney(0L);
+            }
             if(vo.getReviewTime() != null){
                 vo.setReviewTime(DateUtil.formatDateTime(new Date(new Long(vo.getReviewTime())), DateUtil.formatDefaultTimestamp));
             }else{
