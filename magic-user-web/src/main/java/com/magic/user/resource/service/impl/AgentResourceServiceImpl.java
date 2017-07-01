@@ -294,6 +294,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!userService.addAgent(agentUser)) {
             ApiLogger.error("add agent info failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
+        } else {
+            producer.send(Topic.MAGIC_OWNER_USER_ADD_SUCCESS, agentUser.getUserId() + "", JSON.toJSONString(agentUser));
         }
         //3、添加代理登录信息
         Login login = new Login(userId, account, PasswordCapture.getSaltPwd(password));

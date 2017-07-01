@@ -1,7 +1,9 @@
 package com.magic.user.consumer;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.annotation.ConsumerConfig;
 import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
@@ -14,12 +16,10 @@ import com.magic.user.entity.OwnerStockAgentMember;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
-import com.magic.user.service.AccountIdMappingService;
-import com.magic.user.service.LoginService;
-import com.magic.user.service.OwnerStockAgentService;
-import com.magic.user.service.UserService;
+import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.vo.AgentConditionVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -43,6 +43,10 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
     @Resource
     private OwnerStockAgentService ownerStockAgentService;
+    @Resource
+    private AgentMongoService agentMongoService;
+    @Resource
+    private Producer producer;
 
     @Override
     public boolean doit(String topic, String tags, String key, String msg) {
@@ -52,7 +56,7 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
             JSONObject object = JSONObject.parseObject(msg);
             long ownerId = object.getLongValue("id");
             String ownerName = object.getString("account");
-            String password = PasswordCapture.getSaltPwd(object.getString("password"));
+            String password = object.getString("password");
             String realname = object.getString("realName");
             String telephone = object.getString("telephone");
             String email = object.getString("email");
@@ -73,6 +77,8 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
                 if (userService.getUserById(stockUser.getUserId()) == null) {
                     flag = false;
                 }
+            } else {
+                producer.send(Topic.MAGIC_OWNER_USER_ADD_SUCCESS, stockUser.getUserId() + "", JSON.toJSONString(stockUser));
             }
             Login stockLogin = new Login(ownerId, ownerName, PasswordCapture.getSaltPwd(password));
             if (loginService.add(stockLogin) <= 0) {
@@ -84,18 +90,26 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
             long agentId = dubboOutAssembleService.assignUid();
             String agentName = ownerName + "_dl";
             String generalizeCode = UUIDUtil.getCode();
-            String agentRealname = realname;
             OwnerAccountUser agentAccountUser = assembleOwnerAccountUser(ownerId, agentName, agentId);
             if (accountIdMappingService.add(agentAccountUser) <= 0) {
                 if (accountIdMappingService.getUid(agentId, agentName) <= 0) {
                     flag = false;
                 }
             }
-            User agentUser = assembleUser(agentId, agentName, ownerId, realname, agentRealname, telephone, email, AccountType.agent, registerTime, registerIp, generalizeCode, AccountStatus.enable, bankCardNo, bankName, bankDeposit);
+            User agentUser = assembleUser(agentId, agentName, ownerId, ownerName, realname, telephone, email, AccountType.agent, registerTime, registerIp, generalizeCode, AccountStatus.enable, bankCardNo, bankName, bankDeposit);
             if (!userService.addAgent(agentUser)) {
                 if (userService.get(agentId) == null) {
                     flag = false;
                 }
+            } else {
+                AgentConditionVo agentConditionVo = assembleAgentConditionVo(agentUser);
+                if (!agentMongoService.saveAgent(agentConditionVo)) {
+                    ApiLogger.error(String.format("agent add success mq consumer add agentConditionVo failed.agentId:%d", agentConditionVo.getAgentId()));
+                    if (agentMongoService.get(agentConditionVo.getAgentId()) == null) {
+                        return false;
+                    }
+                }
+                producer.send(Topic.MAGIC_OWNER_USER_ADD_SUCCESS, agentUser.getUserId() + "", JSON.toJSONString(agentUser));
             }
             Login agentLogin = new Login(agentId, agentName, PasswordCapture.getSaltPwd(password));
             if (loginService.add(agentLogin) <= 0) {
@@ -128,6 +142,7 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
         ownerStockAgentMember.setAgentId(agentId);
         ownerStockAgentMember.setStockId(stockId);
         ownerStockAgentMember.setOwnerId(ownerId);
+        ownerStockAgentMember.setMemNumber(0);
         return ownerStockAgentMember;
     }
 
@@ -164,6 +179,22 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
         user.setBank(bankName);
         user.setBankDeposit(bankDeposit);
         return user;
+    }
+
+    private AgentConditionVo assembleAgentConditionVo(User user) {
+        AgentConditionVo vo = new AgentConditionVo();
+        vo.setAgentId(user.getUserId());
+        vo.setAgentName(user.getUsername());
+        vo.setStatus(AccountStatus.enable.value());
+        vo.setDepositMoney(0L);
+        vo.setWithdrawMoney(0L);
+        vo.setMembers(0);
+        vo.setGeneralizeCode(user.getGeneralizeCode());
+        vo.setStockId(user.getOwnerId());
+        vo.setOwnerId(user.getOwnerId());
+        vo.setRegisterTime(System.currentTimeMillis());
+        vo.setUpdateTime(vo.getRegisterTime());
+        return vo;
     }
 
 
