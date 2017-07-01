@@ -41,6 +41,7 @@ import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
+import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
@@ -964,6 +965,12 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberRegister(RequestContext rc, String url, RegisterReq req, String verifyCode) {
+
+        //校验用户名是否包含非法字符
+        if(UserUtil.checkoutUserName(req.getUsername())){
+            throw UserException.ILLEGAL_USERNAME;
+        }
+
         //验证码校验
         verifyCode(rc, verifyCode);
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
@@ -1887,6 +1894,17 @@ public class MemberResourceServiceImpl {
             mv.setLastDepositMoney(0L);
             mv.setMaxWithdrawMoney(0);
             return JSON.toJSONString(mv);
+        }else{
+            mv.setDepositCount(mv.getDepositCount() == null ? 0 : mv.getDepositCount());
+            mv.setDepositMoney(mv.getDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getDepositMoney()).longValue());
+            mv.setLastDepositMoney(mv.getLastDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastDepositMoney()).longValue());
+            mv.setLastDepositMoney(mv.getLastDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastDepositMoney()).longValue());
+
+            mv.setWithdrawCount(mv.getWithdrawCount() == null ? 0 : mv.getWithdrawCount());
+            mv.setWithdrawMoney(mv.getWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getWithdrawMoney()).longValue());
+            mv.setLastDepositMoney(mv.getLastDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastDepositMoney()).longValue());
+            mv.setMaxWithdrawMoney(mv.getMaxDepositMoney() == null ? 0 : NumberUtil.fenToYuan(mv.getMaxDepositMoney()).intValue());
+
         }
         return JSON.toJSONString(mv);
        }
