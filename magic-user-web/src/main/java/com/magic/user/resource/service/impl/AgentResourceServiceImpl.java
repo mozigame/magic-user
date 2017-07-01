@@ -235,6 +235,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         //3、条件查询mongo中的代理，组装id
         List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, null, null);
+        if (!Optional.ofNullable(agentConditionVoList).isPresent()){
+            downLoadFile.setContent(content);
+            return downLoadFile;
+        }
         //todo 将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
         List<Long> agentIds = Lists.newArrayList();
         Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
