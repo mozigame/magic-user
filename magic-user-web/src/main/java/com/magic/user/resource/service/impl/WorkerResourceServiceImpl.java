@@ -264,6 +264,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         if (user == null) {
             throw UserException.ILLEGAL_USER;
         }
+        Integer oldRole = user.getRoleId();
         user.setRealname(realname);
         user.setRoleId(roleId);
         //修改子账号
@@ -271,7 +272,7 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             throw UserException.USER_UPDATE_FAIL;
         }
         //修改角色
-        if (user.getRoleId() != null && !user.getRoleId().equals(roleId)) {
+        if (oldRole != null && !oldRole.equals(roleId)) {
             if (!dubboOutAssembleService.updateUserRole(operaUser.getOwnerId(), userId, roleId)) {
                 ApiLogger.error("update worker role failed, userId : " + userId);
             }
