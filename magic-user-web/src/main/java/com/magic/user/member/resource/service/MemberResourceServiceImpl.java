@@ -46,6 +46,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1844,10 +1845,8 @@ public class MemberResourceServiceImpl {
          */
         MemberFundInfo memberFundInfoObj;
         FundProfile fundProfile = new FundProfile();
-        //TODO 2、kevin 根据会员ID查询会员资金概括
         String capitalBody = "{\"memberId\":" + memberId + "}";
         EGResp capitalResp = thriftOutAssembleService.getMemberCapital(capitalBody, "account");
-        //TODO 确定resp的code
         if (capitalResp != null && capitalResp.getData() != null) {
             JSONObject capitalData = JSONObject.parseObject(capitalResp.getData());
             fundProfile.setSyncTime(capitalData.getString("syncTime"));
@@ -1855,21 +1854,13 @@ public class MemberResourceServiceImpl {
             memberFundInfoObj.setBalance(capitalData.getString("balance"));
             memberFundInfoObj.setLastDeposit(capitalData.getString("lastDeposit"));
             memberFundInfoObj.setLastWithdraw(capitalData.getString("lastWithdraw"));
-            //TODO 存款总金额、取款总金额、存款总次数、取款总次数在mongo中获取
-
         } else {
-            //TODO 假数据去掉
-            String memberFundInfo = "{\n" +
-                    "\t\"balance\": \"1805.50\",\n" +
-                    "\t\"depositNumbers\": 15,\n" +
-                    "\t\"depositTotalMoney\": \"29006590\",\n" +
-                    "\t\"lastDeposit\": \"1200\",\n" +
-                    "\t\"withdrawNumbers\": 10,\n" +
-                    "\t\"withdrawTotalMoney\": \"24500120\",\n" +
-                    "\t\"lastWithdraw\": \"2500\"\n" +
-                    "}";
-            memberFundInfoObj = JSONObject.parseObject(memberFundInfo, MemberFundInfo.class);
-            fundProfile.setSyncTime("2017-05-31 09:12:36");
+            fundProfile.setSyncTime(new SimpleDateFormat("yyyy-mm-dd HH:mm:ss").format(new Date()));
+            memberFundInfoObj = new MemberFundInfo();
+            memberFundInfoObj.setBalance("0");
+            memberFundInfoObj.setLastDeposit("0");
+            memberFundInfoObj.setLastWithdraw("0");
+
         }
         fundProfile.setInfo(memberFundInfoObj);
         return JSON.toJSONString(fundProfile);
@@ -1881,9 +1872,22 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberTradingRecord(RequestContext rc, Long memberId) {
+        ApiLogger.info("memberId:"+memberId);
         MemberConditionVo mv = memberMongoService.get(memberId);
-        return JSONObject.toJSONString(mv);
-//        return "{\"username\":\"merry\",\"withdrawInfo\":{\"withdrawSumNumber\":100,\"withdrawSumMoney\":20000,\"withdrawNearTime\":1200,\"withdrawBig\":200000}," +
-//                "\"depositInfo\":{\"depositSumNumber\":100,\"depositSumMoney\":20000,\"depositNearTime\":1200,\"depositBig\":200000}}";
-    }
+        if(mv == null){
+            mv = new MemberConditionVo();
+            mv.setMemberId(memberId);
+            mv.setDepositCount(0);
+            mv.setDepositMoney(0L);
+            mv.setLastDepositMoney(0L);
+            mv.setMaxDepositMoney(0);
+
+            mv.setWithdrawCount(0);
+            mv.setWithdrawMoney(0L);
+            mv.setLastDepositMoney(0L);
+            mv.setMaxWithdrawMoney(0);
+            return JSON.toJSONString(mv);
+        }
+        return JSON.toJSONString(mv);
+       }
 }
