@@ -941,7 +941,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         } else if (baseInfo.getStatus() == ReviewStatus.pass.value()) {
             long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), baseInfo.getAccount());
             if (agentId > 0) {
-                return JSON.toJSONString(getAgentInfoVo(agentId, true));
+                return getAgentInfoVo(agentId, true);
             }
         }
         return UserContants.EMPTY_STRING;
@@ -1187,6 +1187,16 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 "}";
         JSONObject object = JSONObject.parseObject(fundProfile);
         return JSON.toJSONString(object);
+    }
+
+    @Override
+    public String getAgentRegisterMustParam(RequestContext rc) {
+        User user = userService.get(rc.getUid());
+        List<String> result = dubboOutAssembleService.getMustRegisterarameters(user.getOwnerId(),AccountType.agent.value());
+        if(result == null){
+            return "{}";
+        }
+        return JSONObject.toJSONString(result);
     }
 
     /**
