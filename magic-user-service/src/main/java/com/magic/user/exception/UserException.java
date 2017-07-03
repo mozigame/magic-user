@@ -200,4 +200,11 @@ public class UserException extends ExceptionFactor {
     public static final CommonException VERIFY_CODE_INVALID = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 28, HttpServletResponse.SC_OK, "verify code invalid!", "验证码失效.");
 
+    /**
+     * 用户名包含非法字符
+     */
+    public static final CommonException ILLEGAL_USERNAME = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 29, HttpServletResponse.SC_OK, "illegal username!", "用户名包含非法字符.");
+
+
 }

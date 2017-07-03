@@ -319,7 +319,7 @@ public class AgentResource {
     public void reviewListExport(
             HttpServletResponse response,
             @RequestParam(name = "account", required = false) String account,
-            @RequestParam(name = "status", required = false, defaultValue = "1") Integer status,
+            @RequestParam(name = "status", required = false) Integer status,
             @RequestParam(name = "userId") Long userId
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();

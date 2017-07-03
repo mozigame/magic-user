@@ -12,6 +12,11 @@ import java.util.*;
  */
 public class UserUtil {
 
+    private static String [] names = {
+            "admin","administrator","管理员","版主", "超级版主","超级管理员","本站管理员","本版版主",
+            "会员","超级会员","vip",".com", ".cn","用户管理","管理员"
+    };
+
     /**
      * 解析区间段，按天
      *
@@ -75,6 +80,20 @@ public class UserUtil {
         }
         // 返回
         return temp;
+    }
+
+    /**
+     * 校验字符串是否包非法值
+     * @param name
+     * @return
+     */
+    public static boolean checkoutUserName(String name){
+        for (String str : names) {
+            if(name.indexOf(str) != -1){
+                return false;
+            }
+        }
+        return true;
     }
 
 }

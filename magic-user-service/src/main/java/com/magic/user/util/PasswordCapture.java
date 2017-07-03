@@ -15,4 +15,7 @@ public class PasswordCapture {
     public static String getSaltPwd(String password) {
         return MD5Util.md5Digest((PRIVATE_KEY + password).getBytes());
     }
+
+
+
 }

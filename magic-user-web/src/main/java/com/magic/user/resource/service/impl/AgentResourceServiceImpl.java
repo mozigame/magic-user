@@ -33,6 +33,7 @@ import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
@@ -742,6 +743,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.ILLEGAL_PARAMETERS;
         }
 
+        //校验用户名是否包含非法字符
+        if(UserUtil.checkoutUserName(account)){
+            throw UserException.ILLEGAL_USERNAME;
+        }
+
         long stockId = accountIdMappingService.getUid(ownerInfo.getOwnerId(), ownerInfo.getOwnerName());
         User stockUser = userService.get(stockId);
         if (stockUser == null) {
@@ -901,7 +907,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             return downLoadFile;
         }
         assembleAgentApplyList(agentApplyVos);
-        //TODO 查询表数据，生成excel的zip，并返回zip byte[]
         content = ExcelUtil.agentReviewListExport(agentApplyVos, filename);
         downLoadFile.setContent(content);
         return downLoadFile;
