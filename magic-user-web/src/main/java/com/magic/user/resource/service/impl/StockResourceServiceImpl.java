@@ -16,9 +16,7 @@ import com.magic.oceanus.entity.Summary.OwnerCurrentOperation;
 import com.magic.oceanus.service.OceanusProviderDubboService;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.constants.UserContants;
-import com.magic.user.entity.Login;
-import com.magic.user.entity.OwnerAccountUser;
-import com.magic.user.entity.User;
+import com.magic.user.entity.*;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
@@ -28,6 +26,7 @@ import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.StockResourceService;
 import com.magic.user.service.AccountIdMappingService;
 import com.magic.user.service.LoginService;
+import com.magic.user.service.OwnerStockAgentService;
 import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
@@ -65,6 +64,9 @@ public class StockResourceServiceImpl implements StockResourceService {
     private OceanusProviderDubboService oceanusProviderDubboService;
     @Resource
     private Producer producer;
+    @Resource
+    private OwnerStockAgentService ownerStockAgentService;
+
     /**
      * @param rc
      * @return
@@ -76,7 +78,6 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (user == null) {
             throw UserException.ILLEGAL_USER;
         }
-        //TODO
         List<StockInfoVo> list = userService.findAllStock(user.getOwnerId());
         assembleStockList(list);
         for (StockInfoVo info : list) {
@@ -139,6 +140,12 @@ public class StockResourceServiceImpl implements StockResourceService {
         StockInfoVo stockDetail = userService.getStockDetail(id);
         assembleStockDetail(stockDetail);
         StockDetailVo stockDetailVo = new StockDetailVo();
+        OwnerStockAgentMember osam = ownerStockAgentService.findById(stockDetail.getId(),AccountType.stockholder);
+        if(osam != null){
+            stockDetail.setMembers(osam.getMemNumber());
+        }else{
+            stockDetail.setMembers(0);
+        }
         stockDetailVo.setBaseInfo(stockDetail);
         OwnerCurrentOperation oco = dubboOutAssembleService.getShareholderOperation(id);
         FundProfile<StockFundInfo> profile = new FundProfile<>();
@@ -222,6 +229,7 @@ public class StockResourceServiceImpl implements StockResourceService {
             info.setRegisterTime(DateUtil.formatDateTime(new Date(Long.parseLong(info.getRegisterTime())), DateUtil.formatDefaultTimestamp));
             info.setRegisterIp(IPUtil.intToIp(Integer.parseInt(info.getRegisterIp())));
             info.setLastLoginIp(IPUtil.intToIp(Integer.parseInt(info.getLastLoginIp())));
+
         }
     }
 

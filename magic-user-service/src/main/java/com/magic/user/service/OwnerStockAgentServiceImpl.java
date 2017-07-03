@@ -1,10 +1,13 @@
 package com.magic.user.service;
 
+import com.magic.user.entity.Member;
 import com.magic.user.entity.OwnerStockAgentMember;
+import com.magic.user.enums.AccountType;
 import com.magic.user.storage.OwnerStockAgentDbService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * User: joey
@@ -29,4 +32,47 @@ public class OwnerStockAgentServiceImpl implements OwnerStockAgentService {
     public OwnerStockAgentMember findById(OwnerStockAgentMember ownerStockAgentMember) {
         return (OwnerStockAgentMember) ownerStockAgentDbService.get("findById", new String[]{"ownerMapper"}, ownerStockAgentMember);
     }
+
+    @Override
+    public boolean updateMemNumber(Member member) {
+        long result = ownerStockAgentDbService.update("updateMemNumber",new String[]{"member"},member);
+        return result > 0;
+    }
+
+    @Override
+    public OwnerStockAgentMember findById(Long id, AccountType type) {
+        if(id == null || type == null){
+            return null;
+        }
+        String name = null;
+        if(type == AccountType.stockholder){
+            name = "stockId";
+        }
+        if(type == AccountType.proprietor){
+            name = "ownerId";
+        }
+        if(type == AccountType.agent){
+            name = "agentId";
+        }
+        return (OwnerStockAgentMember) ownerStockAgentDbService.get("findByMember", new String[]{name}, id);
+    }
+
+    @Override
+    public List<OwnerStockAgentMember> findByIds(List<Long> ids, AccountType type) {
+        if(ids == null || type == null){
+            return null;
+        }
+        String name = null;
+        if(type == AccountType.stockholder){
+            name = "stockIds";
+        }
+        if(type == AccountType.proprietor){
+            name = "ownerIds";
+        }
+        if(type == AccountType.agent){
+            name = "agentIds";
+        }
+        return ownerStockAgentDbService.find("findByIds",new String[]{name},ids);
+    }
+
 }
