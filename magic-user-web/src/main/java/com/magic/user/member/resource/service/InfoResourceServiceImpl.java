@@ -24,6 +24,7 @@ import com.magic.user.service.*;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.ExcelUtil;
+import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.AccountModifyInfoVo;
 import com.magic.user.vo.AccountModifyListVo;
 import org.apache.commons.collections.map.HashedMap;
@@ -342,7 +343,7 @@ public class InfoResourceServiceImpl {
                 userMap.put("operTime", System.currentTimeMillis());
             }
             if (loginPassword != null) {
-                result = loginService.resetPassword(id, loginPassword);
+                result = loginService.resetPassword(id, PasswordCapture.getSaltPwd(loginPassword));
                 if (result) {
                     newMap.put("loginPassword", "password reset");
                 }
