@@ -186,11 +186,13 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         //添加账号信息
         //todo 子账号中需要冗余roleId,用于查询功能
         User worker = assembleAddWorker(userId, operaUser.getOwnerId(), operaUser.getOwnerName(), AccountType.worker, account, realname, roleId);
-        if (!userService.addWorker(worker)) {
-            throw UserException.REGISTER_FAIL;
-        }
         if (!dubboOutAssembleService.updateUserRole(worker.getOwnerId(), worker.getUserId(), roleId)) {
             ApiLogger.error(String.format("add user role failed, userId:%d", userId));
+            throw UserException.REGISTER_FAIL;
+        } else {
+            if (!userService.addWorker(worker)) {
+                throw UserException.REGISTER_FAIL;
+            }
         }
         return "{\"id\":" + userId + "}";
     }
@@ -267,14 +269,20 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
         Integer oldRole = user.getRoleId();
         user.setRealname(realname);
         user.setRoleId(roleId);
-        //修改子账号
-        if (!userService.updateWorker(user)) {
-            throw UserException.USER_UPDATE_FAIL;
-        }
         //修改角色
         if (oldRole != null && !oldRole.equals(roleId)) {
             if (!dubboOutAssembleService.updateUserRole(operaUser.getOwnerId(), userId, roleId)) {
                 ApiLogger.error("update worker role failed, userId : " + userId);
+            } else {
+                //修改子账号
+                if (!userService.updateWorker(user)) {
+                    throw UserException.USER_UPDATE_FAIL;
+                }
+            }
+        } else {
+            //修改子账号
+            if (!userService.updateWorker(user)) {
+                throw UserException.USER_UPDATE_FAIL;
             }
         }
         return UserContants.EMPTY_STRING;
