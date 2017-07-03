@@ -586,6 +586,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 vo.setDomains(domains);
             }
         }
+        if(vo.getDomain() == null){
+            vo.setDomain("");
+        }
     }
 
     /**
