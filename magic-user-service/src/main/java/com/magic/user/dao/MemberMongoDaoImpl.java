@@ -173,4 +173,11 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         Update update = new Update().set("level", level);
         return super.update(query, update) != null;
     }
+
+    public long getDepositMembers(Long agentId) {
+        Query query = new Query();
+        query.addCriteria(new Criteria("agentId").is(agentId)).
+                addCriteria(new Criteria("depositCount").gt(0));
+        return count(query);
+    }
 }

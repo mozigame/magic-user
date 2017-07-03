@@ -107,4 +107,11 @@ public interface MemberMongoService {
      * @return
      */
     boolean updateLevel(Member member, long level);
+
+    /**
+     * @Doc 根据代理Id查询存款会员数量
+     * @param agentId
+     * @return
+     */
+    long getDepositMembers(Long agentId);
 }

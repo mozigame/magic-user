@@ -73,6 +73,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private OceanusProviderDubboService oceanusProviderDubboService;
     @Resource
     private OwnerStockAgentService ownerStockAgentService;
+    @Resource
+    private MemberMongoService memberMongoService;
     /**
      * {@inheritDoc}
      *
@@ -500,7 +502,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
             FundProfile<AgentFundInfo> profile = new FundProfile<>();
             profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
-            profile.setInfo(assembleFundProfile(p));
+            AgentFundInfo info = assembleFundProfile(p);
+            info.setDepositMembers((int)memberMongoService.getDepositMembers(agentVo.getId()));
+            profile.setInfo(info);
+
             agentDetailVo.setFundProfile(profile);
         }
         return JSON.toJSONString(agentDetailVo);
@@ -515,7 +520,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private AgentFundInfo assembleFundProfile(ProxyCurrentOperaton operaton) {
         AgentFundInfo agentFundInfo = new AgentFundInfo();
         int members = 0;//会员数量
-        int depositMembers = 0;//存款会员数量
+        //int depositMembers = 0;//存款会员数量
         String depositTotalMoney = "0";//存款金额
         String withdrawTotalMoney = "0";//取款金额
         String betTotalMoney = "0";//总投注额
@@ -524,9 +529,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (Optional.ofNullable(operaton).filter(membersValue -> membersValue.getMembers() != null && membersValue.getMembers() > 0).isPresent()){
             members = operaton.getMembers().intValue();
         }
-        if (Optional.ofNullable(operaton).filter(depositMembersValue -> depositMembersValue.getDepositMembers() != null && depositMembersValue.getDepositMembers() > 0).isPresent()){
-            depositMembers = operaton.getDepositMembers().intValue();
-        }
+//        if (Optional.ofNullable(operaton).filter(depositMembersValue -> depositMembersValue.getDepositMembers() != null && depositMembersValue.getDepositMembers() > 0).isPresent()){
+//            depositMembers = operaton.getDepositMembers().intValue();
+//        }
         if (Optional.ofNullable(operaton).filter(depositTotalMoneyValue -> depositTotalMoneyValue.getDepositTotalMoney() != null && depositTotalMoneyValue.getDepositTotalMoney() > 0).isPresent()){
             depositTotalMoney = String.valueOf(NumberUtil.fenToYuan(operaton.getDepositTotalMoney()));
         }
@@ -543,7 +548,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             gains = String.valueOf(NumberUtil.fenToYuan(operaton.getGains()));
         }
         agentFundInfo.setMembers(members);
-        agentFundInfo.setDepositMembers(depositMembers);
+        //agentFundInfo.setDepositMembers(depositMembers);
         agentFundInfo.setDepositTotalMoney(depositTotalMoney);
         agentFundInfo.setWithdrawTotalMoney(withdrawTotalMoney);
         agentFundInfo.setBetTotalMoney(betTotalMoney);
