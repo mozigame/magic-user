@@ -7,6 +7,7 @@ import com.magic.api.commons.core.tools.MauthUtil;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.api.commons.tools.NumberUtil;
 import com.magic.bc.query.service.PrepaySchemeService;
 import com.magic.bc.query.vo.PrePaySchemeVo;
@@ -125,7 +126,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         Integer n =  Integer.parseInt(nt == null ? "0":nt);
 
         result.setNotReadNotice(n);
-        result.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        result.setTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
 
         return JSONObject.toJSONString(result);
     }
