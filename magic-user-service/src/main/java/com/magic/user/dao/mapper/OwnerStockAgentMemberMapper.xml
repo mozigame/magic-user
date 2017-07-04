@@ -10,6 +10,9 @@
         <result column="mem_number" jdbcType="INTEGER" property="memNumber" />
     </resultMap>
 
+    <sql id="rows">
+        id,owner_id,stock_id,agent_id,mem_number
+    </sql>
 
     <insert id="insert">
         INSERT INTO
@@ -23,14 +26,20 @@
     </insert>
 
     <select id="findById" resultMap="BaseResultMap">
-      SELECT * from t_owner_stock_agent_member
-        WHERE owner_id=#{ownerMapper.ownerId}
-          AND stock_id=#{ownerMapper.stockId}
-          AND agent_id=#{ownerMapper.agentId}
+      SELECT
+        <include refid="rows" />
+      FROM
+        t_owner_stock_agent_member
+      WHERE
+        owner_id=#{ownerMapper.ownerId}
+        AND stock_id=#{ownerMapper.stockId}
+        AND agent_id=#{ownerMapper.agentId}
     </select>
 
-    <select id="findByMember" resultMap="BaseResultMap">
-        SELECT * from t_owner_stock_agent_member
+    <select id="countMembersById" resultMap="BaseResultMap">
+        SELECT
+          SUM(mem_number) as memNumber
+        FROM t_owner_stock_agent_member
         <where>
             <if test="ownerId != null">
               AND  owner_id=#{ownerId}
@@ -44,28 +53,49 @@
         </where>
     </select>
 
-    <select id="findByIds" resultMap="BaseResultMap">
-        SELECT * from t_owner_stock_agent_member
+    <select id="countMembersByIds" resultMap="BaseResultMap">
+        SELECT
+            SUM(mem_number) AS memNumber
+            <if test="ownerIds != null">
+                ,owner_id
+            </if>
+            <if test="stockIds != null">
+                ,stock_id
+            </if>
+            <if test="agentIds != null">
+                ,agent_id
+            </if>
+        FROM t_owner_stock_agent_member
         <where>
             <if test="ownerIds != null">
                 AND  owner_id
-                <foreach collection="ids" item="id" open="IN (" close=")" separator=",">
+                <foreach collection="ownerIds" item="id" open="IN (" close=")" separator=",">
                     #{id}
                 </foreach>
             </if>
             <if test="stockIds != null">
                 AND stock_id
-                <foreach collection="ids" item="id" open="IN (" close=")" separator=",">
+                <foreach collection="stockIds" item="id" open="IN (" close=")" separator=",">
                     #{id}
                 </foreach>
             </if>
             <if test="agentIds != null">
                 AND agent_id
-                <foreach collection="ids" item="id" open="IN (" close=")" separator=",">
+                <foreach collection="agentIds" item="id" open="IN (" close=")" separator=",">
                     #{id}
                 </foreach>
             </if>
         </where>
+        GROUP BY
+            <if test="ownerIds != null">
+              owner_id
+            </if>
+            <if test="stockIds != null">
+              stock_id
+            </if>
+            <if test="agentIds != null">
+              agent_id
+            </if>
     </select>
 
     <update id="updateMemNumber">

@@ -118,7 +118,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //根据代理ID列表查询代理的会员数量信息
-        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.findByIds(agentIds,AccountType.agent);
+        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
         Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
         for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
             osamMap.put(osam.getAgentId(),osam);
@@ -264,7 +264,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //根据代理ID列表查询代理的会员数量信息
-        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.findByIds(agentIds,AccountType.agent);
+        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
         Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
         for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
             osamMap.put(osam.getAgentId(),osam);
@@ -489,7 +489,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         assembleAgentDetail(agentVo, isReview);
         AgentDetailVo agentDetailVo = new AgentDetailVo();
 
-        OwnerStockAgentMember osam = ownerStockAgentService.findById(agentVo.getId(),AccountType.agent);
+        OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(agentVo.getId(),AccountType.agent);
         if(osam != null){
             agentVo.setMembers(osam.getMemNumber());
         }else{
@@ -497,7 +497,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         agentDetailVo.setBaseInfo(agentVo);
-        agentDetailVo.setSettings(thriftOutAssembleService.getAgentConfig(id));
+        AgentConfigVo setting = thriftOutAssembleService.getAgentConfig(id);
+        setting = initAgentConfigVo(setting);
+
+        agentDetailVo.setSettings(setting);
+
         if (!isReview) {
             ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
             FundProfile<AgentFundInfo> profile = new FundProfile<>();
@@ -509,6 +513,27 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             agentDetailVo.setFundProfile(profile);
         }
         return JSON.toJSONString(agentDetailVo);
+    }
+
+    /**
+     * 初始化setting
+     * @param setting
+     * @return
+     */
+    private AgentConfigVo initAgentConfigVo(AgentConfigVo setting) {
+        if(setting == null){
+            setting = new AgentConfigVo();
+        }
+        if(setting.getAdminCost() == null) setting.setAdminCost(0);
+        if(setting.getAdminCostName() == null) setting.setAdminCostName("");
+        if(setting.getCost() == null) setting.setCost(0);
+        if(setting.getDiscount() == null) setting.setDiscount(0);
+        if (setting.getFeeScheme() == null) setting.setFeeScheme(0);
+        if(setting.getFeeSchemeName() == null) setting.setFeeSchemeName("");
+        if(setting.getReturnScheme() == null) setting.setReturnScheme(0);
+        if(setting.getReturnSchemeName() == null)setting.setReturnSchemeName("");
+
+        return setting;
     }
 
     /**
@@ -585,6 +610,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 String[] domains = vo.getDomain().split(",");
                 vo.setDomains(domains);
             }
+        }
+        if(vo.getDomain() == null){
+            vo.setDomain("");
         }
     }
 
