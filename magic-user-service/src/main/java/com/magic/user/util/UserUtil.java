@@ -90,10 +90,10 @@ public class UserUtil {
     public static boolean checkoutUserName(String name){
         for (String str : names) {
             if(name.indexOf(str) != -1){
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 }
