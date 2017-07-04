@@ -49,19 +49,19 @@
         <where>
             <if test="ownerIds != null">
                 AND  owner_id
-                <foreach collection="ids" item="id" open="IN (" close=")" separator=",">
+                <foreach collection="ownerIds" item="id" open="IN (" close=")" separator=",">
                     #{id}
                 </foreach>
             </if>
             <if test="stockIds != null">
                 AND stock_id
-                <foreach collection="ids" item="id" open="IN (" close=")" separator=",">
+                <foreach collection="stockIds" item="id" open="IN (" close=")" separator=",">
                     #{id}
                 </foreach>
             </if>
             <if test="agentIds != null">
                 AND agent_id
-                <foreach collection="ids" item="id" open="IN (" close=")" separator=",">
+                <foreach collection="agentIds" item="id" open="IN (" close=")" separator=",">
                     #{id}
                 </foreach>
             </if>

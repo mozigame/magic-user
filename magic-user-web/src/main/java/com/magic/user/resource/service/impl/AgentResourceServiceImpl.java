@@ -497,7 +497,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         agentDetailVo.setBaseInfo(agentVo);
-        agentDetailVo.setSettings(thriftOutAssembleService.getAgentConfig(id));
+        AgentConfigVo setting = thriftOutAssembleService.getAgentConfig(id);
+        setting = initAgentConfigVo(setting);
+
+        agentDetailVo.setSettings(setting);
+
         if (!isReview) {
             ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
             FundProfile<AgentFundInfo> profile = new FundProfile<>();
@@ -509,6 +513,27 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             agentDetailVo.setFundProfile(profile);
         }
         return JSON.toJSONString(agentDetailVo);
+    }
+
+    /**
+     * 初始化setting
+     * @param setting
+     * @return
+     */
+    private AgentConfigVo initAgentConfigVo(AgentConfigVo setting) {
+        if(setting == null){
+            setting = new AgentConfigVo();
+        }
+        if(setting.getAdminCost() == null) setting.setAdminCost(0);
+        if(setting.getAdminCostName() == null) setting.setAdminCostName("");
+        if(setting.getCost() == null) setting.setCost(0);
+        if(setting.getDiscount() == null) setting.setDiscount(0);
+        if (setting.getFeeScheme() == null) setting.setFeeScheme(0);
+        if(setting.getFeeSchemeName() == null) setting.setFeeSchemeName("");
+        if(setting.getReturnScheme() == null) setting.setReturnScheme(0);
+        if(setting.getReturnSchemeName() == null)setting.setReturnSchemeName("");
+
+        return setting;
     }
 
     /**
