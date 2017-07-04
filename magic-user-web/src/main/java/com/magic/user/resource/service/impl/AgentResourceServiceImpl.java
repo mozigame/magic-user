@@ -103,6 +103,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         //3、条件查询mongo中的代理，组装id
         List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, page, count);
+        if(agentConditionVoList == null) return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+
         //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
         List<Long> agentIds = Lists.newArrayList();
 
@@ -116,15 +118,22 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         Map<Long,Integer> listm = agentMongoService.countDepositMembers(agentIds);
-
+        if(listm == null){
+            listm = new HashMap<>();
+        }
         //根据代理ID列表查询代理的会员数量信息
         List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
-        Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
-        for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
-            osamMap.put(osam.getAgentId(),osam);
-        }
-        List<AgentInfoVo> users = userService.findAgents(agentIds);
 
+        Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
+
+        if(OwnerStockAgentMemberList != null){
+            for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
+                osamMap.put(osam.getAgentId(),osam);
+            }
+        }
+
+        List<AgentInfoVo> users = userService.findAgents(agentIds);
+        if(users == null)return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
         List<AgentInfoVo> list = assembleAgentList(users,map,osamMap,listm);
         if (list != null && list.size() > 0) {
             return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));

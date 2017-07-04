@@ -154,12 +154,12 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
 
 
     public Map<Long,Integer> countDepositMembers(List<Long> agentIds) {
+        ApiLogger.info(JSON.toJSONString(agentIds));
         ProjectionOperation projectionOperation = Aggregation.project("agentId", "members");
         GroupOperation groupOperation = Aggregation.group("agentId").count().as("members");
         Criteria operator = Criteria.where("agentId").in(agentIds);
-        MatchOperation matchOperation = Aggregation.match(operator);
         // 组合条件
-        Aggregation aggregation = Aggregation.newAggregation(projectionOperation, matchOperation, groupOperation);
+        Aggregation aggregation = Aggregation.newAggregation(projectionOperation, Aggregation.match(operator), groupOperation);
         // 执行操作
         ApiLogger.info("==========group query Agent members===========");
         AggregationResults<AgentConditionVo> aggregationResults = mongoTemplate.aggregate(aggregation, "memberConditionVo", AgentConditionVo.class);
