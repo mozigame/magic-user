@@ -6,16 +6,17 @@ import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
 import com.magic.user.enums.AccountType;
+import com.magic.user.vo.AgentDepositMember;
 import com.magic.user.vo.MemberConditionVo;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * User: joey
@@ -179,5 +180,25 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         query.addCriteria(new Criteria("agentId").is(agentId)).
                 addCriteria(new Criteria("depositCount").gt(0));
         return count(query);
+    }
+
+    /**
+     * 批量获取代理储值会员数
+     *
+     * @param agentIds
+     * @return
+     */
+    public Map<Long, Integer> batchGetDepositMembers(Collection<Long> agentIds){
+        Map<Long, Integer> result = new HashMap<>();
+        Aggregation aggregation = Aggregation.newAggregation(Aggregation.project("agentId", "members", "depositCount"),
+                Aggregation.match(Criteria.where("agentId").in(agentIds).and("depositCount").gt(0)),
+                Aggregation.group("agentId").count().as("members"));
+        AggregationResults<AgentDepositMember> aggregates = mongoTemplate.aggregate(aggregation, "memberConditionVo", AgentDepositMember.class);
+        Iterator<AgentDepositMember> iterator = aggregates.iterator();
+        while (iterator.hasNext()){
+            AgentDepositMember next = iterator.next();
+            result.put(next.getId(), next.getMembers());
+        }
+        return result;
     }
 }

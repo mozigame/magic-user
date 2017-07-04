@@ -463,7 +463,7 @@ public class AgentResource {
      * @Doc 获取前端注册代理是的必填项
      */
     @Access(type = Access.AccessType.PUBLIC)
-    @RequestMapping(value = "/getAgentRegisterMustParam", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/getAgentRegisterMustParam", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String getAgentRegisterMustParam() {
         return agentResourceService.getAgentRegisterMustParam(RequestContext.getRequestContext());

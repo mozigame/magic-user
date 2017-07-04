@@ -664,7 +664,7 @@ public class MemberResource {
     @ResponseBody
     public String memberTradingRecord(@RequestParam(name = "memberId", required = true) Long memberId) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.memberTradingRecord(rc,memberId);
+        return memberServiceResource.memberTradingRecord(rc, memberId);
     }
 
     /**
@@ -698,4 +698,5 @@ public class MemberResource {
         object.put("code", base64Code);
         return object.toJSONString();
     }
+
 }
