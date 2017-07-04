@@ -118,7 +118,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //根据代理ID列表查询代理的会员数量信息
-        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.findByIds(agentIds,AccountType.agent);
+        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
         Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
         for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
             osamMap.put(osam.getAgentId(),osam);
@@ -264,7 +264,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //根据代理ID列表查询代理的会员数量信息
-        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.findByIds(agentIds,AccountType.agent);
+        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
         Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
         for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
             osamMap.put(osam.getAgentId(),osam);
@@ -489,7 +489,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         assembleAgentDetail(agentVo, isReview);
         AgentDetailVo agentDetailVo = new AgentDetailVo();
 
-        OwnerStockAgentMember osam = ownerStockAgentService.findById(agentVo.getId(),AccountType.agent);
+        OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(agentVo.getId(),AccountType.agent);
         if(osam != null){
             agentVo.setMembers(osam.getMemNumber());
         }else{

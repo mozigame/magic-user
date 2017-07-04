@@ -40,7 +40,7 @@ public class OwnerStockAgentServiceImpl implements OwnerStockAgentService {
     }
 
     @Override
-    public OwnerStockAgentMember findById(Long id, AccountType type) {
+    public OwnerStockAgentMember countMembersById(Long id, AccountType type) {
         if(id == null || type == null){
             return null;
         }
@@ -49,11 +49,11 @@ public class OwnerStockAgentServiceImpl implements OwnerStockAgentService {
         if(type == AccountType.proprietor)name = "ownerId";
         if(type == AccountType.agent) name = "agentId";
         if(name == null) return null;
-        return (OwnerStockAgentMember) ownerStockAgentDbService.get("findByMember", new String[]{name}, id);
+        return (OwnerStockAgentMember) ownerStockAgentDbService.get("countMembersById", new String[]{name}, id);
     }
 
     @Override
-    public List<OwnerStockAgentMember> findByIds(List<Long> ids, AccountType type) {
+    public List<OwnerStockAgentMember> countMembersByIds(List<Long> ids, AccountType type) {
         if(ids == null || type == null){
             return null;
         }
@@ -67,7 +67,7 @@ public class OwnerStockAgentServiceImpl implements OwnerStockAgentService {
         if(type == AccountType.agent){
             name = "agentIds";
         }
-        return ownerStockAgentDbService.find("findByIds",new String[]{name},ids);
+        return ownerStockAgentDbService.find("countMembersByIds",new String[]{name},ids);
     }
 
 }

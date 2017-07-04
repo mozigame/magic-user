@@ -33,16 +33,16 @@ public interface OwnerStockAgentService {
     boolean updateMemNumber(Member member);
 
     /**
-     * @Doc 根据Id(股东Id/业主Id/代理Id)获取映射数据
+     * @Doc 根据Id(股东Id/业主Id/代理Id)获取会员数
      * @return
      */
-    OwnerStockAgentMember findById(Long id, AccountType type);
+    OwnerStockAgentMember countMembersById(Long id, AccountType type);
 
     /**
-     *@Doc  根据ID列表（股东Id/业主Id/代理Id）获取映射数据
+     *@Doc  根据ID列表（股东Id/业主Id/代理Id）获取会员数
      * @param ids
      * @param type
      * @return
      */
-    List<OwnerStockAgentMember> findByIds(List<Long> ids, AccountType type);
+    List<OwnerStockAgentMember> countMembersByIds(List<Long> ids, AccountType type);
 }

@@ -36,9 +36,9 @@
         AND agent_id=#{ownerMapper.agentId}
     </select>
 
-    <select id="findByMember" resultMap="BaseResultMap">
+    <select id="countMembersById" resultMap="BaseResultMap">
         SELECT
-          <include refid="rows" />
+          SUM(mem_number) as memNumber
         FROM t_owner_stock_agent_member
         <where>
             <if test="ownerId != null">
@@ -53,9 +53,18 @@
         </where>
     </select>
 
-    <select id="findByIds" resultMap="BaseResultMap">
+    <select id="countMembersByIds" resultMap="BaseResultMap">
         SELECT
-          <include refid="rows" />
+            SUM(mem_number) AS memNumber
+            <if test="ownerIds != null">
+                ,owner_id
+            </if>
+            <if test="stockIds != null">
+                ,stock_id
+            </if>
+            <if test="agentIds != null">
+                ,agent_id
+            </if>
         FROM t_owner_stock_agent_member
         <where>
             <if test="ownerIds != null">
@@ -77,6 +86,16 @@
                 </foreach>
             </if>
         </where>
+        GROUP BY
+            <if test="ownerIds != null">
+              owner_id
+            </if>
+            <if test="stockIds != null">
+              stock_id
+            </if>
+            <if test="agentIds != null">
+              agent_id
+            </if>
     </select>
 
     <update id="updateMemNumber">
