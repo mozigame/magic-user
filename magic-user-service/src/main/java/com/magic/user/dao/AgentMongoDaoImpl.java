@@ -164,10 +164,12 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
         ApiLogger.info("==========group query Agent members===========");
         AggregationResults<AgentConditionVo> aggregationResults = mongoTemplate.aggregate(aggregation, "memberConditionVo", AgentConditionVo.class);
         ApiLogger.info(JSON.toJSONString(aggregationResults));
-        List<AgentConditionVo> result = aggregationResults.getMappedResults();
         Map<Long,Integer> resultMap = new HashMap();
-        for (AgentConditionVo r:result) {
-            resultMap.put(r.getAgentId(),r.getMembers());
+        if (Optional.ofNullable(aggregationResults).isPresent()) {
+            List<AgentConditionVo> result = aggregationResults.getMappedResults();
+            for (AgentConditionVo r : result) {
+                resultMap.put(r.getAgentId(), r.getMembers());
+            }
         }
         return resultMap;
     }
