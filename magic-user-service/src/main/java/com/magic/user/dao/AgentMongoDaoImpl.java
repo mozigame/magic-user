@@ -1,17 +1,27 @@
 package com.magic.user.dao;
 
+import com.alibaba.fastjson.JSON;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.vo.AgentConditionVo;
+import com.magic.user.vo.AgentConfigVo;
+import com.magic.user.vo.MemberConditionVo;
+import com.mongodb.BasicDBList;
+import com.mongodb.DBObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.mapreduce.GroupBy;
+import org.springframework.data.mongodb.core.mapreduce.GroupByResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import sun.security.krb5.internal.APOptions;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * User: joey
@@ -143,4 +153,24 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
     }
 
 
+    public Map<Long,Integer> countDepositMembers(List<Long> agentIds) {
+        ApiLogger.info(JSON.toJSONString(agentIds));
+        ProjectionOperation projectionOperation = Aggregation.project("agentId", "members");
+        GroupOperation groupOperation = Aggregation.group("agentId").count().as("members");
+        Criteria operator = Criteria.where("agentId").in(agentIds);
+        // 组合条件
+        Aggregation aggregation = Aggregation.newAggregation(projectionOperation, Aggregation.match(operator), groupOperation);
+        // 执行操作
+        ApiLogger.info("==========group query Agent members===========");
+        AggregationResults<AgentConditionVo> aggregationResults = mongoTemplate.aggregate(aggregation, "memberConditionVo", AgentConditionVo.class);
+        ApiLogger.info(JSON.toJSONString(aggregationResults));
+        Map<Long,Integer> resultMap = new HashMap();
+        if (Optional.ofNullable(aggregationResults).isPresent()) {
+            List<AgentConditionVo> result = aggregationResults.getMappedResults();
+            for (AgentConditionVo r : result) {
+                resultMap.put(r.getAgentId(), r.getMembers());
+            }
+        }
+        return resultMap;
+    }
 }

@@ -2,8 +2,11 @@ package com.magic.user.service;
 
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.vo.AgentConditionVo;
+import com.magic.user.vo.AgentInfoVo;
+import com.magic.user.vo.MemberConditionVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: joey
@@ -49,4 +52,11 @@ public interface AgentMongoService {
      * @return
      */
     long getCount(AgentCondition userCondition);
+
+    /**
+     * @Doc 获取代理的存值会员数
+     * @param agentIds
+     * @return
+     */
+    Map<Long,Integer> countDepositMembers(List<Long> agentIds);
 }
