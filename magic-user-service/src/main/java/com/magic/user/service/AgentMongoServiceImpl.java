@@ -4,10 +4,14 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.dao.AgentMongoDaoImpl;
 import com.magic.user.vo.AgentConditionVo;
+import com.magic.user.vo.AgentInfoVo;
+import com.magic.user.vo.MemberConditionVo;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: joey
@@ -99,5 +103,15 @@ public class AgentMongoServiceImpl implements AgentMongoService {
             ApiLogger.error(String.format("get agent count error.userCondition:%d", userCondition), e);
         }
         return 0;
+    }
+
+    @Override
+    public Map<Long,Integer> countDepositMembers(List<Long> agentIds) {
+        try {
+            return agentMongoDao.countDepositMembers(agentIds);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("get agent count members error.agentIds:%d", agentIds), e);
+        }
+        return null;
     }
 }

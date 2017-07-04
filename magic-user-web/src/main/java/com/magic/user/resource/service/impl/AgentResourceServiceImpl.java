@@ -103,8 +103,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         //3、条件查询mongo中的代理，组装id
         List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, page, count);
-        ApiLogger.info("=======agentConditionVoList=======");
-        ApiLogger.info(JSON.toJSONString(agentConditionVoList));
         //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
         List<Long> agentIds = Lists.newArrayList();
 
@@ -117,13 +115,17 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
         }
 
+        Map<Long,Integer> listm = agentMongoService.countDepositMembers(agentIds);
+
         //根据代理ID列表查询代理的会员数量信息
         List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
         Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
         for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
             osamMap.put(osam.getAgentId(),osam);
         }
-        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map,osamMap);
+        List<AgentInfoVo> users = userService.findAgents(agentIds);
+
+        List<AgentInfoVo> list = assembleAgentList(users,map,osamMap,listm);
         if (list != null && list.size() > 0) {
             return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
         }
@@ -136,10 +138,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 封装代理列表
      */
-    private List<AgentInfoVo> assembleAgentList(List<AgentInfoVo> users,Map<Long,AgentConditionVo> map,Map<Long,OwnerStockAgentMember> osamMap) {
+    private List<AgentInfoVo> assembleAgentList(List<AgentInfoVo> users,Map<Long,AgentConditionVo> map,Map<Long,OwnerStockAgentMember> osamMap,Map<Long,Integer> listm) {
         for (AgentInfoVo vo : users) {
             AgentConditionVo av = map.get(vo.getId());
             OwnerStockAgentMember osam = osamMap.get(vo.getId());
+            Integer v = listm.get(vo.getId());
             if(av != null){
                 vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
                 // 会员数量，存款金额，取款金额
@@ -162,7 +165,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }else{
                 vo.setReviewTime("");
             }
-            if(vo.getStoreMembers() == null){
+            if(v != null){
+                vo.setStoreMembers(v);
+            }else{
                 vo.setStoreMembers(0);
             }
             if(vo.getReviewer() == null){
@@ -270,7 +275,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             osamMap.put(osam.getAgentId(),osam);
         }
 
-        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map,osamMap);
+        Map<Long,Integer> listm = agentMongoService.countDepositMembers(agentIds);
+        if(listm == null) listm = new HashMap<Long,Integer>();
+        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map,osamMap,listm);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
         content = ExcelUtil.agentListExport(list, filename);
         downLoadFile.setContent(content);
