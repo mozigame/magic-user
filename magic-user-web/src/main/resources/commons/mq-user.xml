@@ -34,6 +34,7 @@
                 <ref bean="userLoginLogSuccessConsumer"/>
                 <ref bean="userModifyPaymentPasswordConsumer"/>
                 <ref bean="memberRegisterSucessPaymentPasswordConsumer"/>
+                <ref bean="memberRegisterSuccessAddNumber"/>
             </list>
         </constructor-arg>
         <constructor-arg index="1" value="${mq.all.consumer.nameserver}"/>

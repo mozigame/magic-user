@@ -34,7 +34,6 @@ public class StockholderResource {
     @Resource(name = "stockResourceService")
     private StockResourceService stockResourceService;
 
-
     /**
      * @return
      * @Doc 股东列表

@@ -197,4 +197,14 @@ public class MemberMongoServiceImpl implements MemberMongoService {
         }
         return false;
     }
+
+    @Override
+    public long getDepositMembers(Long agentId) {
+        try {
+            return memberMongoDao.getDepositMembers(agentId);
+        }catch (Exception e){
+            ApiLogger.error(String.format("get memberConditionVo count agentId:%d ", agentId), e);
+        }
+        return 0L;
+    }
 }

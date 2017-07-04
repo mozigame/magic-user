@@ -1,6 +1,10 @@
 package com.magic.user.service;
 
+import com.magic.user.entity.Member;
 import com.magic.user.entity.OwnerStockAgentMember;
+import com.magic.user.enums.AccountType;
+
+import java.util.List;
 
 /**
  * User: joey
@@ -20,4 +24,25 @@ public interface OwnerStockAgentService {
      * @return
      */
     OwnerStockAgentMember findById(OwnerStockAgentMember ownerStockAgentMember);
+
+    /**
+     * @Doc 修改业主股东代理用户数映射(注册会员成功后更新业主、股东、代理的会员数)
+     * @param member
+     * @return
+     */
+    boolean updateMemNumber(Member member);
+
+    /**
+     * @Doc 根据Id(股东Id/业主Id/代理Id)获取会员数
+     * @return
+     */
+    OwnerStockAgentMember countMembersById(Long id, AccountType type);
+
+    /**
+     *@Doc  根据ID列表（股东Id/业主Id/代理Id）获取会员数
+     * @param ids
+     * @param type
+     * @return
+     */
+    List<OwnerStockAgentMember> countMembersByIds(List<Long> ids, AccountType type);
 }

@@ -71,7 +71,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private ThriftOutAssembleServiceImpl thriftOutAssembleService;
     @Resource
     private OceanusProviderDubboService oceanusProviderDubboService;
-
+    @Resource
+    private OwnerStockAgentService ownerStockAgentService;
+    @Resource
+    private MemberMongoService memberMongoService;
     /**
      * {@inheritDoc}
      *
@@ -104,6 +107,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         ApiLogger.info(JSON.toJSONString(agentConditionVoList));
         //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
         List<Long> agentIds = Lists.newArrayList();
+
         Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
         for (AgentConditionVo vo : agentConditionVoList) {
             agentIds.add(vo.getAgentId());
@@ -112,7 +116,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             map.put(vo.getAgentId(),vo);
 
         }
-        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map);
+
+        //根据代理ID列表查询代理的会员数量信息
+        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
+        Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
+        for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
+            osamMap.put(osam.getAgentId(),osam);
+        }
+        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map,osamMap);
         if (list != null && list.size() > 0) {
             return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
         }
@@ -125,13 +136,18 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 封装代理列表
      */
-    private List<AgentInfoVo> assembleAgentList(List<AgentInfoVo> users,Map<Long,AgentConditionVo> map) {
+    private List<AgentInfoVo> assembleAgentList(List<AgentInfoVo> users,Map<Long,AgentConditionVo> map,Map<Long,OwnerStockAgentMember> osamMap) {
         for (AgentInfoVo vo : users) {
             AgentConditionVo av = map.get(vo.getId());
+            OwnerStockAgentMember osam = osamMap.get(vo.getId());
             if(av != null){
                 vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
                 // 会员数量，存款金额，取款金额
-                vo.setMembers(av.getMembers());
+                if (osam != null) {
+                    vo.setMembers(osam.getMemNumber());
+                }else{
+                    vo.setMembers(0);
+                }
                 vo.setDepositTotalMoney(av.getDepositMoney());
                 vo.setWithdrawTotalMoney(av.getWithdrawMoney());
             }else{
@@ -246,7 +262,15 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             agentIds.add(vo.getAgentId());
             map.put(vo.getAgentId(),vo);
         }
-        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map);
+
+        //根据代理ID列表查询代理的会员数量信息
+        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
+        Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
+        for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
+            osamMap.put(osam.getAgentId(),osam);
+        }
+
+        List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map,osamMap);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
         content = ExcelUtil.agentListExport(list, filename);
         downLoadFile.setContent(content);
@@ -464,16 +488,52 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         assembleAgentDetail(agentVo, isReview);
         AgentDetailVo agentDetailVo = new AgentDetailVo();
+
+        OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(agentVo.getId(),AccountType.agent);
+        if(osam != null){
+            agentVo.setMembers(osam.getMemNumber());
+        }else{
+            agentVo.setMembers(0);
+        }
+
         agentDetailVo.setBaseInfo(agentVo);
-        agentDetailVo.setSettings(thriftOutAssembleService.getAgentConfig(id));
+        AgentConfigVo setting = thriftOutAssembleService.getAgentConfig(id);
+        setting = initAgentConfigVo(setting);
+
+        agentDetailVo.setSettings(setting);
+
         if (!isReview) {
             ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
             FundProfile<AgentFundInfo> profile = new FundProfile<>();
             profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
-            profile.setInfo(assembleFundProfile(p));
+            AgentFundInfo info = assembleFundProfile(p);
+            info.setDepositMembers((int)memberMongoService.getDepositMembers(agentVo.getId()));
+            profile.setInfo(info);
+
             agentDetailVo.setFundProfile(profile);
         }
         return JSON.toJSONString(agentDetailVo);
+    }
+
+    /**
+     * 初始化setting
+     * @param setting
+     * @return
+     */
+    private AgentConfigVo initAgentConfigVo(AgentConfigVo setting) {
+        if(setting == null){
+            setting = new AgentConfigVo();
+        }
+        if(setting.getAdminCost() == null) setting.setAdminCost(0);
+        if(setting.getAdminCostName() == null) setting.setAdminCostName("");
+        if(setting.getCost() == null) setting.setCost(0);
+        if(setting.getDiscount() == null) setting.setDiscount(0);
+        if (setting.getFeeScheme() == null) setting.setFeeScheme(0);
+        if(setting.getFeeSchemeName() == null) setting.setFeeSchemeName("");
+        if(setting.getReturnScheme() == null) setting.setReturnScheme(0);
+        if(setting.getReturnSchemeName() == null)setting.setReturnSchemeName("");
+
+        return setting;
     }
 
     /**
@@ -485,7 +545,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private AgentFundInfo assembleFundProfile(ProxyCurrentOperaton operaton) {
         AgentFundInfo agentFundInfo = new AgentFundInfo();
         int members = 0;//会员数量
-        int depositMembers = 0;//存款会员数量
+        //int depositMembers = 0;//存款会员数量
         String depositTotalMoney = "0";//存款金额
         String withdrawTotalMoney = "0";//取款金额
         String betTotalMoney = "0";//总投注额
@@ -494,9 +554,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (Optional.ofNullable(operaton).filter(membersValue -> membersValue.getMembers() != null && membersValue.getMembers() > 0).isPresent()){
             members = operaton.getMembers().intValue();
         }
-        if (Optional.ofNullable(operaton).filter(depositMembersValue -> depositMembersValue.getDepositMembers() != null && depositMembersValue.getDepositMembers() > 0).isPresent()){
-            depositMembers = operaton.getDepositMembers().intValue();
-        }
+//        if (Optional.ofNullable(operaton).filter(depositMembersValue -> depositMembersValue.getDepositMembers() != null && depositMembersValue.getDepositMembers() > 0).isPresent()){
+//            depositMembers = operaton.getDepositMembers().intValue();
+//        }
         if (Optional.ofNullable(operaton).filter(depositTotalMoneyValue -> depositTotalMoneyValue.getDepositTotalMoney() != null && depositTotalMoneyValue.getDepositTotalMoney() > 0).isPresent()){
             depositTotalMoney = String.valueOf(NumberUtil.fenToYuan(operaton.getDepositTotalMoney()));
         }
@@ -513,7 +573,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             gains = String.valueOf(NumberUtil.fenToYuan(operaton.getGains()));
         }
         agentFundInfo.setMembers(members);
-        agentFundInfo.setDepositMembers(depositMembers);
+        //agentFundInfo.setDepositMembers(depositMembers);
         agentFundInfo.setDepositTotalMoney(depositTotalMoney);
         agentFundInfo.setWithdrawTotalMoney(withdrawTotalMoney);
         agentFundInfo.setBetTotalMoney(betTotalMoney);
@@ -550,6 +610,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 String[] domains = vo.getDomain().split(",");
                 vo.setDomains(domains);
             }
+        }
+        if(vo.getDomain() == null){
+            vo.setDomain("");
         }
     }
 
