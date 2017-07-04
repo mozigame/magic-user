@@ -451,6 +451,7 @@
         <if test="roleId != null and roleId > 0">
             and role_id=#{roleId}
         </if>
+        order by register_time desc
         <if test="offset != null and offset > -1">
             limit #{offset},#{limit}
         </if>

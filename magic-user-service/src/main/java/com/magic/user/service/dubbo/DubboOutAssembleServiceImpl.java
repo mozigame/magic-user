@@ -384,7 +384,7 @@ public class DubboOutAssembleServiceImpl {
      */
     public Role getUserRoleInfo(Long userId) {
         try {
-            permitDubboService.getUserRoleInfo(userId);
+            return permitDubboService.getUserRoleInfo(userId);
         } catch (Exception e) {
             e.printStackTrace();
         }
