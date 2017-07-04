@@ -45,15 +45,10 @@ public class OwnerStockAgentServiceImpl implements OwnerStockAgentService {
             return null;
         }
         String name = null;
-        if(type == AccountType.stockholder){
-            name = "stockId";
-        }
-        if(type == AccountType.proprietor){
-            name = "ownerId";
-        }
-        if(type == AccountType.agent){
-            name = "agentId";
-        }
+        if(type == AccountType.stockholder)name = "stockId";
+        if(type == AccountType.proprietor)name = "ownerId";
+        if(type == AccountType.agent) name = "agentId";
+        if(name == null) return null;
         return (OwnerStockAgentMember) ownerStockAgentDbService.get("findByMember", new String[]{name}, id);
     }
 
