@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
-import com.magic.api.commons.tools.DateUtil;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.owner.entity.Role;
 import com.magic.owner.vo.UserRoleVo;
 import com.magic.service.java.UuidService;
@@ -28,7 +28,6 @@ import com.magic.user.vo.WorkerVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -138,11 +137,11 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             vo.setRealname(user.getRealname());
             vo.setStatus(user.getStatus().value());
             vo.setShowStatus(user.getStatus().desc());
-            vo.setCreateTime(DateUtil.formatDateTime(new Date(user.getRegisterTime()),DateUtil.formatDefaultTimestamp));
+            vo.setCreateTime(LocalDateTimeUtil.toAmerica(user.getRegisterTime()));
             if (loginMap != null) {
                 Login subAccount = loginMap.get(user.getUserId());
                 if (subAccount != null) {
-                    vo.setLastLoginTime(DateUtil.formatDateTime(new Date(subAccount.getUpdateTime()),DateUtil.formatDefaultTimestamp));
+                    vo.setLastLoginTime(LocalDateTimeUtil.toAmerica(subAccount.getUpdateTime()));
                 }
             }
             if (userRoleVoMap != null) {

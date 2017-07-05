@@ -170,7 +170,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 vo.setWithdrawTotalMoney(0L);
             }
             if(vo.getReviewTime() != null){
-                vo.setReviewTime(DateUtil.formatDateTime(new Date(new Long(vo.getReviewTime())), DateUtil.formatDefaultTimestamp));
+                vo.setReviewTime(LocalDateTimeUtil.toAmerica(new Long(vo.getReviewTime())));
             }else{
                 vo.setReviewTime("");
             }
@@ -182,7 +182,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             if(vo.getReviewer() == null){
                 vo.setReviewer("");
             }
-            vo.setRegisterTime(DateUtil.formatDateTime(new Date(new Long(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
+            vo.setRegisterTime(LocalDateTimeUtil.toAmerica(new Long(vo.getRegisterTime())));
         }
         return users;
     }
@@ -521,7 +521,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!isReview) {
             ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
             FundProfile<AgentFundInfo> profile = new FundProfile<>();
-            profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+            profile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
             AgentFundInfo info = assembleFundProfile(p);
             info.setDepositMembers((int)memberMongoService.getDepositMembers(agentVo.getId()));
             profile.setInfo(info);
@@ -613,7 +613,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private void assembleAgentDetail(AgentInfoVo vo, boolean isReview) {
         vo.setType(AccountType.agent.value());
         vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
-        vo.setRegisterTime(DateUtil.formatDateTime(new Date(Long.parseLong(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
+        vo.setRegisterTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getRegisterTime())));
         vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
         vo.setLastLoginIp(IPUtil.intToIp(Integer.parseInt(vo.getLastLoginIp())));
         if (!isReview) {
@@ -1001,7 +1001,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             vo.setShowStatus(ReviewStatus.parse(vo.getStatus()).desc());
             vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
             if (vo.getOperatorTime() != null) {
-                vo.setOperatorTime(DateUtil.formatDateTime(new Date(Long.parseLong(vo.getOperatorTime())), DateUtil.formatDefaultTimestamp));
+                vo.setOperatorTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime())));
             }
         }
     }

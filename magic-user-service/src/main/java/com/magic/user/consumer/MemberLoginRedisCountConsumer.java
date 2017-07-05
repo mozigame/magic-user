@@ -12,7 +12,7 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.mq.annotation.ConsumerConfig;
 import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.CommonDateParseUtil;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.user.constants.RedisConstants;
 import com.magic.user.entity.Member;
 import com.magic.user.storage.CountRedisStorageService;
@@ -46,7 +46,7 @@ public class MemberLoginRedisCountConsumer implements Consumer {
             }
             long memberId = member.getMemberId();
             long loginTime = object.getLongValue("loginTime");
-            String date = CommonDateParseUtil.longToStringDate(loginTime, CommonDateParseUtil.YYYYMMDD);
+            String date = LocalDateTimeUtil.toAmerica(loginTime, LocalDateTimeUtil.YYYYMMDD);
             String countKey = RedisConstants.assmbleIncrKey(memberId, date);
             long incr = countRedisStorageService.incr(countKey);
             if (incr == 0){

@@ -218,7 +218,7 @@ public class MemberResourceServiceImpl {
         if (!Optional.ofNullable(subAccount).filter(time -> time.getLastTime() > 0).isPresent()){
             return "";
         }
-        return DateUtil.formatDateTime(new Date(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp);
+        return LocalDateTimeUtil.toAmerica(subAccount.getLastTime());
     }
 
     /**
@@ -233,7 +233,7 @@ public class MemberResourceServiceImpl {
         vo.setAccount(member.getUsername());
         vo.setAgentId(member.getAgentId());
         vo.setAgent(member.getAgentUsername());
-        vo.setRegisterTime(DateUtil.formatDateTime(new Date(member.getRegisterTime()),DateUtil.formatDefaultTimestamp));
+        vo.setRegisterTime(LocalDateTimeUtil.toAmerica(member.getRegisterTime()));
         vo.setStatus(member.getStatus().value());
         vo.setShowStatus(member.getStatus().desc());
         return vo;
@@ -448,7 +448,7 @@ public class MemberResourceServiceImpl {
      */
     private FundProfile assembleFundProfile(MemberConditionVo mv, Member member) {
         FundProfile<MemberFundInfo> fundProfile = new FundProfile<>();
-        fundProfile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+        fundProfile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
         MemberFundInfo fundInfo = new MemberFundInfo();
         fundInfo.setBalance(thriftOutAssembleService.getMemberBalance(member.getMemberId()));
         if (Optional.ofNullable(mv).isPresent()){
@@ -513,7 +513,7 @@ public class MemberResourceServiceImpl {
         info.setAgentId(member.getAgentId());
         info.setAgent(member.getAgentUsername());
         info.setRealname(member.getRealname());
-        info.setRegisterTime(DateUtil.formatDateTime(new Date(member.getRegisterTime()), DateUtil.formatDefaultTimestamp));
+        info.setRegisterTime(LocalDateTimeUtil.toAmerica(member.getRegisterTime()));
         info.setRegisterIp(IPUtil.intToIp(member.getRegisterIp()));
         info.setEmail(member.getEmail());
         info.setStatus(member.getStatus().value());
@@ -833,7 +833,7 @@ public class MemberResourceServiceImpl {
                 memberLevelListVo.setId(js.getInteger("userLevel"));
                 memberLevelListVo.setName(js.getString("userLevelName"));
                 memberLevelListVo.setCreateTime(
-                        CommonDateParseUtil.date2string(new Date(Long.valueOf(js.getString("createTime"))), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+                        LocalDateTimeUtil.toAmerica(Long.valueOf(js.getString("createTime"))));
                 memberLevelListVo.setReturnWater(js.getInteger("cbsId"));
                 memberLevelListVo.setReturnWaterName(js.getString("cbsName"));
                 memberLevelListVo.setDiscount(js.getInteger("dwdsId"));
@@ -1647,9 +1647,9 @@ public class MemberResourceServiceImpl {
                 onLineMemberVo.setMemberId(next.getMemberId());
                 onLineMemberVo.setAccount(next.getAccount());
                 if (next.getLoginTime() != null) {
-                    onLineMemberVo.setLoginTime(CommonDateParseUtil.date2string(new Date(next.getLoginTime()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+                    onLineMemberVo.setLoginTime(LocalDateTimeUtil.toAmerica(next.getLoginTime()));
                 }
-                onLineMemberVo.setRegisterTime(CommonDateParseUtil.date2string(new Date(next.getRegisterTime()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+                onLineMemberVo.setRegisterTime(LocalDateTimeUtil.toAmerica(next.getRegisterTime()));
                 onLineMemberVo.setLoginIp(next.getLoginIp());
                 onLineMemberVo.setRegisterIp(next.getRegisterIp());
                 members.add(onLineMemberVo);
@@ -1744,7 +1744,7 @@ public class MemberResourceServiceImpl {
         MemberCenterDetailVo memberCenterDetailVo = new MemberCenterDetailVo();
         SubAccount subAccount = dubboOutAssembleService.getSubLoginById(member.getMemberId());
         if (subAccount != null && subAccount.getLastTime() != 0) {
-            memberCenterDetailVo.setLastLoginTime(DateUtil.formatDateTime(DateUtil.getDate(subAccount.getLastTime()), DateUtil.formatDefaultTimestamp));
+            memberCenterDetailVo.setLastLoginTime(LocalDateTimeUtil.toAmerica(subAccount.getLastTime()));
         }
 
         initMemberCenterDetailVo(memberCenterDetailVo, member);

@@ -2,15 +2,12 @@ package com.magic.user.member.resource.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.CommonDateParseUtil;
-import com.magic.api.commons.utils.StringUtils;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.config.thrift.base.EGResp;
-import com.magic.tethys.user.api.entity.UserPass;
 import com.magic.tethys.user.api.service.dubbo.TethysUserDubboService;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.AccountOperHistory;
@@ -31,7 +28,6 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.net.InetAddress;
 import java.util.*;
 
 /**
@@ -513,14 +509,13 @@ public class InfoResourceServiceImpl {
                 AccountType type = next.getType();
                 accountModifyListVo.setType(type.value());
                 accountModifyListVo.setShowType(AccountType.getDesc(type));
-                //todo 新增业主ID 和 业主名称
                 accountModifyListVo.setOwnerId(next.getOwnerId());
                 accountModifyListVo.setOwnerName(next.getOwnerName());
                 accountModifyListVo.setBefore(JSONObject.parseObject(next.getBeforeInfo()));
                 accountModifyListVo.setAfter(JSONObject.parseObject(next.getAfterInfo()));
                 accountModifyListVo.setOperatorId(next.getProcUserId());
                 accountModifyListVo.setOperatorName(next.getProcUsername());
-                accountModifyListVo.setOperatorTime(CommonDateParseUtil.date2string(new Date(next.getCreateTime()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+                accountModifyListVo.setOperatorTime(LocalDateTimeUtil.toAmerica(next.getCreateTime()));
                 result.add(accountModifyListVo);
             }
         }

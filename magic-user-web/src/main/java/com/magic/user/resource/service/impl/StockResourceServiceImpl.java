@@ -4,19 +4,19 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.CommonDateParseUtil;
-import com.magic.api.commons.tools.DateUtil;
 import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.api.commons.tools.NumberUtil;
 import com.magic.oceanus.entity.Summary.OwnerCurrentOperation;
 import com.magic.oceanus.service.OceanusProviderDubboService;
-import com.magic.user.bean.AgentCondition;
 import com.magic.user.constants.UserContants;
-import com.magic.user.entity.*;
+import com.magic.user.entity.Login;
+import com.magic.user.entity.OwnerAccountUser;
+import com.magic.user.entity.OwnerStockAgentMember;
+import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
@@ -38,9 +38,7 @@ import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -152,7 +150,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         stockDetailVo.setBaseInfo(stockDetail);
         OwnerCurrentOperation oco = dubboOutAssembleService.getShareholderOperation(id);
         FundProfile<StockFundInfo> profile = new FundProfile<>();
-        profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+        profile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
         StockFundInfo info = assembleStockFundInfo(oco);
         profile.setInfo(info);
         stockDetailVo.setOperation(profile);
@@ -202,7 +200,7 @@ public class StockResourceServiceImpl implements StockResourceService {
     private void assembleStockList(List<StockInfoVo> list) {
         for (StockInfoVo info : list) {
             info.setShowStatus(AccountStatus.parse(info.getStatus()).desc());
-            info.setRegisterTime(DateUtil.formatDateTime(new Date(Long.parseLong(info.getRegisterTime())), DateUtil.formatDefaultTimestamp));
+            info.setRegisterTime(LocalDateTimeUtil.toAmerica(Long.parseLong(info.getRegisterTime())));
         }
     }
 
@@ -229,7 +227,7 @@ public class StockResourceServiceImpl implements StockResourceService {
     private void assembleStockDetail(StockInfoVo info) {
         if (info != null) {
             info.setShowStatus(AccountStatus.parse(info.getStatus()).desc());
-            info.setRegisterTime(DateUtil.formatDateTime(new Date(Long.parseLong(info.getRegisterTime())), DateUtil.formatDefaultTimestamp));
+            info.setRegisterTime(LocalDateTimeUtil.toAmerica(Long.parseLong(info.getRegisterTime())));
             info.setRegisterIp(IPUtil.intToIp(Integer.parseInt(info.getRegisterIp())));
             info.setLastLoginIp(IPUtil.intToIp(Integer.parseInt(info.getLastLoginIp())));
 
