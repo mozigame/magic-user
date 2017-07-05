@@ -505,13 +505,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         assembleAgentDetail(agentVo, isReview);
         AgentDetailVo agentDetailVo = new AgentDetailVo();
 
-        OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(agentVo.getId(),AccountType.agent);
-        if(osam != null){
-            agentVo.setMembers(osam.getMemNumber());
-        }else{
-            agentVo.setMembers(0);
-        }
-
         agentDetailVo.setBaseInfo(agentVo);
         AgentConfigVo setting = thriftOutAssembleService.getAgentConfig(id);
         setting = initAgentConfigVo(setting);
@@ -523,7 +516,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             FundProfile<AgentFundInfo> profile = new FundProfile<>();
             profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
             AgentFundInfo info = assembleFundProfile(p);
-            info.setDepositMembers((int)memberMongoService.getDepositMembers(agentVo.getId()));
+            long depositMembers =  memberMongoService.getDepositMembers(agentVo.getId());
+            info.setDepositMembers((int)depositMembers);
+            OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(agentVo.getId(),AccountType.agent);
+            if(osam != null){
+                info.setMembers(osam.getMemNumber());
+            }else{
+                info.setMembers(0);
+            }
             profile.setInfo(info);
 
             agentDetailVo.setFundProfile(profile);
