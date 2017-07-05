@@ -2,28 +2,26 @@ package com.magic.user.resource.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPObject;
 import com.google.common.collect.Lists;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.api.commons.core.tools.MauthUtil;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.*;
 import com.magic.api.commons.utils.StringUtils;
-import com.magic.bc.query.service.AgentSchemeService;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerDomainVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.oceanus.entity.Summary.ProxyCurrentOperaton;
 import com.magic.oceanus.service.OceanusProviderDubboService;
-import com.magic.passport.enums.LoginStatus;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.*;
-import com.magic.user.enums.*;
+import com.magic.user.enums.AccountStatus;
+import com.magic.user.enums.AccountType;
+import com.magic.user.enums.ReviewStatus;
 import com.magic.user.exception.UserException;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.RegisterReq;
@@ -39,8 +37,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -170,7 +166,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 vo.setWithdrawTotalMoney(0L);
             }
             if(vo.getReviewTime() != null){
-                vo.setReviewTime(DateUtil.formatDateTime(new Date(new Long(vo.getReviewTime())), DateUtil.formatDefaultTimestamp));
+                vo.setReviewTime(LocalDateTimeUtil.toAmerica(new Long(vo.getReviewTime())));
             }else{
                 vo.setReviewTime("");
             }
@@ -182,7 +178,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             if(vo.getReviewer() == null){
                 vo.setReviewer("");
             }
-            vo.setRegisterTime(DateUtil.formatDateTime(new Date(new Long(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
+            vo.setRegisterTime(LocalDateTimeUtil.toAmerica(new Long(vo.getRegisterTime())));
         }
         return users;
     }
@@ -350,7 +346,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             ApiLogger.error("add agent info failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
         } else {
-            producer.send(Topic.MAGIC_OWNER_USER_ADD_SUCCESS, agentUser.getUserId() + "", JSON.toJSONString(agentUser));
+            sendAddUserSuccess(agentUser);
         }
         //3、添加代理登录信息
         Login login = new Login(userId, account, PasswordCapture.getSaltPwd(password));
@@ -367,12 +363,26 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         //mq 处理 6、将代理基础信息放入mongo
         AgentConditionVo agentConditionVo = assembleAgentConfigVo(userId, account, generalizeCode, holder, agentUser.getOwnerId());
         sendAgentAddSuccessMq(agentConfig, ownerStockAgentMember, agentConditionVo);
-
+        /*用户添加成功发送mq*/
+        sendAddUserSuccess(agentUser);
         JSONObject result = new JSONObject();
         result.put("id", userId);
         return result.toJSONString();
     }
 
+    /**
+     * 用户添加成功发送mq
+     * @param agentUser
+     * @return
+     */
+    private boolean sendAddUserSuccess(User agentUser) {
+        try {
+            return producer.send(Topic.MAGIC_OWNER_USER_ADD_SUCCESS, agentUser.getUserId() + "", JSON.toJSONString(agentUser));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     /**
      * @param userId
@@ -514,7 +524,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!isReview) {
             ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
             FundProfile<AgentFundInfo> profile = new FundProfile<>();
-            profile.setSyncTime(CommonDateParseUtil.date2string(new Date(System.currentTimeMillis()), CommonDateParseUtil.YYYY_MM_DD_HH_MM_SS));
+            profile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
             AgentFundInfo info = assembleFundProfile(p);
             long depositMembers =  memberMongoService.getDepositMembers(agentVo.getId());
             info.setDepositMembers((int)depositMembers);
@@ -613,7 +623,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private void assembleAgentDetail(AgentInfoVo vo, boolean isReview) {
         vo.setType(AccountType.agent.value());
         vo.setShowStatus(AccountStatus.parse(vo.getStatus()).desc());
-        vo.setRegisterTime(DateUtil.formatDateTime(new Date(Long.parseLong(vo.getRegisterTime())), DateUtil.formatDefaultTimestamp));
+        vo.setRegisterTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getRegisterTime())));
         vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
         vo.setLastLoginIp(IPUtil.intToIp(Integer.parseInt(vo.getLastLoginIp())));
         if (!isReview) {
@@ -1001,7 +1011,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             vo.setShowStatus(ReviewStatus.parse(vo.getStatus()).desc());
             vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
             if (vo.getOperatorTime() != null) {
-                vo.setOperatorTime(DateUtil.formatDateTime(new Date(Long.parseLong(vo.getOperatorTime())), DateUtil.formatDefaultTimestamp));
+                vo.setOperatorTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime())));
             }
         }
     }
@@ -1142,6 +1152,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             //mq 处理 6、将代理基础信息放入mongo
             AgentConditionVo agentConditionVo = assembleAgentConfigVo(userId, agentUser.getUsername(), generalizeCode, holder, agentUser.getOwnerId());
             sendAgentAddSuccessMq(agentConfig, ownerStockAgentMember, agentConditionVo);
+            /*用户添加成功发送mq*/
+            sendAddUserSuccess(agentUser);
         }
         return UserContants.EMPTY_STRING;
     }
@@ -1154,11 +1166,15 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * 2、业主股东代理映射数据
      */
     private void sendAgentAddSuccessMq(AgentConfig agentConfig, OwnerStockAgentMember ownerStockAgentMember, AgentConditionVo agentConditionVo) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(UserContants.CUSTOMER_MQ_TAG.AGENT_CONFIG_ADD.name(), agentConfig);
-        jsonObject.put(UserContants.CUSTOMER_MQ_TAG.USER_ID_MAPPING_ADD.name(), ownerStockAgentMember);
-        jsonObject.put(UserContants.CUSTOMER_MQ_TAG.AGENT_CONDITION_ADD.name(), agentConditionVo);
-        producer.send(Topic.AGENT_ADD_SUCCESS, agentConfig.getAgentId() + "", jsonObject.toJSONString());
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(UserContants.CUSTOMER_MQ_TAG.AGENT_CONFIG_ADD.name(), agentConfig);
+            jsonObject.put(UserContants.CUSTOMER_MQ_TAG.USER_ID_MAPPING_ADD.name(), ownerStockAgentMember);
+            jsonObject.put(UserContants.CUSTOMER_MQ_TAG.AGENT_CONDITION_ADD.name(), agentConditionVo);
+            producer.send(Topic.AGENT_ADD_SUCCESS, agentConfig.getAgentId() + "", jsonObject.toJSONString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -1166,7 +1182,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @Doc 发送代理审核历史
      */
     private void sendAgentReviewMq(AgentReview review) {
-        producer.send(Topic.AGENT_REVIEW_HISTORY, review.getAgentApplyId() + "", JSONObject.toJSONString(review));
+        try {
+            producer.send(Topic.AGENT_REVIEW_HISTORY, review.getAgentApplyId() + "", JSONObject.toJSONString(review));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -1230,10 +1250,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @Doc 发送代理状态修改
      */
     private void sendAgentStatusUpdateMq(Long id, Integer status) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("agentId", id);
-        jsonObject.put("status", status);
-        producer.send(Topic.AGENT_STATUS_UPDATE_SUCCESS, id + "", jsonObject.toJSONString());
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("agentId", id);
+            jsonObject.put("status", status);
+            producer.send(Topic.AGENT_STATUS_UPDATE_SUCCESS, id + "", jsonObject.toJSONString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

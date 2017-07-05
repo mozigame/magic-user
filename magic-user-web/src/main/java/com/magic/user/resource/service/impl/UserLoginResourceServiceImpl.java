@@ -1,7 +1,6 @@
 package com.magic.user.resource.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.core.tools.MauthUtil;
 import com.magic.api.commons.mq.Producer;
@@ -9,7 +8,6 @@ import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.api.commons.tools.NumberUtil;
-import com.magic.bc.query.service.PrepaySchemeService;
 import com.magic.bc.query.vo.PrePaySchemeVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.user.constants.UserContants;
@@ -21,7 +19,9 @@ import com.magic.user.enums.LoginType;
 import com.magic.user.exception.UserException;
 import com.magic.user.resource.service.StatisticsResourceService;
 import com.magic.user.resource.service.UserLoginResourceService;
-import com.magic.user.service.*;
+import com.magic.user.service.AccountIdMappingService;
+import com.magic.user.service.LoginService;
+import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.PasswordCapture;
@@ -29,8 +29,6 @@ import com.magic.user.vo.LoginResultVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * User: joey
@@ -187,17 +185,21 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
      * @Doc 发送用户登录历史到mq
      */
     private void sendLoginHistory(User user, Long createTime, Integer requestIp, LoginType loginType, String platform) {
-        JSONObject object = new JSONObject();
-        object.put("user", user);
-        object.put("createTime", createTime);
-        object.put("requestIp", requestIp);
-        object.put("loginType", loginType.value());
-        object.put("platform", platform);
-        if (loginType == LoginType.login) {
-            producer.send(Topic.USER_LOGIN_SUCCESS, user.getUserId() + "", object.toJSONString());
-        }
-        if (loginType == LoginType.logout) {
-            producer.send(Topic.USER_LOGOUT_SUCCESS, user.getUserId() + "", object.toJSONString());
+        try {
+            JSONObject object = new JSONObject();
+            object.put("user", user);
+            object.put("createTime", createTime);
+            object.put("requestIp", requestIp);
+            object.put("loginType", loginType.value());
+            object.put("platform", platform);
+            if (loginType == LoginType.login) {
+                producer.send(Topic.USER_LOGIN_SUCCESS, user.getUserId() + "", object.toJSONString());
+            }
+            if (loginType == LoginType.logout) {
+                producer.send(Topic.USER_LOGOUT_SUCCESS, user.getUserId() + "", object.toJSONString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,9 +1,7 @@
 package com.magic.user.util;
 
 import com.magic.api.commons.ApiLogger;
-import com.magic.api.commons.tools.DateUtil;
-import com.magic.user.entity.AccountOperHistory;
-import com.magic.user.po.OnLineMember;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.user.vo.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -14,7 +12,6 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -684,7 +681,7 @@ public class ExcelUtil {
      */
     public static String assembleFileName(long uid, String name) {
         StringBuilder filename = new StringBuilder();
-        filename.append(DateUtil.formatDateTime(new Date(),DateUtil.format_yyyy_MM_dd));
+        filename.append(LocalDateTimeUtil.toAmerica(System.currentTimeMillis(), LocalDateTimeUtil.YYYYMMDD));
         filename.append("(");
         filename.append(uid);
         filename.append("-");
