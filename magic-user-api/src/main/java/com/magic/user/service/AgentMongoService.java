@@ -53,10 +53,4 @@ public interface AgentMongoService {
      */
     long getCount(AgentCondition userCondition);
 
-    /**
-     * @Doc 获取代理的存值会员数
-     * @param agentIds
-     * @return
-     */
-    Map<Long,Integer> countDepositMembers(List<Long> agentIds);
 }

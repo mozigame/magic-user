@@ -8,6 +8,7 @@ import com.magic.user.vo.AgentConditionVo;
 import com.magic.user.vo.MemberConditionVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * MemberMongoService
@@ -114,4 +115,11 @@ public interface MemberMongoService {
      * @return
      */
     long getDepositMembers(Long agentId);
+
+    /**
+     *  获取代理的存款会员数量
+     * @param agentIds
+     * @return
+     */
+    Map<Long,Integer> countDepositMembers(List<Long> agentIds);
 }

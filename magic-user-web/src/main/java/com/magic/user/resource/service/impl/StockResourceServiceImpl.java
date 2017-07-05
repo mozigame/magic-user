@@ -142,8 +142,6 @@ public class StockResourceServiceImpl implements StockResourceService {
         StockDetailVo stockDetailVo = new StockDetailVo();
 
         OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(stockDetail.getId(),AccountType.stockholder);
-        ApiLogger.info("osam : "+stockDetail.getId() + ","+AccountType.stockholder);
-        ApiLogger.info(JSON.toJSONString(osam));
         if(osam != null){
             stockDetail.setMembers(osam.getMemNumber());
         }else{

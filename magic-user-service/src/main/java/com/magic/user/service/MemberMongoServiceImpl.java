@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * MemberMongoServiceImpl
@@ -206,5 +207,15 @@ public class MemberMongoServiceImpl implements MemberMongoService {
             ApiLogger.error(String.format("get memberConditionVo count agentId:%d ", agentId), e);
         }
         return 0L;
+    }
+
+    @Override
+    public Map<Long, Integer> countDepositMembers(List<Long> agentIds) {
+        try {
+            return memberMongoDao.batchGetDepositMembers(agentIds);
+        }catch (Exception e){
+            ApiLogger.error(String.format("get memberConditionVo count deposit members, agentIds:%d ", agentIds), e);
+        }
+        return null;
     }
 }

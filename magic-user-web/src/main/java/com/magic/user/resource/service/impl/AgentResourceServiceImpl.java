@@ -117,14 +117,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
         }
 
-        Map<Long,Integer> listm = agentMongoService.countDepositMembers(agentIds);
+        Map<Long,Integer> listm = memberMongoService.countDepositMembers(agentIds);
         if(listm == null){
             listm = new HashMap<>();
         }
         //根据代理ID列表查询代理的会员数量信息
         List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
 
-        Map<Long,OwnerStockAgentMember> osamMap = new HashMap<Long,OwnerStockAgentMember>();
+        Map<Long,OwnerStockAgentMember> osamMap = new HashMap<>();
 
         if(OwnerStockAgentMemberList != null){
             for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
@@ -284,7 +284,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             osamMap.put(osam.getAgentId(),osam);
         }
 
-        Map<Long,Integer> listm = agentMongoService.countDepositMembers(agentIds);
+        Map<Long,Integer> listm = memberMongoService.countDepositMembers(agentIds);
         if(listm == null) listm = new HashMap<Long,Integer>();
         List<AgentInfoVo> list = assembleAgentList(userService.findAgents(agentIds),map,osamMap,listm);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
