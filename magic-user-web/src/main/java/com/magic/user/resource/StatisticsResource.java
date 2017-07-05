@@ -2,6 +2,7 @@ package com.magic.user.resource;
 
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.user.resource.service.StatisticsResourceService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -55,6 +56,17 @@ public class StatisticsResource {
     public String getOwnerNotReadNotice(){
         RequestContext rc = RequestContext.getRequestContext();
         return statisticsResourceService.getOwnerNotReadNotice(rc.getUid());
+    }
+
+    /**
+     *  获取系统的当前时间(美东时间)
+     * @return
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/getSystemTime", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getSystemTime(){
+        return LocalDateTimeUtil.toAmerica(System.currentTimeMillis());
     }
 
 }
