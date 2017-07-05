@@ -471,7 +471,7 @@ public class MemberResourceServiceImpl {
      */
     private MemberPreferScheme getPreferScheme(MemberConditionVo mv) {
         MemberPreferScheme result = new MemberPreferScheme();
-        if (Optional.ofNullable(mv).isPresent()){
+        if (Optional.ofNullable(mv) .isPresent()){
             result = thriftOutAssembleService.getMemberPrivilege(mv.getLevel());
         }
         if (!Optional.ofNullable(result).isPresent()){

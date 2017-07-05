@@ -105,13 +105,4 @@ public class AgentMongoServiceImpl implements AgentMongoService {
         return 0;
     }
 
-    @Override
-    public Map<Long,Integer> countDepositMembers(List<Long> agentIds) {
-        try {
-            return agentMongoDao.countDepositMembers(agentIds);
-        } catch (Exception e) {
-            ApiLogger.error(String.format("get agent count members error.agentIds:%d", agentIds), e);
-        }
-        return null;
-    }
 }

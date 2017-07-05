@@ -140,8 +140,6 @@ public class StockResourceServiceImpl implements StockResourceService {
         StockDetailVo stockDetailVo = new StockDetailVo();
 
         OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(stockDetail.getId(),AccountType.stockholder);
-        ApiLogger.info("osam : "+stockDetail.getId() + ","+AccountType.stockholder);
-        ApiLogger.info(JSON.toJSONString(osam));
         if(osam != null){
             stockDetail.setMembers(osam.getMemNumber());
         }else{
@@ -348,7 +346,12 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (!userService.addStock(stockUser)) {
             throw UserException.REGISTER_FAIL;
         } else {
-            producer.send(Topic.MAGIC_OWNER_USER_ADD_SUCCESS, stockUser.getUserId() + "", JSON.toJSONString(stockUser));
+            try {
+                //用户添加成功发送mq消息，添加默认角色
+                producer.send(Topic.MAGIC_OWNER_USER_ADD_SUCCESS, stockUser.getUserId() + "", JSON.toJSONString(stockUser));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         JSONObject result = new JSONObject();
         result.put("id", userId);
