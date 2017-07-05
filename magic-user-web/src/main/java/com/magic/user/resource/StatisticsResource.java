@@ -66,7 +66,7 @@ public class StatisticsResource {
     @RequestMapping(value = "/getSystemTime", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String getSystemTime(){
-        return LocalDateTimeUtil.toAmerica(System.currentTimeMillis());
+        return "{" + "\"localTime\":" + "\"" + LocalDateTimeUtil.toAmerica(System.currentTimeMillis()) + "\"" + "}";
     }
 
 }
