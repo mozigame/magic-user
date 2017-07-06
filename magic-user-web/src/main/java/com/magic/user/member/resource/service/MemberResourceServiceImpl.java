@@ -974,6 +974,7 @@ public class MemberResourceServiceImpl {
         //验证码校验
         verifyCode(rc, verifyCode);
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
+
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
@@ -994,10 +995,11 @@ public class MemberResourceServiceImpl {
         String proCode = req.getProCode();
         if (StringUtils.isNoneEmpty(proCode)) {
             User agentUser = userService.getUserByCode(proCode);
-            if (agentUser != null && agentUser.getOwnerId() == ownerInfo.getOwnerId()) {
+            if (agentUser != null && agentUser.getOwnerId().equals(ownerInfo.getOwnerId())) {
                 agent = agentUser;
             }
         }
+
         if (agent == null) {
             long agentId = accountIdMappingService.getUid(ownerInfo.getOwnerId(), ownerInfo.getOwnerName() + "_dl");
             if (agentId > 0) {
@@ -1007,7 +1009,8 @@ public class MemberResourceServiceImpl {
         if (agent == null) {
             throw UserException.ILLEGAL_USER;
         }
-        String body = assembleRegisterBody(rc, url, ownerInfo.getOwnerId(), agent.getId(), req);
+        String body = assembleRegisterBody(rc, url, ownerInfo.getOwnerId(), agent.getUserId(), req);
+        ApiLogger.info(body);
         EGResp resp = thriftOutAssembleService.memberRegister(body, "account");
         if (resp == null) {
             throw UserException.REGISTER_FAIL;
