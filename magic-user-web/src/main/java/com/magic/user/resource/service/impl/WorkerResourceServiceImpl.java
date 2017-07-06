@@ -141,7 +141,11 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
             if (loginMap != null) {
                 Login subAccount = loginMap.get(user.getUserId());
                 if (subAccount != null) {
-                    vo.setLastLoginTime(LocalDateTimeUtil.toAmerica(subAccount.getUpdateTime()));
+                    if (subAccount.getUpdateTime() > 0) {
+                        vo.setLastLoginTime(LocalDateTimeUtil.toAmerica(subAccount.getUpdateTime()));
+                    } else{
+                      vo.setLastLoginTime(UserContants.SPLIT_LINE);
+                    }
                 }
             }
             if (userRoleVoMap != null) {
