@@ -147,6 +147,7 @@
         <if test="account!=null and account != ''">
             and a.username=#{account}
         </if>
+        ORDER BY a.status ASC , r.create_time DESC
         <if test="offset != null and offset >= 0">
             limit #{offset},#{limit}
         </if>
