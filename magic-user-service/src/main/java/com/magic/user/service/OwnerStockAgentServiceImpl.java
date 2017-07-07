@@ -34,8 +34,8 @@ public class OwnerStockAgentServiceImpl implements OwnerStockAgentService {
     }
 
     @Override
-    public boolean updateMemNumber(Member member) {
-        long result = ownerStockAgentDbService.update("updateMemNumber",new String[]{"member"},member);
+    public boolean updateMemNumber(Long agentId) {
+        long result = ownerStockAgentDbService.update("updateMemNumber",new String[]{"agentId"},agentId);
         return result > 0;
     }
 

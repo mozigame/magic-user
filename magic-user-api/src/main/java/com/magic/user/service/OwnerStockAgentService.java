@@ -26,11 +26,11 @@ public interface OwnerStockAgentService {
     OwnerStockAgentMember findById(OwnerStockAgentMember ownerStockAgentMember);
 
     /**
-     * @Doc 修改业主股东代理用户数映射(注册会员成功后更新业主、股东、代理的会员数)
-     * @param member
+     * @Doc 修改业主股东代理用户数映射(注册会员成功后更新代理的会员数)
+     * @param agentId
      * @return
      */
-    boolean updateMemNumber(Member member);
+    boolean updateMemNumber(Long agentId);
 
     /**
      * @Doc 根据Id(股东Id/业主Id/代理Id)获取会员数

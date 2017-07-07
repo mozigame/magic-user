@@ -1009,6 +1009,7 @@ public class MemberResourceServiceImpl {
         if (agent == null) {
             throw UserException.ILLEGAL_USER;
         }
+
         String body = assembleRegisterBody(rc, url, ownerInfo.getOwnerId(), agent.getUserId(), req);
         ApiLogger.info(body);
         EGResp resp = thriftOutAssembleService.memberRegister(body, "account");

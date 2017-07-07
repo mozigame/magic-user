@@ -35,14 +35,13 @@ public class MemberRegisterSuccessAddNumber implements Consumer{
 
             if (!Optional.ofNullable(member).
                     filter(request -> request.getMemberId() > 0).
-                    filter(request -> request.getOwnerId() != null && request.getOwnerId() > 0).
-                    filter(request -> request.getStockId() != null && request.getStockId() > 0).
                     filter(request -> request.getAgentId() != null && request.getAgentId() > 0).
                     isPresent()){
                 return true;
             }
-
-            return ownerStockAgentService.updateMemNumber(member);
+            member.setOwnerId(null);
+            member.setStockId(null);
+            return ownerStockAgentService.updateMemNumber(member.getAgentId());
         }catch (Exception e){
             ApiLogger.error(String.format("member register success add member consumer error. key:%s, msg:%s", key, msg), e);
         }

@@ -101,12 +101,7 @@
     <update id="updateMemNumber">
         UPDATE t_owner_stock_agent_member
         SET mem_number = mem_number+1
-        <where>
-            owner_id = #{member.ownerId}
-            AND stock_id = #{member.stockId}
-            AND agent_id = #{member.agentId}
-        </where>
+        WHERE agent_id = #{agentId}
     </update>
-
 
 </mapper>
