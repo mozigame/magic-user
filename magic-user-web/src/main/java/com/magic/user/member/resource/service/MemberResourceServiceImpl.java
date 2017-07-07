@@ -1909,12 +1909,12 @@ public class MemberResourceServiceImpl {
             mv.setDepositCount(mv.getDepositCount() == null ? 0 : mv.getDepositCount());
             mv.setDepositMoney(mv.getDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getDepositMoney()).longValue());
             mv.setLastDepositMoney(mv.getLastDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastDepositMoney()).longValue());
-            mv.setLastDepositMoney(mv.getLastDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastDepositMoney()).longValue());
+            mv.setMaxDepositMoney(mv.getMaxDepositMoney() == null ? 0 : NumberUtil.fenToYuan(mv.getMaxDepositMoney()).intValue());
 
             mv.setWithdrawCount(mv.getWithdrawCount() == null ? 0 : mv.getWithdrawCount());
             mv.setWithdrawMoney(mv.getWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getWithdrawMoney()).longValue());
-            mv.setLastDepositMoney(mv.getLastDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastDepositMoney()).longValue());
-            mv.setMaxWithdrawMoney(mv.getMaxDepositMoney() == null ? 0 : NumberUtil.fenToYuan(mv.getMaxDepositMoney()).intValue());
+            mv.setLastWithdrawMoney(mv.getLastWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastWithdrawMoney()).longValue());
+            mv.setMaxWithdrawMoney(mv.getMaxWithdrawMoney() == null ? 0 : NumberUtil.fenToYuan(mv.getMaxWithdrawMoney()).intValue());
 
         }
         return JSON.toJSONString(mv);
