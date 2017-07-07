@@ -458,6 +458,13 @@ public class MemberResourceServiceImpl {
             fundInfo.setWithdrawNumbers(mv.getWithdrawCount() == null ? 0 : mv.getWithdrawCount());//取款总次数
             fundInfo.setWithdrawTotalMoney(mv.getWithdrawMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(mv.getWithdrawMoney())));//取款总金额
             fundInfo.setLastWithdraw(mv.getLastWithdrawMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(mv.getLastWithdrawMoney())));//最近取款
+        }else{
+            fundInfo.setDepositNumbers(0);//存款总次数
+            fundInfo.setDepositTotalMoney("0");//存款总金额
+            fundInfo.setLastDeposit("0");//最近存款
+            fundInfo.setWithdrawNumbers(0);//取款总次数
+            fundInfo.setWithdrawTotalMoney("0");//取款总金额
+            fundInfo.setLastWithdraw("0");//最近取款
         }
         fundProfile.setInfo(fundInfo);
         return fundProfile;
