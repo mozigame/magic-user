@@ -219,4 +219,13 @@ public interface AgentResourceService {
      * @Doc 获取前端注册代理是的必填项
      */
     String getAgentRegisterMustParam(RequestContext requestContext);
+
+    /**
+     *
+     * @param requestContext
+     * @param id
+     * @return
+     * @Doc 查看域名
+     */
+    String queryDomains(RequestContext requestContext, Long id);
 }
