@@ -1,7 +1,11 @@
 package com.magic.user.util;
 
 import com.magic.api.commons.tools.CommonDateParseUtil;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -25,15 +29,14 @@ public class UserUtil {
      * @return
      */
     public static Set<String> parseDates(Long startTime, Long endTime) {
-        Calendar start = Calendar.getInstance();
-        start.setTime(parseLong(startTime));
-        Calendar end = Calendar.getInstance();
-        end.setTime(parseLong(endTime));
+        LocalDate start = LocalDateTimeUtil.toLocalDate(startTime);
+        LocalDate end = LocalDateTimeUtil.toLocalDate(endTime);
+
         Set<String> result = new LinkedHashSet<>();
         do{
-            result.add(CommonDateParseUtil.date2string(start.getTime(), CommonDateParseUtil.YYYYMMDD));
-            start.add(Calendar.DAY_OF_YEAR, 1);
-        }while (start.compareTo(end) <= 0);
+            result.add(start.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+            start = start.plusDays(1);
+        }while (start.isBefore(end));
         return result;
     }
 
