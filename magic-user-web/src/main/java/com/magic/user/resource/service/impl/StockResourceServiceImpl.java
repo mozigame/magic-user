@@ -147,6 +147,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         }
         stockDetailVo.setBaseInfo(stockDetail);
         OwnerCurrentOperation oco = dubboOutAssembleService.getShareholderOperation(user.getOwnerId());
+
         FundProfile<StockFundInfo> profile = new FundProfile<>();
         profile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
         StockFundInfo info = assembleStockFundInfo(oco);
@@ -180,7 +181,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (Optional.ofNullable(oco).filter(betEffMoneyValue -> betEffMoneyValue.getBetEffMoney() != null && betEffMoneyValue.getBetEffMoney() > 0).isPresent()){
             betEffMoney = String.valueOf(NumberUtil.fenToYuan(oco.getBetEffMoney()));
         }
-        if (Optional.ofNullable(oco).filter(gainsValue -> gainsValue.getGains() != null && gainsValue.getGains() > 0).isPresent()){
+        if (Optional.ofNullable(oco).filter(gainsValue -> gainsValue.getGains() != null).isPresent()){
             gains = String.valueOf(NumberUtil.fenToYuan(oco.getGains()));
         }
         stockFundInfo.setBets(bets);

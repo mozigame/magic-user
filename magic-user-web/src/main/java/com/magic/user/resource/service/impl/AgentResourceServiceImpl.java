@@ -596,7 +596,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (Optional.ofNullable(operaton).filter(betEffMoneyValue -> betEffMoneyValue.getBetEffMoney() != null && betEffMoneyValue.getBetEffMoney() > 0).isPresent()){
             betEffMoney = String.valueOf(NumberUtil.fenToYuan(operaton.getBetEffMoney()));
         }
-        if (Optional.ofNullable(operaton).filter(gainsValue -> gainsValue.getGains() != null && gainsValue.getGains() > 0).isPresent()){
+        if (Optional.ofNullable(operaton).filter(gainsValue -> gainsValue.getGains() != null).isPresent()){
             gains = String.valueOf(NumberUtil.fenToYuan(operaton.getGains()));
         }
         agentFundInfo.setMembers(members);
