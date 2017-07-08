@@ -1324,6 +1324,33 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return JSONObject.toJSONString(result);
     }
 
+    public String queryDomains(RequestContext rc, Long agentId) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        List<String> leftList = new ArrayList<>();
+        List<String> rightList = agentConfigService.getAgentDomain(agentId);
+
+        List<OwnerDomainVo> allDomains = dubboOutAssembleService.queryAllDomainList(user.getOwnerId());
+        if(allDomains != null){
+            for (OwnerDomainVo domain:allDomains) {
+                leftList.add(domain.getDomain());
+            }
+        }
+        if(rightList != null){
+            leftList.removeAll(rightList);
+        }else{
+            rightList = new ArrayList<>();
+        }
+
+        Map<String,Object> result = new HashMap<>();
+        result.put("leftList",leftList);
+        result.put("rightList",rightList);
+
+        return JSON.toJSONString(result);
+    }
+
     /**
      * @param list
      * @return

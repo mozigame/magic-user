@@ -449,6 +449,19 @@ public class AgentResource {
 
     /**
      * @return
+     * @Doc 查看域名
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/domains", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String queryDomains(@RequestParam(name = "id") Long id) {
+        return agentResourceService.queryDomains(RequestContext.getRequestContext(),id);
+    }
+
+
+
+    /**
+     * @return
      * @Doc 获取 方案，成本，手续列表
      */
     @Access(type = Access.AccessType.COMMON)
