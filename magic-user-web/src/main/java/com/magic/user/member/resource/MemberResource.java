@@ -687,6 +687,19 @@ public class MemberResource {
     }
 
     /**
+     * 用户名检测
+     *
+     * @return
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/username/check", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String usernameCheck(@RequestParam(name = "username", required = true) String username){
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.usernameCheck(rc, username);
+    }
+
+    /**
      * 组装返回数据
      * @param clientId
      * @param base64Code
