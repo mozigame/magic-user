@@ -146,7 +146,7 @@ public class StockResourceServiceImpl implements StockResourceService {
             stockDetail.setMembers(0);
         }
         stockDetailVo.setBaseInfo(stockDetail);
-        OwnerCurrentOperation oco = dubboOutAssembleService.getShareholderOperation(id);
+        OwnerCurrentOperation oco = dubboOutAssembleService.getShareholderOperation(user.getOwnerId());
         FundProfile<StockFundInfo> profile = new FundProfile<>();
         profile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
         StockFundInfo info = assembleStockFundInfo(oco);
