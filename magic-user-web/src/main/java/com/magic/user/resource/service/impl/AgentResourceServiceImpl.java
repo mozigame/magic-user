@@ -497,18 +497,18 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        return getAgentInfoVo(id, false);
+        return getAgentInfoVo(id,opera.getOwnerId(), false);
     }
 
     /**
      * 获取代理详情
-     *
-     * @param id
+     * @param agentId
+     * @param ownerId
      * @param isReview 是否是审核通过的信息
      * @return
      */
-    private String getAgentInfoVo(Long id, boolean isReview) {
-        AgentInfoVo agentVo = userService.getAgentDetail(id);
+    private String getAgentInfoVo(Long agentId,Long ownerId, boolean isReview) {
+        AgentInfoVo agentVo = userService.getAgentDetail(agentId);
         if (agentVo == null) {
             throw UserException.ILLEGAL_USER;
         }
@@ -516,13 +516,13 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         AgentDetailVo agentDetailVo = new AgentDetailVo();
 
         agentDetailVo.setBaseInfo(agentVo);
-        AgentConfigVo setting = thriftOutAssembleService.getAgentConfig(id);
+        AgentConfigVo setting = thriftOutAssembleService.getAgentConfig(agentId);
         setting = initAgentConfigVo(setting);
 
         agentDetailVo.setSettings(setting);
 
         if (!isReview) {
-            ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),agentVo.getHolder());
+            ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(agentVo.getId(),ownerId);
             FundProfile<AgentFundInfo> profile = new FundProfile<>();
             profile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
             AgentFundInfo info = assembleFundProfile(p);
@@ -540,6 +540,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         return JSON.toJSONString(agentDetailVo);
     }
+
 
     /**
      * 初始化setting
@@ -595,7 +596,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (Optional.ofNullable(operaton).filter(betEffMoneyValue -> betEffMoneyValue.getBetEffMoney() != null && betEffMoneyValue.getBetEffMoney() > 0).isPresent()){
             betEffMoney = String.valueOf(NumberUtil.fenToYuan(operaton.getBetEffMoney()));
         }
-        if (Optional.ofNullable(operaton).filter(gainsValue -> gainsValue.getGains() != null && gainsValue.getGains() > 0).isPresent()){
+        if (Optional.ofNullable(operaton).filter(gainsValue -> gainsValue.getGains() != null).isPresent()){
             gains = String.valueOf(NumberUtil.fenToYuan(operaton.getGains()));
         }
         agentFundInfo.setMembers(members);
@@ -1051,7 +1052,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         } else if (baseInfo.getStatus() == ReviewStatus.pass.value()) {
             long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), baseInfo.getAccount());
             if (agentId > 0) {
-                return getAgentInfoVo(agentId, true);
+                return getAgentInfoVo(agentId, operaUser.getOwnerId(),true);
             }
         }
         return UserContants.EMPTY_STRING;
