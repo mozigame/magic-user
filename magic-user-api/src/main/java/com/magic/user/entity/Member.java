@@ -52,13 +52,15 @@ public class Member implements Serializable{
 
     private CurrencyType currencyType;   //币种
 
-    private DeleteStatus isDelete;      //删除状态
+    private DeleteStatus isDelete; //删除状态
 
-    private String weixin;   //微信
+    private String weixin; //微信
 
-    private String qq;   //qq
+    private String qq; //qq
 
     private String paymentPassword;//支付密码
+
+    private String bankCode;//银行简码
 
     private String temp1;
 
@@ -280,5 +282,13 @@ public class Member implements Serializable{
 
     public void setPaymentPassword(String paymentPassword) {
         this.paymentPassword = paymentPassword;
+    }
+
+    public String getBankCode() {
+        return bankCode;
+    }
+
+    public void setBankCode(String bankCode) {
+        this.bankCode = bankCode;
     }
 }
