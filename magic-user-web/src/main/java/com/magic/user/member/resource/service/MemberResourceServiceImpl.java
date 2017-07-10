@@ -18,6 +18,7 @@ import com.magic.config.vo.OwnerInfo;
 import com.magic.oceanus.entity.Summary.UserOrderRecord;
 import com.magic.oceanus.entity.Summary.UserPreferentialRecord;
 import com.magic.passport.po.SubAccount;
+import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
 import com.magic.user.bean.RegionNumber;
@@ -1983,5 +1984,25 @@ public class MemberResourceServiceImpl {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 检测用户名
+     *
+     * @param rc
+     * @param username
+     * @return
+     */
+    public String usernameCheck(RequestContext rc, String username) {
+        //根据url获取业主ID
+        OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(rc.getOrigin());
+        if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
+            throw UserException.ILLEGAL_SOURCE_URL;
+        }
+        long uid = dubboOutAssembleService.getUid(ownerInfo.getOwnerId(), username);
+        if (uid > 0){
+            throw UserException.USERNAME_EXIST;
+        }
+        return UserContants.EMPTY_STRING;
     }
 }
