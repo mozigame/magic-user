@@ -170,7 +170,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
      * @Doc 验证登陆参数合法性
      */
     private boolean checkLoginReq(String username, String password) {
-        if (username.length() >= 6 && username.length() <= 16 && password.length() == 32) {
+        if (username.length() >= 4 && username.length() <= 15 && password.length() == 32) {
             return true;
         }
         return false;
