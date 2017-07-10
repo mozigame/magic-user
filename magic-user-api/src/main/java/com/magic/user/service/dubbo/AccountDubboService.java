@@ -40,6 +40,13 @@ public interface AccountDubboService {
     Member getMember(long uid);
 
     /**
+     * 批量获取会员的取款次数
+     * @param members
+     * @return
+     */
+    Map<Long,Integer> getMemberWithdrawCount(List<Long> members);
+
+    /**
      * 获取业主下股东、代理、会员、子账号数
      *
      * @param ownerIds

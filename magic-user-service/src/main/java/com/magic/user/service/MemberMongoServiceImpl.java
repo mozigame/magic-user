@@ -218,4 +218,13 @@ public class MemberMongoServiceImpl implements MemberMongoService {
         }
         return null;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<Long, Integer> getMemberWithdrawCount(List<Long> members) {
+        return memberMongoDao.getMemberWithdrawCount(members);
+    }
+
 }

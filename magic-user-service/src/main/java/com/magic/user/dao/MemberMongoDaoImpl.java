@@ -201,4 +201,26 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         }
         return result;
     }
+
+    /**
+     * 批量获取会员的取款次数
+     * @param members
+     * @return
+     */
+    public Map<Long,Integer> getMemberWithdrawCount(List<Long> members) {
+        if(members == null || members.size() < 1) return null;
+        Map<Long, Integer> result = new HashMap<>();
+        Query query = new Query().addCriteria(new Criteria("memberId").in(members));
+
+        List<MemberConditionVo> list = super.find(query);
+        ApiLogger.info(String.format("get data from mongo. query: %s, result: %s", JSON.toJSONString(query), JSON.toJSONString(list)));
+
+        if(list != null){
+            for (MemberConditionVo m:list) {
+                result.put(m.getMemberId(),m.getWithdrawCount());
+            }
+        }
+
+        return result;
+    }
 }

@@ -79,6 +79,15 @@ public class AccountDubboServiceImpl implements AccountDubboService {
      * {@inheritDoc}
      */
     @Override
+    public Map<Long, Integer> getMemberWithdrawCount(List<Long> members) {
+        return memberMongoService.getMemberWithdrawCount(members);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<Long, OwnerStaticInfo> getOwnerStaticInfo(Collection<Long> ownerIds) {
         Map<Long, OwnerStaticInfo> map = new HashMap<>();
         if (!Optional.ofNullable(ownerIds).filter(size -> size.size() > 0).isPresent()){
