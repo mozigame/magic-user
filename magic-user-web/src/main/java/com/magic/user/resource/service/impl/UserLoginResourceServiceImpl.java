@@ -88,7 +88,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         }
         if (loginUser.getStatus() == AccountStatus.disable
                 || loginUser.getIsDelete() == DeleteStatus.del) {
-            throw UserException.ILLEGAL_USER;
+            throw UserException.ACCOUNT_DISABLED;
         }
         Login loginInfo = loginService.get(userId);
         if (loginInfo == null) {
