@@ -512,4 +512,20 @@ public class ThriftOutAssembleServiceImpl {
         }
         return result;
     }
+
+    /**
+     * 消息推送 - 会员注册成功或登录成功
+     * @param body
+     * @return
+     */
+    public boolean pushMsg(String body){
+        try {
+            EGResp call = thriftFactory.call(CmdType.CONFIG, 0x500091, body, UserContants.CALLER);
+            return Optional.ofNullable(call).filter(code -> code.getCode() == 0).isPresent();
+        }catch (Exception e){
+            ApiLogger.error(String.format("set member level error. body: %s", body), e);
+        }
+        return false;
+    }
+
 }
