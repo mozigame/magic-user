@@ -1978,7 +1978,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private boolean checkBankInfo(String realname, String telephone, String bankCode, String bank, String bankCardNo) {
-        if(realname.trim().length() < 4 || realname.trim().length() > 15){
+        if(realname.trim().length() < 1){
             return false;
         }
         if(telephone.trim().length() != 11){
