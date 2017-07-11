@@ -712,6 +712,22 @@ public class MemberResource {
         return object.toJSONString();
     }
 
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/bankInfo/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String addBankInfo(
+            HttpServletRequest request, HttpServletResponse response,
+            @RequestParam(name = "realname", required = true) String realname,
+            @RequestParam(name = "telephone", required = true) String telephone,
+            @RequestParam(name = "bankCode", required = true) String bankCode,
+            @RequestParam(name = "bank", required = true) String bank,
+            @RequestParam(name = "bankCardNo", required = true) String bankCardNo
+
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.addBankInfo(rc, realname, telephone, bankCode, bank,bankCardNo);
+    }
+
     /**
      * @return
      * @Doc 刷新会员的余额和未读消息

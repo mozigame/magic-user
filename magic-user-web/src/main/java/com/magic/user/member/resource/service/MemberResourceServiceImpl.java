@@ -1922,6 +1922,71 @@ public class MemberResourceServiceImpl {
        }
 
     /**
+     * 客端添加银行卡信息
+     * @param rc
+     * @param realname
+     * @param telephone
+     * @param bankCode
+     * @param bank
+     * @param bankCardNo
+     * @return
+     */
+    public String addBankInfo(RequestContext rc, String realname, String telephone, String bankCode, String bank, String bankCardNo) {
+        Member member = memberService.getMemberById(rc.getUid());
+        if (member == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        if(!checkBankInfo(realname,telephone,bankCode,bank,bankCardNo)){
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        assembleBankInfo(member,realname.trim(),telephone.trim(),bankCode.trim(),bank.trim(),bankCardNo.trim());
+        memberService.updateMember(member);
+        return JSON.toJSONString(member);
+    }
+
+    /**
+     * 组装会员银行卡信息
+     * @param member
+     * @param realname
+     * @param telephone
+     * @param bankCode
+     * @param bank
+     * @param bankCardNo
+     */
+    private void assembleBankInfo(Member member, String realname, String telephone, String bankCode, String bank, String bankCardNo) {
+        if(member == null){
+            return;
+        }
+        member.setRealname(realname);
+        member.setTelephone(telephone);
+        member.setBank(bank);
+        member.setBankCode(bankCode);
+        member.setBankCardNo(bankCardNo);
+    }
+
+    /**
+     * 校验添加会员银行卡信息参数
+     * @param realname
+     * @param telephone
+     * @param bankCode
+     * @param bank
+     * @param bankCardNo
+     * @return
+     */
+    private boolean checkBankInfo(String realname, String telephone, String bankCode, String bank, String bankCardNo) {
+        if(realname.trim().length() < 2){
+            return false;
+        }
+        if(telephone.trim().length() != 11){
+            return false;
+        }
+        if(bankCardNo.trim().length() < 18){
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * 检测用户名
      *
      * @param rc

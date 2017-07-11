@@ -206,5 +206,10 @@ public class UserException extends ExceptionFactor {
     public static final CommonException ILLEGAL_USERNAME = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 29, HttpServletResponse.SC_OK, "illegal username!", "用户名包含非法字符.");
 
+    /**
+     * 会员账号被禁用
+     */
+    public static final CommonException ACCOUNT_DISABLED = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 30, HttpServletResponse.SC_OK, "account is disabled!", "该账号已被禁用.");
 
 }

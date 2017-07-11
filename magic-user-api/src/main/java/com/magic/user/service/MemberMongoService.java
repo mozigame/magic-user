@@ -122,4 +122,11 @@ public interface MemberMongoService {
      * @return
      */
     Map<Long,Integer> countDepositMembers(List<Long> agentIds);
+
+    /**
+     * 批量获取会员的取款次数
+     * @param members
+     * @return
+     */
+    Map<Long,Integer> getMemberWithdrawCount(List<Long> members);
 }

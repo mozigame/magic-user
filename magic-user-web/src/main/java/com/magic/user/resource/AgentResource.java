@@ -458,8 +458,6 @@ public class AgentResource {
         return agentResourceService.queryDomains(RequestContext.getRequestContext(),id);
     }
 
-
-
     /**
      * @return
      * @Doc 获取 方案，成本，手续列表

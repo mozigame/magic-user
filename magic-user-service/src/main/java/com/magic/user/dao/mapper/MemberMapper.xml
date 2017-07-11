@@ -32,6 +32,7 @@
         <result column="temp3" jdbcType="VARCHAR" property="temp3"/>
         <result column="weixin" jdbcType="VARCHAR" property="weixin"/>
         <result column="qq" jdbcType="VARCHAR" property="qq"/>
+        <result column="bank_code" jdbcType="VARCHAR" property="bankCode"/>
     </resultMap>
 
     <!--查询会员列表-->
@@ -60,7 +61,8 @@
             currency_type,
             is_delete,
             weixin,
-            qq
+            qq,
+            bank_code
         FROM t_member
         WHERE member_id IN
         <foreach collection="list" item="id" open="(" close=")"
@@ -95,7 +97,8 @@
             currency_type,
             is_delete,
             weixin,
-            qq
+            qq,
+            bank_code
         FROM t_member
           WHERE member_id=#{memberId}
     </select>
@@ -169,6 +172,9 @@
             </if>
             <if test="isDelete != null ">
                 is_delete=#{isDelete,jdbcType=TINYINT,typeHandler=com.magic.user.util.EnumKeyTypeHandler},
+            </if>
+            <if test="bankCode != null ">
+                bank_code=#{bankCode},
             </if>
         </set>
         WHERE member_id=#{memberId}

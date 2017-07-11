@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * BaseMongoDAOImpl
@@ -83,6 +84,5 @@ public abstract class BaseMongoDAOImpl<T> implements BaseMongoDAO<T>{
     private Class<T> getEntityClass(){
         return ReflectionUtils.getSuperClassGenricType(getClass());
     }
-
 
 }
