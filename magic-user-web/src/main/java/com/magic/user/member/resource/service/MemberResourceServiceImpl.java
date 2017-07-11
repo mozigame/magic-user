@@ -2014,6 +2014,6 @@ public class MemberResourceServiceImpl {
      */
     public String getBalance(RequestContext rc) {
         String balance = thriftOutAssembleService.getMemberBalance(rc.getUid());
-        return "{\"balance\":\""+balance+"\"}";
+        return "{\"balance\":\"" + balance + "\"}";
     }
 }

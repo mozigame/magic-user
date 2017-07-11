@@ -730,7 +730,7 @@ public class MemberResource {
 
     /**
      * @return
-     * @Doc 刷新会员的余额和未读消息
+     * @Doc 获取会员当前余额
      */
     @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/balance/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
