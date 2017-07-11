@@ -18,7 +18,7 @@ public class AccountModifyInfoVo {
     private String email;//电子邮箱;
     private String telephone;//手机号码
     private String loginPassword = "*******";//登录密码
-    private String paymentPassword = "*******";//支付密码
+    private String paymentPassword = "****";//支付密码
 
     public Long getId() {
         return id;
