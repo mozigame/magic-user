@@ -2093,7 +2093,7 @@ public class MemberResourceServiceImpl {
         }
         Set<String> list = memberConditionVos.stream().map(MemberConditionVo::getMemberName).collect(Collectors.toSet());
 
-        return JSON.toJSONString(assemblePageBeanList(null, null, 0, list));
+        return JSON.toJSONString(assemblePageBeanList(null, null, total, list));
     }
 
     /**
