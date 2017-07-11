@@ -1798,6 +1798,12 @@ public class MemberResourceServiceImpl {
         }else{
             o.setEmail("无");
         }
+        if(StringUtils.isNotEmpty(member.getBank())){
+            o.setBank(member.getBank());
+        }
+        if(StringUtils.isNotEmpty(member.getBankCode())){
+            o.setBankCode(member.getBankCode());
+        }
     }
 
     /**

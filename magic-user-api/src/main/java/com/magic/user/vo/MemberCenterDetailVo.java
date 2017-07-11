@@ -8,11 +8,29 @@ public class MemberCenterDetailVo {
     private String currency = "人民币";
     private String lastLoginTime ="";//最后登录时间
     private String bankCardNo = "";//银行卡号
+    private String bank = "";//银行名称
+    private String bankCode = "";//银行简码
     private String realname = "无";//真实姓名
     private String telephone = "无";//手机号码
     private String weixin = "无";//微信
     private String qq = "无";//QQ
     private String email = "无";//电子邮箱
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public String getBankCode() {
+        return bankCode;
+    }
+
+    public void setBankCode(String bankCode) {
+        this.bankCode = bankCode;
+    }
 
     public String getUsername() {
         return username;
