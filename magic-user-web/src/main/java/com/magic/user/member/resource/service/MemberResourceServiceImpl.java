@@ -1142,8 +1142,8 @@ public class MemberResourceServiceImpl {
     private boolean checkRegisterParam(RegisterReq req,Long ownerId,int type) {
         //校验用户名和密码
         if (!Optional.ofNullable(req)
-                .filter(request -> request.getUsername() != null && request.getUsername().length() >= 6
-                        && request.getUsername().length() <= 16)
+                .filter(request -> request.getUsername() != null && request.getUsername().length() >= 4
+                        && request.getUsername().length() <= 15)
                 .filter(request -> request.getPassword() != null && request.getPassword().length() == 32 )
                 .isPresent()){
             return false;
