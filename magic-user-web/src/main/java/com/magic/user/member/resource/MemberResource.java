@@ -728,4 +728,16 @@ public class MemberResource {
         return memberServiceResource.addBankInfo(rc, realname, telephone, bankCode, bank,bankCardNo);
     }
 
+    /**
+     * @return
+     * @Doc 获取会员当前余额
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/balance/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getBalance() {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.getBalance(rc);
+    }
+
 }

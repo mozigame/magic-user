@@ -186,7 +186,7 @@ public class MemberResourceServiceImpl {
         MemberListVo result = new MemberListVo();
         result.setReturnWater(memberListVo.getReturnWater());
         result.setReturnWaterName(memberListVo.getReturnWaterName() == null ? "":memberListVo.getReturnWaterName());
-        result.setLevel(memberListVo.getLevel() == null ? "": memberListVo.getLevel());
+        result.setLevel(memberListVo.getLevel() == null ? "" : memberListVo.getLevel());
         return result;
     }
 
@@ -2004,5 +2004,16 @@ public class MemberResourceServiceImpl {
             throw UserException.USERNAME_EXIST;
         }
         return UserContants.EMPTY_STRING;
+    }
+
+    /**
+     * 获取会员当前余额
+     *
+     * @param rc
+     * @return
+     */
+    public String getBalance(RequestContext rc) {
+        String balance = thriftOutAssembleService.getMemberBalance(rc.getUid());
+        return "{\"balance\":\"" + balance + "\"}";
     }
 }
