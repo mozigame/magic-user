@@ -873,7 +873,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private boolean checkRegisterParam(String account, String password,// String paymentPassword,
                                        long ownerId, int type, String email, String province, String city, String weixin, String qq) {
         //校验用户名和密码
-        if (account.length() < 6 || account.length() > 16 || password.length() != 32) {
+        if (account.length() < 4 || account.length() > 15 || password.length() != 32) {
             return false;
         }
         //校验其他注册参数
@@ -1388,7 +1388,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      */
     private boolean checkRegisterAgentParam(RegisterReq req) {
         return Optional.ofNullable(req)
-                .filter(request -> request.getUsername() != null && req.getUsername().length() >= 6 && req.getUsername().length() <= 16)
+                .filter(request -> request.getUsername() != null && req.getUsername().length() >= 4 && req.getUsername().length() <= 15)
                 .filter(request -> request.getPassword() != null && request.getPassword().length() == 32)
                 .isPresent();
     }

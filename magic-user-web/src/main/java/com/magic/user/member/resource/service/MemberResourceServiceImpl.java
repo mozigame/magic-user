@@ -1939,7 +1939,9 @@ public class MemberResourceServiceImpl {
         if(!checkBankInfo(realname,telephone,bankCode,bank,bankCardNo)){
             throw UserException.ILLEGAL_PARAMETERS;
         }
+
         assembleBankInfo(member,realname.trim(),telephone.trim(),bankCode.trim(),bank.trim(),bankCardNo.trim());
+
         memberService.updateMember(member);
         return JSON.toJSONString(member);
     }
@@ -1957,7 +1959,9 @@ public class MemberResourceServiceImpl {
         if(member == null){
             return;
         }
-        member.setRealname(realname);
+        if(!(member.getRealname() != null && member.getRealname().trim().length()>0)){
+            member.setRealname(realname);
+        }
         member.setTelephone(telephone);
         member.setBank(bank);
         member.setBankCode(bankCode);
@@ -1974,7 +1978,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private boolean checkBankInfo(String realname, String telephone, String bankCode, String bank, String bankCardNo) {
-        if(realname.trim().length() < 2){
+        if(realname.trim().length() < 4 || realname.trim().length() > 15){
             return false;
         }
         if(telephone.trim().length() != 11){
