@@ -1804,6 +1804,16 @@ public class MemberResourceServiceImpl {
         if(StringUtils.isNotEmpty(member.getBankCode())){
             o.setBankCode(member.getBankCode());
         }
+        if(StringUtils.isNotEmpty(member.getTelephone())){
+            o.setTelephone(member.getTelephone());
+        }else{
+            o.setTelephone("无");
+        }
+        if(StringUtils.isNotEmpty(member.getBankDeposit())){
+            o.setBankDeposit(member.getBankDeposit());
+        }else{
+            o.setBankDeposit("无");
+        }
     }
 
     /**

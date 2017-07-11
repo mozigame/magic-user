@@ -10,11 +10,20 @@ public class MemberCenterDetailVo {
     private String bankCardNo = "";//银行卡号
     private String bank = "";//银行名称
     private String bankCode = "";//银行简码
+    private String bankDeposit = "";//银行简码
     private String realname = "无";//真实姓名
     private String telephone = "无";//手机号码
     private String weixin = "无";//微信
     private String qq = "无";//QQ
     private String email = "无";//电子邮箱
+
+    public String getBankDeposit() {
+        return bankDeposit;
+    }
+
+    public void setBankDeposit(String bankDeposit) {
+        this.bankDeposit = bankDeposit;
+    }
 
     public String getBank() {
         return bank;
