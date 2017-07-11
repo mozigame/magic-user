@@ -721,11 +721,12 @@ public class MemberResource {
             @RequestParam(name = "telephone", required = true) String telephone,
             @RequestParam(name = "bankCode", required = true) String bankCode,
             @RequestParam(name = "bank", required = true) String bank,
+            @RequestParam(name = "bankAddress", required = true) String bankAddress,
             @RequestParam(name = "bankCardNo", required = true) String bankCardNo
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.addBankInfo(rc, realname, telephone, bankCode, bank, bankCardNo);
+        return memberServiceResource.addBankInfo(rc, realname, telephone, bankCode, bank, bankCardNo,bankAddress);
     }
 
     /**
