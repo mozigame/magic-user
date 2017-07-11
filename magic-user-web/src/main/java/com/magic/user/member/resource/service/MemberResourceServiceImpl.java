@@ -1939,7 +1939,7 @@ public class MemberResourceServiceImpl {
         if(!checkBankInfo(realname,telephone,bankCode,bank,bankCardNo)){
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        assembleBankInfo(member,realname.trim(),telephone.trim(),bankCode.trim(),bank.trim(),bankCardNo.trim());
+        assembleBankInfo(member, realname.trim(), telephone.trim(), bankCode.trim(), bank.trim(), bankCardNo.trim());
         memberService.updateMember(member);
         return JSON.toJSONString(member);
     }
@@ -2015,5 +2015,63 @@ public class MemberResourceServiceImpl {
     public String getBalance(RequestContext rc) {
         String balance = thriftOutAssembleService.getMemberBalance(rc.getUid());
         return "{\"balance\":\"" + balance + "\"}";
+    }
+
+    /**
+     * 获取满足分层条件会员数
+     *
+     * @param rc
+     * @param condition
+     * @return
+     */
+    public String memberListCount(RequestContext rc, String condition) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        MemberCondition memberCondition = MemberCondition.valueOf(condition);
+        if (memberCondition == null) {
+            memberCondition = new MemberCondition();
+        }
+        memberCondition.setOwnerId(operaUser.getOwnerId());
+        if (!checkCondition(memberCondition)) {
+            return "{\"total\":0}";
+        }
+        long total = memberMongoService.getCount(memberCondition);
+        if (total <= 0) {
+            return "{\"total\":0}";
+        }
+        return "{" + "\"total\":" + total + "}";
+    }
+
+    /**
+     * 获取满足分层条件
+     * @param rc
+     * @param condition
+     * @return
+     */
+    public String memberListSearch(RequestContext rc, String condition) {
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        MemberCondition memberCondition = MemberCondition.valueOf(condition);
+        if (memberCondition == null) {
+            memberCondition = new MemberCondition();
+        }
+        memberCondition.setOwnerId(operaUser.getOwnerId());
+        if (!checkCondition(memberCondition)) {
+            return "{\"list\":[]}";
+        }
+        //获取mongo中查询到的会员列表
+        List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, null, null);
+        ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
+        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
+            return "{\"list\":[]}";
+        }
+        Set<String> list = memberConditionVos.stream().map(MemberConditionVo::getMemberName).collect(Collectors.toSet());
+        JSONObject result = new JSONObject();
+        result.put("list", list);
+        return JSON.toJSONString(result);
     }
 }
