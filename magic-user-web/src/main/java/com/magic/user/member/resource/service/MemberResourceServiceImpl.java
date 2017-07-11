@@ -1816,6 +1816,22 @@ public class MemberResourceServiceImpl {
         }else{
             o.setEmail("无");
         }
+        if(StringUtils.isNotEmpty(member.getBank())){
+            o.setBank(member.getBank());
+        }
+        if(StringUtils.isNotEmpty(member.getBankCode())){
+            o.setBankCode(member.getBankCode());
+        }
+        if(StringUtils.isNotEmpty(member.getTelephone())){
+            o.setTelephone(member.getTelephone());
+        }else{
+            o.setTelephone("无");
+        }
+        if(StringUtils.isNotEmpty(member.getBankDeposit())){
+            o.setBankDeposit(member.getBankDeposit());
+        }else{
+            o.setBankDeposit("无");
+        }
     }
 
     /**
@@ -1949,16 +1965,17 @@ public class MemberResourceServiceImpl {
      * @param bankCardNo
      * @return
      */
-    public String addBankInfo(RequestContext rc, String realname, String telephone, String bankCode, String bank, String bankCardNo) {
+    public String addBankInfo(RequestContext rc, String realname, String telephone, String bankCode,
+                              String bank, String bankCardNo,String bankAddress) {
         Member member = memberService.getMemberById(rc.getUid());
         if (member == null) {
             throw UserException.ILLEGAL_USER;
         }
-        if(!checkBankInfo(realname,telephone,bankCode,bank,bankCardNo)){
+        if(!checkBankInfo(realname,telephone,bankCode,bank,bankCardNo,bankAddress)){
             throw UserException.ILLEGAL_PARAMETERS;
         }
 
-        assembleBankInfo(member,realname.trim(),telephone.trim(),bankCode.trim(),bank.trim(),bankCardNo.trim());
+        assembleBankInfo(member,realname.trim(),telephone.trim(),bankCode.trim(),bank.trim(),bankCardNo.trim(),bankAddress.trim());
 
         memberService.updateMember(member);
         return JSON.toJSONString(member);
@@ -1973,7 +1990,8 @@ public class MemberResourceServiceImpl {
      * @param bank
      * @param bankCardNo
      */
-    private void assembleBankInfo(Member member, String realname, String telephone, String bankCode, String bank, String bankCardNo) {
+    private void assembleBankInfo(Member member, String realname, String telephone,
+                                  String bankCode, String bank, String bankCardNo,String bankAddress) {
         if(member == null){
             return;
         }
@@ -1984,6 +2002,7 @@ public class MemberResourceServiceImpl {
         member.setBank(bank);
         member.setBankCode(bankCode);
         member.setBankCardNo(bankCardNo);
+        member.setBankDeposit(bankAddress);
     }
 
     /**
@@ -1995,14 +2014,17 @@ public class MemberResourceServiceImpl {
      * @param bankCardNo
      * @return
      */
-    private boolean checkBankInfo(String realname, String telephone, String bankCode, String bank, String bankCardNo) {
-        if(realname.trim().length() < 4 || realname.trim().length() > 15){
+    private boolean checkBankInfo(String realname, String telephone, String bankCode, String bank, String bankCardNo,String bankAddress) {
+        if(realname.trim().length() < 1){
             return false;
         }
         if(telephone.trim().length() != 11){
             return false;
         }
         if(bankCardNo.trim().length() < 18){
+            return false;
+        }
+        if(bankAddress.trim().length() < 1){
             return false;
         }
         return true;
