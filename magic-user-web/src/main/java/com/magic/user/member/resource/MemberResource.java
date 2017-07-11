@@ -725,7 +725,7 @@ public class MemberResource {
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.addBankInfo(rc, realname, telephone, bankCode, bank,bankCardNo);
+        return memberServiceResource.addBankInfo(rc, realname, telephone, bankCode, bank, bankCardNo);
     }
 
     /**
@@ -740,4 +740,31 @@ public class MemberResource {
         return memberServiceResource.getBalance(rc);
     }
 
+    /**
+     * @param condition 检索条件
+     * @return
+     * @Doc 满足分层条件的会员数
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/level/list/special/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String levelListCount(
+            @RequestParam(name = "condition") String condition) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberListCount(rc, condition);
+    }
+
+    /**
+     * @param condition 检索条件
+     * @return
+     * @Doc 满足分层条件的会员列表
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/level/list/special/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String levelListSearch(
+            @RequestParam(name = "condition") String condition) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberListSearch(rc, condition);
+    }
 }
