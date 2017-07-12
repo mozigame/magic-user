@@ -1435,7 +1435,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private boolean checkLoginReq(String username, String password) {
-        if (username == null || username.length() < 6 || username.length() > 16) {
+        if (username == null || username.length() < 4 || username.length() > 15) {
             return false;
         }
         if (password == null || password.length() != 32) {
