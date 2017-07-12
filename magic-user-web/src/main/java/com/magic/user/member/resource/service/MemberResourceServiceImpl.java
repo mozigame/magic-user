@@ -185,7 +185,7 @@ public class MemberResourceServiceImpl {
         }
         MemberListVo result = new MemberListVo();
         result.setReturnWater(memberListVo.getReturnWater());
-        result.setReturnWaterName(memberListVo.getReturnWaterName() == null ? "":memberListVo.getReturnWaterName());
+        result.setReturnWaterName(memberListVo.getReturnWaterName() == null ? "" : memberListVo.getReturnWaterName());
         result.setLevel(memberListVo.getLevel() == null ? "" : memberListVo.getLevel());
         return result;
     }
@@ -319,8 +319,26 @@ public class MemberResourceServiceImpl {
      * @param list  详细列表数据
      * @return
      */
-    private static PageBean<MemberListVo> assemblePageBean(int page, int count, long total, Collection<MemberListVo> list) {
+    private static PageBean<MemberListVo> assemblePageBean(Integer page, Integer count, long total, Collection<MemberListVo> list) {
         PageBean<MemberListVo> result = new PageBean<>();
+        result.setPage(page);
+        result.setCount(count);
+        result.setTotal(total);
+        result.setList(list);
+        return result;
+    }
+
+    /**
+     * 组装翻页数据
+     *
+     * @param page  页码
+     * @param count 当页条数
+     * @param total 总条数
+     * @param list  详细列表数据
+     * @return
+     */
+    private static PageBean<String> assemblePageBeanList(Integer page, Integer count, long total, Collection<String> list) {
+        PageBean<String> result = new PageBean<>();
         result.setPage(page);
         result.setCount(count);
         result.setTotal(total);
@@ -2061,13 +2079,21 @@ public class MemberResourceServiceImpl {
         }
         memberCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkCondition(memberCondition)) {
-            return "{\"total\":0}";
+            return JSON.toJSONString(assemblePageBeanList(null, null, 0, null));
         }
         long total = memberMongoService.getCount(memberCondition);
         if (total <= 0) {
-            return "{\"total\":0}";
+            return JSON.toJSONString(assemblePageBeanList(null, null, 0, null));
         }
-        return "{" + "\"total\":" + total + "}";
+        //获取mongo中查询到的会员列表
+        List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, null, null);
+        ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
+        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
+            return JSON.toJSONString(assemblePageBeanList(null, null, 0, null));
+        }
+        Set<String> list = memberConditionVos.stream().map(MemberConditionVo::getMemberName).collect(Collectors.toSet());
+
+        return JSON.toJSONString(assemblePageBeanList(null, null, total, list));
     }
 
     /**
