@@ -36,7 +36,7 @@ public class MemberLoginSucessPushMsgConsumer implements Consumer{
             if (!Optional.ofNullable(member).isPresent()){
                 return true;
             }
-            String body = assembleBody(member);
+            String body = assembleBody(object);
             return thriftOutAssembleService.pushMsg(body);
         }catch (Exception e){
             ApiLogger.error(String.format("member login success push msg consumer error. key:%s, msg:%s", key, msg), e);
@@ -47,13 +47,13 @@ public class MemberLoginSucessPushMsgConsumer implements Consumer{
     /**
      * 组装body
      *
-     * @param member
+     * @param object
      * @return
      */
-    private String assembleBody(Member member) {
+    private String assembleBody(JSONObject object) {
         JSONObject body = new JSONObject();
         body.put("ReqType", 2);
-        body.put("Msg", member);
+        body.put("Msg", object);
         return body.toJSONString();
     }
 }
