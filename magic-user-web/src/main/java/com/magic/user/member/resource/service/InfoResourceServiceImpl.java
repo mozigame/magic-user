@@ -300,13 +300,15 @@ public class InfoResourceServiceImpl {
                 userMap.put("operTime", System.currentTimeMillis());
             }
             if (loginPassword != null) {
-                newMap.put("loginPassword", "password reset");
+                newMap.put("loginPassword", loginPassword);
                 EGResp resp = thriftOutAssembleService.passwordReset(assembleLoginPwdBody(member.getMemberId(),member.getUsername(),
                         loginPassword,rc.getIp()), "account");
                // ApiLogger.info("=========password reset========");
                 //ApiLogger.info(resp.getData());
             }
-            //todo 组织map
+            if(paymentPassword != null){
+                newMap.put("paymentPassword",paymentPassword);
+            }
         } else {//代理或股东
             User user = userService.getUserById(id);
             if (user == null) {
@@ -337,14 +339,16 @@ public class InfoResourceServiceImpl {
                 userMap.put("ownerName", user.getOwnerName());
                 userMap.put("type", type);
                 userMap.put("operTime", System.currentTimeMillis());
+                userMap.put("paymentPassword",paymentPassword);
             }
             if (loginPassword != null) {
-                result = loginService.resetPassword(id, PasswordCapture.getSaltPwd(loginPassword));
+                String pwd = PasswordCapture.getSaltPwd(loginPassword);
+                result = loginService.resetPassword(id,pwd);
                 if (result) {
-                    newMap.put("loginPassword", "password reset");
+                    newMap.put("loginPassword", pwd);
                 }
             }
-            //todo 组织map
+
         }
         if (newMap.size() > 0) {
             JSONObject object = new JSONObject();
