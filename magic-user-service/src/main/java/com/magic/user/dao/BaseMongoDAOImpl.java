@@ -2,6 +2,7 @@ package com.magic.user.dao;
 
 import com.magic.api.commons.model.Page;
 import com.magic.user.util.ReflectionUtils;
+import com.magic.user.vo.AgentConditionVo;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;

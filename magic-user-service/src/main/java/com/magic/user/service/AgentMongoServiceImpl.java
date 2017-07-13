@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.management.Query;
 import java.util.List;
 import java.util.Map;
 
@@ -105,4 +106,18 @@ public class AgentMongoServiceImpl implements AgentMongoService {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     * @param agentConditionVo
+     * @return
+     */
+    @Override
+    public boolean updateAgent(AgentConditionVo agentConditionVo) {
+        try {
+            return agentMongoDao.updateAgent(agentConditionVo);
+        }catch (Exception e){
+            ApiLogger.error(String.format("update agent  error.agentConditionVo:%d", agentConditionVo), e);
+        }
+        return false;
+    }
 }

@@ -53,4 +53,9 @@ public interface AgentMongoService {
      */
     long getCount(AgentCondition userCondition);
 
+    /**
+     * 根据代理ID更新代理的会员数量信息
+     * @param agentConditionVo
+     */
+    boolean updateAgent(AgentConditionVo agentConditionVo);
 }

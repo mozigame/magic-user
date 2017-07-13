@@ -14,6 +14,7 @@ import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
+import com.magic.user.enums.AccountType;
 import com.magic.user.enums.DeleteStatus;
 import com.magic.user.enums.LoginType;
 import com.magic.user.exception.UserException;
@@ -25,7 +26,9 @@ import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.util.PasswordCapture;
+import com.magic.user.vo.AgentInfoVo;
 import com.magic.user.vo.LoginResultVo;
+import com.magic.user.vo.StockInfoVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -77,6 +80,8 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         if (userId <= 0) {
             throw UserException.USERNAME_NOT_EXIST;
         }
+
+
         //todo 从redis里面获取ownerId_username下的验证码，如果存在验证码，与code对比，如果相符，进行下一步操作
         String proCode = "";
 //        if (!proCode.equals(code)) {
@@ -85,6 +90,11 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         User loginUser = userService.get(userId);
         if (loginUser == null) {
             throw UserException.ILLEGAL_USER;
+        }
+
+        //校验上级是否被停用
+        if(!checkParent(loginUser)){
+            throw UserException.ACCOUNT_DISABLED;
         }
         if (loginUser.getStatus() == AccountStatus.disable
                 || loginUser.getIsDelete() == DeleteStatus.del) {
@@ -127,6 +137,16 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         result.setTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
 
         return JSONObject.toJSONString(result);
+    }
+
+    private boolean checkParent(User user) {
+        if(user.getType() == AccountType.agent){
+            AgentInfoVo agent = userService.getAgentDetail(user.getUserId());
+            StockInfoVo stockInfoVo = userService.getStockDetail(agent.getHolder());
+            return stockInfoVo.getStatus() == 1 ? true : false;
+        }else{
+            return false;
+        }
     }
 
     /**

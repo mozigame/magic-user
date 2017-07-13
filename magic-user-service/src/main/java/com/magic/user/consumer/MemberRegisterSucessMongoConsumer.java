@@ -11,8 +11,10 @@ import com.magic.user.entity.Member;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.CurrencyType;
 import com.magic.user.po.OnLineMember;
+import com.magic.user.service.AgentMongoService;
 import com.magic.user.service.MemberMongoService;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
+import com.magic.user.vo.AgentConditionVo;
 import com.magic.user.vo.MemberConditionVo;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +35,8 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
     private MemberMongoService memberMongoService;
     @Resource
     private ThriftOutAssembleServiceImpl thriftOutAssembleService;
+    @Resource
+    private AgentMongoService agentMongoService;
 
     @Override
     public boolean doit(String topic, String tags, String key, String msg) {
@@ -60,6 +64,15 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
                 }
                 vo.setLevel(level);
                 result = memberMongoService.saveMemberInfo(vo);
+                if (!result){
+                    return false;
+                }
+            }
+            //累加代理的会员数（members）
+            AgentConditionVo agentConditionVo = agentMongoService.get(member.getAgentId());
+            if (!Optional.ofNullable(agentConditionVo).isPresent()){
+                agentConditionVo.setMembers(agentConditionVo.getMembers()+1);
+                result = agentMongoService.updateAgent(agentConditionVo);
                 if (!result){
                     return false;
                 }

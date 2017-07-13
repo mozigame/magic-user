@@ -107,8 +107,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
         for (AgentConditionVo vo : agentConditionVoList) {
             agentIds.add(vo.getAgentId());
-            vo.setDepositMoney(NumberUtil.fenToYuan(vo.getDepositMoney()).longValue());
-            vo.setWithdrawMoney(NumberUtil.fenToYuan(vo.getWithdrawMoney()).longValue());
+            vo.setDepositMoney(vo.getDepositMoney());
+            vo.setWithdrawMoney(vo.getWithdrawMoney());
             map.put(vo.getAgentId(),vo);
 
         }
@@ -156,8 +156,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 }else{
                     vo.setMembers(0);
                 }
-                vo.setDepositTotalMoney(av.getDepositMoney());
-                vo.setWithdrawTotalMoney(av.getWithdrawMoney());
+                ;
+                vo.setDepositTotalMoney(av.getDepositMoney() == null ? 0L:NumberUtil.fenToYuan(av.getDepositMoney()).longValue());
+                vo.setWithdrawTotalMoney(av.getWithdrawMoney() == null ? 0L:NumberUtil.fenToYuan(av.getWithdrawMoney()).longValue());
             }else{
                 vo.setShowStatus("");
                 // 会员数量，存款金额，取款金额

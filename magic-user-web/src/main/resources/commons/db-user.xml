@@ -15,32 +15,56 @@
        http://www.springframework.org/schema/util/spring-util.xsd">
 
 
-    <bean id="baseDataSource" class="com.alibaba.druid.pool.DruidDataSource">
-        <!-- 驱动包名 -->
-        <property name="driverClassName" value="${mysql.magic.driver}"/>
-        <!-- 最大连接数量 -->
-        <property name="maxActive" value="20"/>
-        <!-- 最小空闲连接  -->
+    <bean id="baseDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${mysql.magic.driver}" />
+
+        <property name="minEvictableIdleTimeMillis" value="5000" />
+        <property name="numTestsPerEvictionRun" value="10" />
+        <property name="testOnBorrow" value="true" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnReturn" value="true" />
+        <property name="validationQuery" value="SELECT 1" />
+        <property name= "validationQueryTimeout" value="1"/>
+        <property name="maxActive" value="150"/>
         <property name="minIdle" value="5"/>
-        <!-- 最大空闲连接 -->
         <property name="maxIdle" value="20"/>
-        <!-- 初始化连接数量 -->
-        <property name="initialSize" value="10"/>
-        <!-- 连接被泄露时是否打印 -->
+        <property name="initialSize" value="30"/>
         <property name="logAbandoned" value="true"/>
-        <!-- 是否自动回收超时连接 -->
+        <property name="removeAbandoned"  value="true"/>
+        <property name="removeAbandonedTimeout" value="10"/>
+        <property name="maxWait" value="1000"/>
+        <property name="timeBetweenEvictionRunsMillis" value="10000"/>
+
+
+    </bean>
+<!--
+    <bean id="baseDataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        &lt;!&ndash; 驱动包名 &ndash;&gt;
+        <property name="driverClassName" value="${mysql.magic.driver}"/>
+        &lt;!&ndash; 最大连接数量 &ndash;&gt;
+        <property name="maxActive" value="20"/>
+        &lt;!&ndash; 最小空闲连接  &ndash;&gt;
+        <property name="minIdle" value="5"/>
+        &lt;!&ndash; 最大空闲连接 &ndash;&gt;
+        <property name="maxIdle" value="20"/>
+        &lt;!&ndash; 初始化连接数量 &ndash;&gt;
+        <property name="initialSize" value="10"/>
+        &lt;!&ndash; 连接被泄露时是否打印 &ndash;&gt;
+        <property name="logAbandoned" value="true"/>
+        &lt;!&ndash; 是否自动回收超时连接 &ndash;&gt;
         <property name="removeAbandoned" value="true"/>
-        <!-- 超时等待时间(以秒为单位) -->
+        &lt;!&ndash; 超时等待时间(以秒为单位) &ndash;&gt;
         <property name="removeAbandonedTimeout" value="10"/>
 
-        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，相当于C3P0的idleConnectionTestPeriod 参数，单位是毫秒 -->
+        &lt;!&ndash; 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，相当于C3P0的idleConnectionTestPeriod 参数，单位是毫秒 &ndash;&gt;
         <property name="timeBetweenEvictionRunsMillis" value="30000" />
-        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        &lt;!&ndash; 配置一个连接在池中最小生存的时间，单位是毫秒 &ndash;&gt;
         <property name="minEvictableIdleTimeMillis" value="30000" />
-        <!-- 测试连接，单位为毫秒 -->
+        &lt;!&ndash; 测试连接，单位为毫秒 &ndash;&gt;
         <property name="validationQueryTimeout" value="30000" />
         <property name="validationQuery" value="SELECT 1" />
     </bean>
+-->
 
 
     <!-- dataSource_0-->
