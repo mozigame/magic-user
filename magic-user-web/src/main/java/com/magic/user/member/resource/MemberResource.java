@@ -65,7 +65,7 @@ public class MemberResource {
             @RequestParam(name = "proCode", required = false, defaultValue = "") String proCode,
             @RequestParam(name = "username", required = true) String username,
             @RequestParam(name = "password", required = true) String password,
-            @RequestParam(name = "paymentPassword", required = false, defaultValue = "") String paymentPassword,
+            @RequestParam(name = "paymentPassword", required = true, defaultValue = "") String paymentPassword,
             @RequestParam(name = "telephone", required = false, defaultValue = "") String telephone,
             @RequestParam(name = "email", required = false, defaultValue = "") String email,
             @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
