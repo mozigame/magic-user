@@ -93,9 +93,9 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         }
 
         //校验上级是否被停用
-//        if(checkParent(loginUser)){
-//            throw UserException.ACCOUNT_DISABLED;
-//        }
+        if(checkParent(loginUser)){
+            throw UserException.ACCOUNT_DISABLED;
+        }
         if (loginUser.getStatus() == AccountStatus.disable
                 || loginUser.getIsDelete() == DeleteStatus.del) {
             throw UserException.ACCOUNT_DISABLED;
@@ -143,7 +143,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         if(user.getType() == AccountType.agent){
             AgentInfoVo agent = userService.getAgentDetail(user.getUserId());
             StockInfoVo stockInfoVo = userService.getStockDetail(agent.getHolder());
-            return stockInfoVo.getStatus() == 1 ? true : false;
+            return stockInfoVo.getStatus() == 1 ? false : true;
         }else{
             return false;
         }
@@ -221,5 +221,18 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String testLogin(Long id){
+        User loginUser = userService.get(id);
+        if (loginUser == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+
+        //校验上级是否被停用
+        if(checkParent(loginUser)){
+            throw UserException.ACCOUNT_DISABLED;
+        }
+        return "{}";
     }
 }

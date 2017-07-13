@@ -266,6 +266,7 @@ public class InfoResourceServiceImpl {
             if (member == null) {
                 throw UserException.ILLEGAL_MEMBER;
             }
+            newMap.put("ownerId",member.getOwnerId());
             boolean result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
                 if (realname != null) {
@@ -309,6 +310,7 @@ public class InfoResourceServiceImpl {
             if(paymentPassword != null){
                 newMap.put("paymentPassword",paymentPassword);
             }
+
         } else {//代理或股东
             User user = userService.getUserById(id);
             if (user == null) {

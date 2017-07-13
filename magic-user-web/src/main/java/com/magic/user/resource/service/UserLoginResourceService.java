@@ -36,4 +36,6 @@ public interface UserLoginResourceService {
      * @return
      */
     String verify(RequestContext rc);
+
+    String testLogin(Long id);
 }
