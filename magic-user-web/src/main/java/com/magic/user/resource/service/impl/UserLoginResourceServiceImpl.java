@@ -93,9 +93,9 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         }
 
         //校验上级是否被停用
-        if(!checkParent(loginUser)){
-            throw UserException.ACCOUNT_DISABLED;
-        }
+//        if(checkParent(loginUser)){
+//            throw UserException.ACCOUNT_DISABLED;
+//        }
         if (loginUser.getStatus() == AccountStatus.disable
                 || loginUser.getIsDelete() == DeleteStatus.del) {
             throw UserException.ACCOUNT_DISABLED;
