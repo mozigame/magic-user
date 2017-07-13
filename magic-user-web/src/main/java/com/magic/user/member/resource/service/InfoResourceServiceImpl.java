@@ -267,6 +267,7 @@ public class InfoResourceServiceImpl {
                 throw UserException.ILLEGAL_MEMBER;
             }
             newMap.put("ownerId",member.getOwnerId());
+            newMap.put("userId", member.getMemberId());
             boolean result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
                 if (realname != null) {
