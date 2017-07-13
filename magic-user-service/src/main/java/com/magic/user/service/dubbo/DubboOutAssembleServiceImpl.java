@@ -253,6 +253,8 @@ public class DubboOutAssembleServiceImpl {
             UserPass userPass = new UserPass();
             userPass.setUserId(uid);
             userPass.setTradePass(password);
+            ApiLogger.info("========update payPwd=====");
+            ApiLogger.info(JSON.toJSONString(userPass));
             tethysUserDubboService.updateUserPaidPwd(userPass);
             return true;
         }catch (Exception e){
