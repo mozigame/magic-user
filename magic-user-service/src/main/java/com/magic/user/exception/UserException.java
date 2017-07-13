@@ -119,7 +119,7 @@ public class UserException extends ExceptionFactor {
      * 密码错误
      */
     public static final CommonException PASSWORD_ERROR = new CommonException(
-            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 16, HttpServletResponse.SC_OK, "password error!", "密码错误.");
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 16, HttpServletResponse.SC_OK, "password error!", "原登录密码错误.");
 
     /**
      * 验证失败
