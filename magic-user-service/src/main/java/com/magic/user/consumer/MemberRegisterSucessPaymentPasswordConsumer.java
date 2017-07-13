@@ -3,6 +3,7 @@ package com.magic.user.consumer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.core.tools.MD5Util;
 import com.magic.api.commons.mq.annotation.ConsumerConfig;
 import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
@@ -10,6 +11,7 @@ import com.magic.api.commons.utils.StringUtils;
 import com.magic.user.entity.Member;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import org.springframework.stereotype.Component;
+import sun.security.provider.MD5;
 
 import javax.annotation.Resource;
 import java.util.Optional;
@@ -36,14 +38,19 @@ public class MemberRegisterSucessPaymentPasswordConsumer implements Consumer{
             if (!Optional.ofNullable(member).filter(id -> id.getMemberId() > 0).isPresent()){
                 return true;
             }
+
             String paymentPassword = member.getPaymentPassword();
-            if (StringUtils.isEmpty(paymentPassword)){
-                return true;
+            if(paymentPassword == null || paymentPassword.trim().length() < 1){
+                paymentPassword  = MD5Util.md5Digest("1234".getBytes());
             }
+//            if (StringUtils.isEmpty(paymentPassword)){
+//                return true;
+//            }
             return dubboOutAssembleService.insertUserPaymentPassword(member.getMemberId(),  member.getOwnerId(), paymentPassword);
         }catch (Exception e){
             ApiLogger.error(String.format("member register sucess payment password consumer error. key:%s, msg:%s", key, msg), e);
         }
         return true;
     }
+
 }

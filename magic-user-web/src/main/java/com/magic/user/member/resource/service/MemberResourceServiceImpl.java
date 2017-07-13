@@ -1158,12 +1158,11 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private boolean checkRegisterParam(RegisterReq req,Long ownerId,int type) {
-        //校验用户名和密码和支付密码
+        //校验用户名和密码
         if (!Optional.ofNullable(req)
                 .filter(request -> request.getUsername() != null && request.getUsername().length() >= 4
                         && request.getUsername().length() <= 15)
                 .filter(request -> request.getPassword() != null && request.getPassword().length() == 32 )
-                .filter(request -> request.getPaymentPassword() != null && request.getPaymentPassword().length() == 32 )
                 .isPresent()){
             return false;
         }
@@ -1176,6 +1175,11 @@ public class MemberResourceServiceImpl {
                     field.setAccessible(true);
                     if(field.get(req) == null) {
                         return false;
+                    }
+                    if("paymentPassword".equals(name)){
+                        if(((String)field.get(req)).length() != 32){
+                            return false;
+                        }
                     }
                 } catch (NoSuchFieldException e) {
 
