@@ -248,12 +248,12 @@ public class DubboOutAssembleServiceImpl {
      * @param password
      * @return
      */
-    public boolean updateUserPaymentPassword(long uid, String password,long ownerId) {
+    public boolean updateUserPaymentPassword(long uid, String password,Integer ownerId) {
         try {
             UserPass userPass = new UserPass();
             userPass.setUserId(uid);
             userPass.setTradePass(password);
-            userPass.setOwnerId(ownerId);
+            userPass.setOwnerId(ownerId.longValue());
             ApiLogger.info("========update payPwd=====");
             ApiLogger.info(JSON.toJSONString(userPass));
             tethysUserDubboService.updateUserPaidPwd(userPass);

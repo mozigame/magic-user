@@ -35,7 +35,7 @@ public class UserModifyPaymentPasswordConsumer implements Consumer {
                 return true;
             }
             String password = (String) map.get("paymentPassword");
-            Long ownerId = (Long) map.get("ownerId");
+            Integer ownerId = (Integer) map.get("ownerId");
             if (StringUtils.isEmpty(password)){
                 return true;
             }

@@ -32,12 +32,12 @@ public class UserLoginResource {
     private UserLoginResourceService userLoginResourceService;
 
     /**
-     * 用户登陆
-     *
+     *  用户登陆
      * @param request
      * @param response
      * @param code
-
+     * @param username
+     * @param password
      * @return
      */
     @Access(type = Access.AccessType.PUBLIC)
@@ -46,19 +46,17 @@ public class UserLoginResource {
     public String login(
             HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "code", required = false, defaultValue = "") String code,
-//            @RequestParam(name = "username") String username,
-//            @RequestParam(name = "password") String password
-            @RequestParam(name = "id") Long id
+            @RequestParam(name = "username") String username,
+            @RequestParam(name = "password") String password
 
     ) {
-//        RequestContext rc = RequestContext.getRequestContext();
-//        //获取浏览器、操作系统名称等数据
-//        String agent = request.getHeader(HeaderUtil.USER_AGENT);
-//        //获取域名
-//        String url = rc.getOrigin();
-//        ApiLogger.info("/user/login url : " + url);
-//        return userLoginResourceService.login(rc, agent, url, username, password, code);
-        return userLoginResourceService.testLogin(id);
+        RequestContext rc = RequestContext.getRequestContext();
+        //获取浏览器、操作系统名称等数据
+        String agent = request.getHeader(HeaderUtil.USER_AGENT);
+        //获取域名
+        String url = rc.getOrigin();
+        ApiLogger.info("/user/login url : " + url);
+        return userLoginResourceService.login(rc, agent, url, username, password, code);
     }
 
     /**
