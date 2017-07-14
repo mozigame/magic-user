@@ -223,4 +223,18 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
 
         return result;
     }
+
+    /**
+     * 批量获取会员数
+     *
+     * @param accounts
+     * @param ownerId
+     * @return
+     */
+    public List<MemberConditionVo> batchGetMembers(Collection<String> accounts, Long ownerId){
+        Query query = new Query();
+        query.addCriteria(new Criteria("ownerId").is(ownerId));
+        query.addCriteria(new Criteria("memberName").in(accounts));
+        return super.find(query);
+    }
 }

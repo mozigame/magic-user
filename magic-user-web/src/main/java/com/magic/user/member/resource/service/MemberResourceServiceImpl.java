@@ -1998,7 +1998,7 @@ public class MemberResourceServiceImpl {
     public String memberListSearch(RequestContext rc, String condition) {
         User operaUser = userService.get(rc.getUid());
         if (operaUser == null) {
-            throw UserException.ILLEGAL_USER;
+            return JSON.toJSONString(assemblePageBean(null, null, null, null));
         }
         MemberCondition memberCondition = MemberCondition.valueOf(condition);
         if (memberCondition == null) {
@@ -2033,5 +2033,50 @@ public class MemberResourceServiceImpl {
         result.setTotal(total);
         result.setList(list);
         return result;
+    }
+
+    /**
+     * 检索会员列表
+     *
+     * @param rc
+     * @param accounts
+     * @return
+     */
+    public String memberListSearchByAccounts(RequestContext rc, String accounts) {
+        if (!checkParams(accounts)){
+            return JSON.toJSONString(assemblePageBean(null, null, null, null));
+        }
+        User operaUser = userService.get(rc.getUid());
+        if (operaUser == null) {
+            return JSON.toJSONString(assemblePageBean(null, null, null, null));
+        }
+        Set<String> sets = Arrays.asList(accounts.split(",")).stream().map(s -> s.trim()).collect(Collectors.toSet());
+        //获取mongo中查询到的会员列表
+        List<MemberConditionVo> memberConditionVos = memberMongoService.batchQuery(sets, operaUser.getOwnerId());
+        ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
+        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
+            return JSON.toJSONString(assemblePageBean(null, null, null, null));
+        }
+        return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, null, memberConditionVos));
+    }
+
+    /**
+     * 参数检查
+     * @param accounts
+     * @return
+     */
+    private boolean checkParams(String accounts) {
+        if (StringUtils.isNotEmpty(accounts)){
+            try {
+                String[] split = accounts.split(",");
+                if (split.length == 0){
+                    return false;
+                }
+                return true;
+            }catch (Exception e){
+                ApiLogger.error(String.format("spilt accounts error. accounts: %s", accounts), e);
+            }
+        }
+        return false;
     }
 }
