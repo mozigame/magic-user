@@ -187,7 +187,7 @@ public class StockholderResource {
      * @return
      * @Doc 启用停用股东
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/disable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String disable(
@@ -200,6 +200,7 @@ public class StockholderResource {
         }
         return stockResourceService.updateStatus(rc, id, status);
     }
+
 
 
 }

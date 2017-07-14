@@ -1649,6 +1649,32 @@ public class MemberResourceServiceImpl {
     }
 
     /**
+     * 获取会员的银行卡信息
+     *
+     * @param rc
+     * @return
+     */
+    public String bankDetail (RequestContext rc){
+        Member member = memberService.getMemberById(rc.getUid());
+        if (member == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        BankDetailVo result = new BankDetailVo();
+        result.setBank(member.getBank());
+        result.setBankCardNo(member.getBankCardNo());
+        result.setRealname(member.getRealname());
+        result.setTelephone(member.getTelephone());
+        if(member.getBankCardNo() == null || member.getBankCardNo().trim().length() == 0 ||
+                member.getBank() == null || member.getBank().trim().length() == 0){
+            result.setHave(false);
+        }else{
+            result.setHave(true);
+        }
+
+        return JSONObject.toJSONString(result);
+    }
+
+    /**
      * 查询个人中心详细信息
      *
      * @param rc
