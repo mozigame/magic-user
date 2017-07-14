@@ -645,6 +645,18 @@ public class MemberResource {
 
     /**
      * @return
+     * @Doc 获取会员的银行卡信息
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/center/bankDetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String bankDetail() {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.bankDetail(rc);
+    }
+
+    /**
+     * @return
      * @Doc 刷新会员的余额和未读消息
      */
     @Access(type = Access.AccessType.COMMON)
