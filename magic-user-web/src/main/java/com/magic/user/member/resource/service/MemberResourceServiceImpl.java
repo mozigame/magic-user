@@ -102,17 +102,17 @@ public class MemberResourceServiceImpl {
         }
         memberCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkCondition(memberCondition)) {
-            return JSON.toJSONString(assemblePageBean(page, count, 0, null));
+            return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
         }
         long total = memberMongoService.getCount(memberCondition);
         if (total <= 0) {
-            return JSON.toJSONString(assemblePageBean(page, count, 0, null));
+            return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
         }
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
         ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
         if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
-            return JSON.toJSONString(assemblePageBean(page, count, 0, null));
+            return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
         }
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
@@ -319,7 +319,7 @@ public class MemberResourceServiceImpl {
      * @param list  详细列表数据
      * @return
      */
-    private static PageBean<MemberListVo> assemblePageBean(Integer page, Integer count, long total, Collection<MemberListVo> list) {
+    private static PageBean<MemberListVo> assemblePageBean(Integer page, Integer count, Long total, Collection<MemberListVo> list) {
         PageBean<MemberListVo> result = new PageBean<>();
         result.setPage(page);
         result.setCount(count);
@@ -725,113 +725,6 @@ public class MemberResourceServiceImpl {
         List<MemberLevelListVo> list = getMemberLevelList(operaUser.getOwnerId(), lock);
         result.setList(list != null ? list : new ArrayList<>());
         return JSON.toJSONString(result);
-//        return "{\n" +
-//                "    \"list\": [\n" +
-//                "        {\n" +
-//                "            \"id\": 10001,\n" +
-//                "            \"name\": \"VIP1\",\n" +
-//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-//                "            \"members\": 4310,\n" +
-//                "            \"condition\": {\n" +
-//                "                \"depositNumbers\": 1,\n" +
-//                "                \"depositTotalMoney\": \"1\",\n" +
-//                "                \"maxDepositMoney\": \"0\",\n" +
-//                "                \"withdrawNumbers\": 0,\n" +
-//                "                \"withdrawTotalMoney\": \"0\"\n" +
-//                "            },\n" +
-//                "            \"returnWater\": 1,\n" +
-//                "            \"returnWaterName\": \"返水方案1\",\n" +
-//                "            \"discount\": 1,\n" +
-//                "            \"discountName\": \"出入款优惠1\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"id\": 10002,\n" +
-//                "            \"name\": \"VIP2\",\n" +
-//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-//                "            \"members\": 4310,\n" +
-//                "            \"condition\": {\n" +
-//                "                \"depositNumbers\": 1,\n" +
-//                "                \"depositTotalMoney\": \"1\",\n" +
-//                "                \"maxDepositMoney\": \"0\",\n" +
-//                "                \"withdrawNumbers\": 0,\n" +
-//                "                \"withdrawTotalMoney\": \"0\"\n" +
-//                "            },\n" +
-//                "            \"returnWater\": 2,\n" +
-//                "            \"returnWaterName\": \"返水方案2\",\n" +
-//                "            \"discount\": 2,\n" +
-//                "            \"discountName\": \"出入款优惠2\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"id\": 10003,\n" +
-//                "            \"name\": \"VIP3\",\n" +
-//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-//                "            \"members\": 4310,\n" +
-//                "            \"condition\": {\n" +
-//                "                \"depositNumbers\": 1,\n" +
-//                "                \"depositTotalMoney\": \"1\",\n" +
-//                "                \"maxDepositMoney\": \"0\",\n" +
-//                "                \"withdrawNumbers\": 0,\n" +
-//                "                \"withdrawTotalMoney\": \"0\"\n" +
-//                "            },\n" +
-//                "            \"returnWater\": 3,\n" +
-//                "            \"returnWaterName\": \"返水方案3\",\n" +
-//                "            \"discount\": 3,\n" +
-//                "            \"discountName\": \"出入款优惠3\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"id\": 10004,\n" +
-//                "            \"name\": \"VIP4\",\n" +
-//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-//                "            \"members\": 4310,\n" +
-//                "            \"condition\": {\n" +
-//                "                \"depositNumbers\": 1,\n" +
-//                "                \"depositTotalMoney\": \"1\",\n" +
-//                "                \"maxDepositMoney\": \"0\",\n" +
-//                "                \"withdrawNumbers\": 0,\n" +
-//                "                \"withdrawTotalMoney\": \"0\"\n" +
-//                "            },\n" +
-//                "            \"returnWater\": 4,\n" +
-//                "            \"returnWaterName\": \"返水方案4\",\n" +
-//                "            \"discount\": 4,\n" +
-//                "            \"discountName\": \"出入款优惠4\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"id\": 10005,\n" +
-//                "            \"name\": \"VIP5\",\n" +
-//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-//                "            \"members\": 4310,\n" +
-//                "            \"condition\": {\n" +
-//                "                \"depositNumbers\": 1,\n" +
-//                "                \"depositTotalMoney\": \"1\",\n" +
-//                "                \"maxDepositMoney\": \"0\",\n" +
-//                "                \"withdrawNumbers\": 0,\n" +
-//                "                \"withdrawTotalMoney\": \"0\"\n" +
-//                "            },\n" +
-//                "            \"returnWater\": 5,\n" +
-//                "            \"returnWaterName\": \"返水方案5\",\n" +
-//                "            \"discount\": 5,\n" +
-//                "            \"discountName\": \"出入款优惠5\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"id\": 10006,\n" +
-//                "            \"name\": \"VIP6\",\n" +
-//                "            \"createTime\": \"2017-03-01 16:43:22\",\n" +
-//                "            \"members\": 4310,\n" +
-//                "            \"condition\": {\n" +
-//                "                \"depositNumbers\": 1,\n" +
-//                "                \"depositTotalMoney\": \"1\",\n" +
-//                "                \"maxDepositMoney\": \"0\",\n" +
-//                "                \"withdrawNumbers\": 0,\n" +
-//                "                \"withdrawTotalMoney\": \"0\"\n" +
-//                "            },\n" +
-//                "            \"returnWater\": 6,\n" +
-//                "            \"returnWaterName\": \"返水方案6\",\n" +
-//                "            \"discount\": 6,\n" +
-//                "            \"discountName\": \"出入款优惠6\"\n" +
-//                "        }\n" +
-//                "    ]\n" +
-//                "}";
-//
      }
 
     /**
@@ -1925,7 +1818,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberTradingRecord(RequestContext rc, Long memberId) {
-        ApiLogger.info("memberId:"+memberId);
+        ApiLogger.info("memberId:" + memberId);
         MemberConditionVo mv = memberMongoService.get(memberId);
         if(mv == null){
             mv = new MemberConditionVo();
@@ -1975,7 +1868,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_PARAMETERS;
         }
 
-        assembleBankInfo(member,realname.trim(),telephone.trim(),bankCode.trim(),bank.trim(),bankCardNo.trim(),bankAddress.trim());
+        assembleBankInfo(member, realname.trim(), telephone.trim(), bankCode.trim(), bank.trim(), bankCardNo.trim(), bankAddress.trim());
 
         memberService.updateMember(member);
         return JSON.toJSONString(member);
@@ -2113,17 +2006,32 @@ public class MemberResourceServiceImpl {
         }
         memberCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkCondition(memberCondition)) {
-            return "{\"list\":[]}";
+            return JSON.toJSONString(assemblePageBean(null, null, null, null));
         }
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, null, null);
         ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
         if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
-            return "{\"list\":[]}";
+            return JSON.toJSONString(assemblePageBean(null, null, null, null));
         }
-        Set<String> list = memberConditionVos.stream().map(MemberConditionVo::getMemberName).collect(Collectors.toSet());
-        JSONObject result = new JSONObject();
-        result.put("list", list);
-        return JSON.toJSONString(result);
+        return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, null, memberConditionVos));
+    }
+
+    /**
+     * 组装翻页数据
+     *
+     * @param page  页码
+     * @param count 当页条数
+     * @param total 总条数
+     * @param list  详细列表数据
+     * @return
+     */
+    private static PageBean<MemberConditionVo> assemblePageBeanMemberCondions(Integer page, Integer count, Long total, Collection<MemberConditionVo> list) {
+        PageBean<MemberConditionVo> result = new PageBean<>();
+        result.setPage(page);
+        result.setCount(count);
+        result.setTotal(total);
+        result.setList(list);
+        return result;
     }
 }
