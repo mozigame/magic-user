@@ -38,7 +38,7 @@ public class StockholderResource {
      * @return
      * @Doc 股东列表
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String list() {
@@ -96,7 +96,7 @@ public class StockholderResource {
      * @return
      * @Doc 股东详情
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
@@ -161,7 +161,7 @@ public class StockholderResource {
      * @return
      * @Doc 新增股东
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String add(

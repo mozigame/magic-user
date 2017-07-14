@@ -39,7 +39,7 @@ public class AgentResource {
      * @return
      * @Doc 代理列表
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String list(
@@ -105,7 +105,7 @@ public class AgentResource {
      * @return
      * @Doc 手动添加代理
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String add(
@@ -149,7 +149,7 @@ public class AgentResource {
      * @return
      * @Doc 代理详情
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
@@ -373,7 +373,7 @@ public class AgentResource {
      * @return
      * @Doc 代理审核/拒绝
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/review", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String review(
@@ -404,7 +404,7 @@ public class AgentResource {
      * @return
      * @Doc 查看代理审核信息
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/review/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String reviewDetail(
@@ -419,7 +419,7 @@ public class AgentResource {
      * @return
      * @Doc 启用禁用代理
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/disable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String review(

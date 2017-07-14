@@ -1668,6 +1668,8 @@ public class MemberResourceServiceImpl {
         result.setBankCardNo(member.getBankCardNo());
         result.setRealname(member.getRealname());
         result.setTelephone(member.getTelephone());
+        result.setBankCode(member.getBankCode());
+        result.setBankDetail(member.getBankDeposit());
         if(member.getBankCardNo() == null || member.getBankCardNo().trim().length() == 0 ||
                 member.getBank() == null || member.getBank().trim().length() == 0){
             result.setHave(false);
@@ -1940,7 +1942,7 @@ public class MemberResourceServiceImpl {
         if(telephone.trim().length() != 11){
             return false;
         }
-        if(bankCardNo.trim().length() < 18){
+        if(bankCardNo.trim().length() < 15){
             return false;
         }
         if(bankAddress.trim().length() < 1){

@@ -36,7 +36,7 @@ public class WorkerResource {
      * @return
      * @Doc 子账号列表，子账号只包括工作人员账号
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String list(
@@ -96,7 +96,7 @@ public class WorkerResource {
      * @return
      * @Doc 添加子账号
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String add(
@@ -116,7 +116,7 @@ public class WorkerResource {
      * @param roleId
      * @return
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String update(
@@ -134,7 +134,7 @@ public class WorkerResource {
      * @param status
      * @return
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/update/status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String updateStatus(
