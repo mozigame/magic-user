@@ -7,6 +7,7 @@ import com.magic.user.po.OnLineMember;
 import com.magic.user.vo.AgentConditionVo;
 import com.magic.user.vo.MemberConditionVo;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -129,4 +130,12 @@ public interface MemberMongoService {
      * @return
      */
     Map<Long,Integer> getMemberWithdrawCount(List<Long> members);
+
+    /**
+     * 批量获取会员数据
+     * @param accounts
+     * @param ownerId
+     * @return
+     */
+    List<MemberConditionVo> batchQuery(Collection<String> accounts, Long ownerId);
 }

@@ -13,6 +13,7 @@ import com.magic.user.vo.MemberConditionVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -225,6 +226,19 @@ public class MemberMongoServiceImpl implements MemberMongoService {
     @Override
     public Map<Long, Integer> getMemberWithdrawCount(List<Long> members) {
         return memberMongoDao.getMemberWithdrawCount(members);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<MemberConditionVo> batchQuery(Collection<String> accounts, Long ownerId) {
+        try {
+            return memberMongoDao.batchGetMembers(accounts, ownerId);
+        }catch (Exception e){
+            ApiLogger.error(String.format("batch get members from mongo error. accounts: %s, ownerId: %d", accounts, ownerId), e);
+        }
+        return null;
     }
 
 }

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * User: joey
@@ -738,7 +739,7 @@ public class MemberResource {
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.addBankInfo(rc, realname, telephone, bankCode, bank, bankCardNo,bankAddress);
+        return memberServiceResource.addBankInfo(rc, realname, telephone, bankCode, bank, bankCardNo, bankAddress);
     }
 
     /**
@@ -779,5 +780,19 @@ public class MemberResource {
             @RequestParam(name = "condition") String condition) {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberListSearch(rc, condition);
+    }
+
+    /**
+     * @param accounts 待检索的帐号列表
+     * @return
+     * @Doc 满足分层条件的会员列表
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/level/list/special/search/byaccounts", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String levelListSearchByAccounts(
+            @RequestParam(name = "accounts", required = true) String accounts) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberListSearchByAccounts(rc, accounts);
     }
 }
