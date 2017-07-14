@@ -9,7 +9,16 @@ public class BankDetailVo implements Serializable {
     private String realname;
     private String bank;
     private String bankCardNo;  //银行卡号
+    private String telephone;   //电话
     private boolean isHave;
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
 
     public boolean isHave() {
         return isHave;

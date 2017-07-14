@@ -1667,7 +1667,7 @@ public class MemberResourceServiceImpl {
         result.setBank(member.getBank());
         result.setBankCardNo(member.getBankCardNo());
         result.setRealname(member.getRealname());
-
+        result.setTelephone(member.getTelephone());
         if(member.getBankCardNo() == null || member.getBankCardNo().trim().length() == 0 ||
                 member.getBank() == null || member.getBank().trim().length() == 0){
             result.setHave(false);
