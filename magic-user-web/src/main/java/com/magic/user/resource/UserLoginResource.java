@@ -32,12 +32,12 @@ public class UserLoginResource {
     private UserLoginResourceService userLoginResourceService;
 
     /**
-     * 用户登陆
-     *
+     *  用户登陆
      * @param request
      * @param response
      * @param code
-
+     * @param username
+     * @param password
      * @return
      */
     @Access(type = Access.AccessType.PUBLIC)

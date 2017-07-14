@@ -223,16 +223,4 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         }
     }
 
-    public String testLogin(Long id){
-        User loginUser = userService.get(id);
-        if (loginUser == null) {
-            throw UserException.ILLEGAL_USER;
-        }
-
-        //校验上级是否被停用
-        if(checkParent(loginUser)){
-            throw UserException.ACCOUNT_DISABLED;
-        }
-        return "{}";
-    }
 }

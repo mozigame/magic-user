@@ -106,7 +106,7 @@ public class ExcelUtil {
                 row.createCell(6).setCellValue(vo.getRegisterIp());
                 row.createCell(7).setCellValue(vo.getOperUserName());
                 row.createCell(8).setCellValue(vo.getOperatorTime());
-                row.createCell(9).setCellValue(vo.getStatus());
+                row.createCell(9).setCellValue(vo.getShowStatus());
             }
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             workbook.write(os);
