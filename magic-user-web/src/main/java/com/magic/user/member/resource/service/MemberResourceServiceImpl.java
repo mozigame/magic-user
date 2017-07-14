@@ -1964,7 +1964,7 @@ public class MemberResourceServiceImpl {
     public String memberListCount(RequestContext rc, String condition) {
         User operaUser = userService.get(rc.getUid());
         if (operaUser == null) {
-            throw UserException.ILLEGAL_USER;
+            return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, 0L, null));
         }
         MemberCondition memberCondition = MemberCondition.valueOf(condition);
         if (memberCondition == null) {
@@ -1972,21 +1972,19 @@ public class MemberResourceServiceImpl {
         }
         memberCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkCondition(memberCondition)) {
-            return JSON.toJSONString(assemblePageBeanList(null, null, 0, null));
+            return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, 0L, null));
         }
         long total = memberMongoService.getCount(memberCondition);
         if (total <= 0) {
-            return JSON.toJSONString(assemblePageBeanList(null, null, 0, null));
+            return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, 0L, null));
         }
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, null, null);
         ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
         if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
-            return JSON.toJSONString(assemblePageBeanList(null, null, 0, null));
+            return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, 0L, null));
         }
-        Set<String> list = memberConditionVos.stream().map(MemberConditionVo::getMemberName).collect(Collectors.toSet());
-
-        return JSON.toJSONString(assemblePageBeanList(null, null, total, list));
+        return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, total, memberConditionVos));
     }
 
     /**
