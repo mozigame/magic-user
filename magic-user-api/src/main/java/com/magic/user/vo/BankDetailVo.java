@@ -11,6 +11,24 @@ public class BankDetailVo implements Serializable {
     private String bankCardNo;  //银行卡号
     private String telephone;   //电话
     private boolean isHave;
+    private String bankDetail;
+    private String bankCode;
+
+    public String getBankDetail() {
+        return bankDetail;
+    }
+
+    public void setBankDetail(String bankDetail) {
+        this.bankDetail = bankDetail;
+    }
+
+    public String getBankCode() {
+        return bankCode;
+    }
+
+    public void setBankCode(String bankCode) {
+        this.bankCode = bankCode;
+    }
 
     public String getTelephone() {
         return telephone;

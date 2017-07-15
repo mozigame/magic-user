@@ -57,7 +57,7 @@ public class MemInfoResource {
      * @return
      * @Doc 资料查询
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
@@ -82,7 +82,7 @@ public class MemInfoResource {
      * @return
      * @Doc 资料修改
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/modify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String modify(

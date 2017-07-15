@@ -237,7 +237,7 @@ public class MemberResource {
      * @return
      * @Doc 会员列表查询
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public String list(
@@ -316,7 +316,7 @@ public class MemberResource {
      * @return
      * @Doc 会员详情信息查询
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detail(
@@ -364,7 +364,7 @@ public class MemberResource {
      * @return
      * @Doc 会员强制下线
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/force/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String forceLogout(
@@ -422,7 +422,7 @@ public class MemberResource {
      * @return
      * @Doc 会员层级列表
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/level/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String levelList(
@@ -474,7 +474,7 @@ public class MemberResource {
      * @return
      * @Doc 层级映射列表
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/level/list/simple", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String levelListSpecial() {
@@ -544,7 +544,7 @@ public class MemberResource {
      * @param status 1 启用 2禁用
      * @return
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/disable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String statusUpdate(
@@ -561,7 +561,7 @@ public class MemberResource {
      * @return
      * @Doc 在线会员列表
      */
-    @Access(type = Access.AccessType.COMMON)
+    @Access(type = Access.AccessType.RESOURCE)
     @RequestMapping(value = "/online/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String onlineList(
