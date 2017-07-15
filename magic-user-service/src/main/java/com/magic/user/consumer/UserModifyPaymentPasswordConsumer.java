@@ -35,13 +35,16 @@ public class UserModifyPaymentPasswordConsumer implements Consumer {
                 return true;
             }
             String password = (String) map.get("paymentPassword");
+            if (StringUtils.isEmpty(password)){
+                ApiLogger.info(String.format("payment password empty. msg: %s", msg));
+                return true;
+            }
             Long ownerId = ((Number) map.get("ownerId")).longValue();
             Long userId = ((Number) map.get("userId")).longValue();
             if (StringUtils.isEmpty(password) || ownerId == null || userId == null){
                 return true;
             }
-            //long uid = Long.parseLong(key);
-            return dubboOutAssembleService.updateUserPaymentPassword(userId, password,ownerId);
+            return dubboOutAssembleService.updateUserPaymentPassword(userId, password, ownerId);
         } catch (Exception e) {
             ApiLogger.error(String.format("payment pwd modify success mq consumer error. key:%s, msg:%s", key, msg), e);
         }
