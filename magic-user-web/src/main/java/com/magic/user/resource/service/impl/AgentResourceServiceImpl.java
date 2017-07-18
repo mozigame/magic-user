@@ -9,7 +9,10 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.*;
+import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
+import com.magic.api.commons.tools.NumberUtil;
+import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerDomainVo;
@@ -34,6 +37,7 @@ import com.magic.user.util.PasswordCapture;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.NumberUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -107,8 +111,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
         for (AgentConditionVo vo : agentConditionVoList) {
             agentIds.add(vo.getAgentId());
-            vo.setDepositMoney(vo.getDepositMoney());
-            vo.setWithdrawMoney(vo.getWithdrawMoney());
             map.put(vo.getAgentId(),vo);
 
         }
@@ -528,6 +530,15 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             profile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
             AgentFundInfo info = assembleFundProfile(p);
             long depositMembers =  memberMongoService.getDepositMembers(agentVo.getId());
+            AgentConditionVo detail = agentMongoService.get(agentVo.getId());
+            if(detail != null){
+                if(detail.getWithdrawMoney() != null){
+                    info.setWithdrawTotalMoney(NumberUtil.fenToYuan(detail.getWithdrawMoney()).toString());
+                }
+                if(detail.getDepositMoney() != null){
+                    info.setDepositTotalMoney(NumberUtil.fenToYuan(detail.getDepositMoney()).toString());
+                }
+            }
             info.setDepositMembers((int)depositMembers);
             OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(agentVo.getId(),AccountType.agent);
             if(osam != null){

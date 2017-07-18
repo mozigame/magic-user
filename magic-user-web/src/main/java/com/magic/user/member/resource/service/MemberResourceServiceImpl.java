@@ -1848,33 +1848,32 @@ public class MemberResourceServiceImpl {
     public String memberTradingRecord(RequestContext rc, Long memberId) {
         ApiLogger.info("memberId:" + memberId);
         MemberConditionVo mv = memberMongoService.get(memberId);
+        MemberConditionWebVo result = new MemberConditionWebVo();
         if(mv == null){
-            mv = new MemberConditionVo();
-            mv.setMemberId(memberId);
-            mv.setDepositCount(0);
-            mv.setDepositMoney(0L);
-            mv.setLastDepositMoney(0L);
-            mv.setMaxDepositMoney(0);
+            result.setMemberId(memberId);
+            result.setDepositCount(0);
+            result.setDepositMoney("0");
+            result.setLastDepositMoney("0");
+            result.setMaxDepositMoney("0");
 
-            mv.setWithdrawCount(0);
-            mv.setWithdrawMoney(0L);
-            mv.setLastDepositMoney(0L);
-            mv.setMaxWithdrawMoney(0);
-            return JSON.toJSONString(mv);
+            result.setWithdrawCount(0);
+            result.setWithdrawMoney("0");
+            result.setLastDepositMoney("0");
+            result.setMaxWithdrawMoney("0");
         }else{
-            mv.setDepositCount(mv.getDepositCount() == null ? 0 : mv.getDepositCount());
-            mv.setDepositMoney(mv.getDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getDepositMoney()).longValue());
-            mv.setLastDepositMoney(mv.getLastDepositMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastDepositMoney()).longValue());
-            mv.setMaxDepositMoney(mv.getMaxDepositMoney() == null ? 0 : NumberUtil.fenToYuan(mv.getMaxDepositMoney()).intValue());
+            result.setDepositCount(mv.getDepositCount() == null ? 0 : mv.getDepositCount());
+            result.setDepositMoney(mv.getDepositMoney() == null ? "" : NumberUtil.fenToYuan(mv.getDepositMoney()).toString());
+            result.setLastDepositMoney(mv.getLastDepositMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getLastDepositMoney()).toString());
+            result.setMaxDepositMoney(mv.getMaxDepositMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getMaxDepositMoney()).toString());
 
-            mv.setWithdrawCount(mv.getWithdrawCount() == null ? 0 : mv.getWithdrawCount());
-            mv.setWithdrawMoney(mv.getWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getWithdrawMoney()).longValue());
-            mv.setLastWithdrawMoney(mv.getLastWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(mv.getLastWithdrawMoney()).longValue());
-            mv.setMaxWithdrawMoney(mv.getMaxWithdrawMoney() == null ? 0 : NumberUtil.fenToYuan(mv.getMaxWithdrawMoney()).intValue());
-
+            result.setWithdrawCount(mv.getWithdrawCount() == null ? 0 : mv.getWithdrawCount());
+            result.setWithdrawMoney(mv.getWithdrawMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getWithdrawMoney()).toString());
+            result.setLastWithdrawMoney(mv.getLastWithdrawMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getLastWithdrawMoney()).toString());
+            result.setMaxWithdrawMoney(mv.getMaxWithdrawMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getMaxWithdrawMoney()).toString());
         }
-        return JSON.toJSONString(mv);
+        return JSON.toJSONString(result);
        }
+
 
     /**
      * 客端添加银行卡信息

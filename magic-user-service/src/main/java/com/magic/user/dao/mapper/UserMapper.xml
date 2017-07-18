@@ -336,6 +336,7 @@
                 WHERE u.type=3
             </otherwise>
         </choose>
+        ORDER BY registerTime DESC
     </select>
 
     <!--代理详情--><!-- used -->
