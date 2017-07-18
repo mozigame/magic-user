@@ -419,7 +419,7 @@ public class AgentResource {
      * @return
      * @Doc 启用禁用代理
      */
-    @Access(type = Access.AccessType.RESOURCE)
+    @Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/disable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String review(

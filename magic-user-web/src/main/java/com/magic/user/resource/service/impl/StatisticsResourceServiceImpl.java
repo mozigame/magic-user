@@ -90,15 +90,22 @@ public class StatisticsResourceServiceImpl implements StatisticsResourceService{
     public String getOwnerAccountLimit(RequestContext rc) {
         long uid = rc.getUid();
         User user = userService.get(uid);
-        //获取授信额度
-        PrePaySchemeVo limitr = dubboOutAssembleService.getOwnerLimit(user.getOwnerId());
+        ApiLogger.info(String.format("get user by uid. uid: %d, user: %s", uid, JSON.toJSONString(user)));
         Map<String,Object> result = new HashMap<String,Object>();
+        if (!Optional.ofNullable(user).isPresent()){
+            result.put("type",0);
+            return JSONObject.toJSONString(result);
+        }
+        //获取授信额度
+        ApiLogger.info(String.format("get owner limit from dubbo api. ownerId: %d", user.getOwnerId()));
+        PrePaySchemeVo limitr = dubboOutAssembleService.getOwnerLimit(user.getOwnerId());
+        ApiLogger.info(String.format("get owner limit from dubbo api. ownerId: %d, data: %s", user.getOwnerId(), JSON.toJSONString(limitr)));
         if(limitr != null){
             if(limitr.isValid()){
                 result.put("type",1);
                 result.put("limit",String.valueOf(NumberUtil.fenToYuan(limitr.getBalance())));
 
-                Long limited = thriftOutAssembleService.getOwnerLimited(user.getOwnerId());;
+                Long limited = thriftOutAssembleService.getOwnerLimited(user.getOwnerId());
                 result.put("limited",String.valueOf(NumberUtil.fenToYuan(limited)));
             }else{
                 result.put("type",0);

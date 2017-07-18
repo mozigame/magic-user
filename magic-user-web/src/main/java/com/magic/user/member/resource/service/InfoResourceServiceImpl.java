@@ -7,6 +7,7 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.LocalDateTimeUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.tethys.user.api.service.dubbo.TethysUserDubboService;
 import com.magic.user.constants.UserContants;
@@ -270,27 +271,27 @@ public class InfoResourceServiceImpl {
             newMap.put("userId", member.getMemberId());
             boolean result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
-                if (realname != null) {
+                if (StringUtils.isNotEmpty(realname) && !realname.equals(member.getRealname())) {
                     newMap.put("realname", realname);
                     oldMap.put("realname", member.getRealname());
                 }
-                if (telephone != null) {
+                if (StringUtils.isNoneEmpty(telephone) && !telephone.equals(member.getTelephone())) {
                     newMap.put("telephone", telephone);
                     oldMap.put("telephone", member.getTelephone());
                 }
-                if (email != null) {
+                if (StringUtils.isNoneEmpty(email) && !email.equals(member.getEmail())) {
                     newMap.put("email", email);
                     oldMap.put("email", member.getEmail());
                 }
-                if (bankCardNo != null) {
+                if (StringUtils.isNoneEmpty(bankCardNo) && !bankCardNo.equals(member.getBankCardNo())) {
                     newMap.put("bankCardNo", bankCardNo);
                     oldMap.put("bankCardNo", member.getBankCardNo());
                 }
-                if (bank != null) {
+                if (StringUtils.isNoneEmpty(bank) && !bank.equals(member.getBank())) {
                     newMap.put("bank", bank);
                     oldMap.put("bank", member.getBank());
                 }
-                if (bankDeposit != null) {
+                if (StringUtils.isNotEmpty(bankDeposit) && !bankDeposit.equals(member.getBankDeposit())) {
                     newMap.put("bankDeposit", bankDeposit);
                     oldMap.put("bankDeposit", member.getBankDeposit());
                 }
@@ -301,15 +302,15 @@ public class InfoResourceServiceImpl {
                 userMap.put("type", type);
                 userMap.put("operTime", System.currentTimeMillis());
             }
-            if (loginPassword != null) {
+            if (StringUtils.isNotEmpty(loginPassword)) {
                 newMap.put("loginPassword", loginPassword);
-                EGResp resp = thriftOutAssembleService.passwordReset(assembleLoginPwdBody(member.getMemberId(),member.getUsername(),
+                oldMap.put("loginPassword", "******");
+                thriftOutAssembleService.passwordReset(assembleLoginPwdBody(member.getMemberId(),member.getUsername(),
                         loginPassword,rc.getIp()), "account");
-               // ApiLogger.info("=========password reset========");
-                //ApiLogger.info(resp.getData());
             }
-            if(paymentPassword != null){
+            if(StringUtils.isNotEmpty(paymentPassword)){
                 newMap.put("paymentPassword",paymentPassword);
+                oldMap.put("paymentPassword", "******");
             }
 
         } else {//代理或股东
@@ -320,19 +321,19 @@ public class InfoResourceServiceImpl {
             //用户数据更新
             boolean result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
-                if (realname != null) {
+                if (StringUtils.isNoneEmpty(realname) && !realname.equals(user.getRealname())) {
                     newMap.put("realname", realname);
                     oldMap.put("realname", user.getRealname());
                 }
-                if (telephone != null) {
+                if (StringUtils.isNoneEmpty(telephone) && !telephone.equals(user.getTelephone())) {
                     newMap.put("telephone", telephone);
                     oldMap.put("telephone", user.getTelephone());
                 }
-                if (email != null) {
+                if (StringUtils.isNoneEmpty(email) && !email.equals(user.getEmail())) {
                     newMap.put("email", email);
                     oldMap.put("email", user.getEmail());
                 }
-                if (bankCardNo != null) {
+                if (StringUtils.isNoneEmpty(bankCardNo) && !bankCardNo.equals(user.getBankCardNo())) {
                     newMap.put("bankCardNo", bankCardNo);
                     oldMap.put("bankCardNo", user.getBankCardNo());
                 }
@@ -344,11 +345,12 @@ public class InfoResourceServiceImpl {
                 userMap.put("operTime", System.currentTimeMillis());
                 userMap.put("paymentPassword",paymentPassword);
             }
-            if (loginPassword != null) {
+            if (StringUtils.isNoneEmpty(loginPassword)) {
                 String pwd = PasswordCapture.getSaltPwd(loginPassword);
                 result = loginService.resetPassword(id,pwd);
                 if (result) {
                     newMap.put("loginPassword", pwd);
+                    oldMap.put("loginPassword", "******");
                 }
             }
 
@@ -359,7 +361,6 @@ public class InfoResourceServiceImpl {
             object.put("before", oldMap);
             object.put("operator", operator);
             object.put("user", userMap);
-            //todo 修改topic,并增加消费者
             producer.send(Topic.USER_INFO_MODIFY_SUCCESS, String.valueOf(uid), object.toJSONString());
         }
         return UserContants.EMPTY_STRING;

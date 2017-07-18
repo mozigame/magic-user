@@ -254,8 +254,7 @@ public class DubboOutAssembleServiceImpl {
             userPass.setUserId(uid);
             userPass.setTradePass(password);
             userPass.setOwnerId(ownerId);
-            ApiLogger.info("========update payPwd=====");
-            ApiLogger.info(JSON.toJSONString(userPass));
+            ApiLogger.info(String.format("update userpayment password. data: %s", JSON.toJSONString(userPass)));
             tethysUserDubboService.updateUserPaidPwd(userPass);
             return true;
         }catch (Exception e){
@@ -402,6 +401,8 @@ public class DubboOutAssembleServiceImpl {
                     return vo;
                 }
             }
+        }catch (Error e){
+            ApiLogger.error("get  owner limit failed !", e);
         }catch (Exception e){
             ApiLogger.error("get  owner limit failed !",e);
         }
