@@ -1360,7 +1360,7 @@ public class MemberResourceServiceImpl {
         }
         int code = resp.getCode();
         if (code == 0x1009) {
-            throw UserException.PASSWORD_ERROR;
+            throw UserException.OLD_PASSWORD_ERROR;
         }
         if (code != 0x4444) {
             throw UserException.PASSWORD_RESET_FAIL;

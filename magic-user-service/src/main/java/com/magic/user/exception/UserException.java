@@ -212,5 +212,10 @@ public class UserException extends ExceptionFactor {
     public static final CommonException ACCOUNT_DISABLED = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 30, HttpServletResponse.SC_OK, "account is disabled!", "该账号已被冻结.");
 
+    /**
+     * 原密码错误
+     */
+    public static final CommonException OLD_PASSWORD_ERROR = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 31, HttpServletResponse.SC_OK, "old password error!", "原密码错误.");
 
 }
