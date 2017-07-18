@@ -271,27 +271,27 @@ public class InfoResourceServiceImpl {
             newMap.put("userId", member.getMemberId());
             boolean result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
-                if (StringUtils.isNotEmpty(realname)) {
+                if (StringUtils.isNotEmpty(realname) && !realname.equals(member.getRealname())) {
                     newMap.put("realname", realname);
                     oldMap.put("realname", member.getRealname());
                 }
-                if (StringUtils.isNoneEmpty(telephone)) {
+                if (StringUtils.isNoneEmpty(telephone) && !telephone.equals(member.getTelephone())) {
                     newMap.put("telephone", telephone);
                     oldMap.put("telephone", member.getTelephone());
                 }
-                if (StringUtils.isNoneEmpty(email)) {
+                if (StringUtils.isNoneEmpty(email) && !email.equals(member.getEmail())) {
                     newMap.put("email", email);
                     oldMap.put("email", member.getEmail());
                 }
-                if (StringUtils.isNoneEmpty(bankCardNo)) {
+                if (StringUtils.isNoneEmpty(bankCardNo) && !bankCardNo.equals(member.getBankCardNo())) {
                     newMap.put("bankCardNo", bankCardNo);
                     oldMap.put("bankCardNo", member.getBankCardNo());
                 }
-                if (StringUtils.isNoneEmpty(bank)) {
+                if (StringUtils.isNoneEmpty(bank) && !bank.equals(member.getBank())) {
                     newMap.put("bank", bank);
                     oldMap.put("bank", member.getBank());
                 }
-                if (StringUtils.isNotEmpty(bankDeposit)) {
+                if (StringUtils.isNotEmpty(bankDeposit) && !bankDeposit.equals(member.getBankDeposit())) {
                     newMap.put("bankDeposit", bankDeposit);
                     oldMap.put("bankDeposit", member.getBankDeposit());
                 }
@@ -304,11 +304,13 @@ public class InfoResourceServiceImpl {
             }
             if (StringUtils.isNotEmpty(loginPassword)) {
                 newMap.put("loginPassword", loginPassword);
+                oldMap.put("loginPassword", "******");
                 thriftOutAssembleService.passwordReset(assembleLoginPwdBody(member.getMemberId(),member.getUsername(),
                         loginPassword,rc.getIp()), "account");
             }
             if(StringUtils.isNotEmpty(paymentPassword)){
                 newMap.put("paymentPassword",paymentPassword);
+                oldMap.put("paymentPassword", "******");
             }
 
         } else {//代理或股东
@@ -319,19 +321,19 @@ public class InfoResourceServiceImpl {
             //用户数据更新
             boolean result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
-                if (StringUtils.isNoneEmpty(realname)) {
+                if (StringUtils.isNoneEmpty(realname) && !realname.equals(user.getRealname())) {
                     newMap.put("realname", realname);
                     oldMap.put("realname", user.getRealname());
                 }
-                if (StringUtils.isNoneEmpty(telephone)) {
+                if (StringUtils.isNoneEmpty(telephone) && !telephone.equals(user.getTelephone())) {
                     newMap.put("telephone", telephone);
                     oldMap.put("telephone", user.getTelephone());
                 }
-                if (StringUtils.isNoneEmpty(email)) {
+                if (StringUtils.isNoneEmpty(email) && !email.equals(user.getEmail())) {
                     newMap.put("email", email);
                     oldMap.put("email", user.getEmail());
                 }
-                if (StringUtils.isNoneEmpty(bankCardNo)) {
+                if (StringUtils.isNoneEmpty(bankCardNo) && !bankCardNo.equals(user.getBankCardNo())) {
                     newMap.put("bankCardNo", bankCardNo);
                     oldMap.put("bankCardNo", user.getBankCardNo());
                 }
@@ -348,6 +350,7 @@ public class InfoResourceServiceImpl {
                 result = loginService.resetPassword(id,pwd);
                 if (result) {
                     newMap.put("loginPassword", pwd);
+                    oldMap.put("loginPassword", "******");
                 }
             }
 
