@@ -218,4 +218,16 @@ public class UserException extends ExceptionFactor {
     public static final CommonException OLD_PASSWORD_ERROR = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 31, HttpServletResponse.SC_OK, "old password error!", "原密码错误.");
 
+    /**
+     * 密码非法
+     */
+    public static final CommonException PASSWORD_ILLEDGE = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 32, HttpServletResponse.SC_OK, "password illedge!", "密码输入非法.");
+
+    /**
+     * 密码非法
+     */
+    public static final CommonException OLD_NEWPASSWORD_SAME = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 33, HttpServletResponse.SC_OK, "oldpassword is same with newpassword!", "新密码不能和原密码相同.");
+
 }

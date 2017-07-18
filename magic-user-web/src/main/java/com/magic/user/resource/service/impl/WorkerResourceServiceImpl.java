@@ -6,6 +6,7 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.tools.LocalDateTimeUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.owner.entity.Role;
 import com.magic.owner.vo.UserRoleVo;
 import com.magic.service.java.UuidService;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * User: joey
@@ -363,11 +365,24 @@ public class WorkerResourceServiceImpl implements WorkerResourceService {
      */
     @Override
     public String pwdReset(RequestContext rc, Long userId, String password) {
-        //todo 检查参数
-        if (!loginService.resetPassword(userId, PasswordCapture.getSaltPwd(password))) {
-            throw UserException.PASSWORD_RESET_FAIL;
+        if (StringUtils.isEmpty(password)){
+            throw UserException.PASSWORD_ILLEDGE;
         }
-        return UserContants.EMPTY_STRING;
+        Login login = loginService.getByUserId(userId);
+        String newPassword = PasswordCapture.getSaltPwd(password);
+        if (Optional.ofNullable(login).isPresent()){
+            String oldPassword = login.getPassword();
+            if (oldPassword.equals(newPassword)){
+                throw UserException.OLD_NEWPASSWORD_SAME;
+            }
+            else{
+                if(!loginService.resetPassword(userId, newPassword)) {
+                    throw UserException.PASSWORD_RESET_FAIL;
+                }
+                return UserContants.EMPTY_STRING;
+            }
+        }
+        throw UserException.ILLEGAL_USER;
     }
 
 }
