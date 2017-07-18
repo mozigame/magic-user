@@ -401,6 +401,8 @@ public class DubboOutAssembleServiceImpl {
                     return vo;
                 }
             }
+        }catch (Error e){
+            ApiLogger.error("get  owner limit failed !", e);
         }catch (Exception e){
             ApiLogger.error("get  owner limit failed !",e);
         }
