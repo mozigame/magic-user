@@ -107,7 +107,7 @@ public class UserException extends ExceptionFactor {
      * 登录失败
      */
     public static final CommonException MEMBER_LOGIN_FAIL = new CommonException(
-            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 14, HttpServletResponse.SC_OK, "member login fail!", "登录失败.");
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 14, HttpServletResponse.SC_OK, "username or password error!", "用户名或密码错误.");
 
     /**
      * 用户名不存在
