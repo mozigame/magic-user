@@ -119,7 +119,7 @@ public class CodeImageUtil {
 
         //shear(g2, w, h, c);// 使图片扭曲
 
-        g2.setColor(new Color(255,0,0));
+        g2.setColor(new Color(255,96,0));
         int fontSize = h-14;
         Font font = new Font("TimesRoman", Font.BOLD, fontSize);
         g2.setFont(font);
