@@ -120,7 +120,7 @@ public class CodeImageUtil {
         //shear(g2, w, h, c);// 使图片扭曲
 
         g2.setColor(new Color(255,0,0));
-        int fontSize = h-4;
+        int fontSize = h-8;
         Font font = new Font("TimesRoman", Font.BOLD, fontSize);
         g2.setFont(font);
         char[] chars = code.toCharArray();
@@ -128,7 +128,7 @@ public class CodeImageUtil {
             //AffineTransform affine = new AffineTransform();
             //affine.setToRotation(Math.PI / 4 * rand.nextDouble() * (rand.nextBoolean() ? 1 : -1), (w / verifySize) * i + fontSize/2, h/2);
             //g2.setTransform(affine);
-            g2.drawChars(chars, i, 1, ((w-10) / verifySize) * i + 5, h/2 + fontSize/2 - 15);
+            g2.drawChars(chars, i, 1, ((w-10) / verifySize) * i + 5, h/2 + fontSize/2 - 5);
         }
 
         g2.dispose();
