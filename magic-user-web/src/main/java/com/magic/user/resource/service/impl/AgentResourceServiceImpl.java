@@ -129,6 +129,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 av.setReviewer("");
             }
             av.setRegisterTime(LocalDateTimeUtil.toAmerica(new Long(av.getRegisterTime())));
+            list.add(av);
             return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
         }else{
             totalCount = agentMongoService.getCount(userCondition);

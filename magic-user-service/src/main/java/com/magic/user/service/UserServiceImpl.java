@@ -36,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(Long userId) {
+        //boolean f = userRedisStorageService.delUser(userId);
         User user = userRedisStorageService.getUser(userId);
         if (user == null) {
             user = userDbService.get(userId);
