@@ -7,6 +7,7 @@ import com.magic.bc.query.service.PrepaySchemeService;
 import com.magic.bc.query.service.UserLevelService;
 import com.magic.bc.query.vo.PrePaySchemeVo;
 import com.magic.bc.query.vo.UserLevelVo;
+import com.magic.cms.enums.SiteMsgType;
 import com.magic.cms.service.MsgDubboService;
 import com.magic.config.service.DomainDubboService;
 import com.magic.config.service.RegisterDubboService;
@@ -372,7 +373,7 @@ public class DubboOutAssembleServiceImpl {
      */
     public boolean updateUserRole(Long ownerId, Long userId, Integer roleId) {
         try {
-            return permitDubboService.updateUserRole(ownerId,userId,roleId);
+            return permitDubboService.updateUserRole(ownerId, userId, roleId);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -404,8 +405,25 @@ public class DubboOutAssembleServiceImpl {
         }catch (Error e){
             ApiLogger.error("get  owner limit failed !", e);
         }catch (Exception e){
-            ApiLogger.error("get  owner limit failed !",e);
+            ApiLogger.error("get  owner limit failed !", e);
         }
         return null;
+    }
+
+    /**
+     * 发送消息
+     * @param type
+     * @param uid
+     * @param ownerId
+     * @param msg
+     * @return
+     */
+    public boolean sendSiteMsg(SiteMsgType type, Long uid, Long ownerId, String msg){
+        try {
+            return msgDubboService.saveSiteMsg(type, ownerId, uid, msg);
+        }catch (Exception e){
+            ApiLogger.error(String.format("send site msg error. type: %s, uid: %d, ownerId: %d, msg: %s", type, uid, ownerId, msg), e);
+        }
+        return false;
     }
 }
