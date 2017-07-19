@@ -21,7 +21,7 @@ import java.util.Random;
 public class CodeImageUtil {
 
     //使用到Algerian字体，系统里没有的话需要安装字体，字体只显示大写
-    public static final String VERIFY_CODES = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public static final String VERIFY_CODES = "0123456789";
     private static Random random = new Random();
 
     /**
@@ -97,7 +97,7 @@ public class CodeImageUtil {
         g2.fillRect(0, 2, w, h-4);
 
         //绘制干扰线
-        Random random = new Random();
+        /*Random random = new Random();
         g2.setColor(getRandColor(160, 200));// 设置线条的颜色
         for (int i = 0; i < 20; i++) {
             int x = random.nextInt(w - 1);
@@ -106,9 +106,9 @@ public class CodeImageUtil {
             int yl = random.nextInt(12) + 1;
             g2.drawLine(x, y, x + xl + 40, y + yl + 20);
         }
-
+*/
         // 添加噪点
-        float yawpRate = 0.05f;// 噪声率
+        float yawpRate = 0.01f;// 噪声率
         int area = (int) (yawpRate * w * h);
         for (int i = 0; i < area; i++) {
             int x = random.nextInt(w);
@@ -117,11 +117,11 @@ public class CodeImageUtil {
             image.setRGB(x, y, rgb);
         }
 
-        shear(g2, w, h, c);// 使图片扭曲
+        //shear(g2, w, h, c);// 使图片扭曲
 
-        g2.setColor(getRandColor(100, 160));
+        g2.setColor(new Color(255,0,0));
         int fontSize = h-4;
-        Font font = new Font("Algerian", Font.ITALIC, fontSize);
+        Font font = new Font("TimesRoman", Font.BOLD, fontSize);
         g2.setFont(font);
         char[] chars = code.toCharArray();
         for(int i = 0; i < verifySize; i++){
