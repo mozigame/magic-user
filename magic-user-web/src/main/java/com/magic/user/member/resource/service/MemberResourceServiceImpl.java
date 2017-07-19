@@ -652,7 +652,7 @@ public class MemberResourceServiceImpl {
             throw UserException.MEMBER_UPDATE_FAIL;
         }
         if (status > 0) {
-            sendMemberStatusUpdateMq(id, status);
+            sendMemberStatusUpdateMq(id, status, member.getOwnerId());
         }
 
         return UserContants.EMPTY_STRING;
@@ -837,7 +837,7 @@ public class MemberResourceServiceImpl {
         if (!result) {
             throw UserException.MEMBER_STATUS_UPDATE_FAIL;
         }
-        sendMemberStatusUpdateMq(id, status);
+        sendMemberStatusUpdateMq(id, status, member.getOwnerId());
         return UserContants.EMPTY_STRING;
     }
 
@@ -846,10 +846,11 @@ public class MemberResourceServiceImpl {
      * @param id
      * @param status
      */
-    private void sendMemberStatusUpdateMq(Long id,Integer status) {
+    private void sendMemberStatusUpdateMq(Long id, Integer status, Long ownerId) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("memberId", id);
         jsonObject.put("status", status);
+        jsonObject.put("ownerId", ownerId);
         producer.send(Topic.MEMBER_STATUS_UPDATE_SUCCESS, id + "", jsonObject.toJSONString());
     }
 
