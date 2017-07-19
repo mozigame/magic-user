@@ -128,7 +128,7 @@ public class CodeImageUtil {
             //AffineTransform affine = new AffineTransform();
             //affine.setToRotation(Math.PI / 4 * rand.nextDouble() * (rand.nextBoolean() ? 1 : -1), (w / verifySize) * i + fontSize/2, h/2);
             //g2.setTransform(affine);
-            g2.drawChars(chars, i, 1, ((w-10) / verifySize) * i + 6, h/2 + fontSize/2 - 6);
+            g2.drawChars(chars, i, 1, ((w-10) / verifySize) * i + 10, h/2 + fontSize/2 - 10);
         }
 
         g2.dispose();
