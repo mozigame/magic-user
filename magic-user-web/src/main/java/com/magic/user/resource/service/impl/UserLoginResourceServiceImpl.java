@@ -96,8 +96,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         if(checkParent(loginUser)){
             throw UserException.ACCOUNT_DISABLED;
         }
-        if (loginUser.getStatus() == AccountStatus.disable
-                || loginUser.getIsDelete() == DeleteStatus.del) {
+        if (loginUser.getStatus() == AccountStatus.disable) {
             throw UserException.ACCOUNT_DISABLED;
         }
         Login loginInfo = loginService.get(userId);
