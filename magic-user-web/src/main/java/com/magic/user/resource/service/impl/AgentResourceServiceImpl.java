@@ -97,44 +97,80 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!checkAgentCondition(userCondition)) {
             return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
         }
-        long totalCount = agentMongoService.getCount(userCondition);
-        if (totalCount <= 0) {
-            return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
-        }
-        //3、条件查询mongo中的代理，组装id
-        List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, page, count);
-        if(agentConditionVoList == null) return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+        long totalCount = 0;
+        if(operaUser.getType() == AccountType.agent){
+            AgentConditionVo ac = agentMongoService.get(operaUser.getUserId());
+            Long v = memberMongoService.getDepositMembers(operaUser.getUserId());
+            if(ac == null)return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
 
-        //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
-        List<Long> agentIds = Lists.newArrayList();
+            totalCount = 1;
+            //根据代理ID查询代理的会员数量信息
+            OwnerStockAgentMember osa = ownerStockAgentService.countMembersById(operaUser.getUserId(),AccountType.agent);
 
-        Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
-        for (AgentConditionVo vo : agentConditionVoList) {
-            agentIds.add(vo.getAgentId());
-            map.put(vo.getAgentId(),vo);
+            AgentInfoVo av = userService.getAgentDetail(operaUser.getUserId());
+            if(av == null)return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+            List<AgentInfoVo> list = new ArrayList<>();
 
-        }
+            av.setDepositTotalMoney(ac.getDepositMoney() == null ? 0L:NumberUtil.fenToYuan(ac.getDepositMoney()).longValue());
+            av.setWithdrawTotalMoney(ac.getWithdrawMoney() == null ? 0L:NumberUtil.fenToYuan(ac.getWithdrawMoney()).longValue());
+            av.setShowStatus(AccountStatus.parse(ac.getStatus()).desc());
 
-        Map<Long,Integer> listm = memberMongoService.countDepositMembers(agentIds);
-        if(listm == null){
-            listm = new HashMap<>();
-        }
-        //根据代理ID列表查询代理的会员数量信息
-        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
-
-        Map<Long,OwnerStockAgentMember> osamMap = new HashMap<>();
-
-        if(OwnerStockAgentMemberList != null){
-            for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
-                osamMap.put(osam.getAgentId(),osam);
+            if (osa != null) {
+                av.setMembers(osa.getMemNumber());
+            }else{
+                av.setMembers(0);
             }
-        }
-
-        List<AgentInfoVo> users = userService.findAgents(agentIds);
-        if(users == null)return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
-        List<AgentInfoVo> list = assembleAgentList(users,map,osamMap,listm);
-        if (list != null && list.size() > 0) {
+            if(v != null){
+                av.setStoreMembers(v.intValue());
+            }else{
+                av.setStoreMembers(0);
+            }
+            if(av.getReviewer() == null){
+                av.setReviewer("");
+            }
+            av.setRegisterTime(LocalDateTimeUtil.toAmerica(new Long(av.getRegisterTime())));
             return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
+        }else{
+            totalCount = agentMongoService.getCount(userCondition);
+            if (totalCount <= 0) {
+                return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+            }
+
+            //3、条件查询mongo中的代理，组装id
+            List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, page, count);
+            if(agentConditionVoList == null) return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+
+            //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
+            List<Long> agentIds = Lists.newArrayList();
+
+            Map<Long,AgentConditionVo> map = new HashMap<Long,AgentConditionVo>();
+            for (AgentConditionVo vo : agentConditionVoList) {
+                agentIds.add(vo.getAgentId());
+                map.put(vo.getAgentId(),vo);
+
+            }
+
+            Map<Long,Integer> listm = memberMongoService.countDepositMembers(agentIds);
+            if(listm == null){
+                listm = new HashMap<>();
+            }
+            //根据代理ID列表查询代理的会员数量信息
+            List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds,AccountType.agent);
+
+            Map<Long,OwnerStockAgentMember> osamMap = new HashMap<>();
+
+            if(OwnerStockAgentMemberList != null){
+                for (OwnerStockAgentMember osam:OwnerStockAgentMemberList) {
+                    osamMap.put(osam.getAgentId(),osam);
+                }
+            }
+
+            List<AgentInfoVo> users = userService.findAgents(agentIds);
+            if(users == null)return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+            List<AgentInfoVo> list = assembleAgentList(users,map,osamMap,listm);
+            if (list != null && list.size() > 0) {
+                return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
+            }
         }
         return JSON.toJSONString(assemblePageBean(count, page, totalCount, null));
     }

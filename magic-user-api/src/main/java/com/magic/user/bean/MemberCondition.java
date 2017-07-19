@@ -16,6 +16,11 @@ public class MemberCondition {
      * 业主ID
      */
     private Long ownerId;
+
+    /**
+     * 代理ID
+     */
+    private Long agentId;
     /**
      * 币种
      */
@@ -62,6 +67,14 @@ public class MemberCondition {
      * 空对象
      */
     private static final MemberCondition EMPTY_MEMBER_CONDITION = new MemberCondition();
+
+    public Long getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(Long agentId) {
+        this.agentId = agentId;
+    }
 
     public Integer getCurrencyType() {
         return currencyType;

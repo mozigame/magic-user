@@ -198,6 +198,9 @@
         <if test="bank != null ">
             bank,
         </if>
+        <if test="bankCode != null ">
+            bankCode,
+        </if>
         <if test="bankDeposit != null ">
             bank_deposit,
         </if>
@@ -266,6 +269,9 @@
         </if>
         <if test="bank != null ">
             #{bank},
+        </if>
+        <if test="bankCode != null ">
+            #{bankCode},
         </if>
         <if test="bankDeposit != null ">
             #{bankDeposit},

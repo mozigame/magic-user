@@ -104,6 +104,9 @@ public class MemberResourceServiceImpl {
         if (!checkCondition(memberCondition)) {
             return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
         }
+        if(operaUser.getType() == AccountType.agent){
+            memberCondition.setAgentId(operaUser.getUserId());
+        }
         long total = memberMongoService.getCount(memberCondition);
         if (total <= 0) {
             return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
@@ -993,12 +996,12 @@ public class MemberResourceServiceImpl {
      */
     private Member assembleMember(RequestContext rc, RegisterReq req, long userId, long ownerId, String ownerName, User holder, User agent, String url) {
         Member member = new Member();
-        //todo
         member.setUsername(req.getUsername());
         member.setRealname(req.getRealname());
         member.setTelephone(req.getTelephone());
         member.setEmail(req.getEmail());
         member.setBank(req.getBank());
+        member.setBankCode(req.getBankCode());
         member.setBankCardNo(req.getBankCardNo());
         member.setBankDeposit(req.getBankDeposit());
         member.setBank(req.getBank());

@@ -15,6 +15,7 @@ public class RegisterReq {
     private String telephone;//手机号
     private String email;//邮箱
     private String bank;//银行名称
+    private String bankCode;//银行简码
     private String realname;//姓名
     private String bankCardNo;//银行卡号
     private String bankDeposit;//开户行
@@ -22,6 +23,14 @@ public class RegisterReq {
     private String city;//市
     private String weixin;//微信
     private String qq;//QQ
+
+    public String getBankCode() {
+        return bankCode;
+    }
+
+    public void setBankCode(String bankCode) {
+        this.bankCode = bankCode;
+    }
 
     public String getProCode() {
         return proCode;

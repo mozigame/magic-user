@@ -70,6 +70,7 @@ public class MemberResource {
             @RequestParam(name = "telephone", required = false, defaultValue = "") String telephone,
             @RequestParam(name = "email", required = false, defaultValue = "") String email,
             @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
+            @RequestParam(name = "bankCode", required = false, defaultValue = "") String bankCode,
             @RequestParam(name = "realname", required = false, defaultValue = "") String realname,
             @RequestParam(name = "bankCardNo", required = false, defaultValue = "") String bankCardNo,
             @RequestParam(name = "bankDeposit", required = false, defaultValue = "") String bankDeposit,
@@ -83,7 +84,7 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         //获取域名
         String url = rc.getOrigin();
-        RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
+        RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank,bankCode, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
         return memberServiceResource.memberRegister(rc, url, req, code);
     }
 
@@ -106,7 +107,7 @@ public class MemberResource {
      * @param qq
      * @return
      */
-    private RegisterReq assembleRegister(String proCode, String username, String password, String paymentPassword, String telephone, String email, String bank, String realname, String bankCardNo, String bankDeposit, String province, String city, String weixin, String qq) {
+    private RegisterReq assembleRegister(String proCode, String username, String password, String paymentPassword, String telephone, String email, String bank,String bankCode, String realname, String bankCardNo, String bankDeposit, String province, String city, String weixin, String qq) {
         RegisterReq req = new RegisterReq();
         req.setProCode(proCode);
         req.setUsername(username);
@@ -122,6 +123,7 @@ public class MemberResource {
         req.setCity(city);
         req.setWeixin(weixin);
         req.setQq(qq);
+        req.setBankCode(bankCode);
         return req;
     }
 

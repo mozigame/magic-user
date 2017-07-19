@@ -93,6 +93,9 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         Query query = new Query();
         if (memberCondition != null) {
             query.addCriteria(new Criteria("ownerId").is(memberCondition.getOwnerId()));
+            if(memberCondition.getAgentId() != null){
+                query.addCriteria(new Criteria("agentId").is(memberCondition.getAgentId()));
+            }
             if (memberCondition.getRegister() != null) {
                 Long start = memberCondition.getRegister().getStart();
                 Long end = memberCondition.getRegister().getEnd();
