@@ -92,7 +92,7 @@ public class CodeImageUtil {
         g2.setColor(Color.GRAY);// 设置边框色
         g2.fillRect(0, 0, w, h);
 
-        Color c = new Color(0,0,0);
+        Color c = getRandColor(200, 250);
         g2.setColor(c);// 设置背景色
         g2.fillRect(0, 2, w, h-4);
 
@@ -119,7 +119,7 @@ public class CodeImageUtil {
 
         //shear(g2, w, h, c);// 使图片扭曲
 
-        g2.setColor(new Color(255,96,0));
+        g2.setColor(new Color(255, 0, 0));//255,96,0
         int fontSize = h-14;
         Font font = new Font("TimesRoman", Font.BOLD, fontSize);
         g2.setFont(font);
