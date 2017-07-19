@@ -108,7 +108,7 @@ public class CodeImageUtil {
         }
 */
         // 添加噪点
-        float yawpRate = 0.01f;// 噪声率
+        float yawpRate = 0.001f;// 噪声率
         int area = (int) (yawpRate * w * h);
         for (int i = 0; i < area; i++) {
             int x = random.nextInt(w);
@@ -121,14 +121,14 @@ public class CodeImageUtil {
 
         g2.setColor(new Color(255,0,0));
         int fontSize = h-14;
-        Font font = new Font("TimesRoman", Font.BOLD, fontSize);
+        Font font = new Font("TimesRoman", Font.PLAIN, fontSize);
         g2.setFont(font);
         char[] chars = code.toCharArray();
         for(int i = 0; i < verifySize; i++){
             //AffineTransform affine = new AffineTransform();
             //affine.setToRotation(Math.PI / 4 * rand.nextDouble() * (rand.nextBoolean() ? 1 : -1), (w / verifySize) * i + fontSize/2, h/2);
             //g2.setTransform(affine);
-            g2.drawChars(chars, i, 1, ((w-10) / verifySize) * i + 5, h/2 + fontSize/2 - 5);
+            g2.drawChars(chars, i, 2, ((w-10) / verifySize) * i + 5, h/2 + fontSize/2 - 5);
         }
 
         g2.dispose();
