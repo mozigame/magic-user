@@ -228,4 +228,12 @@ public interface AgentResourceService {
      * @Doc 查看域名
      */
     String queryDomains(RequestContext requestContext, Long id);
+
+    /**
+     *
+     * @param requestContext
+     * @param username
+     * @return
+     */
+    String checkUsernameIsExists(RequestContext requestContext, String username);
 }

@@ -244,7 +244,7 @@ public class AgentResource {
         return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domains);
     }
 
-    /**
+        /**
      * @param account    代理账号
      * @param password   密码
      * @param realname   真实姓名
@@ -261,7 +261,7 @@ public class AgentResource {
             HttpServletRequest request,
             @RequestParam(name = "username",required = true) String account,
             @RequestParam(name = "password",required = true) String password,
-           // @RequestParam(name = "paymentPassword",required = true) String paymentPassword,
+            // @RequestParam(name = "paymentPassword",required = true) String paymentPassword,
             @RequestParam(name = "realname",required = true) String realname,
             @RequestParam(name = "telephone",required = true) String telephone,
             @RequestParam(name = "email",required = false,defaultValue = "") String email,
@@ -275,8 +275,24 @@ public class AgentResource {
 
     ) {
         return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password,//paymentPassword,
-                realname, telephone, email, bankCardNo, bank, bankDeposit,province,city,weixin,qq);
+                realname, telephone, email, bankCardNo, bank, bankDeposit, province, city, weixin, qq);
     }
+
+    /**
+     * @param username    代理账号
+     * @Doc 代理申请--前端页面
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/username/check", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String checkUserName(
+            HttpServletRequest request,
+            @RequestParam(name = "username",required = true) String username
+
+    ) {
+        return agentResourceService.checkUsernameIsExists(RequestContext.getRequestContext(), username);
+    }
+
 
     /**
      * @param account 账号

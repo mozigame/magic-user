@@ -1366,7 +1366,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     @Override
     public String getAgentRegisterMustParam(RequestContext rc) {
         User user = userService.get(rc.getUid());
-        List<String> result = dubboOutAssembleService.getMustRegisterarameters(user.getOwnerId(),AccountType.agent.value());
+        List<String> result = dubboOutAssembleService.getMustRegisterarameters(user.getOwnerId(), AccountType.agent.value());
         if(result == null){
             return "{}";
         }
@@ -1398,6 +1398,22 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         result.put("rightList",rightList);
 
         return JSON.toJSONString(result);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String checkUsernameIsExists(RequestContext rc, String username) {
+        //根据url获取业主ID
+        OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(rc.getOrigin());
+        if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
+            throw UserException.ILLEGAL_SOURCE_URL;
+        }
+        if (accountIdMappingService.getUid(ownerInfo.getOwnerId(), username) > 0) {
+            throw UserException.USERNAME_EXIST;
+        }
+        return UserContants.EMPTY_STRING;
     }
 
     /**
