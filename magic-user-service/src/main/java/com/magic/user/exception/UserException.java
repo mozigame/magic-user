@@ -89,7 +89,7 @@ public class UserException extends ExceptionFactor {
      * 用户名重复
      */
     public static final CommonException USERNAME_EXIST = new CommonException(
-            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 11, HttpServletResponse.SC_OK, "username exist!", "用户名重复.");
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 11, HttpServletResponse.SC_OK, "username exist!", "用户名重复");
 
     /**
      * 用户名或密码非法
