@@ -20,6 +20,7 @@ public class LoginResultVo {
     private String limit;//授信额度
     private String limited;//已用额度
     private String time;//服务器时间
+    private Long ownerId;//业主ID
 
     public Long getUserId() {
         return userId;
@@ -99,5 +100,13 @@ public class LoginResultVo {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 }

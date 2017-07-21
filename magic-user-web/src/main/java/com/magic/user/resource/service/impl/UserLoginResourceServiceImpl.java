@@ -81,12 +81,6 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
             throw UserException.USERNAME_NOT_EXIST;
         }
 
-
-        //todo 从redis里面获取ownerId_username下的验证码，如果存在验证码，与code对比，如果相符，进行下一步操作
-        String proCode = "";
-//        if (!proCode.equals(code)) {
-//            throw UserException.PROCODE_ERROR;
-//        }
         User loginUser = userService.get(userId);
         if (loginUser == null) {
             throw UserException.ILLEGAL_USER;
@@ -134,7 +128,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
 
         result.setNotReadNotice(n);
         result.setTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
-
+        result.setOwnerId(ownerInfo.getOwnerId());
         return JSONObject.toJSONString(result);
     }
 
