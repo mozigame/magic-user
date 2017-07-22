@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd">
+	<!-- sql sessionTemplate_0 -->
+    <bean id="mySqlSessionFactory_0" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="userDataSource_0"/>
+        <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
+        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/*Mapper.xml"/>
+        <property name="plugins">
+            <array>
+            	<bean id="sqlInterceptor" class="com.magic.common.logger.SqlInterceptor">
+            		<!-- 以下配置优先于数据库的系统参数配置 -->
+            		<property name="properties">
+						<props>  
+			                <prop key="sql.logSqlIgnore">select_seq,select_count</prop> 
+			            </props>
+			         </property>
+            	</bean>
+            </array>
+        </property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.magic.passport.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="mySqlSessionFactory_0"/>
+    </bean>
+
+    <bean id="mySqlSessionTemplate_0" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+        <constructor-arg index="0" ref="mySqlSessionFactory_0"/>
+    </bean>
+    <!-- sql sessionTemplate_0 -->
+
+    <!-- sql sessionTemplate_1 -->
+    <bean id="mySqlSessionFactory_1" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="userDataSource_1"/>
+        <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
+        <property name="mapperLocations" value="classpath*:com/magic/user/dao/mapper/*Mapper.xml"/>
+        <property name="plugins">
+            <array>
+            	<bean id="sqlInterceptor" class="com.magic.common.logger.SqlInterceptor">
+            		<!-- 以下配置优先于数据库的系统参数配置 -->
+            		<property name="properties">
+						<props>  
+			                <prop key="sql.logSqlIgnore">select_seq,select_count</prop> 
+			            </props>
+			         </property>
+            	</bean>
+            </array>
+        </property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.magic.passport.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="mySqlSessionFactory_1"/>
+    </bean>
+
+    <bean id="mySqlSessionTemplate_1" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+        <constructor-arg index="0" ref="mySqlSessionFactory_1"/>
+    </bean>
+    <!-- sql sessionTemplate_1 -->
+
+
+    <!--id取余范围配置-->
+    <util:map id="idShardRange" map-class="java.util.TreeMap">
+        <entry key="0" value="512"/>
+        <entry key="513" value="1024"/>
+    </util:map>
+
+
+    <!-- 分实例存储mysql数据的sessionTemplate配置,key与idShardRange中的key对应 -->
+    <bean id="sqlSessionShardTemplates" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="sourceMap">
+            <map>
+                <entry key="0" value-ref="mySqlSessionTemplate_0"/>
+                <entry key="513" value-ref="mySqlSessionTemplate_1"/>
+            </map>
+        </property>
+    </bean>
+
+    <!--全局的sessionTemplate-->
+    <bean id="globalSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+        <constructor-arg index="0" ref="mySqlSessionFactory_0"/>
+    </bean>
+
+
+</beans>
