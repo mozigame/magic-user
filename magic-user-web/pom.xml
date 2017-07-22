@@ -10,6 +10,11 @@
     <packaging>war</packaging>
 
     <dependencies>
+    	<dependency>
+            <groupId>com.magic.analysis</groupId>
+            <artifactId>commons</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.magic</groupId>
             <artifactId>magic-user-service</artifactId>
