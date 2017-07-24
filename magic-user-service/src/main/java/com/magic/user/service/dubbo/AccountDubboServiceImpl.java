@@ -12,6 +12,7 @@ import com.magic.user.entity.Login;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
+import com.magic.user.enums.MemberStatus;
 import com.magic.user.exception.UserException;
 import com.magic.user.po.OwnerStaticInfo;
 import com.magic.user.service.*;
@@ -170,6 +171,27 @@ public class AccountDubboServiceImpl implements AccountDubboService {
     @Override
     public List<User> periodAgentList(Long startTime, Long endTime, Long ownerId) {
         return userService.periodAgentList(startTime, endTime, ownerId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MemberStatus verifyMember(long uid) {
+        Member member = memberService.getMemberById(uid);
+        if (!Optional.ofNullable(member).isPresent()){
+            ApiLogger.info(String.format("member not exists! uid: %d", uid));
+            return MemberStatus.logout;
+        }
+        if (member.getStatus() == AccountStatus.disable){
+            return MemberStatus.disable;
+        }
+        boolean result = checkLogin(member);
+        if (!result){
+            ApiLogger.error(String.format("member not logined uid: %d", uid));
+            return MemberStatus.logout;
+        }
+        return MemberStatus.enable;
     }
 
 

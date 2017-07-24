@@ -2,6 +2,7 @@ package com.magic.user.service.dubbo;
 
 import com.magic.user.entity.Member;
 import com.magic.user.entity.User;
+import com.magic.user.enums.MemberStatus;
 import com.magic.user.po.OwnerStaticInfo;
 import com.magic.user.vo.MemberConditionVo;
 import com.magic.user.vo.MemberInfoVo;
@@ -77,4 +78,11 @@ public interface AccountDubboService {
      */
     List<User> periodAgentList(Long startTime, Long endTime, Long ownerId);
 
+    /**
+     * 验证会员登陆和启用情况
+     *
+     * @param uid
+     * @return
+     */
+    MemberStatus verifyMember(long uid);
 }
