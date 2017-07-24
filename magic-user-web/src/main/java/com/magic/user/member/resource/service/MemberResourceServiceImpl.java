@@ -1135,7 +1135,7 @@ public class MemberResourceServiceImpl {
             throw UserException.MEMBER_ACCOUNT_DISABLED;
         }
         //异步回收资金
-        thriftOutAssembleService.backMoney(uid, 2);
+//        thriftOutAssembleService.backMoney(uid, 2);
         String token = object.getString("token");
         String result = assembleLoginResult(uid, member.getUsername(), token);
         sendLoginMessage(member, rc);
