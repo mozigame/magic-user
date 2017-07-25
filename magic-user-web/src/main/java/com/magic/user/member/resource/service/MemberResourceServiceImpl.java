@@ -2163,14 +2163,13 @@ public class MemberResourceServiceImpl {
         }
         return false;
     }
-
     /**
      * 根据ip获取城市名
      * @param ip
      * @param URL
      * @return
      */
-    public String getAddressByIP(String ip, String URL) {
+    public static String getAddressByIP(String ip, String URL) {
         try {
             java.net.URL url = new URL(URL + ip);
             URLConnection conn = url.openConnection();
@@ -2183,7 +2182,11 @@ public class MemberResourceServiceImpl {
             reader.close();
             JSONObject object = JSONObject.parseObject(result.toString());
             if (object.size() > 0) {
-                return object.getString("city");
+                if(object.getString("city") != null && !object.getString("city").equals("")){
+                    return object.getString("city");
+                }else{
+                    return object.getString("province");
+                }
             }
         } catch (IOException e) {
             return "读取失败";
