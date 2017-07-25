@@ -18,6 +18,7 @@ public class OnLineMember {
     private Long loginTime;//登陆时间
     private String loginIp;//登陆ip
     private Integer status;//状态 1注销 2登录
+    private String city;
 
     public Long getMemberId() {
         return memberId;
@@ -95,7 +96,16 @@ public class OnLineMember {
         return status;
     }
 
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public void setStatus(Integer status) {
         this.status = status;
     }
+
 }

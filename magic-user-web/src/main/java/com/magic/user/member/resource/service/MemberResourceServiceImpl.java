@@ -47,7 +47,12 @@ import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,7 +65,8 @@ import java.util.stream.Collectors;
  */
 @Service("memberServiceResource")
 public class MemberResourceServiceImpl {
-
+    //根据ip获取城市的接口地址
+    private static final String URL = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
     @Resource
     private MemberService memberService;
 
@@ -1518,6 +1524,13 @@ public class MemberResourceServiceImpl {
             return JSON.toJSONString(assemblePage(page, count, 0, null));
         }
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, page, count);
+        if (list != null && list.size() > 0) {
+            for (OnLineMember member : list) {
+                if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
+                    member.setCity(getAddressByIP(this.URL,member.getLoginIp()));
+                }
+            }
+        }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
     }
 
@@ -2108,4 +2121,32 @@ public class MemberResourceServiceImpl {
         }
         return false;
     }
+
+    /**
+     * 根据ip获取城市名
+     * @param ip
+     * @param URL
+     * @return
+     */
+    public String getAddressByIP(String ip, String URL) {
+        try {
+            java.net.URL url = new URL(URL + ip);
+            URLConnection conn = url.openConnection();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "GBK"));
+            String line = null;
+            StringBuffer result = new StringBuffer();
+            while ((line = reader.readLine()) != null) {
+                result.append(line);
+            }
+            reader.close();
+            JSONObject object = JSONObject.parseObject(result.toString());
+            if (object.size() > 0) {
+                return object.getString("city");
+            }
+        } catch (IOException e) {
+            return "读取失败";
+        }
+        return "未知城市";
+    }
+
 }
