@@ -103,6 +103,31 @@ public class InfoResourceServiceImpl {
         AccountModifyInfoVo modifyInfoVo = getModifyInfo(type, memberId);
         return JSON.toJSONString(modifyInfoVo);
     }
+    
+    /**
+     * 检查用户是否存在
+     *
+     * @param rc      RequestContext
+     * @param type    账号类型
+     * @param account
+     * @return
+     */
+    public String searchUserExist(RequestContext rc, Integer type, String account) {
+        if (!checkParams(type, account)) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        long uid = rc.getUid();
+        User user = userService.getUserById(uid);
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        long ownerId = user.getOwnerId();//业主ID
+        long memberId = getMemberId(type, ownerId, account);
+        if (memberId <= 0) {
+            throw UserException.ILLEGAL_MEMBER;
+        }
+        return "{\"memberId\":"+memberId+"}";
+    }
 
     /**
      * 快速检测

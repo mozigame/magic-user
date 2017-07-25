@@ -67,6 +67,17 @@ public class MemInfoResource {
         RequestContext rc = RequestContext.getRequestContext();
         return infoResourceService.infoDetail(rc, type, account);
     }
+    
+    @Access(type = Access.AccessType.RESOURCE)
+    @RequestMapping(value = "/searchUserMemberId", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String searchUserMemberId(
+            @RequestParam(name = "type", required = true) Integer type,
+            @RequestParam(name = "account", required = true) String account
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return infoResourceService.searchUserExist(rc, type, account);
+    }
 
     /**
      * @param id              账号ID
