@@ -1605,7 +1605,7 @@ public class MemberResourceServiceImpl {
                 if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
                     member.setCity(getAddressByIP(member.getLoginIp(),this.URL));
                 }
-                member.setCity("未知城市");
+                
             }
         }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
