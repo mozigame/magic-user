@@ -122,7 +122,7 @@ public class AgentResource {
             @RequestParam(name = "returnScheme") Integer returnScheme,
             @RequestParam(name = "adminCost") Integer adminCost,
             @RequestParam(name = "feeScheme") Integer feeScheme,
-            @RequestParam(name = "domain", required = false) String[] domain,
+            @RequestParam(name = "domain", required = false) String domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
     ) {
