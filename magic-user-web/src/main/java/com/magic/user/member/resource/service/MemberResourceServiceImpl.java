@@ -472,7 +472,11 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_MEMBER;
         }
         // 权限检查
-        authOfSearchResources(member.getMemberId(), member.getOwnerId(), member);
+        try {
+            authOfSearchResources(member.getMemberId(), member.getOwnerId(), member);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);

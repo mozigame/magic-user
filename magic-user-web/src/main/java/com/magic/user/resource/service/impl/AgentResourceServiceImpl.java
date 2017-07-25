@@ -535,7 +535,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
         }
+
+
         User agentUser = userService.get(id);
+
+
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
         }
@@ -583,7 +587,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (agentVo == null) {
             throw UserException.ILLEGAL_USER;
         }
-        authOfSearchResources(agentId, ownerId, agentVo);
+        try {
+            authOfSearchResources(agentId, ownerId, agentVo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         assembleAgentDetail(agentVo, isReview);
         AgentDetailVo agentDetailVo = new AgentDetailVo();
