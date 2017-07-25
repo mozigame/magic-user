@@ -1597,10 +1597,11 @@ public class MemberResourceServiceImpl {
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, page, count);
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
-				member.setCity("未知城市");
+
                 if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
                     member.setCity(getAddressByIP(member.getLoginIp(),this.URL));
                 }
+                member.setCity("未知城市");
             }
         }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
