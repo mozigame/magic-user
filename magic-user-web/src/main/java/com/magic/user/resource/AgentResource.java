@@ -224,7 +224,7 @@ public class AgentResource {
      * @param feeScheme    手续费方案ID
      * @param discount     优惠扣除 默认1 1不选 2勾选
      * @param cost         返水成本 默认1 1不选 2勾选
-     * @param domains       域名,www.123.com,233.abc.com
+     * @param domains      域名,www.123.com,233.abc.com
      * @return
      * @Doc 代理参数配置修改
      */
@@ -244,7 +244,7 @@ public class AgentResource {
         return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domains);
     }
 
-        /**
+    /**
      * @param account    代理账号
      * @param password   密码
      * @param realname   真实姓名
@@ -259,19 +259,19 @@ public class AgentResource {
     @ResponseBody
     public String apply(
             HttpServletRequest request,
-            @RequestParam(name = "username",required = true) String account,
-            @RequestParam(name = "password",required = true) String password,
+            @RequestParam(name = "username", required = true) String account,
+            @RequestParam(name = "password", required = true) String password,
             // @RequestParam(name = "paymentPassword",required = true) String paymentPassword,
-            @RequestParam(name = "realname",required = true) String realname,
-            @RequestParam(name = "telephone",required = true) String telephone,
-            @RequestParam(name = "email",required = false,defaultValue = "") String email,
-            @RequestParam(name = "bankCardNo",required = true) String bankCardNo,
-            @RequestParam(name = "bank",required = true) String bank,
-            @RequestParam(name = "bankDeposit",required = true) String bankDeposit,
-            @RequestParam(name = "province",required = false,defaultValue = "") String province,
-            @RequestParam(name = "city",required = false,defaultValue = "") String city,
-            @RequestParam(name = "weixin",required = false,defaultValue = "") String weixin,
-            @RequestParam(name = "qq",required = false,defaultValue = "") String qq
+            @RequestParam(name = "realname", required = true) String realname,
+            @RequestParam(name = "telephone", required = true) String telephone,
+            @RequestParam(name = "email", required = false, defaultValue = "") String email,
+            @RequestParam(name = "bankCardNo", required = true) String bankCardNo,
+            @RequestParam(name = "bank", required = true) String bank,
+            @RequestParam(name = "bankDeposit", required = true) String bankDeposit,
+            @RequestParam(name = "province", required = false, defaultValue = "") String province,
+            @RequestParam(name = "city", required = false, defaultValue = "") String city,
+            @RequestParam(name = "weixin", required = false, defaultValue = "") String weixin,
+            @RequestParam(name = "qq", required = false, defaultValue = "") String qq
 
     ) {
         return agentResourceService.agentApply(RequestContext.getRequestContext(), request, account, password,//paymentPassword,
@@ -279,7 +279,7 @@ public class AgentResource {
     }
 
     /**
-     * @param username    代理账号
+     * @param username 代理账号
      * @Doc 代理申请--前端页面
      */
     @Access(type = Access.AccessType.PUBLIC)
@@ -287,7 +287,7 @@ public class AgentResource {
     @ResponseBody
     public String checkUserName(
             HttpServletRequest request,
-            @RequestParam(name = "username",required = true) String username
+            @RequestParam(name = "username", required = true) String username
 
     ) {
         return agentResourceService.checkUsernameIsExists(RequestContext.getRequestContext(), username);
@@ -466,7 +466,7 @@ public class AgentResource {
     @RequestMapping(value = "/domains", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String queryDomains(@RequestParam(name = "id") Long id) {
-        return agentResourceService.queryDomains(RequestContext.getRequestContext(),id);
+        return agentResourceService.queryDomains(RequestContext.getRequestContext(), id);
     }
 
     /**
