@@ -543,14 +543,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (agentUser == null) {
             throw UserException.ILLEGAL_USER;
         }
-        return getAgentInfoVo(id, opera.getOwnerId(), false);
+        return getAgentInfoVo(id, opera.getOwnerId(), false, opera.getUserId());
     }
 
 
     public void authOfSearchResources(Long agentId, Long ownerId, AgentInfoVo agentInfoVo) {
         List<Resources> resources = dubboOutAssembleService.getUserRes(agentId, ownerId);
         boolean hasEmail = false, hasPhone = false, hasBankCardNo = false; //初始化未拥有权限
-        if(resources.size()>0) {
+        if (resources.size() > 0) {
             for (Resources temp : resources) {
                 if (temp.getEngKey().trim().equals(AuthConst.AGENT_CHECK_PHONE_KEY)) {
                     hasEmail = true;
@@ -566,10 +566,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!hasEmail) {
             agentInfoVo.setEmail("************");
         }
-        if(!hasPhone){
+        if (!hasPhone) {
             agentInfoVo.setTelephone("************");
         }
-        if(!hasBankCardNo){
+        if (!hasBankCardNo) {
             agentInfoVo.setBankCardNo("************");
         }
     }
@@ -582,16 +582,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @param isReview 是否是审核通过的信息
      * @return
      */
-    private String getAgentInfoVo(Long agentId, Long ownerId, boolean isReview) {
+    private String getAgentInfoVo(Long agentId, Long ownerId, boolean isReview, Long userId) {
         AgentInfoVo agentVo = userService.getAgentDetail(agentId);
         if (agentVo == null) {
             throw UserException.ILLEGAL_USER;
         }
-        try {
-            authOfSearchResources(agentId, ownerId, agentVo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        authOfSearchResources(userId, ownerId, agentVo);
 
         assembleAgentDetail(agentVo, isReview);
         AgentDetailVo agentDetailVo = new AgentDetailVo();
@@ -1146,7 +1142,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         } else if (baseInfo.getStatus() == ReviewStatus.pass.value()) {
             long agentId = accountIdMappingService.getUid(operaUser.getOwnerId(), baseInfo.getAccount());
             if (agentId > 0) {
-                return getAgentInfoVo(agentId, operaUser.getOwnerId(), true);
+                return getAgentInfoVo(agentId, operaUser.getOwnerId(), true, operaUser.getUserId());
             }
         }
         return UserContants.EMPTY_STRING;

@@ -169,7 +169,7 @@ public class StockResourceServiceImpl implements StockResourceService {
         StockInfoVo stockDetail = userService.getStockDetail(id);
         //权限检查
         try {
-            authOfSearchResources(id, user.getOwnerId(), stockDetail);
+            authOfSearchResources(user.getUserId(), user.getOwnerId(), stockDetail);
         } catch (Exception e) {
             e.printStackTrace();
         }

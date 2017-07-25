@@ -467,16 +467,16 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberDetails(RequestContext rc, long id) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         Member member = memberService.getMemberById(id);
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
         // 权限检查
-        try {
-            authOfSearchResources(member.getMemberId(), member.getOwnerId(), member);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            authOfSearchResources(user.getUserId(), user.getOwnerId(), member);
 
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
