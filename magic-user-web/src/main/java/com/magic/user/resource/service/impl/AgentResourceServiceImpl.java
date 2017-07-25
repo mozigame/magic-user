@@ -352,7 +352,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     @Override
     public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
                       String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
-                      Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost) {
+                      Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost) {
         String generalizeCode = UUIDUtil.getCode();
         RegisterReq req = assembleRegister(account, password);
         if (!checkRegisterAgentParam(req)) {
@@ -394,10 +394,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             ApiLogger.error("add agent login failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
         }
-        String domainSpit = StringUtils.arrayToStrSplit(domain);
 
         //mq 处理 4、添加代理配置
-        AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domainSpit, discount, cost);
+        AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost);
         //mq 处理 5、添加业主股东代理id映射信息
         OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
         //mq 处理 6、将代理基础信息放入mongo
