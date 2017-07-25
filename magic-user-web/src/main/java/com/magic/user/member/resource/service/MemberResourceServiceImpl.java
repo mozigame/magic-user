@@ -1598,7 +1598,7 @@ public class MemberResourceServiceImpl {
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
                 if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
-                    member.setCity(getAddressByIP(this.URL,member.getLoginIp()));
+                    member.setCity(getAddressByIP(member.getLoginIp(),this.URL));
                 }
             }
         }
