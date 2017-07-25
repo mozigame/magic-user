@@ -2184,7 +2184,8 @@ public class MemberResourceServiceImpl {
             if (object.size() > 0) {
                 if(object.getString("city") != null && !object.getString("city").equals("")){
                     return object.getString("city");
-                }else{
+                }
+                if(object.getString("province") != null && !object.getString("province").equals("")){
                     return object.getString("province");
                 }
             }
