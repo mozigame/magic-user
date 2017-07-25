@@ -1665,7 +1665,9 @@ public class MemberResourceServiceImpl {
                 onLineMemberVo.setRegisterTime(LocalDateTimeUtil.toAmerica(next.getRegisterTime()));
                 onLineMemberVo.setLoginIp(next.getLoginIp());
                 onLineMemberVo.setRegisterIp(next.getRegisterIp());
+                onLineMemberVo.setCity(next.getCity());
                 members.add(onLineMemberVo);
+
             }
         }
         return members;
