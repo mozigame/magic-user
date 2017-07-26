@@ -14,7 +14,7 @@
         <dubbo:method name="getMember" timeout="3000"/>
         <dubbo:method name="getOwnerStaticInfo" timeout="3000"/>
         <dubbo:method name="getMemberInfo" timeout="3000"/>
-        <dubbo:method name="getMemberInfo" timeout="3000"/>
+        <dubbo:method name="getAgentListByPage" timeout="3000"/>
     </dubbo:service>
     <dubbo:service interface="com.magic.user.service.dubbo.StatisticsDubboService" ref="statisticsDubboService">
         <dubbo:method name="statisActiveMembers" timeout="3000"/>
