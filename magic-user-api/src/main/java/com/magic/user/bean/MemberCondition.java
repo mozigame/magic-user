@@ -221,4 +221,12 @@ public class MemberCondition {
     public void setLevelList(List<Integer> levelList) {
         this.levelList = levelList;
     }
+
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("accountList = " + accountList);
+        return stringBuilder.toString();
+    }
+
 }
