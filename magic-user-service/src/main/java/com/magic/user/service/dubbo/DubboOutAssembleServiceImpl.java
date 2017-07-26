@@ -18,6 +18,7 @@ import com.magic.oceanus.entity.Summary.ProxyCurrentOperaton;
 import com.magic.oceanus.entity.Summary.UserOrderRecord;
 import com.magic.oceanus.entity.Summary.UserPreferentialRecord;
 import com.magic.oceanus.service.OceanusProviderDubboService;
+import com.magic.owner.entity.Resources;
 import com.magic.owner.entity.Role;
 import com.magic.owner.service.dubbo.PermitDubboService;
 import com.magic.owner.vo.UserRoleVo;
@@ -42,37 +43,47 @@ import java.util.*;
 @Service("dubboOutAssembleService")
 public class DubboOutAssembleServiceImpl {
 
+    private static final Map<Long, String> EMPTY_MAP = new HashMap<>();
     @Resource
     private UuidService uuidService;
-
     @Resource
     private PassportDubboService passportDubboService;
-
     @Resource
     private DomainDubboService domainDubboService;
-
     @Resource
     private AgentSchemeService agentSchemeService;
-
     @Resource
     private UserLevelService userLevelService;
-
     @Resource
     private MsgDubboService msgDubboService;
-
     @Resource
     private RegisterDubboService registerDubboService;
-
     @Resource
     private TethysUserDubboService tethysUserDubboService;
-
     @Resource
     private OceanusProviderDubboService oceanusProviderDubboService;
     @Resource
     private PermitDubboService permitDubboService;
     @Resource
     private PrepaySchemeService prepaySchemeService;
-    private static final Map<Long, String> EMPTY_MAP = new HashMap<>();
+
+
+    /**
+     * 根据用户获取资源列表
+     *
+     * @param userId
+     * @param ownerId
+     * @return
+     */
+    public List<Resources> getUserRes(Long userId, Long ownerId) {
+        try {
+            return permitDubboService.getUserRes(userId, ownerId);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("Failed to get the user Resources. userId: %s,ownerId: %s", userId, ownerId), e);
+        }
+        return null;
+    }
+
 
     /**
      * 分配ID 13位时间戳+2位机器识别码+4位随机数
@@ -90,12 +101,13 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 通过域名获取业主信息
+     *
      * @param sourceUrl
      * @return
      */
     public OwnerInfo getOwnerInfoByDomain(String sourceUrl) {
         try {
-           return domainDubboService.getOwnerInfoByDomain(sourceUrl);
+            return domainDubboService.getOwnerInfoByDomain(sourceUrl);
         } catch (Exception e) {
             ApiLogger.error(String.format("Failed to get the owner information. sourceUrl: %s", sourceUrl), e);
         }
@@ -118,9 +130,9 @@ public class DubboOutAssembleServiceImpl {
     }
 
     /**
-     * @doc 获取多个用户的最近登录时间
      * @param ids
      * @return
+     * @doc 获取多个用户的最近登录时间
      */
     public Map<Long, SubAccount> getSubLogins(Set<Long> ids) {
         try {
@@ -149,10 +161,11 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 获取配置列表
+     *
      * @param ownerId
      * @return
      */
-    public Map<String,Object> agentSchemeList(Long ownerId) {
+    public Map<String, Object> agentSchemeList(Long ownerId) {
         try {
             return agentSchemeService.agentSchemeList(ownerId);
         } catch (Exception e) {
@@ -163,6 +176,7 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 获取业主的所有域名
+     *
      * @param ownerId
      * @return
      */
@@ -181,10 +195,10 @@ public class DubboOutAssembleServiceImpl {
      * @param ids
      * @return
      */
-    public Map<Long, String> getLevels(Collection<Long> ids){
+    public Map<Long, String> getLevels(Collection<Long> ids) {
         try {
             return userLevelService.getBatchByIds(ids);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("get levels error. ids: %s", JSON.toJSONString(ids)), e);
         }
         return EMPTY_MAP;
@@ -192,6 +206,7 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 获取层级映射列表
+     *
      * @param ownerId
      * @return
      */
@@ -206,6 +221,7 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 获取会员的未读消息数量
+     *
      * @param uid
      * @return
      */
@@ -221,16 +237,17 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 获取注册时设置的必填项
+     *
      * @param ownerId
      * @param type
      * @return
      */
     public List<String> getMustRegisterarameters(Long ownerId, int type) {
-        if(type == AccountType.member.value()){
+        if (type == AccountType.member.value()) {
             type = 1;//会员
-        }else if(type == AccountType.agent.value()){
+        } else if (type == AccountType.agent.value()) {
             type = 2;//代理
-        }else{
+        } else {
             return null;
         }
         List<String> result = null;
@@ -249,7 +266,7 @@ public class DubboOutAssembleServiceImpl {
      * @param password
      * @return
      */
-    public boolean updateUserPaymentPassword(long uid, String password,long ownerId) {
+    public boolean updateUserPaymentPassword(long uid, String password, long ownerId) {
         try {
             UserPass userPass = new UserPass();
             userPass.setUserId(uid);
@@ -258,7 +275,7 @@ public class DubboOutAssembleServiceImpl {
             ApiLogger.info(String.format("update userpayment password. data: %s", JSON.toJSONString(userPass)));
             tethysUserDubboService.updateUserPaidPwd(userPass);
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("update user payment password error. uid: %d, paymentPassword: %s", uid, password), e);
         }
         return false;
@@ -280,7 +297,7 @@ public class DubboOutAssembleServiceImpl {
             userPass.setOwnerId(ownerId);
             tethysUserDubboService.insertUserPwd(userPass);
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("insert user payment password error. uid: %d, ownerId: %d , paymentPassword: %s", uid, ownerId, paymentPassword), e);
         }
         return false;
@@ -293,10 +310,10 @@ public class DubboOutAssembleServiceImpl {
      * @param uid
      * @return
      */
-    public OwnerCurrentOperation getShareholderOperation(Long uid){
+    public OwnerCurrentOperation getShareholderOperation(Long uid) {
         try {
             return oceanusProviderDubboService.getShareholderOperation(uid);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("get shareholder error. uid: %d", uid), e);
         }
         return null;
@@ -309,10 +326,10 @@ public class DubboOutAssembleServiceImpl {
      * @param stockId
      * @return
      */
-    public ProxyCurrentOperaton getProxyOperation(Long agentId, Long stockId){
+    public ProxyCurrentOperaton getProxyOperation(Long agentId, Long stockId) {
         try {
             return oceanusProviderDubboService.getProxyOperation(agentId, stockId);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("get proxy operation error. agentId: %d, stockId: %d", agentId, stockId), e);
         }
         return null;
@@ -325,10 +342,10 @@ public class DubboOutAssembleServiceImpl {
      * @param stockId
      * @return
      */
-    public UserOrderRecord getMemberOperation(Long memberId, Long stockId){
+    public UserOrderRecord getMemberOperation(Long memberId, Long stockId) {
         try {
             return oceanusProviderDubboService.getMemberOperation(memberId, stockId);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("get member operation error. memberId: %d, stockId: %d", memberId, stockId), e);
         }
         return null;
@@ -341,10 +358,10 @@ public class DubboOutAssembleServiceImpl {
      * @param stockId
      * @return
      */
-    public UserPreferentialRecord getPreferentialOperation(Long memberId, Long stockId){
+    public UserPreferentialRecord getPreferentialOperation(Long memberId, Long stockId) {
         try {
             return oceanusProviderDubboService.getPreferentialOperation(memberId, stockId);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("get member prefer operation error. memberId: %d, stockId: %d", memberId, stockId), e);
         }
         return null;
@@ -353,6 +370,7 @@ public class DubboOutAssembleServiceImpl {
     /*********  权限  ********/
     /**
      * 批量获取用户的角色
+     *
      * @return
      */
     public Map<Long, UserRoleVo> getUsersRole(Collection<Long> userIds) {
@@ -366,6 +384,7 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 修改用户的角色
+     *
      * @param ownerId
      * @param userId
      * @param roleId
@@ -382,6 +401,7 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 获取单个用户的角色
+     *
      * @param userId
      * @return
      */
@@ -397,14 +417,14 @@ public class DubboOutAssembleServiceImpl {
     public PrePaySchemeVo getOwnerLimit(long userId) {
         try {
             PrePaySchemeVo vo = prepaySchemeService.getOwnerPrePayScheme(userId);
-            if(vo != null){
-                if(vo.isValid()){
+            if (vo != null) {
+                if (vo.isValid()) {
                     return vo;
                 }
             }
-        }catch (Error e){
+        } catch (Error e) {
             ApiLogger.error("get  owner limit failed !", e);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("get  owner limit failed !", e);
         }
         return null;
@@ -412,16 +432,17 @@ public class DubboOutAssembleServiceImpl {
 
     /**
      * 发送消息
+     *
      * @param type
      * @param uid
      * @param ownerId
      * @param msg
      * @return
      */
-    public boolean sendSiteMsg(SiteMsgType type, Long uid, Long ownerId, String msg){
+    public boolean sendSiteMsg(SiteMsgType type, Long uid, Long ownerId, String msg) {
         try {
             return msgDubboService.saveSiteMsg(type, ownerId, uid, msg);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("send site msg error. type: %s, uid: %d, ownerId: %d, msg: %s", type, uid, ownerId, msg), e);
         }
         return false;

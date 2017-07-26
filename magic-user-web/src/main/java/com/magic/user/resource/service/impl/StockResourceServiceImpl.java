@@ -12,6 +12,7 @@ import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.api.commons.tools.NumberUtil;
 import com.magic.oceanus.entity.Summary.OwnerCurrentOperation;
 import com.magic.oceanus.service.OceanusProviderDubboService;
+import com.magic.owner.entity.Resources;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Login;
 import com.magic.user.entity.OwnerAccountUser;
@@ -29,6 +30,7 @@ import com.magic.user.service.LoginService;
 import com.magic.user.service.OwnerStockAgentService;
 import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
+import com.magic.user.util.AuthConst;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.PasswordCapture;
 import com.magic.user.vo.FundProfile;
@@ -123,6 +125,34 @@ public class StockResourceServiceImpl implements StockResourceService {
         return JSON.toJSONString(simpleListResult);
     }
 
+
+    public void authOfSearchResources(Long agentId, Long ownerId, StockInfoVo stockDetail) {
+        List<Resources> resources = dubboOutAssembleService.getUserRes(agentId, ownerId);
+        boolean hasEmail = false, hasPhone = false, hasBankCardNo = false; //初始化未拥有权限
+        if (resources.size() > 0) {
+            for (Resources temp : resources) {
+                if (temp.getEngKey().trim().equals(AuthConst.STOCK_CHECK_PHONE_KEY)) {
+                    hasEmail = true;
+                }
+                if (temp.getEngKey().trim().equals(AuthConst.STOCK_CHECK_EMIAL_KEY)) {
+                    hasPhone = true;
+                }
+                if (temp.getEngKey().trim().equals(AuthConst.STOCK_CHECK_BANKCARDNO_KEY)) {
+                    hasBankCardNo = true;
+                }
+            }
+        }
+        if (!hasEmail) {
+            stockDetail.setEmail("************");
+        }
+        if (!hasPhone) {
+            stockDetail.setTelephone("************");
+        }
+        if (!hasBankCardNo) {
+            stockDetail.setBankCardNo("************");
+        }
+    }
+
     /**
      * @param rc
      * @param id
@@ -135,14 +165,22 @@ public class StockResourceServiceImpl implements StockResourceService {
         if (user == null) {
             throw UserException.ILLEGAL_USER;
         }
+
         StockInfoVo stockDetail = userService.getStockDetail(id);
+        //权限检查
+        try {
+            authOfSearchResources(user.getUserId(), user.getOwnerId(), stockDetail);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         assembleStockDetail(stockDetail);
         StockDetailVo stockDetailVo = new StockDetailVo();
 
-        OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(stockDetail.getId(),AccountType.stockholder);
-        if(osam != null){
+        OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(stockDetail.getId(), AccountType.stockholder);
+        if (osam != null) {
             stockDetail.setMembers(osam.getMemNumber());
-        }else{
+        } else {
             stockDetail.setMembers(0);
         }
         stockDetailVo.setBaseInfo(stockDetail);
@@ -169,19 +207,19 @@ public class StockResourceServiceImpl implements StockResourceService {
         String betTotalMoney = "0";
         String betEffMoney = "0";
         String gains = "0";
-        if (Optional.ofNullable(oco).filter(betsValue -> betsValue.getBets() != null && betsValue.getBets() > 0).isPresent()){
+        if (Optional.ofNullable(oco).filter(betsValue -> betsValue.getBets() != null && betsValue.getBets() > 0).isPresent()) {
             bets = oco.getBets().intValue();
         }
-        if (Optional.ofNullable(oco).filter(notesValue -> notesValue.getNotes() != null && notesValue.getNotes() > 0).isPresent()){
+        if (Optional.ofNullable(oco).filter(notesValue -> notesValue.getNotes() != null && notesValue.getNotes() > 0).isPresent()) {
             notes = oco.getNotes().intValue();
         }
-        if (Optional.ofNullable(oco).filter(betTotalMoneyValue -> betTotalMoneyValue.getBetTotalMoney() != null && betTotalMoneyValue.getBetTotalMoney() > 0).isPresent()){
+        if (Optional.ofNullable(oco).filter(betTotalMoneyValue -> betTotalMoneyValue.getBetTotalMoney() != null && betTotalMoneyValue.getBetTotalMoney() > 0).isPresent()) {
             betTotalMoney = String.valueOf(NumberUtil.fenToYuan(oco.getBetTotalMoney()));
         }
-        if (Optional.ofNullable(oco).filter(betEffMoneyValue -> betEffMoneyValue.getBetEffMoney() != null && betEffMoneyValue.getBetEffMoney() > 0).isPresent()){
+        if (Optional.ofNullable(oco).filter(betEffMoneyValue -> betEffMoneyValue.getBetEffMoney() != null && betEffMoneyValue.getBetEffMoney() > 0).isPresent()) {
             betEffMoney = String.valueOf(NumberUtil.fenToYuan(oco.getBetEffMoney()));
         }
-        if (Optional.ofNullable(oco).filter(gainsValue -> gainsValue.getGains() != null).isPresent()){
+        if (Optional.ofNullable(oco).filter(gainsValue -> gainsValue.getGains() != null).isPresent()) {
             gains = String.valueOf(NumberUtil.fenToYuan(oco.getGains()));
         }
         stockFundInfo.setBets(bets);
@@ -315,7 +353,7 @@ public class StockResourceServiceImpl implements StockResourceService {
      * @Doc 添加股东
      */
     @Override
-    public String add(RequestContext rc, String account, String password, String realname,String bankCardNo, String bankDeposit, String bank,
+    public String add(RequestContext rc, String account, String password, String realname, String bankCardNo, String bankDeposit, String bank,
                       String telephone, Integer currencyType, String email, Integer sex) {
 
         User opera = userService.get(rc.getUid());
@@ -374,7 +412,7 @@ public class StockResourceServiceImpl implements StockResourceService {
      * @return
      * @Doc 组装股东基础数据
      */
-    private User assembleStock(Long userId, String realname,String bankCardNo, String bankDeposit, String bank, String username, String telephone, String email,
+    private User assembleStock(Long userId, String realname, String bankCardNo, String bankDeposit, String bank, String username, String telephone, String email,
                                AccountType type, GeneraType gender, CurrencyType currencyType, Integer registerIp, Long registerTime, Long ownerId) {
         User user = new User();
         user.setUserId(userId);

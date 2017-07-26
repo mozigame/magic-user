@@ -10,15 +10,18 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.*;
+import com.magic.api.commons.tools.IPUtil;
+import com.magic.api.commons.tools.LocalDateTimeUtil;
+import com.magic.api.commons.tools.NumberUtil;
+import com.magic.api.commons.tools.UUIDUtil;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.config.thrift.base.EGResp;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.oceanus.entity.Summary.UserOrderRecord;
 import com.magic.oceanus.entity.Summary.UserPreferentialRecord;
+import com.magic.owner.entity.Resources;
 import com.magic.passport.po.SubAccount;
-import com.magic.passport.service.dubbo.PassportDubboService;
 import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
 import com.magic.user.bean.RegionNumber;
@@ -41,13 +44,19 @@ import com.magic.user.service.MemberService;
 import com.magic.user.service.UserService;
 import com.magic.user.service.dubbo.DubboOutAssembleServiceImpl;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
+import com.magic.user.util.AuthConst;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,7 +69,8 @@ import java.util.stream.Collectors;
  */
 @Service("memberServiceResource")
 public class MemberResourceServiceImpl {
-
+    //根据ip获取城市的接口地址
+    private static final String URL = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
     @Resource
     private MemberService memberService;
 
@@ -81,6 +91,78 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
+
+    /**
+     * 组装翻页数据
+     *
+     * @param page  页码
+     * @param count 当页条数
+     * @param total 总条数
+     * @param list  详细列表数据
+     * @return
+     */
+    private static PageBean<MemberListVo> assemblePageBean(Integer page, Integer count, Long total, Collection<MemberListVo> list) {
+        PageBean<MemberListVo> result = new PageBean<>();
+        result.setPage(page);
+        result.setCount(count);
+        result.setTotal(total);
+        result.setList(list);
+        return result;
+    }
+
+    /**
+     * 组装翻页数据
+     *
+     * @param page  页码
+     * @param count 当页条数
+     * @param total 总条数
+     * @param list  详细列表数据
+     * @return
+     */
+    private static PageBean<String> assemblePageBeanList(Integer page, Integer count, long total, Collection<String> list) {
+        PageBean<String> result = new PageBean<>();
+        result.setPage(page);
+        result.setCount(count);
+        result.setTotal(total);
+        result.setList(list);
+        return result;
+    }
+
+    /**
+     * 组装翻页数据
+     *
+     * @param page  页码
+     * @param count 当页条数
+     * @param total 总条数
+     * @param list  详细列表数据
+     * @return
+     */
+    private static PageBean<OnLineMemberVo> assemblePage(int page, int count, long total, Collection<OnLineMemberVo> list) {
+        PageBean<OnLineMemberVo> result = new PageBean<>();
+        result.setPage(page);
+        result.setCount(count);
+        result.setTotal(total);
+        result.setList(list);
+        return result;
+    }
+
+    /**
+     * 组装翻页数据
+     *
+     * @param page  页码
+     * @param count 当页条数
+     * @param total 总条数
+     * @param list  详细列表数据
+     * @return
+     */
+    private static PageBean<MemberConditionVo> assemblePageBeanMemberCondions(Integer page, Integer count, Long total, Collection<MemberConditionVo> list) {
+        PageBean<MemberConditionVo> result = new PageBean<>();
+        result.setPage(page);
+        result.setCount(count);
+        result.setTotal(total);
+        result.setList(list);
+        return result;
+    }
 
     /**
      * 会员列表
@@ -104,7 +186,7 @@ public class MemberResourceServiceImpl {
         if (!checkCondition(memberCondition)) {
             return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
         }
-        if(operaUser.getType() == AccountType.agent){
+        if (operaUser.getType() == AccountType.agent) {
             memberCondition.setAgentId(operaUser.getUserId());
         }
         long total = memberMongoService.getCount(memberCondition);
@@ -114,7 +196,7 @@ public class MemberResourceServiceImpl {
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, page, count);
         ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
-        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
+        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()) {
             return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
         }
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
@@ -132,8 +214,8 @@ public class MemberResourceServiceImpl {
         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
         Map<Long, Member> members = memberService.findMemberByIds(memberIds);
-        ApiLogger.info(String.format("get members. ids: %s, result: %s",JSON.toJSONString(memberIds), JSON.toJSONString(members)));
-        if (!Optional.ofNullable(members).filter(size -> size.size() > 0).isPresent()){
+        ApiLogger.info(String.format("get members. ids: %s, result: %s", JSON.toJSONString(memberIds), JSON.toJSONString(members)));
+        if (!Optional.ofNullable(members).filter(size -> size.size() > 0).isPresent()) {
             return memberListVos;
         }
         //2、获取会员最近登录信息
@@ -144,10 +226,10 @@ public class MemberResourceServiceImpl {
         Set<Long> levels = memberConditionVos.stream().map(MemberConditionVo::getLevel).collect(Collectors.toSet());
         Map<Long, MemberListVo> memberRetWaterMap = getMemberReturnWater(levels);
         ApiLogger.info(String.format("get return water scheme. levels: %s, result: %s", JSON.toJSONString(levels), JSON.toJSONString(memberRetWaterMap)));
-        for (MemberConditionVo vo : memberConditionVos){
+        for (MemberConditionVo vo : memberConditionVos) {
             //1.组装基础信息
             Member member = members.get(vo.getMemberId());
-            if (!Optional.ofNullable(member).isPresent()){
+            if (!Optional.ofNullable(member).isPresent()) {
                 continue;
             }
             MemberListVo memberListVo = assembleMemberListVo(member);
@@ -157,11 +239,11 @@ public class MemberResourceServiceImpl {
             memberListVo.setBalance(getMemberBalance(vo.getMemberId(), memberBalanceLevelVoMap));
             //4.返水方案
             MemberListVo returnWater = assembleMemberListVo(vo, memberRetWaterMap);
-            if (!Optional.ofNullable(returnWater).isPresent()){
+            if (!Optional.ofNullable(returnWater).isPresent()) {
                 memberListVo.setReturnWater(0);
                 memberListVo.setReturnWaterName("");
                 memberListVo.setLevel("");
-            }else {
+            } else {
                 memberListVo.setReturnWater(returnWater.getReturnWater());
                 memberListVo.setReturnWaterName(returnWater.getReturnWaterName());
                 memberListVo.setLevel(returnWater.getLevel());
@@ -179,11 +261,11 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private MemberListVo assembleMemberListVo(MemberConditionVo vo, Map<Long, MemberListVo> memberRetWaterMap) {
-        if (!Optional.ofNullable(memberRetWaterMap).filter(size -> size.size() > 0).isPresent()){
+        if (!Optional.ofNullable(memberRetWaterMap).filter(size -> size.size() > 0).isPresent()) {
             return null;
         }
         MemberListVo memberListVo = memberRetWaterMap.get(vo.getLevel());
-        if (!Optional.ofNullable(memberListVo).isPresent()){
+        if (!Optional.ofNullable(memberListVo).isPresent()) {
             return null;
         }
         MemberListVo result = new MemberListVo();
@@ -201,10 +283,10 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private String getMemberBalance(Long memberId, Map<Long, String> map) {
-       if (!Optional.ofNullable(map).filter(size -> size.size() > 0).isPresent()){
-           return "0";
-       }
-       return map.getOrDefault(memberId, "0");
+        if (!Optional.ofNullable(map).filter(size -> size.size() > 0).isPresent()) {
+            return "0";
+        }
+        return map.getOrDefault(memberId, "0");
     }
 
     /**
@@ -215,11 +297,11 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private String getLastLoginTime(Long memberId, Map<Long, SubAccount> subLogins) {
-        if (!Optional.ofNullable(subLogins).filter(size -> size.size() > 0).isPresent()){
+        if (!Optional.ofNullable(subLogins).filter(size -> size.size() > 0).isPresent()) {
             return "";
         }
         SubAccount subAccount = subLogins.get(memberId);
-        if (!Optional.ofNullable(subAccount).filter(time -> time.getLastTime() > 0).isPresent()){
+        if (!Optional.ofNullable(subAccount).filter(time -> time.getLastTime() > 0).isPresent()) {
             return "";
         }
         return LocalDateTimeUtil.toAmerica(subAccount.getLastTime());
@@ -245,6 +327,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 组装会员反水记录列表
+     *
      * @param levelIds
      * @return
      */
@@ -253,9 +336,9 @@ public class MemberResourceServiceImpl {
         memberRetWaterBody.put("levels", levelIds);
         try {
             EGResp retWaterResp = thriftOutAssembleService.getMemberReturnWater(memberRetWaterBody.toJSONString(), "account");
-            if (retWaterResp != null&& retWaterResp.getData()!= null) {
+            if (retWaterResp != null && retWaterResp.getData() != null) {
                 JSONObject obj = JSONObject.parseObject(retWaterResp.getData());
-                if(obj != null && obj.getInteger("total") > 0){
+                if (obj != null && obj.getInteger("total") > 0) {
                     JSONArray result = obj.getJSONArray("levels");
                     Map<Long, MemberListVo> memberBalanceLevelVoMap = new HashMap<>();
                     for (Object object : result) {
@@ -269,12 +352,11 @@ public class MemberResourceServiceImpl {
                     return memberBalanceLevelVoMap;
                 }
             }
-        }catch (Exception e){
-            ApiLogger.error("get member return water failed!",e);
+        } catch (Exception e) {
+            ApiLogger.error("get member return water failed!", e);
         }
         return new HashMap<>();
     }
-
 
     /**
      * 检查请求参数
@@ -314,42 +396,6 @@ public class MemberResourceServiceImpl {
     }
 
     /**
-     * 组装翻页数据
-     *
-     * @param page  页码
-     * @param count 当页条数
-     * @param total 总条数
-     * @param list  详细列表数据
-     * @return
-     */
-    private static PageBean<MemberListVo> assemblePageBean(Integer page, Integer count, Long total, Collection<MemberListVo> list) {
-        PageBean<MemberListVo> result = new PageBean<>();
-        result.setPage(page);
-        result.setCount(count);
-        result.setTotal(total);
-        result.setList(list);
-        return result;
-    }
-
-    /**
-     * 组装翻页数据
-     *
-     * @param page  页码
-     * @param count 当页条数
-     * @param total 总条数
-     * @param list  详细列表数据
-     * @return
-     */
-    private static PageBean<String> assemblePageBeanList(Integer page, Integer count, long total, Collection<String> list) {
-        PageBean<String> result = new PageBean<>();
-        result.setPage(page);
-        result.setCount(count);
-        result.setTotal(total);
-        result.setList(list);
-        return result;
-    }
-
-    /**
      * 会员列表导出
      *
      * @param rc        RequestContext
@@ -386,6 +432,33 @@ public class MemberResourceServiceImpl {
         return downLoadFile;
     }
 
+    public void authOfSearchResources(Long agentId, Long ownerId, Member member) {
+        List<Resources> resources = dubboOutAssembleService.getUserRes(agentId, ownerId);
+        boolean hasEmail = false, hasPhone = false, hasBankCardNo = false; //初始化未拥有权限
+        if (resources.size() > 0) {
+            for (Resources temp : resources) {
+                if (temp.getEngKey().trim().equals(AuthConst.MEMBER_CHECK_PHONE_KEY)) {
+                    hasEmail = true;
+                }
+                if (temp.getEngKey().trim().equals(AuthConst.MEMBER_CHECK_EMIAL_KEY)) {
+                    hasPhone = true;
+                }
+                if (temp.getEngKey().trim().equals(AuthConst.MEMBER_CHECK_BANKCARDNO_KEY)) {
+                    hasBankCardNo = true;
+                }
+            }
+        }
+        if (!hasEmail) {
+            member.setEmail("************");
+        }
+        if (!hasPhone) {
+            member.setTelephone("************");
+        }
+        if (!hasBankCardNo) {
+            member.setBankCardNo("************");
+        }
+    }
+
     /**
      * 会员详情
      *
@@ -394,10 +467,17 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberDetails(RequestContext rc, long id) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         Member member = memberService.getMemberById(id);
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
+        // 权限检查
+            authOfSearchResources(user.getUserId(), user.getOwnerId(), member);
+
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
     }
@@ -428,11 +508,11 @@ public class MemberResourceServiceImpl {
     private MemberDiscountHistory assembleDiscountHistory(Member member) {
         MemberDiscountHistory history = new MemberDiscountHistory();
         UserPreferentialRecord operation = dubboOutAssembleService.getPreferentialOperation(member.getMemberId(), member.getStockId());
-        if (Optional.ofNullable(operation).isPresent()){
+        if (Optional.ofNullable(operation).isPresent()) {
             history.setNumbers(operation.getNumbers() == null ? 0 : operation.getNumbers().intValue());
             history.setReturnWaterTotalMoney(operation.getReturnWaterTotalMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getReturnWaterTotalMoney())));
             history.setTotalMoney(operation.getTotalMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getTotalMoney())));
-        }else {
+        } else {
             history.setNumbers(0);
             history.setReturnWaterTotalMoney("0");
             history.setTotalMoney("0");
@@ -449,11 +529,11 @@ public class MemberResourceServiceImpl {
     private MemberBetHistory assembleBetHistory(Member member) {
         MemberBetHistory history = new MemberBetHistory();
         UserOrderRecord operation = dubboOutAssembleService.getMemberOperation(member.getMemberId(), member.getStockId());
-        if (Optional.ofNullable(operation).isPresent()){
+        if (Optional.ofNullable(operation).isPresent()) {
             history.setEffMoney(operation.getEffMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getEffMoney())));
             history.setTotalMoney(operation.getTotalMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getTotalMoney())));
             history.setGains(operation.getGains() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(operation.getGains())));
-        }else {
+        } else {
             history.setEffMoney("0");
             history.setGains("0");
             history.setTotalMoney("0");
@@ -473,14 +553,14 @@ public class MemberResourceServiceImpl {
         fundProfile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
         MemberFundInfo fundInfo = new MemberFundInfo();
         fundInfo.setBalance(thriftOutAssembleService.getMemberBalance(member.getMemberId()));
-        if (Optional.ofNullable(mv).isPresent()){
+        if (Optional.ofNullable(mv).isPresent()) {
             fundInfo.setDepositNumbers(mv.getDepositCount() == null ? 0 : mv.getDepositCount());//存款总次数
             fundInfo.setDepositTotalMoney(String.valueOf(mv.getDepositMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getDepositMoney())));//存款总金额
             fundInfo.setLastDeposit(mv.getLastDepositMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(mv.getLastDepositMoney())));//最近存款
             fundInfo.setWithdrawNumbers(mv.getWithdrawCount() == null ? 0 : mv.getWithdrawCount());//取款总次数
             fundInfo.setWithdrawTotalMoney(mv.getWithdrawMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(mv.getWithdrawMoney())));//取款总金额
             fundInfo.setLastWithdraw(mv.getLastWithdrawMoney() == null ? "0" : String.valueOf(NumberUtil.fenToYuan(mv.getLastWithdrawMoney())));//最近取款
-        }else{
+        } else {
             fundInfo.setDepositNumbers(0);//存款总次数
             fundInfo.setDepositTotalMoney("0");//存款总金额
             fundInfo.setLastDeposit("0");//最近存款
@@ -500,30 +580,30 @@ public class MemberResourceServiceImpl {
      */
     private MemberPreferScheme getPreferScheme(MemberConditionVo mv) {
         MemberPreferScheme result = new MemberPreferScheme();
-        if (Optional.ofNullable(mv) .isPresent()){
+        if (Optional.ofNullable(mv).isPresent()) {
             result = thriftOutAssembleService.getMemberPrivilege(mv.getLevel());
         }
-        if (!Optional.ofNullable(result).isPresent()){
+        if (!Optional.ofNullable(result).isPresent()) {
             result = new MemberPreferScheme();
             result.setLevel(0);
             result.setShowLevel("无");
             result.setOnlineDiscount("无");
             result.setReturnWater("无");
             result.setDepositDiscountScheme("无");
-        }else {
-            if (!Optional.ofNullable(result.getLevel()).isPresent()){
+        } else {
+            if (!Optional.ofNullable(result.getLevel()).isPresent()) {
                 result.setLevel(0);
             }
-            if (StringUtils.isEmpty(result.getShowLevel())){
+            if (StringUtils.isEmpty(result.getShowLevel())) {
                 result.setShowLevel("无");
             }
-            if (StringUtils.isEmpty(result.getOnlineDiscount())){
+            if (StringUtils.isEmpty(result.getOnlineDiscount())) {
                 result.setOnlineDiscount("无");
             }
-            if (StringUtils.isEmpty(result.getReturnWater())){
+            if (StringUtils.isEmpty(result.getReturnWater())) {
                 result.setReturnWater("无");
             }
-            if (StringUtils.isEmpty(result.getDepositDiscountScheme())){
+            if (StringUtils.isEmpty(result.getDepositDiscountScheme())) {
                 result.setDepositDiscountScheme("无");
             }
         }
@@ -531,9 +611,9 @@ public class MemberResourceServiceImpl {
     }
 
     /**
-     * @Doc 组装会员基础信息中的会员信息
      * @param member
      * @return
+     * @Doc 组装会员基础信息中的会员信息
      */
     private MemberInfo assembleMemberInfo(Member member) {
         MemberInfo info = new MemberInfo();
@@ -692,10 +772,10 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String updateLevel(RequestContext rc, Long memberId, Long level) {
-        if (!Optional.ofNullable(memberId).filter(id -> id > 0).isPresent()){
+        if (!Optional.ofNullable(memberId).filter(id -> id > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        if (!Optional.ofNullable(level).filter(levelValue -> levelValue > 0).isPresent()){
+        if (!Optional.ofNullable(level).filter(levelValue -> levelValue > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         Member member = memberService.getMemberById(memberId);
@@ -703,8 +783,8 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_MEMBER;
         }
         boolean result = thriftOutAssembleService.setMemberLevel(member, level);
-        if (result){
-            result = memberMongoService.updateLevel(member,level);
+        if (result) {
+            result = memberMongoService.updateLevel(member, level);
         }
         if (!result) {
             throw UserException.MEMBER_LEVEL_UPDATE_FAIL;
@@ -715,8 +795,8 @@ public class MemberResourceServiceImpl {
     /**
      * 会员层级列表
      *
-     * @param rc    RequestContext
-     * @param lock  是否锁定 1：非锁定 2锁定
+     * @param rc   RequestContext
+     * @param lock 是否锁定 1：非锁定 2锁定
      * @return
      */
     public String memberLevelList(RequestContext rc, int lock) {
@@ -728,10 +808,11 @@ public class MemberResourceServiceImpl {
         List<MemberLevelListVo> list = getMemberLevelList(operaUser.getOwnerId(), lock);
         result.setList(list != null ? list : new ArrayList<>());
         return JSON.toJSONString(result);
-     }
+    }
 
     /**
      * 在jason thrift获取层级列表
+     *
      * @param ownerId
      * @param lock
      * @return
@@ -749,8 +830,8 @@ public class MemberResourceServiceImpl {
             List<MemberLevelListVo> memberLevelListVos = new ArrayList<>();
             JSONArray array = JSONObject.parseObject(resp.getData()).getJSONArray("userLevels");
             for (Object object : array) {
-                JSONObject js = (JSONObject)object;
-               // MemberLevelListVo memberLevelListVo = JSON.parseObject(JSON.toJSONString(object), MemberLevelListVo.class);
+                JSONObject js = (JSONObject) object;
+                // MemberLevelListVo memberLevelListVo = JSON.parseObject(JSON.toJSONString(object), MemberLevelListVo.class);
                 MemberLevelListVo memberLevelListVo = new MemberLevelListVo();
                 memberLevelListVo.setId(js.getInteger("userLevel"));
                 memberLevelListVo.setName(js.getString("userLevelName"));
@@ -804,6 +885,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 会员层级映射列表
+     *
      * @return
      */
     public String levelListSimple(RequestContext rc) {
@@ -817,7 +899,6 @@ public class MemberResourceServiceImpl {
         result.setList(list != null ? list : new ArrayList<>());
         return JSON.toJSONString(result);
     }
-
 
     /**
      * 状态变更
@@ -845,9 +926,9 @@ public class MemberResourceServiceImpl {
     }
 
     /**
-     * @Doc 发送会员状态修改
      * @param id
      * @param status
+     * @Doc 发送会员状态修改
      */
     private void sendMemberStatusUpdateMq(Long id, Integer status, Long ownerId) {
         JSONObject jsonObject = new JSONObject();
@@ -881,16 +962,16 @@ public class MemberResourceServiceImpl {
     /**
      * 会员注册
      *
-     * @param rc  RequestContext
-     * @param url 注册来源
-     * @param req 注册请求数据
+     * @param rc         RequestContext
+     * @param url        注册来源
+     * @param req        注册请求数据
      * @param verifyCode 验证码
      * @return
      */
     public String memberRegister(RequestContext rc, String url, RegisterReq req, String verifyCode) {
 
         //校验用户名是否包含非法字符
-        if(UserUtil.checkoutUserName(req.getUsername())){
+        if (UserUtil.checkoutUserName(req.getUsername())) {
             throw UserException.ILLEGAL_USERNAME;
         }
 
@@ -902,7 +983,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
 
-        if (!checkRegisterParam(req,ownerInfo.getOwnerId(),AccountType.member.value())) {
+        if (!checkRegisterParam(req, ownerInfo.getOwnerId(), AccountType.member.value())) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
 
@@ -964,9 +1045,8 @@ public class MemberResourceServiceImpl {
             throw UserException.REGISTER_FAIL;
         }
         sendRegisterMessage(member);
-        return "{\"token\":" + "\"" + token + "\""+ "}";
+        return "{\"token\":" + "\"" + token + "\"" + "}";
     }
-
 
     /**
      * 发送注册成功消息
@@ -1054,33 +1134,33 @@ public class MemberResourceServiceImpl {
      * @param req
      * @return
      */
-    private boolean checkRegisterParam(RegisterReq req,Long ownerId,int type) {
+    private boolean checkRegisterParam(RegisterReq req, Long ownerId, int type) {
         //校验用户名和密码
         if (!Optional.ofNullable(req)
                 .filter(request -> request.getUsername() != null && request.getUsername().length() >= 4
                         && request.getUsername().length() <= 15)
-                .filter(request -> request.getPassword() != null && request.getPassword().length() == 32 )
-                .isPresent()){
+                .filter(request -> request.getPassword() != null && request.getPassword().length() == 32)
+                .isPresent()) {
             return false;
         }
         //校验其他注册参数
-        List<String> list = dubboOutAssembleService.getMustRegisterarameters(ownerId,type);
-        if(list != null && list.size() > 0){
+        List<String> list = dubboOutAssembleService.getMustRegisterarameters(ownerId, type);
+        if (list != null && list.size() > 0) {
             for (String name : list) {
                 try {
                     Field field = req.getClass().getField(name);
                     field.setAccessible(true);
-                    if(field.get(req) == null) {
+                    if (field.get(req) == null) {
                         return false;
                     }
-                    if("paymentPassword".equals(name)){
-                        if(((String)field.get(req)).length() != 32){
+                    if ("paymentPassword".equals(name)) {
+                        if (((String) field.get(req)).length() != 32) {
                             return false;
                         }
                     }
                 } catch (NoSuchFieldException e) {
 
-                }catch (IllegalAccessException e) {
+                } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
@@ -1096,7 +1176,7 @@ public class MemberResourceServiceImpl {
      * @param url      url
      * @param username 用户名
      * @param password 密码
-     * @param code 验证码
+     * @param code     验证码
      * @return
      */
     public String memberLogin(RequestContext rc, String agent, String url, String username, String password, String code) {
@@ -1128,10 +1208,10 @@ public class MemberResourceServiceImpl {
         long uid = object.getLongValue("uid");
         //查询会员是否被停用
         Member member = memberService.getMemberById(uid);
-        if (!Optional.ofNullable(member).isPresent()){
+        if (!Optional.ofNullable(member).isPresent()) {
             throw UserException.ILLEGAL_USER;
         }
-        if(member.getStatus() == AccountStatus.disable){
+        if (member.getStatus() == AccountStatus.disable) {
             throw UserException.MEMBER_ACCOUNT_DISABLED;
         }
         //异步回收资金
@@ -1150,11 +1230,11 @@ public class MemberResourceServiceImpl {
      * @param code
      */
     private void verifyCode(RequestContext rc, String code) {
-        if (StringUtils.isEmpty(code)){
+        if (StringUtils.isEmpty(code)) {
             throw UserException.VERIFY_CODE_ERROR;
         }
         String clientId = getClientId(rc);
-        if (StringUtils.isEmpty(clientId)){
+        if (StringUtils.isEmpty(clientId)) {
             throw UserException.VERIFY_CODE_INVALID;
         }
         String verifyCodeAndExpireTime = memberService.getVerifyCode(clientId);
@@ -1164,6 +1244,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 会员登陆
+     *
      * @param rc
      * @param agent
      * @param url
@@ -1201,10 +1282,10 @@ public class MemberResourceServiceImpl {
         long uid = object.getLongValue("uid");
         //查询会员是否被停用
         Member member = memberService.getMemberById(uid);
-        if (!Optional.ofNullable(member).isPresent()){
+        if (!Optional.ofNullable(member).isPresent()) {
             throw UserException.ILLEGAL_USER;
         }
-        if(member.getStatus() == AccountStatus.disable){
+        if (member.getStatus() == AccountStatus.disable) {
             throw UserException.MEMBER_ACCOUNT_DISABLED;
         }
 
@@ -1223,34 +1304,34 @@ public class MemberResourceServiceImpl {
      */
     private void checkVerifyCode(String verifyCodeAndExpireTime, String code) {
         //TODO 待删除
-        if (StringUtils.isNoneEmpty(code) && code.equals("000000")){
+        if (StringUtils.isNoneEmpty(code) && code.equals("000000")) {
             return;
         }
-        if (StringUtils.isEmpty(verifyCodeAndExpireTime)){
+        if (StringUtils.isEmpty(verifyCodeAndExpireTime)) {
             throw UserException.VERIFY_CODE_INVALID;
         }
         String[] split = verifyCodeAndExpireTime.split(UserContants.SPLIT_LINE);
-        if (split == null || split.length != 2){
+        if (split == null || split.length != 2) {
             throw UserException.VERIFY_CODE_INVALID;
         }
         String verifyCode = split[0];
         long time;
         try {
             time = Long.parseLong(split[1]);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("parse verifycode of time error. msg: %s", e.getMessage()));
             throw UserException.VERIFY_CODE_INVALID;
         }
         long currentTimeMillis = System.currentTimeMillis();
-        if (currentTimeMillis > time){
+        if (currentTimeMillis > time) {
             ApiLogger.info(String.format("verify code expire. verifyCode: %s, code: %s, ctime: %d", verifyCodeAndExpireTime, code, currentTimeMillis));
             throw UserException.VERIFY_CODE_INVALID;
         }
-        if (StringUtils.isEmpty(verifyCode)){
+        if (StringUtils.isEmpty(verifyCode)) {
             ApiLogger.info(String.format("verify code empty. verifyCode: %s, code: %s, ctime: %d", verifyCodeAndExpireTime, code, currentTimeMillis));
             throw UserException.VERIFY_CODE_INVALID;
         }
-        if (!verifyCode.toUpperCase().equals(code.toUpperCase())){
+        if (!verifyCode.toUpperCase().equals(code.toUpperCase())) {
             throw UserException.VERIFY_CODE_ERROR;
         }
     }
@@ -1354,7 +1435,7 @@ public class MemberResourceServiceImpl {
             throw UserException.PASSWORD_RESET_FAIL;
         }
         Member member = memberService.getMemberById(rc.getUid());
-        if (!Optional.ofNullable(member).isPresent()){
+        if (!Optional.ofNullable(member).isPresent()) {
             throw UserException.ILLEGAL_MEMBER;
         }
         String body = assembleResetBody(rc, member.getUsername(), oldPassword, newPassword);
@@ -1518,16 +1599,26 @@ public class MemberResourceServiceImpl {
             return JSON.toJSONString(assemblePage(page, count, 0, null));
         }
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, page, count);
+        if (list != null && list.size() > 0) {
+            for (OnLineMember member : list) {
+
+                if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
+                    member.setCity(getAddressByIP(member.getLoginIp(),this.URL));
+                }
+                
+            }
+        }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
     }
 
     /**
      * 在线会员列表导出
+     *
      * @param rc
      * @param condition
      * @return
      */
-    public DownLoadFile onlineListExport(RequestContext rc,String condition
+    public DownLoadFile onlineListExport(RequestContext rc, String condition
                                          /*Long loginStartTime,Long loginEndTime,Long registerStartTime,Long registerEndTime*/) {
         long uid = rc.getUid();
         User user = userService.getUserById(uid);
@@ -1557,7 +1648,6 @@ public class MemberResourceServiceImpl {
         return downLoadFile;
     }
 
-
     /**
      * 组装在线会员列表
      *
@@ -1579,7 +1669,9 @@ public class MemberResourceServiceImpl {
                 onLineMemberVo.setRegisterTime(LocalDateTimeUtil.toAmerica(next.getRegisterTime()));
                 onLineMemberVo.setLoginIp(next.getLoginIp());
                 onLineMemberVo.setRegisterIp(next.getRegisterIp());
+                onLineMemberVo.setCity(next.getCity());
                 members.add(onLineMemberVo);
+
             }
         }
         return members;
@@ -1620,24 +1712,6 @@ public class MemberResourceServiceImpl {
     }
 
     /**
-     * 组装翻页数据
-     *
-     * @param page  页码
-     * @param count 当页条数
-     * @param total 总条数
-     * @param list  详细列表数据
-     * @return
-     */
-    private static PageBean<OnLineMemberVo> assemblePage(int page, int count, long total, Collection<OnLineMemberVo> list) {
-        PageBean<OnLineMemberVo> result = new PageBean<>();
-        result.setPage(page);
-        result.setCount(count);
-        result.setTotal(total);
-        result.setList(list);
-        return result;
-    }
-
-    /**
      * 在线会员数
      *
      * @param rc
@@ -1662,7 +1736,7 @@ public class MemberResourceServiceImpl {
      * @param rc
      * @return
      */
-    public String bankDetail (RequestContext rc){
+    public String bankDetail(RequestContext rc) {
         Member member = memberService.getMemberById(rc.getUid());
         if (member == null) {
             throw UserException.ILLEGAL_USER;
@@ -1674,10 +1748,10 @@ public class MemberResourceServiceImpl {
         result.setTelephone(member.getTelephone());
         result.setBankCode(member.getBankCode());
         result.setBankDetail(member.getBankDeposit());
-        if(member.getBankCardNo() == null || member.getBankCardNo().trim().length() == 0 ||
-                member.getBank() == null || member.getBank().trim().length() == 0){
+        if (member.getBankCardNo() == null || member.getBankCardNo().trim().length() == 0 ||
+                member.getBank() == null || member.getBank().trim().length() == 0) {
             result.setHave(false);
-        }else{
+        } else {
             result.setHave(true);
         }
 
@@ -1690,7 +1764,7 @@ public class MemberResourceServiceImpl {
      * @param rc
      * @return
      */
-    public String memberCenterDetail (RequestContext rc){
+    public String memberCenterDetail(RequestContext rc) {
         Member member = memberService.getMemberById(rc.getUid());
         if (member == null) {
             throw UserException.ILLEGAL_USER;
@@ -1707,60 +1781,61 @@ public class MemberResourceServiceImpl {
         return JSONObject.toJSONString(memberCenterDetailVo);
     }
 
-    private void initMemberCenterDetailVo(MemberCenterDetailVo o,Member member){
-        if(o == null || member == null){
+    private void initMemberCenterDetailVo(MemberCenterDetailVo o, Member member) {
+        if (o == null || member == null) {
             return;
         }
-        if(StringUtils.isNotEmpty(member.getBankCardNo())){
+        if (StringUtils.isNotEmpty(member.getBankCardNo())) {
             o.setBankCardNo(member.getBankCardNo());
-        }else{
+        } else {
             o.setBankCardNo("尚未设置提款银行卡");
         }
-        if(StringUtils.isNotEmpty(member.getWeixin())){
+        if (StringUtils.isNotEmpty(member.getWeixin())) {
             o.setWeixin(member.getWeixin());
-        }else{
+        } else {
             o.setWeixin("无");
         }
-        if(StringUtils.isNotEmpty(member.getQq())){
+        if (StringUtils.isNotEmpty(member.getQq())) {
             o.setQq(member.getQq());
-        }else{
+        } else {
             o.setQq("无");
         }
-        if(StringUtils.isNotEmpty(member.getUsername())){
+        if (StringUtils.isNotEmpty(member.getUsername())) {
             o.setUsername(member.getUsername());
-        }else{
+        } else {
             o.setUsername("无");
         }
-        if(StringUtils.isNotEmpty(member.getRealname())){
+        if (StringUtils.isNotEmpty(member.getRealname())) {
             o.setRealname(member.getRealname());
-        }else{
+        } else {
             o.setRealname("无");
         }
-        if(StringUtils.isNotEmpty(member.getEmail())){
+        if (StringUtils.isNotEmpty(member.getEmail())) {
             o.setEmail(member.getEmail());
-        }else{
+        } else {
             o.setEmail("无");
         }
-        if(StringUtils.isNotEmpty(member.getBank())){
+        if (StringUtils.isNotEmpty(member.getBank())) {
             o.setBank(member.getBank());
         }
-        if(StringUtils.isNotEmpty(member.getBankCode())){
+        if (StringUtils.isNotEmpty(member.getBankCode())) {
             o.setBankCode(member.getBankCode());
         }
-        if(StringUtils.isNotEmpty(member.getTelephone())){
+        if (StringUtils.isNotEmpty(member.getTelephone())) {
             o.setTelephone(member.getTelephone());
-        }else{
+        } else {
             o.setTelephone("无");
         }
-        if(StringUtils.isNotEmpty(member.getBankDeposit())){
+        if (StringUtils.isNotEmpty(member.getBankDeposit())) {
             o.setBankDeposit(member.getBankDeposit());
-        }else{
+        } else {
             o.setBankDeposit("无");
         }
     }
 
     /**
      * 获取会员的余额和未读消息
+     *
      * @param rc
      * @return
      */
@@ -1769,7 +1844,7 @@ public class MemberResourceServiceImpl {
         //同步回收
         thriftOutAssembleService.backMoney(rc.getUid(), 1);
         String balance = thriftOutAssembleService.getMemberBalance(rc.getUid());
-        return "{\"message\":"+message+",\"balance\":\""+balance+"\"}";
+        return "{\"message\":" + message + ",\"balance\":\"" + balance + "\"}";
     }
 
     /**
@@ -1780,13 +1855,13 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String saveCode(RequestContext rc, String code) {
-        String clientId  = rc.getRequest().getSession().getId();
-        if (StringUtils.isEmpty(clientId)){
+        String clientId = rc.getRequest().getSession().getId();
+        if (StringUtils.isEmpty(clientId)) {
             clientId = UUIDUtil.getUUID();
         }
         ApiLogger.info(String.format("refresh code. clientId: %s, code: %s", clientId, code));
         boolean result = memberService.refreshCode(clientId, code);
-        if (!result){
+        if (!result) {
             throw UserException.GET_VERIFY_CODE_ERROR;
         }
         return clientId;
@@ -1801,7 +1876,7 @@ public class MemberResourceServiceImpl {
     private String getClientId(RequestContext rc) {
         try {
             return rc.getRequest().getHeader(UserContants.X_VERIFY_CODE);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("get verify code from header error.", e);
         }
         return null;
@@ -1815,7 +1890,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String fundProfileRefresh(RequestContext rc, Long memberId) {
-        if (!Optional.ofNullable(memberId).filter(value -> value > 0).isPresent()){
+        if (!Optional.ofNullable(memberId).filter(value -> value > 0).isPresent()) {
             throw UserException.ILLEGAL_MEMBER;
         }
         /**
@@ -1843,8 +1918,10 @@ public class MemberResourceServiceImpl {
         fundProfile.setInfo(memberFundInfoObj);
         return JSON.toJSONString(fundProfile);
     }
+
     /**
-     *获取会员的交易记录
+     * 获取会员的交易记录
+     *
      * @param rc
      * @param memberId
      * @return
@@ -1853,7 +1930,7 @@ public class MemberResourceServiceImpl {
         ApiLogger.info("memberId:" + memberId);
         MemberConditionVo mv = memberMongoService.get(memberId);
         MemberConditionWebVo result = new MemberConditionWebVo();
-        if(mv == null){
+        if (mv == null) {
             result.setMemberId(memberId);
             result.setDepositCount(0);
             result.setDepositMoney("0");
@@ -1864,7 +1941,7 @@ public class MemberResourceServiceImpl {
             result.setWithdrawMoney("0");
             result.setLastDepositMoney("0");
             result.setMaxWithdrawMoney("0");
-        }else{
+        } else {
             result.setDepositCount(mv.getDepositCount() == null ? 0 : mv.getDepositCount());
             result.setDepositMoney(mv.getDepositMoney() == null ? "" : NumberUtil.fenToYuan(mv.getDepositMoney()).toString());
             result.setLastDepositMoney(mv.getLastDepositMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getLastDepositMoney()).toString());
@@ -1876,11 +1953,11 @@ public class MemberResourceServiceImpl {
             result.setMaxWithdrawMoney(mv.getMaxWithdrawMoney() == null ? "0" : NumberUtil.fenToYuan(mv.getMaxWithdrawMoney()).toString());
         }
         return JSON.toJSONString(result);
-       }
-
+    }
 
     /**
      * 客端添加银行卡信息
+     *
      * @param rc
      * @param realname
      * @param telephone
@@ -1890,12 +1967,12 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String addBankInfo(RequestContext rc, String realname, String telephone, String bankCode,
-                              String bank, String bankCardNo,String bankAddress) {
+                              String bank, String bankCardNo, String bankAddress) {
         Member member = memberService.getMemberById(rc.getUid());
         if (member == null) {
             throw UserException.ILLEGAL_USER;
         }
-        if(!checkBankInfo(realname,telephone,bankCode,bank,bankCardNo,bankAddress)){
+        if (!checkBankInfo(realname, telephone, bankCode, bank, bankCardNo, bankAddress)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
 
@@ -1907,6 +1984,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 组装会员银行卡信息
+     *
      * @param member
      * @param realname
      * @param telephone
@@ -1915,11 +1993,11 @@ public class MemberResourceServiceImpl {
      * @param bankCardNo
      */
     private void assembleBankInfo(Member member, String realname, String telephone,
-                                  String bankCode, String bank, String bankCardNo,String bankAddress) {
-        if(member == null){
+                                  String bankCode, String bank, String bankCardNo, String bankAddress) {
+        if (member == null) {
             return;
         }
-        if(!(member.getRealname() != null && member.getRealname().trim().length()>0)){
+        if (!(member.getRealname() != null && member.getRealname().trim().length() > 0)) {
             member.setRealname(realname);
         }
         member.setTelephone(telephone);
@@ -1931,6 +2009,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 校验添加会员银行卡信息参数
+     *
      * @param realname
      * @param telephone
      * @param bankCode
@@ -1938,17 +2017,17 @@ public class MemberResourceServiceImpl {
      * @param bankCardNo
      * @return
      */
-    private boolean checkBankInfo(String realname, String telephone, String bankCode, String bank, String bankCardNo,String bankAddress) {
-        if(realname.trim().length() < 1){
+    private boolean checkBankInfo(String realname, String telephone, String bankCode, String bank, String bankCardNo, String bankAddress) {
+        if (realname.trim().length() < 1) {
             return false;
         }
-        if(telephone.trim().length() != 11){
+        if (telephone.trim().length() != 11) {
             return false;
         }
-        if(bankCardNo.trim().length() < 15){
+        if (bankCardNo.trim().length() < 15) {
             return false;
         }
-        if(bankAddress.trim().length() < 1){
+        if (bankAddress.trim().length() < 1) {
             return false;
         }
         return true;
@@ -1968,7 +2047,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
         long uid = dubboOutAssembleService.getUid(ownerInfo.getOwnerId(), username);
-        if (uid > 0){
+        if (uid > 0) {
             throw UserException.USERNAME_EXIST;
         }
         return UserContants.EMPTY_STRING;
@@ -2012,7 +2091,7 @@ public class MemberResourceServiceImpl {
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, null, null);
         ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
-        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
+        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()) {
             return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, 0L, null));
         }
         return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, total, memberConditionVos));
@@ -2020,6 +2099,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 获取满足分层条件
+     *
      * @param rc
      * @param condition
      * @return
@@ -2040,28 +2120,10 @@ public class MemberResourceServiceImpl {
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.queryByPage(memberCondition, null, null);
         ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
-        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
+        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()) {
             return JSON.toJSONString(assemblePageBean(null, null, null, null));
         }
         return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, null, memberConditionVos));
-    }
-
-    /**
-     * 组装翻页数据
-     *
-     * @param page  页码
-     * @param count 当页条数
-     * @param total 总条数
-     * @param list  详细列表数据
-     * @return
-     */
-    private static PageBean<MemberConditionVo> assemblePageBeanMemberCondions(Integer page, Integer count, Long total, Collection<MemberConditionVo> list) {
-        PageBean<MemberConditionVo> result = new PageBean<>();
-        result.setPage(page);
-        result.setCount(count);
-        result.setTotal(total);
-        result.setList(list);
-        return result;
     }
 
     /**
@@ -2072,7 +2134,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberListSearchByAccounts(RequestContext rc, String accounts) {
-        if (!checkParams(accounts)){
+        if (!checkParams(accounts)) {
             return JSON.toJSONString(assemblePageBean(null, null, null, null));
         }
         User operaUser = userService.get(rc.getUid());
@@ -2083,7 +2145,7 @@ public class MemberResourceServiceImpl {
         //获取mongo中查询到的会员列表
         List<MemberConditionVo> memberConditionVos = memberMongoService.batchQuery(sets, operaUser.getOwnerId());
         ApiLogger.info(String.format("get member conditon from mongo. members: %s", JSON.toJSONString(memberConditionVos)));
-        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()){
+        if (!Optional.ofNullable(memberConditionVos).filter(size -> size.size() > 0).isPresent()) {
             return JSON.toJSONString(assemblePageBean(null, null, null, null));
         }
         return JSON.toJSONString(assemblePageBeanMemberCondions(null, null, null, memberConditionVos));
@@ -2091,21 +2153,58 @@ public class MemberResourceServiceImpl {
 
     /**
      * 参数检查
+     *
      * @param accounts
      * @return
      */
     private boolean checkParams(String accounts) {
-        if (StringUtils.isNotEmpty(accounts)){
+        if (StringUtils.isNotEmpty(accounts)) {
             try {
                 String[] split = accounts.split(",");
-                if (split.length == 0){
+                if (split.length == 0) {
                     return false;
                 }
                 return true;
-            }catch (Exception e){
+            } catch (Exception e) {
                 ApiLogger.error(String.format("spilt accounts error. accounts: %s", accounts), e);
             }
         }
         return false;
     }
+
+    /**
+     * 根据ip获取城市名
+     * @param ip
+     * @param URL
+     * @return
+     */
+    public String getAddressByIP(String ip, String URL) {
+        try {
+            java.net.URL url = new URL(URL + ip);
+            URLConnection conn = url.openConnection();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "GBK"));
+            String line = null;
+            StringBuffer result = new StringBuffer();
+            while ((line = reader.readLine()) != null) {
+                result.append(line);
+            }
+            reader.close();
+            JSONObject object = JSONObject.parseObject(result.toString());
+            if (object.size() > 0) {
+                if(object.getString("city") != null && !object.getString("city").equals("")){
+                    return object.getString("city");
+                }
+                if(object.getString("province") != null && !object.getString("province").equals("")){
+                    return object.getString("province");
+                }
+                if(object.getString("country") != null && !object.getString("country").equals("")){
+                    return object.getString("country");
+                }
+            }
+        } catch (IOException e) {
+            return "读取失败";
+        }
+        return "未知城市";
+    }
+
 }

@@ -96,6 +96,7 @@ public class AgentAddSuccessConsumer implements Consumer {
         object.put("feeScheme", config.getFeeId());
         object.put("discount", config.getDiscount());
         object.put("cost", config.getCost());
+        object.put("levelId",Long.valueOf(config.getTemp1()));
         return object.toJSONString();
     }
 

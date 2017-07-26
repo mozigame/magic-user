@@ -14,6 +14,7 @@ public class OnLineMemberVo {
     private String registerIp;//注册IP
     private String loginTime;//登陆时间
     private String loginIp;//登陆ip
+    private String city;
 
     public Long getMemberId() {
         return memberId;
@@ -61,5 +62,13 @@ public class OnLineMemberVo {
 
     public void setLoginIp(String loginIp) {
         this.loginIp = loginIp;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

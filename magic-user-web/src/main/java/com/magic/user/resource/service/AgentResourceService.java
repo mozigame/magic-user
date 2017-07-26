@@ -50,7 +50,7 @@ public interface AgentResourceService {
      */
     String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
                String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
-               Integer adminCost, Integer feeScheme, String[] domain, Integer discount, Integer cost);
+               Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost,Long userLevel);
 
     /**
      * @param id
@@ -180,7 +180,7 @@ public interface AgentResourceService {
      */
     String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone,
                        String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
-                       Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost);
+                       Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost,Long userLevel);
 
     /**
      * @param rc
