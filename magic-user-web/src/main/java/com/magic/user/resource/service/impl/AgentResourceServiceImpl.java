@@ -354,7 +354,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     @Override
     public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
                       String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
-                      Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost) {
+                      Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost,Long userLevel) {
         String generalizeCode = UUIDUtil.getCode();
         RegisterReq req = assembleRegister(account, password);
         if (!checkRegisterAgentParam(req)) {
@@ -398,7 +398,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //mq 处理 4、添加代理配置
-        AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost);
+        AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost,userLevel);
         //mq 处理 5、添加业主股东代理id映射信息
         OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
         //mq 处理 6、将代理基础信息放入mongo
@@ -509,7 +509,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 组装添加的代理配置对象
      */
-    private AgentConfig assembleAgentConfig(long ownerId, Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain, Integer discount, Integer cost) {
+    private AgentConfig assembleAgentConfig(long ownerId, Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain, Integer discount, Integer cost,Long userLevel) {
         AgentConfig agentConfig = new AgentConfig();
         agentConfig.setOwnerId(ownerId);
         agentConfig.setAgentId(agentId);
@@ -519,6 +519,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         agentConfig.setDomain(domain);
         agentConfig.setDiscount(discount);
         agentConfig.setCost(cost);
+        agentConfig.setTemp1(String.valueOf(userLevel));
         return agentConfig;
     }
 
@@ -646,7 +647,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (setting.getFeeSchemeName() == null) setting.setFeeSchemeName("");
         if (setting.getReturnScheme() == null) setting.setReturnScheme(0);
         if (setting.getReturnSchemeName() == null) setting.setReturnSchemeName("");
-
+        if (setting.getUserLevelName()==null) setting.setUserLevelName("");
         return setting;
     }
 
@@ -1168,7 +1169,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost) {
+    public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost,Long userLevel) {
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
@@ -1237,7 +1238,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 throw UserException.REGISTER_FAIL;
             }
             //mq 处理 4、添加代理配置
-            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost);
+            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost,userLevel);
             //mq 处理 5、添加业主股东代理id映射信息
             OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
             //mq 处理 6、将代理基础信息放入mongo

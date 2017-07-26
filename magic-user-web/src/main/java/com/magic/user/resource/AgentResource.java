@@ -124,10 +124,11 @@ public class AgentResource {
             @RequestParam(name = "feeScheme") Integer feeScheme,
             @RequestParam(name = "domain", required = false) String domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
-            @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
+            @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost,
+            @RequestParam(name = "userLevel",required = false,defaultValue = "-1")Long userLevel  //新增用户层级id
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
+        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost,userLevel);
     }
 
     /**
@@ -407,11 +408,12 @@ public class AgentResource {
             @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme,
             @RequestParam(name = "domain", required = false) String domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
-            @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost
+            @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost,
+            @RequestParam(name = "userLevel",required = false,defaultValue = "-1")Long userLevel  //新增用户层级id
 
     ) {
         //TODO 所有涉及审核的信息增加开户行信息、银行名称
-        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost);
+        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost,userLevel);
     }
 
 
