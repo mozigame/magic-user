@@ -425,6 +425,30 @@
         </if>
 
     </select>
+    <!-- 按页取代理列表 -->
+    <select id="getAgentListByPage" resultMap="baseResultMap">
+      SELECT
+            id,
+            user_id,
+            realname,
+            username,
+            register_time,
+            generalize_code,
+            status,
+            currency_type,
+            bank_card_no,
+            bank,
+            bank_deposit,
+            owner_id,
+            owner_name,
+            type
+            from t_user_info
+        WHERE type = 3
+        order by id
+        <if test="offset != null and offset > -1">
+            limit #{offset},#{count}
+        </if>
+    </select>
     <!--###########   代理操作   #############-->
 
     <!--##############   子账号   #################-->

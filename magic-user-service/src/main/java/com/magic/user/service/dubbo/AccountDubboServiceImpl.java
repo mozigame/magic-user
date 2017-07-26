@@ -172,6 +172,10 @@ public class AccountDubboServiceImpl implements AccountDubboService {
     public List<User> periodAgentList(Long startTime, Long endTime, Long ownerId) {
         return userService.periodAgentList(startTime, endTime, ownerId);
     }
+    
+    public List<User> getAgentListByPage(Integer offset, Integer count){
+        return userService.getAgentListByPage(offset, count);
+    }
 
     /**
      * {@inheritDoc}

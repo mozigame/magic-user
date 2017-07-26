@@ -22,7 +22,7 @@ public class AgentConfig {
 
     private String domain;  //域名
 
-    private String temp1;
+    private String temp1;  //存放用户层级id
 
     private String temp2;
 

@@ -513,12 +513,16 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberDetails(RequestContext rc, long id) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
         Member member = memberService.getMemberById(id);
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
         // 权限检查
-        authOfSearchResources(member.getMemberId(), member.getOwnerId(), member);
+            authOfSearchResources(user.getUserId(), user.getOwnerId(), member);
 
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
@@ -1643,9 +1647,10 @@ public class MemberResourceServiceImpl {
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, page, count);
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
-                if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
-                    member.setCity(getAddressByIP(this.URL, member.getLoginIp()));
+                if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
+                    member.setCity(getAddressByIP(member.getLoginIp(),this.URL));
                 }
+                
             }
         }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
@@ -1709,7 +1714,9 @@ public class MemberResourceServiceImpl {
                 onLineMemberVo.setRegisterTime(LocalDateTimeUtil.toAmerica(next.getRegisterTime()));
                 onLineMemberVo.setLoginIp(next.getLoginIp());
                 onLineMemberVo.setRegisterIp(next.getRegisterIp());
+                onLineMemberVo.setCity(next.getCity());
                 members.add(onLineMemberVo);
+
             }
         }
         return members;
@@ -2230,7 +2237,15 @@ public class MemberResourceServiceImpl {
             reader.close();
             JSONObject object = JSONObject.parseObject(result.toString());
             if (object.size() > 0) {
-                return object.getString("city");
+                if(object.getString("city") != null && !object.getString("city").equals("")){
+                    return object.getString("city");
+                }
+                if(object.getString("province") != null && !object.getString("province").equals("")){
+                    return object.getString("province");
+                }
+                if(object.getString("country") != null && !object.getString("country").equals("")){
+                    return object.getString("country");
+                }
             }
         } catch (IOException e) {
             return "读取失败";

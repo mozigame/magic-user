@@ -77,6 +77,8 @@ public interface AccountDubboService {
      * @return
      */
     List<User> periodAgentList(Long startTime, Long endTime, Long ownerId);
+    
+    public List<User> getAgentListByPage(Integer offset, Integer count);
 
     /**
      * 验证会员登陆和启用情况

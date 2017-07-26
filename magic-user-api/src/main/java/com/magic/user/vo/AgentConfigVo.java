@@ -14,10 +14,17 @@ public class AgentConfigVo {
     private String adminCostName;   //行政成本名称
     private Integer feeScheme;  //手续费方案编号
     private String feeSchemeName;   //手续费方案名称
-
     private Integer discount;   //优惠扣除
-
     private Integer cost;   //返水成本
+    private String userLevelName;//层级名称
+
+    public String getUserLevelName() {
+        return userLevelName;
+    }
+
+    public void setUserLevelName(String userLevelName) {
+        this.userLevelName = userLevelName;
+    }
 
     public Long getAgentId() {
         return agentId;

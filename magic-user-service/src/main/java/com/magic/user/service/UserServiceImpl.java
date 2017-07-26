@@ -117,6 +117,11 @@ public class UserServiceImpl implements UserService {
     public List<User> periodAgentList(Long startTime, Long endTime, Long ownerId) {
         return agentDbService.find("periodAgentList", new String[]{"startTime", "endTime", "ownerId"}, new Object[]{startTime, endTime, ownerId});
     }
+    
+    @Override
+    public List<User> getAgentListByPage(Integer offset, Integer count) {
+        return agentDbService.find("getAgentListByPage", new String[]{"offset", "count"}, new Object[]{offset, count});
+    }
 
     @Override
     public long getUid(String account, int type) {

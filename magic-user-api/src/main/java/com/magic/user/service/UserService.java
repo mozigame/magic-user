@@ -144,6 +144,8 @@ public interface UserService {
      * @return
      */
     List<User> periodAgentList(Long startTime, Long endTime, Long ownerId);
+    
+    List<User> getAgentListByPage(Integer offset, Integer count);
 
     /**
      * 获取股东或代理的编号
