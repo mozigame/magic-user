@@ -60,6 +60,8 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
     public List<MemberConditionVo> queryByPage(MemberCondition memberCondition, Integer page, Integer count) {
         if (memberCondition != null) {
             Query query = assembleQuery(memberCondition);
+            ApiLogger.debug("memberCondition = " + memberCondition
+             + ", query = " + query);
             if (page != null && count != null) {
                 query.skip((page - 1) * count);
                 query.limit(count);
