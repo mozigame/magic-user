@@ -3,6 +3,10 @@ package com.magic.user.bean;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.magic.api.commons.ApiLogger;
+import org.apache.commons.collections.CollectionUtils;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * MemberCondition
@@ -29,6 +33,12 @@ public class MemberCondition {
      * 账号
      */
     private Account account;
+
+    /**
+     * 账号列表
+     */
+    private List<Account> accountList;
+
     /**
      * 账号状态
      */
@@ -37,6 +47,11 @@ public class MemberCondition {
      * 层级
      */
     private Integer level;
+
+    /**
+     * 多层级
+     */
+    private List<Integer> levelList;
 
     /**
      * 注册时间范围
@@ -166,12 +181,44 @@ public class MemberCondition {
      * @param condition
      * @return
      */
-    public static MemberCondition valueOf(String condition){
+    public static MemberCondition valueOf(String condition) {
         try {
-            return JSON.parseObject(condition, MemberCondition.class);
-        }catch (JSONException e){
+            MemberCondition memberCondition = JSON.parseObject(condition, MemberCondition.class);
+            //希望后续判断采用list
+            if (CollectionUtils.isEmpty(memberCondition.getAccountList())) {
+                if (memberCondition.getAccount() != null) {
+                    List<Account> accountList = new LinkedList<>();
+                    accountList.add(memberCondition.getAccount());
+                    memberCondition.setAccountList(accountList);
+                }
+            }
+            if (CollectionUtils.isEmpty(memberCondition.getLevelList())) {
+                if (memberCondition.getLevel() != null) {
+                    List<Integer> levelList = new LinkedList<>();
+                    levelList.add(memberCondition.getLevel());
+                    memberCondition.setLevelList(levelList);
+                }
+            }
+
+        } catch (JSONException e) {
             ApiLogger.error(String.format("parse conditon to membercondition object error. condition: %s, msg: %s", condition, e.getMessage()));
         }
         return EMPTY_MEMBER_CONDITION;
+    }
+
+    public List<Account> getAccountList() {
+        return accountList;
+    }
+
+    public void setAccountList(List<Account> accountList) {
+        this.accountList = accountList;
+    }
+
+    public List<Integer> getLevelList() {
+        return levelList;
+    }
+
+    public void setLevelList(List<Integer> levelList) {
+        this.levelList = levelList;
     }
 }

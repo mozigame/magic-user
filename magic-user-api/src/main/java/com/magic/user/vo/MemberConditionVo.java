@@ -20,15 +20,15 @@ public class MemberConditionVo {
     private Long updateTime;    //修改时间
     private Integer status; //状态
     private Long level;  //层级
-    private Integer depositCount;//存款次数
-    private Integer withdrawCount;//取款次数
-    private Long depositMoney;//充值总额
-    private Long withdrawMoney;   //提款总额
+    private Integer depositCount;//存款次数 1
+    private Integer withdrawCount;//取款次数 1
+    private Long depositMoney;//充值总额 1
+    private Long withdrawMoney;   //提款总额 1
     private Integer currencyType;   //币种
     private Long lastDepositMoney;   //最近存款
     private Long lastWithdrawMoney;  //最近提款
-    private Integer maxDepositMoney;   //最大存款额
-    private Integer maxWithdrawMoney;   //最大取款额
+    private Long maxDepositMoney;   //最大存款额 1
+    private Long maxWithdrawMoney;   //最大取款额
 
     public String getId() {
         return id;
@@ -174,19 +174,19 @@ public class MemberConditionVo {
         this.lastWithdrawMoney = lastWithdrawMoney;
     }
 
-    public Integer getMaxDepositMoney() {
+    public Long getMaxDepositMoney() {
         return maxDepositMoney;
     }
 
-    public void setMaxDepositMoney(Integer maxDepositMoney) {
+    public void setMaxDepositMoney(Long maxDepositMoney) {
         this.maxDepositMoney = maxDepositMoney;
     }
 
-    public Integer getMaxWithdrawMoney() {
+    public Long getMaxWithdrawMoney() {
         return maxWithdrawMoney;
     }
 
-    public void setMaxWithdrawMoney(Integer maxWithdrawMoney) {
+    public void setMaxWithdrawMoney(Long maxWithdrawMoney) {
         this.maxWithdrawMoney = maxWithdrawMoney;
     }
 }

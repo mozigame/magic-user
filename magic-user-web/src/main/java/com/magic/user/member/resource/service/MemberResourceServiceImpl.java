@@ -69,6 +69,7 @@ import java.util.stream.Collectors;
  */
 @Service("memberServiceResource")
 public class MemberResourceServiceImpl {
+
     //根据ip获取城市的接口地址
     private static final String URL = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
     @Resource
@@ -184,6 +185,9 @@ public class MemberResourceServiceImpl {
         }
         memberCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkCondition(memberCondition)) {
+            if (ApiLogger.isDebugEnabled()) {
+                ApiLogger.debug("checkCondition is false::condition = " + condition);
+            }
             return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
         }
         if (operaUser.getType() == AccountType.agent) {
@@ -248,6 +252,17 @@ public class MemberResourceServiceImpl {
                 memberListVo.setReturnWaterName(returnWater.getReturnWaterName());
                 memberListVo.setLevel(returnWater.getLevel());
             }
+            //存款次数
+            memberListVo.setDepositCount(vo.getDepositCount());
+            //存款总额
+            memberListVo.setDepositMoney(vo.getDepositMoney());
+            //最大一次存款数额
+            memberListVo.setMaxDepositMoney(vo.getMaxDepositMoney());
+            //取款次数
+            memberListVo.setWithdrawCount(vo.getWithdrawCount());
+            //取款总额
+            memberListVo.setWithdrawMoney(vo.getWithdrawMoney());
+
             memberListVos.add(memberListVo);
         }
         return memberListVos;
@@ -370,11 +385,14 @@ public class MemberResourceServiceImpl {
             return false;
         }
         Account account = condition.getAccount();
-        if (account != null && StringUtils.isNoneEmpty(account.getName())) {
-            Integer type = account.getType();
-            if (type == null || AccountType.parse(type) == null && (type != AccountType.agent.value() || type != AccountType.member.value())) {
-                return false;
-            }
+        List<Account> accountList = condition.getAccountList();
+        //如果有accountList，则以accountList为准（兼容）
+        if (accountList == null) {
+            accountList = new LinkedList<>();
+            accountList.add(account);
+        }
+        if (checkAccountList(accountList)) {
+            return false;
         }
         RegionNumber region = condition.getDepositNumber();
         if (region != null && region.getMin() != null && region.getMax() != null && region.getMin() > region.getMax()) {
@@ -393,6 +411,34 @@ public class MemberResourceServiceImpl {
             return false;
         }
         return true;
+    }
+
+    private boolean checkAccountList(List<Account> accountList) {
+        //有一个数据不正确就失败
+        for (Account account : accountList) {
+            if (!checkAccount(account)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 检测account查询条件是否合法
+     *
+     * @param account
+     * @return
+     */
+    private boolean checkAccount(Account account) {
+        if (account != null) {
+            if (StringUtils.isNotBlank(account.getName()) || account.getId() > 0) {
+                Integer type = account.getType();
+                if (type == null || AccountType.parse(type) == null && (type != AccountType.agent.value() || type != AccountType.member.value())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -1597,8 +1643,8 @@ public class MemberResourceServiceImpl {
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, page, count);
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
-                if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
-                    member.setCity(getAddressByIP(this.URL,member.getLoginIp()));
+                if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
+                    member.setCity(getAddressByIP(this.URL, member.getLoginIp()));
                 }
             }
         }
@@ -2166,6 +2212,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 根据ip获取城市名
+     *
      * @param ip
      * @param URL
      * @return

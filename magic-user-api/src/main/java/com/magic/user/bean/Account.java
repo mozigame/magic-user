@@ -17,6 +17,11 @@ public class Account {
      */
     private String name;
 
+    /**
+     * 账号id
+    */
+    private Long id;
+
     public Integer getType() {
         return type;
     }
@@ -31,5 +36,13 @@ public class Account {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

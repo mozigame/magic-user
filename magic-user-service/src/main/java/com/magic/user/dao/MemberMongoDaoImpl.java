@@ -8,6 +8,7 @@ import com.magic.user.bean.MemberCondition;
 import com.magic.user.enums.AccountType;
 import com.magic.user.vo.AgentDepositMember;
 import com.magic.user.vo.MemberConditionVo;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -91,73 +92,150 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
      */
     public Query assembleQuery(MemberCondition memberCondition) {
         Query query = new Query();
+        formatQuery(memberCondition, query);
+        return query;
+    }
+
+    private void formatQuery(MemberCondition memberCondition, Query query) {
         if (memberCondition != null) {
             query.addCriteria(new Criteria("ownerId").is(memberCondition.getOwnerId()));
-            if(memberCondition.getAgentId() != null){
+            if (memberCondition.getAgentId() != null) {
                 query.addCriteria(new Criteria("agentId").is(memberCondition.getAgentId()));
             }
-            if (memberCondition.getRegister() != null) {
-                Long start = memberCondition.getRegister().getStart();
-                Long end = memberCondition.getRegister().getEnd();
-                if (start !=null && end != null) {
-                    query.addCriteria(new Criteria("registerTime").gte(start).lte(end));
-                } else if (start != null) {
-                    query.addCriteria(new Criteria("registerTime").gte(start));
-                } else if (end != null) {
-                    query.addCriteria(new Criteria("registerTime").lte(end));
-                }
-            }
-            if (memberCondition.getDepositMoney() != null) {
-                Long min = memberCondition.getDepositMoney().getMin();
-                Long max = memberCondition.getDepositMoney().getMax();
-                if (min != null && max != null) {
-                    query.addCriteria(new Criteria("depositMoney").gte(min).lte(max));
-                } else if (min != null) {
-                    query.addCriteria(new Criteria("depositMoney").gte(min));
-                } else if (max != null) {
-                    query.addCriteria(new Criteria("depositMoney").lte(max));
-                }
-            }
-            if (memberCondition.getWithdrawMoney() != null) {
-                Long min = memberCondition.getWithdrawMoney().getMin();
-                Long max = memberCondition.getWithdrawMoney().getMax();
-                if (min != null && max != null) {
-                    query.addCriteria(new Criteria("withdrawMoney").gte(min).lte(max));
-                }else if (min !=null) {
-                    query.addCriteria(new Criteria("withdrawMoney").gte(min));
-                } else if (max != null) {
-                    query.addCriteria(new Criteria("withdrawMoney").lte(max));
-                }
-            }
-            if (memberCondition.getStatus() != null ) {
+            disposeRegisterTime(memberCondition, query);
+            disposeDepositMoney(memberCondition, query);
+            disposeWithdrawMoney(memberCondition, query);
+
+            if (memberCondition.getStatus() != null) {
                 query.addCriteria(new Criteria("status").is(memberCondition.getStatus()));
             }
+            disposeLevel(memberCondition, query);
+            disposeDepositCount(memberCondition, query);
+            disposeWithdrawCount(memberCondition, query);
+
+            disposeAccount(memberCondition, query);
+        }
+    }
+
+    private void disposeWithdrawCount(MemberCondition memberCondition, Query query) {
+        if (memberCondition.getWithdrawNumber() != null) {
+            Long min = memberCondition.getWithdrawNumber().getMin();
+            Long max = memberCondition.getWithdrawNumber().getMax();
+            if (min != null && max != null) {
+                query.addCriteria(new Criteria("withdrawCount").gte(min).lte(max));
+            } else if (min != null) {
+                query.addCriteria(new Criteria("withdrawCount").gte(min));
+            } else if (max != null) {
+                query.addCriteria(new Criteria("withdrawCount").lte(max));
+            }
+        }
+    }
+
+    private void disposeDepositCount(MemberCondition memberCondition, Query query) {
+        if (memberCondition.getDepositNumber() != null) {
+            Long min = memberCondition.getDepositNumber().getMin();
+            Long max = memberCondition.getDepositNumber().getMax();
+            if (min != null && max != null) {
+                query.addCriteria(new Criteria("depositCount").gte(min).lte(max));
+            } else if (min != null) {
+                query.addCriteria(new Criteria("depositCount").gte(min));
+            } else if (max != null) {
+                query.addCriteria(new Criteria("depositCount").lte(max));
+            }
+        }
+    }
+
+    private void disposeLevel(MemberCondition memberCondition, Query query) {
+        //优先list
+        if (CollectionUtils.isNotEmpty(memberCondition.getLevelList())) {
+            query.addCriteria(new Criteria("level").in(memberCondition.getLevelList()));
+        } else {
             if (memberCondition.getLevel() != null) {
                 query.addCriteria(new Criteria("level").is(memberCondition.getLevel()));
             }
+        }
+    }
 
-            if (memberCondition.getDepositNumber() != null) {
-                Long min = memberCondition.getDepositNumber().getMin();
-                Long max = memberCondition.getDepositNumber().getMax();
-                if (min != null && max != null) {
-                    query.addCriteria(new Criteria("depositCount").gte(min).lte(max));
-                } else if (min != null) {
-                    query.addCriteria(new Criteria("depositCount").gte(min));
-                } else if (max != null) {
-                    query.addCriteria(new Criteria("depositCount").lte(max));
+    private void disposeWithdrawMoney(MemberCondition memberCondition, Query query) {
+        if (memberCondition.getWithdrawMoney() != null) {
+            Long min = memberCondition.getWithdrawMoney().getMin();
+            Long max = memberCondition.getWithdrawMoney().getMax();
+            if (min != null && max != null) {
+                query.addCriteria(new Criteria("withdrawMoney").gte(min).lte(max));
+            } else if (min != null) {
+                query.addCriteria(new Criteria("withdrawMoney").gte(min));
+            } else if (max != null) {
+                query.addCriteria(new Criteria("withdrawMoney").lte(max));
+            }
+        }
+    }
+
+    private void disposeDepositMoney(MemberCondition memberCondition, Query query) {
+        if (memberCondition.getDepositMoney() != null) {
+            Long min = memberCondition.getDepositMoney().getMin();
+            Long max = memberCondition.getDepositMoney().getMax();
+            if (min != null && max != null) {
+                query.addCriteria(new Criteria("depositMoney").gte(min).lte(max));
+            } else if (min != null) {
+                query.addCriteria(new Criteria("depositMoney").gte(min));
+            } else if (max != null) {
+                query.addCriteria(new Criteria("depositMoney").lte(max));
+            }
+        }
+    }
+
+    private void disposeRegisterTime(MemberCondition memberCondition, Query query) {
+        if (memberCondition.getRegister() != null) {
+            Long start = memberCondition.getRegister().getStart();
+            Long end = memberCondition.getRegister().getEnd();
+            if (start != null && end != null) {
+                query.addCriteria(new Criteria("registerTime").gte(start).lte(end));
+            } else if (start != null) {
+                query.addCriteria(new Criteria("registerTime").gte(start));
+            } else if (end != null) {
+                query.addCriteria(new Criteria("registerTime").lte(end));
+            }
+        }
+    }
+
+    private void disposeAccount(MemberCondition memberCondition, Query query) {
+        //优先list
+        if (CollectionUtils.isNotEmpty(memberCondition.getAccountList())) {
+            List<String> agentNameList = new LinkedList<>();
+            List<String> memberNameList = new LinkedList<>();
+            List<Number> memberIdList = new LinkedList<>();
+            List<Number> agentIdList = new LinkedList<>();
+            for (Account account : memberCondition.getAccountList()) {
+                if (account != null) {
+                    if (StringUtils.isNotBlank(account.getName())) {
+                        if (AccountType.parse(account.getType()) == AccountType.agent) {
+                            agentNameList.add(account.getName());
+                        } else if (AccountType.parse(account.getType()) == AccountType.member) {
+                            memberNameList.add(account.getName());
+                        }
+                    }
+                    if (account.getId() != null) {
+                        if (AccountType.parse(account.getType()) == AccountType.agent) {
+                            agentIdList.add(account.getId());
+                        } else if (AccountType.parse(account.getType()) == AccountType.member) {
+                            memberIdList.add(account.getId());
+                        }
+                    }
                 }
             }
-            if (memberCondition.getWithdrawNumber() != null) {
-                Long min = memberCondition.getWithdrawNumber().getMin();
-                Long max = memberCondition.getWithdrawNumber().getMax();
-                if (min != null && max != null) {
-                    query.addCriteria(new Criteria("withdrawCount").gte(min).lte(max));
-                } else if (min != null) {
-                    query.addCriteria(new Criteria("withdrawCount").gte(min));
-                } else if (max != null) {
-                    query.addCriteria(new Criteria("withdrawCount").lte(max));
-                }
+            if (CollectionUtils.isNotEmpty(agentNameList)){
+                query.addCriteria(new Criteria("agentName").in(agentNameList));
             }
+            if (CollectionUtils.isNotEmpty(memberNameList)){
+                query.addCriteria(new Criteria("memberName").in(memberNameList));
+            }
+            if (CollectionUtils.isNotEmpty(memberIdList)){
+                query.addCriteria(new Criteria("memberId").in(memberIdList));
+            }
+            if (CollectionUtils.isNotEmpty(agentIdList)){
+                query.addCriteria(new Criteria("agentId").in(agentIdList));
+            }
+        } else {
             Account account = memberCondition.getAccount();
             if (account != null && StringUtils.isNotBlank(account.getName())) {
                 if (AccountType.parse(account.getType()) == AccountType.agent) {
@@ -167,9 +245,7 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
                     query.addCriteria(new Criteria("memberName").is(account.getName()));
                 }
             }
-
         }
-        return query;
     }
 
     public boolean updateLevel(long memberId, long level) {
@@ -191,14 +267,14 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
      * @param agentIds
      * @return
      */
-    public Map<Long, Integer> batchGetDepositMembers(Collection<Long> agentIds){
+    public Map<Long, Integer> batchGetDepositMembers(Collection<Long> agentIds) {
         Map<Long, Integer> result = new HashMap<>();
         Aggregation aggregation = Aggregation.newAggregation(Aggregation.project("agentId", "members", "depositCount"),
                 Aggregation.match(Criteria.where("agentId").in(agentIds).and("depositCount").gt(0)),
                 Aggregation.group("agentId").count().as("members"));
         AggregationResults<AgentDepositMember> aggregates = mongoTemplate.aggregate(aggregation, "memberConditionVo", AgentDepositMember.class);
         Iterator<AgentDepositMember> iterator = aggregates.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             AgentDepositMember next = iterator.next();
             result.put(next.getId(), next.getMembers());
         }
@@ -207,20 +283,21 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
 
     /**
      * 批量获取会员的取款次数
+     *
      * @param members
      * @return
      */
-    public Map<Long,Integer> getMemberWithdrawCount(List<Long> members) {
-        if(members == null || members.size() < 1) return null;
+    public Map<Long, Integer> getMemberWithdrawCount(List<Long> members) {
+        if (members == null || members.size() < 1) return null;
         Map<Long, Integer> result = new HashMap<>();
         Query query = new Query().addCriteria(new Criteria("memberId").in(members));
 
         List<MemberConditionVo> list = super.find(query);
         ApiLogger.info(String.format("get data from mongo. query: %s, result: %s", JSON.toJSONString(query), JSON.toJSONString(list)));
 
-        if(list != null){
-            for (MemberConditionVo m:list) {
-                result.put(m.getMemberId(),m.getWithdrawCount());
+        if (list != null) {
+            for (MemberConditionVo m : list) {
+                result.put(m.getMemberId(), m.getWithdrawCount());
             }
         }
 
@@ -234,7 +311,7 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
      * @param ownerId
      * @return
      */
-    public List<MemberConditionVo> batchGetMembers(Collection<String> accounts, Long ownerId){
+    public List<MemberConditionVo> batchGetMembers(Collection<String> accounts, Long ownerId) {
         Query query = new Query();
         query.addCriteria(new Criteria("ownerId").is(ownerId));
         query.addCriteria(new Criteria("memberName").in(accounts));
