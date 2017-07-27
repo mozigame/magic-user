@@ -216,8 +216,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
-        Set<Long> memberIds = memberConditionVos.stream().map(MemberConditionVo::getMemberId).collect(Collectors.toSet());
-        List<MemberListVo> memberListVos = Lists.newArrayList();
+         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
 
         for (int i = 0; i < memberConditionVos.size(); i = i + INTERVAL) {
@@ -227,12 +226,13 @@ public class MemberResourceServiceImpl {
                 endIndex = memberConditionVos.size();
             }
             List<MemberConditionVo> subList = memberConditionVos.subList(fromIndex, endIndex);
-            disposeSubList(subList, memberIds, memberListVos);
+            disposeSubList(subList, memberListVos);
         }
         return memberListVos;
     }
 
-    private void disposeSubList(List<MemberConditionVo> memberConditionVos, Set<Long> memberIds, List<MemberListVo> memberListVos) {
+    private void disposeSubList(List<MemberConditionVo> memberConditionVos, List<MemberListVo> memberListVos) {
+        Set<Long> memberIds = memberConditionVos.stream().map(MemberConditionVo::getMemberId).collect(Collectors.toSet());
         Map<Long, Member> members = memberService.findMemberByIds(memberIds);
         ApiLogger.info(String.format("get members. ids: %s, result: %s", JSON.toJSONString(memberIds), JSON.toJSONString(members)));
         if (!Optional.ofNullable(members).filter(size -> size.size() > 0).isPresent()) {
