@@ -328,6 +328,20 @@ public class MemberResource {
         return memberServiceResource.memberDetails(rc, id);
     }
 
+    /**
+     * 单独获取会员信息，没有资金等数据
+     * @return
+     */
+    @Access(type = Access.AccessType.RESOURCE)
+    @RequestMapping(value = "/detail/nocapital", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String detailNoCapital(
+            @RequestParam(name = "id", required = true) long id
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberDetailsNoCapital(rc, id);
+    }
+
 
     /**
      * @param id 会员id

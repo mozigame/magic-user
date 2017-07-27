@@ -483,6 +483,27 @@ public class MemberResourceServiceImpl {
     }
 
     /**
+     * 会员详情
+     *
+     * @param rc RequestContext
+     * @param id 会员ID
+     * @return
+     */
+    public String memberDetailsNoCapital(RequestContext rc, long id) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        Member member = memberService.getMemberById(id);
+        if (member == null) {
+            throw UserException.ILLEGAL_MEMBER;
+        }
+        member.setEmail("");
+        member.setTelephone("");
+        return JSON.toJSONString(member);
+    }
+
+    /**
      * 组装会员详情
      *
      * @return
