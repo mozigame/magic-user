@@ -427,8 +427,8 @@ public class MemberResourceServiceImpl {
     /**
      * 会员列表导出
      *
-     * @param rc        RequestContext
-     * @param condition 检索条件
+     * @param rc             RequestContext
+     * @param condition      检索条件
      * @param downloadSource
      * @return
      */
@@ -437,6 +437,7 @@ public class MemberResourceServiceImpl {
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
         }
+        checkDownloadSource(downloadSource);
         String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.MEMBER_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
         downLoadFile.setFilename(filename);
@@ -457,9 +458,16 @@ public class MemberResourceServiceImpl {
         //todo 组装mongo中拿取的列表
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
-        content = ExcelUtil.memberListExport(memberVos, filename,downloadSource);
+        content = ExcelUtil.memberListExport(memberVos, filename, downloadSource);
         downLoadFile.setContent(content);
         return downLoadFile;
+    }
+
+
+    private void checkDownloadSource(int downloadSource) {
+        if (downloadSource != 0 || downloadSource != 1) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
     }
 
     public void authOfSearchResources(Long agentId, Long ownerId, Member member) {
