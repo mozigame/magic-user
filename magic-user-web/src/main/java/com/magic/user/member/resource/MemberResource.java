@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.List;
 
 /**
  * User: joey
@@ -84,7 +83,7 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         //获取域名
         String url = rc.getOrigin();
-        RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank,bankCode, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
+        RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, bankCode, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
         return memberServiceResource.memberRegister(rc, url, req, code);
     }
 
@@ -107,7 +106,7 @@ public class MemberResource {
      * @param qq
      * @return
      */
-    private RegisterReq assembleRegister(String proCode, String username, String password, String paymentPassword, String telephone, String email, String bank,String bankCode, String realname, String bankCardNo, String bankDeposit, String province, String city, String weixin, String qq) {
+    private RegisterReq assembleRegister(String proCode, String username, String password, String paymentPassword, String telephone, String email, String bank, String bankCode, String realname, String bankCardNo, String bankDeposit, String province, String city, String weixin, String qq) {
         RegisterReq req = new RegisterReq();
         req.setProCode(proCode);
         req.setUsername(username);
@@ -251,6 +250,7 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberList(rc, condition, page, count);
     }
+
     /**
      * @param condition 检索条件
      * @return
@@ -262,11 +262,16 @@ public class MemberResource {
     public void listExport(
             HttpServletRequest request, HttpServletResponse response,
             @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
+            @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition,
+            @RequestParam(name = "downloadSource", required = false, defaultValue = "0") int downloadSource
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
-        DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition);
+        DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition, downloadSource);
+        addContentToResponse(response, downLoadFile);
+    }
+
+    private void addContentToResponse(HttpServletResponse response, DownLoadFile downLoadFile) throws IOException {
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
@@ -418,6 +423,7 @@ public class MemberResource {
     /**
      * @param id    会员ID
      * @param level 层级ID
+     * @param permanentLock 是否永久锁定 0 否 1 是
      * @return
      * @Doc 会员层级修改, 前端直接进行页面跳转
      */
@@ -427,14 +433,15 @@ public class MemberResource {
     @ResponseBody
     public String levelUpdate(
             @RequestParam(name = "id", required = true) Long id,
-            @RequestParam(name = "level", required = true) Long level
+            @RequestParam(name = "level", required = true) Long level,
+            @RequestParam(name="permanentLock",required = false,defaultValue = "0") Long permanentLock
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.updateLevel(rc, id, level);
+        return memberServiceResource.updateLevel(rc, id, level,permanentLock);
     }
 
     /**
-     * @param lock  是否锁定分层  默认1 1：非锁定 2锁定
+     * @param lock 是否锁定分层  默认1 1：非锁定 2锁定
      * @return
      * @Doc 会员层级列表
      */
@@ -466,24 +473,7 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.memberLevelListExport(rc, lock);
-        response.setCharacterEncoding("UTF-8");
-        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
-            String contnetDisposition = "attachment;filename=";
-            if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
-                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
-            }
-            response.setHeader("Content-Disposition", contnetDisposition);
-            ServletOutputStream outputStream = response.getOutputStream();
-            try {
-                outputStream.write(downLoadFile.getContent());
-            } catch (Exception e) {
-                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
-            } finally {
-                outputStream.flush();
-                outputStream.close();
-            }
-        }
+        addContentToResponse(response, downLoadFile);
     }
 
     /**
@@ -532,25 +522,8 @@ public class MemberResource {
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
-        DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition);
-        response.setCharacterEncoding("UTF-8");
-        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
-            String contnetDisposition = "attachment;filename=";
-            if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
-                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
-            }
-            response.setHeader("Content-Disposition", contnetDisposition);
-            ServletOutputStream outputStream = response.getOutputStream();
-            try {
-                outputStream.write(downLoadFile.getContent());
-            } catch (Exception e) {
-                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
-            } finally {
-                outputStream.flush();
-                outputStream.close();
-            }
-        }
+        DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition, 0);
+        addContentToResponse(response, downLoadFile);
     }
 
     /**
@@ -590,7 +563,6 @@ public class MemberResource {
     }
 
     /**
-     *
      * @param request
      * @param response
      * @throws IOException
@@ -610,9 +582,9 @@ public class MemberResource {
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
-        DownLoadFile downLoadFile = memberServiceResource.onlineListExport(rc,condition /*loginStartTime,loginEndTime,registerStartTime,registerEndTime*/);
+        DownLoadFile downLoadFile = memberServiceResource.onlineListExport(rc, condition /*loginStartTime,loginEndTime,registerStartTime,registerEndTime*/);
         response.setCharacterEncoding("UTF-8");
-        if(downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0){
+        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
             if (downLoadFile.getFilename() != null) {
                 contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
@@ -705,8 +677,8 @@ public class MemberResource {
     @RequestMapping(value = "/code/get", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String getCode(
-                        @RequestParam(name = "width", required = false, defaultValue = "200") Integer width,
-                        @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException {
+            @RequestParam(name = "width", required = false, defaultValue = "200") Integer width,
+            @RequestParam(name = "height", required = false, defaultValue = "80") Integer height) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
         ApiLogger.info("Origin:" + rc.getOrigin());
         String code = CodeImageUtil.generateVerifyCode(UserContants.VERIFY_CODE_LENGTH);
@@ -723,13 +695,14 @@ public class MemberResource {
     @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/username/check", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public String usernameCheck(@RequestParam(name = "username", required = true) String username){
+    public String usernameCheck(@RequestParam(name = "username", required = true) String username) {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.usernameCheck(rc, username);
     }
 
     /**
      * 组装返回数据
+     *
      * @param clientId
      * @param base64Code
      * @return

@@ -21,6 +21,8 @@ public class AccountModifyListVo {
     private Long operatorId;//操作人ID
     private String operatorName;//操作人名称
     private String operatorTime;//操作时间
+    private String beforeString;//修改前
+    private String afterString;//修改后
 
     public Long getOwnerId() {
         return ownerId;
@@ -108,5 +110,21 @@ public class AccountModifyListVo {
 
     public void setOperatorTime(String operatorTime) {
         this.operatorTime = operatorTime;
+    }
+
+    public String getBeforeString() {
+        return beforeString;
+    }
+
+    public void setBeforeString(String beforeString) {
+        this.beforeString = beforeString;
+    }
+
+    public String getAfterString() {
+        return afterString;
+    }
+
+    public void setAfterString(String afterString) {
+        this.afterString = afterString;
     }
 }

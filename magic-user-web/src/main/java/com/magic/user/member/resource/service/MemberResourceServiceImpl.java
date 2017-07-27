@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.magic.analysis.utils.HttpUtils;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
@@ -48,6 +49,7 @@ import com.magic.user.util.AuthConst;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -69,6 +71,7 @@ import java.util.stream.Collectors;
  */
 @Service("memberServiceResource")
 public class MemberResourceServiceImpl {
+
     //根据ip获取城市的接口地址
     private static final String URL = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
     @Resource
@@ -248,6 +251,17 @@ public class MemberResourceServiceImpl {
                 memberListVo.setReturnWaterName(returnWater.getReturnWaterName());
                 memberListVo.setLevel(returnWater.getLevel());
             }
+            //存款次数
+            memberListVo.setDepositCount(vo.getDepositCount());
+            //存款总额
+            memberListVo.setDepositMoney(vo.getDepositMoney());
+            //最大一次存款数额
+            memberListVo.setMaxDepositMoney(vo.getMaxDepositMoney());
+            //取款次数
+            memberListVo.setWithdrawCount(vo.getWithdrawCount());
+            //取款总额
+            memberListVo.setWithdrawMoney(vo.getWithdrawMoney());
+
             memberListVos.add(memberListVo);
         }
         return memberListVos;
@@ -370,11 +384,8 @@ public class MemberResourceServiceImpl {
             return false;
         }
         Account account = condition.getAccount();
-        if (account != null && StringUtils.isNoneEmpty(account.getName())) {
-            Integer type = account.getType();
-            if (type == null || AccountType.parse(type) == null && (type != AccountType.agent.value() || type != AccountType.member.value())) {
-                return false;
-            }
+        if (checkAccount(account)) {
+            return false;
         }
         RegionNumber region = condition.getDepositNumber();
         if (region != null && region.getMin() != null && region.getMax() != null && region.getMin() > region.getMax()) {
@@ -395,18 +406,39 @@ public class MemberResourceServiceImpl {
         return true;
     }
 
+
+    /**
+     * 检测account查询条件是否合法
+     *
+     * @param account
+     * @return
+     */
+    private boolean checkAccount(Account account) {
+        if (account != null) {
+            if (StringUtils.isNotBlank(account.getName()) || CollectionUtils.isNotEmpty(account.getNameList())) {
+                Integer type = account.getType();
+                if (type == null || AccountType.parse(type) == null && (type != AccountType.agent.value() || type != AccountType.member.value())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * 会员列表导出
      *
-     * @param rc        RequestContext
-     * @param condition 检索条件
+     * @param rc             RequestContext
+     * @param condition      检索条件
+     * @param downloadSource
      * @return
      */
-    public DownLoadFile memberListExport(RequestContext rc, String condition) {
+    public DownLoadFile memberListExport(RequestContext rc, String condition, int downloadSource) {
         User operaUser = userService.get(rc.getUid());
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
         }
+        checkDownloadSource(downloadSource);
         String filename = ExcelUtil.assembleFileName(operaUser.getUserId(), ExcelUtil.MEMBER_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
         downLoadFile.setFilename(filename);
@@ -427,9 +459,16 @@ public class MemberResourceServiceImpl {
         //todo 组装mongo中拿取的列表
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
-        content = ExcelUtil.memberListExport(memberVos, filename);
+        content = ExcelUtil.memberListExport(memberVos, filename, downloadSource);
         downLoadFile.setContent(content);
         return downLoadFile;
+    }
+
+
+    private void checkDownloadSource(int downloadSource) {
+        if (downloadSource != 0 || downloadSource != 1) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
     }
 
     public void authOfSearchResources(Long agentId, Long ownerId, Member member) {
@@ -476,7 +515,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_MEMBER;
         }
         // 权限检查
-            authOfSearchResources(user.getUserId(), user.getOwnerId(), member);
+        authOfSearchResources(user.getUserId(), user.getOwnerId(), member);
 
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
@@ -792,7 +831,7 @@ public class MemberResourceServiceImpl {
      * @param level
      * @return
      */
-    public String updateLevel(RequestContext rc, Long memberId, Long level) {
+    public String updateLevel(RequestContext rc, Long memberId, Long level,Long permanentLock) {
         if (!Optional.ofNullable(memberId).filter(id -> id > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
@@ -803,7 +842,7 @@ public class MemberResourceServiceImpl {
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
-        boolean result = thriftOutAssembleService.setMemberLevel(member, level);
+        boolean result = thriftOutAssembleService.setMemberLevel(member, level,permanentLock);
         if (result) {
             result = memberMongoService.updateLevel(member, level);
         }
@@ -1622,11 +1661,10 @@ public class MemberResourceServiceImpl {
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, page, count);
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
-
-                if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
-                    member.setCity(getAddressByIP(member.getLoginIp(),this.URL));
+                if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
+                    member.setCity(HttpUtils.getAddressByIP(member.getLoginIp()));
                 }
-                
+
             }
         }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
@@ -2192,40 +2230,5 @@ public class MemberResourceServiceImpl {
         }
         return false;
     }
-
-    /**
-     * 根据ip获取城市名
-     * @param ip
-     * @param URL
-     * @return
-     */
-    public String getAddressByIP(String ip, String URL) {
-        try {
-            java.net.URL url = new URL(URL + ip);
-            URLConnection conn = url.openConnection();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "GBK"));
-            String line = null;
-            StringBuffer result = new StringBuffer();
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
-            reader.close();
-            JSONObject object = JSONObject.parseObject(result.toString());
-            if (object.size() > 0) {
-                if(object.getString("city") != null && !object.getString("city").equals("")){
-                    return object.getString("city");
-                }
-                if(object.getString("province") != null && !object.getString("province").equals("")){
-                    return object.getString("province");
-                }
-                if(object.getString("country") != null && !object.getString("country").equals("")){
-                    return object.getString("country");
-                }
-            }
-        } catch (IOException e) {
-            return "读取失败";
-        }
-        return "未知城市";
-    }
-
+    
 }

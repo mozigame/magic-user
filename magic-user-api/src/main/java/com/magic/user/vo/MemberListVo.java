@@ -57,6 +57,32 @@ public class MemberListVo {
      */
     private String showStatus;
 
+    /**
+     * 存款次数
+     */
+    private Integer depositCount;
+
+    /**
+     * 存款总额
+     */
+    private Long depositMoney;
+
+    /**
+     * 最大存款数额
+     */
+    private Long maxDepositMoney;
+
+    /**
+     * 取款次数
+     */
+    private Integer withdrawCount;
+
+    /**
+     * 取款总额
+     */
+    private Long withdrawMoney;
+
+
     public long getId() {
         return id;
     }
@@ -154,4 +180,43 @@ public class MemberListVo {
     }
 
 
+    public Integer getDepositCount() {
+        return depositCount;
+    }
+
+    public void setDepositCount(Integer depositCount) {
+        this.depositCount = depositCount;
+    }
+
+    public Long getDepositMoney() {
+        return depositMoney;
+    }
+
+    public void setDepositMoney(Long depositMoney) {
+        this.depositMoney = depositMoney;
+    }
+
+    public Long getMaxDepositMoney() {
+        return maxDepositMoney;
+    }
+
+    public void setMaxDepositMoney(Long maxDepositMoney) {
+        this.maxDepositMoney = maxDepositMoney;
+    }
+
+    public Integer getWithdrawCount() {
+        return withdrawCount;
+    }
+
+    public void setWithdrawCount(Integer withdrawCount) {
+        this.withdrawCount = withdrawCount;
+    }
+
+    public Long getWithdrawMoney() {
+        return withdrawMoney;
+    }
+
+    public void setWithdrawMoney(Long withdrawMoney) {
+        this.withdrawMoney = withdrawMoney;
+    }
 }

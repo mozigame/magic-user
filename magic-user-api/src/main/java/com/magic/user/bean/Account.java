@@ -1,5 +1,7 @@
 package com.magic.user.bean;
 
+import java.util.List;
+
 /**
  * Account
  *
@@ -17,6 +19,11 @@ public class Account {
      */
     private String name;
 
+    /**
+     * nameList 解析,从name解析
+     */
+    private List<String> nameList;
+
     public Integer getType() {
         return type;
     }
@@ -31,5 +38,13 @@ public class Account {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<String> getNameList() {
+        return nameList;
+    }
+
+    public void setNameList(List<String> nameList) {
+        this.nameList = nameList;
     }
 }
