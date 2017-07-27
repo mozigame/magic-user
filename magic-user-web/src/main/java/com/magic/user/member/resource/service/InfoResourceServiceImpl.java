@@ -581,59 +581,57 @@ public class InfoResourceServiceImpl {
                     StringBuilder before = new StringBuilder();
                     JSONObject beforeJson = JSONObject.parseObject(next.getBeforeInfo());
                     if(null != beforeJson.getString("loginPassword") && !"".equals(beforeJson.getString("loginPassword"))){
-                        before.append(" 登录密码:"+beforeJson.getString("loginPassword"));
+                        before.append("登录密码:"+beforeJson.getString("loginPassword"));
                     }
                     if(null != beforeJson.getString("email") && !"".equals(beforeJson.getString("email"))){
-                        before.append(" 电子邮箱:"+beforeJson.getString("email"));
+                        before.append("电子邮箱:"+beforeJson.getString("email"));
                     }
                     if(null != beforeJson.getString("realname") && !"".equals(beforeJson.getString("realname"))){
-                        before.append(" 姓名:"+beforeJson.getString("realname"));
+                        before.append("姓名:"+beforeJson.getString("realname"));
                     }
                     if(null != beforeJson.getString("bankCardNo") && !"".equals(beforeJson.getString("bankCardNo"))){
-                        before.append(" 银行卡号:"+beforeJson.getString("bankCardNo"));
+                        before.append("银行卡号:"+beforeJson.getString("bankCardNo"));
                     }
                     if(null != beforeJson.getString("bank") && !"".equals(beforeJson.getString("bank"))){
-                        before.append(" 银行名称:"+beforeJson.getString("bank"));
+                        before.append("银行名称:"+beforeJson.getString("bank"));
                     }
                     if(null != beforeJson.getString("bankDeposit") && !"".equals(beforeJson.getString("bankDeposit"))){
-                        before.append(" 开户行地址:"+beforeJson.getString("bankDeposit"));
+                        before.append("开户行地址:"+beforeJson.getString("bankDeposit"));
                     }
                     if(null != beforeJson.getString("telephone") && !"".equals(beforeJson.getString("telephone"))){
-                        before.append(" 手机号码:"+beforeJson.getString("telephone"));
+                        before.append("手机号码:"+beforeJson.getString("telephone"));
                     }
                     if(null != beforeJson.getString("paymentPassword") && !"".equals(beforeJson.getString("paymentPassword"))){
-                        before.append(" 支付密码:"+beforeJson.getString("paymentPassword"));
+                        before.append("支付密码:"+beforeJson.getString("paymentPassword"));
                     }
-                    String beforeStr = before.toString();
-                    if(before.)
                     accountModifyListVo.setBeforeString(before.toString());
                 }
                 if(null != next.getAfterInfo() && !"".equals(next.getAfterInfo())){
                     StringBuilder after = new StringBuilder();
                     JSONObject afterJson = JSONObject.parseObject(next.getAfterInfo());
                     if(afterJson.getString("loginPassword") != null && !"".equals(afterJson.getString("loginPassword"))){
-                        after.append(" 登录密码:"+afterJson.getString("loginPassword"));
+                        after.append("登录密码:"+afterJson.getString("loginPassword"));
                     }
                     if(afterJson.getString("email") != null && !"".equals(afterJson.getString("email"))){
-                        after.append(" 电子邮箱:"+afterJson.getString("email"));
+                        after.append("电子邮箱:"+afterJson.getString("email"));
                     }
                     if(afterJson.getString("realname") != null && !"".equals(afterJson.getString("realname"))){
-                        after.append(" 姓名:"+afterJson.getString("realname"));
+                        after.append("姓名:"+afterJson.getString("realname"));
                     }
                     if(afterJson.getString("bankCardNo") != null && !"".equals(afterJson.getString("bankCardNo"))){
-                        after.append(" 银行卡号:"+afterJson.getString("bankCardNo"));
+                        after.append("银行卡号:"+afterJson.getString("bankCardNo"));
                     }
                     if(afterJson.getString("bank") != null && !"".equals(afterJson.getString("bank"))){
-                        after.append(" 银行名称:"+afterJson.getString("bank"));
+                        after.append("银行名称:"+afterJson.getString("bank"));
                     }
                     if(afterJson.getString("bankDeposit") != null && !"".equals(afterJson.getString("bankDeposit"))){
-                        after.append(" 开户行地址:"+afterJson.getString("bankDeposit"));
+                        after.append("开户行地址:"+afterJson.getString("bankDeposit"));
                     }
                     if(afterJson.getString("telephone") != null && !"".equals(afterJson.getString("telephone"))){
-                        after.append(" 手机号码:"+afterJson.getString("telephone"));
+                        after.append("手机号码:"+afterJson.getString("telephone"));
                     }
                     if(afterJson.getString("paymentPassword") != null && !"".equals(afterJson.getString("paymentPassword"))){
-                        after.append(" 支付密码:"+afterJson.getString("paymentPassword"));
+                        after.append("支付密码:"+afterJson.getString("paymentPassword"));
                     }
                     accountModifyListVo.setAfterString(after.toString());
                 }
