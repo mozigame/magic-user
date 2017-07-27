@@ -341,10 +341,10 @@ public class MemberResource {
     @RequestMapping(value = "/detail/nocapital", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String detailNoCapital(
-            @RequestParam(name = "id", required = true) long id
+            @RequestParam(name = "userId", required = true) long userId
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.memberDetailsNoCapital(rc, id);
+        return memberServiceResource.memberDetailsNoCapital(rc, userId);
     }
 
 
