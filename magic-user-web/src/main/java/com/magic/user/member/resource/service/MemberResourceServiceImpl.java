@@ -429,9 +429,10 @@ public class MemberResourceServiceImpl {
      *
      * @param rc        RequestContext
      * @param condition 检索条件
+     * @param downloadSource
      * @return
      */
-    public DownLoadFile memberListExport(RequestContext rc, String condition) {
+    public DownLoadFile memberListExport(RequestContext rc, String condition, int downloadSource) {
         User operaUser = userService.get(rc.getUid());
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
@@ -456,7 +457,7 @@ public class MemberResourceServiceImpl {
         //todo 组装mongo中拿取的列表
         List<MemberListVo> memberVos = assembleMemberVos(memberConditionVos);
         //TODO 查询表数据，生成excel的zip，并返回zip byte[]
-        content = ExcelUtil.memberListExport(memberVos, filename);
+        content = ExcelUtil.memberListExport(memberVos, filename,downloadSource);
         downLoadFile.setContent(content);
         return downLoadFile;
     }

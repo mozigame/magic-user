@@ -12,11 +12,13 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
  * ExcelUtil
  * Excel工具
+ *
  * @author zj
  * @date 2015/12/4
  */
@@ -30,17 +32,17 @@ public class ExcelUtil {
     public static final String AGENT_REVIEW_LIST = "代理审核列表";
     public static final String STOCK_LIST = "股东列表";
     public static final String MODIFY_LIST = "资料修改记录";
-    public static final String WORKER_LIST="子账号列表";
+    public static final String WORKER_LIST = "子账号列表";
 
     /**
-     * @Doc 组装代理审核列表导出数据
      * @param list
      * @param filename
      * @return
+     * @Doc 组装代理审核列表导出数据
      */
     public static byte[] agentReviewListExport(List<AgentApplyVo> list, String filename) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
-        try{
+        try {
 
             //创建Excel工作薄
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -94,7 +96,7 @@ public class ExcelUtil {
             status.setCellType(XSSFCell.CELL_TYPE_STRING);
             status.setCellValue("状态");
             //表头创建完成
-            for(int i=0 ;i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++) {
                 AgentApplyVo vo = list.get(i);
                 Row row = sheet.createRow(i + 1);
                 row.createCell(0).setCellValue(i + 1);
@@ -112,7 +114,7 @@ public class ExcelUtil {
             workbook.write(os);
             byte[] bytes = os.toByteArray();
             return bytes;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("生成代理审核列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
             return null;
         }
@@ -120,14 +122,14 @@ public class ExcelUtil {
 
 
     /**
-     * @Doc 组装股东列表导出数据
      * @param list
      * @param filename
      * @return
+     * @Doc 组装股东列表导出数据
      */
     public static byte[] stockListExport(List<StockInfoVo> list, String filename) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
-        try{
+        try {
 
             //创建Excel工作薄
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -161,7 +163,7 @@ public class ExcelUtil {
             email.setCellType(XSSFCell.CELL_TYPE_STRING);
             email.setCellValue("状态");
             //表头创建完成
-            for(int i=0 ;i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++) {
                 StockInfoVo vo = list.get(i);
                 Row row = sheet.createRow(i + 1);
                 row.createCell(0).setCellValue(i + 1);
@@ -174,7 +176,7 @@ public class ExcelUtil {
             workbook.write(os);
             byte[] bytes = os.toByteArray();
             return bytes;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("生成股东列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
             return null;
         }
@@ -182,14 +184,14 @@ public class ExcelUtil {
 
 
     /**
-     * @Doc 组装代理列表导出数据
      * @param list
      * @param filename
      * @return
+     * @Doc 组装代理列表导出数据
      */
     public static byte[] agentListExport(List<AgentInfoVo> list, String filename) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
-        try{
+        try {
 
             //创建Excel工作薄
             XSSFWorkbook workbook = new XSSFWorkbook();
@@ -247,7 +249,7 @@ public class ExcelUtil {
             status.setCellType(XSSFCell.CELL_TYPE_STRING);
             status.setCellValue("状态");
             //表头创建完成
-            for(int i=0 ;i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++) {
                 AgentInfoVo vo = list.get(i);
                 Row row = sheet.createRow(i + 1);
                 row.createCell(0).setCellValue(vo.getHolderName());
@@ -266,21 +268,22 @@ public class ExcelUtil {
             workbook.write(os);
             byte[] bytes = os.toByteArray();
             return bytes;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("生成代理列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
             return null;
         }
     }
 
     /**
-     * @Doc 组装会员列表导出数据
      * @param list
      * @param filename
+     * @param downloadSource
      * @return
+     * @Doc 组装会员列表导出数据
      */
-    public static byte[] memberListExport(List<MemberListVo> list, String filename) {
+    public static byte[] memberListExport(List<MemberListVo> list, String filename, int downloadSource) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
-        try{
+        try {
             //创建Excel工作薄
             XSSFWorkbook workbook = new XSSFWorkbook();
             //创建工作表，可指定工作表名称
@@ -292,75 +295,142 @@ public class ExcelUtil {
             style.setAlignment(XSSFCellStyle.ALIGN_CENTER);
             //head.setRowStyle(style);
             //创建单元格,并设置单元格格式和内容
-            Cell id = head.createCell(0);
-            id.setCellStyle(style);
-            id.setCellType(XSSFCell.CELL_TYPE_STRING);
-            id.setCellValue("序号");
-            Cell memberName = head.createCell(1);
-            memberName.setCellStyle(style);
-            memberName.setCellType(XSSFCell.CELL_TYPE_STRING);
-            memberName.setCellValue("会员账号");
-            Cell agentName = head.createCell(2);
-            agentName.setCellStyle(style);
-            agentName.setCellType(XSSFCell.CELL_TYPE_STRING);
-            agentName.setCellValue("所屬代理");
-            Cell levle = head.createCell(3);
-            levle.setCellStyle(style);
-            levle.setCellType(XSSFCell.CELL_TYPE_STRING);
-            levle.setCellValue("会员层级");
-            Cell balance = head.createCell(4);
-            balance.setCellStyle(style);
-            balance.setCellType(XSSFCell.CELL_TYPE_STRING);
-            balance.setCellValue("余额");
-            Cell returnWater = head.createCell(5);
-            returnWater.setCellStyle(style);
-            returnWater.setCellType(XSSFCell.CELL_TYPE_STRING);
-            returnWater.setCellValue("当前反水方案");
-            Cell registerTime = head.createCell(6);
-            registerTime.setCellStyle(style);
-            registerTime.setCellType(XSSFCell.CELL_TYPE_STRING);
-            registerTime.setCellValue("注册时间");
-            Cell lastLoginTime = head.createCell(7);
-            lastLoginTime.setCellStyle(style);
-            lastLoginTime.setCellType(XSSFCell.CELL_TYPE_STRING);
-            lastLoginTime.setCellValue("最近登录时间");
-            Cell status = head.createCell(8);
-            status.setCellStyle(style);
-            status.setCellType(XSSFCell.CELL_TYPE_STRING);
-            status.setCellValue("状态");
-
-            //表头创建完成
-            for(int i=0 ;i < list.size(); i++){
-                MemberListVo vo = list.get(i);
-                Row row = sheet.createRow(i + 1);
-                row.createCell(0).setCellValue(i + 1);
-                row.createCell(1).setCellValue(vo.getAccount());
-                row.createCell(2).setCellValue(vo.getAgent());
-                row.createCell(3).setCellValue(vo.getLevel());
-                row.createCell(4).setCellValue(vo.getBalance());
-                row.createCell(5).setCellValue(vo.getReturnWaterName());
-                row.createCell(6).setCellValue(vo.getRegisterTime());
-                row.createCell(7).setCellValue(vo.getLastLoginTime());
-                row.createCell(8).setCellValue(vo.getShowStatus());
+            byte[] bytes = null;
+            switch (downloadSource) {
+                case 0:
+                    bytes = downloadSource0(list, workbook, sheet, head, style);
+                    break;
+                case 1:
+                    bytes = downloadSource1(list, workbook, sheet, head, style);
+                    break;
+                default:
+                    ApiLogger.error("生成在线会员列表失败！downloadSource = " + downloadSource);
+                    bytes = null;
+                    break;
             }
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            workbook.write(os);
-            byte[] bytes = os.toByteArray();
             return bytes;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("生成在线会员列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
             return null;
         }
     }
+
+    private final static String[] ELEMENT_FOR_SOURCE1 =
+            new String[]{
+                    "序号",
+                    "会员帐号",
+                    "所属代理",
+                    "会员层级",
+                    "存款次数",
+                    "存款总额",
+                    "最大存款数额",
+                    "取款次数",
+                    "取款总额",
+                    "余额",
+                    "最近登录"
+            };
+
+    private static byte[] downloadSource1(List<MemberListVo> list, XSSFWorkbook workbook, Sheet sheet, Row head, CellStyle style) throws IOException {
+
+        formatFirstRow(head, style,ELEMENT_FOR_SOURCE1);
+        //表头创建完成
+        for (int i = 0; i < list.size(); i++) {
+            MemberListVo vo = list.get(i);
+            Row row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(i + 1);
+            row.createCell(1).setCellValue(vo.getAccount());
+            row.createCell(2).setCellValue(vo.getAgent());
+            row.createCell(3).setCellValue(vo.getLevel());
+            row.createCell(4).setCellValue(vo.getDepositCount());
+            row.createCell(5).setCellValue(vo.getDepositMoney());
+            row.createCell(6).setCellValue(vo.getMaxDepositMoney());
+            row.createCell(7).setCellValue(vo.getWithdrawCount());
+            row.createCell(8).setCellValue(vo.getWithdrawMoney());
+            row.createCell(9).setCellValue(vo.getBalance());
+            row.createCell(10).setCellValue(vo.getLastLoginTime());
+        }
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        workbook.write(os);
+        byte[] bytes = os.toByteArray();
+        return bytes;
+    }
+
+    private static void formatFirstRow(Row head, CellStyle style, String[] elementForSource) {
+        for (int i=0; i<elementForSource.length; ++i){
+            Cell id = head.createCell(i);
+            id.setCellStyle(style);
+            id.setCellType(XSSFCell.CELL_TYPE_STRING);
+            id.setCellValue(elementForSource[i]);
+        }
+    }
+
+    private static byte[] downloadSource0(List<MemberListVo> list, XSSFWorkbook workbook, Sheet sheet, Row head, CellStyle style) throws IOException {
+        Cell id = head.createCell(0);
+        id.setCellStyle(style);
+        id.setCellType(XSSFCell.CELL_TYPE_STRING);
+        id.setCellValue("序号");
+        Cell memberName = head.createCell(1);
+        memberName.setCellStyle(style);
+        memberName.setCellType(XSSFCell.CELL_TYPE_STRING);
+        memberName.setCellValue("会员账号");
+        Cell agentName = head.createCell(2);
+        agentName.setCellStyle(style);
+        agentName.setCellType(XSSFCell.CELL_TYPE_STRING);
+        agentName.setCellValue("所屬代理");
+        Cell levle = head.createCell(3);
+        levle.setCellStyle(style);
+        levle.setCellType(XSSFCell.CELL_TYPE_STRING);
+        levle.setCellValue("会员层级");
+        Cell balance = head.createCell(4);
+        balance.setCellStyle(style);
+        balance.setCellType(XSSFCell.CELL_TYPE_STRING);
+        balance.setCellValue("余额");
+        Cell returnWater = head.createCell(5);
+        returnWater.setCellStyle(style);
+        returnWater.setCellType(XSSFCell.CELL_TYPE_STRING);
+        returnWater.setCellValue("当前反水方案");
+        Cell registerTime = head.createCell(6);
+        registerTime.setCellStyle(style);
+        registerTime.setCellType(XSSFCell.CELL_TYPE_STRING);
+        registerTime.setCellValue("注册时间");
+        Cell lastLoginTime = head.createCell(7);
+        lastLoginTime.setCellStyle(style);
+        lastLoginTime.setCellType(XSSFCell.CELL_TYPE_STRING);
+        lastLoginTime.setCellValue("最近登录时间");
+        Cell status = head.createCell(8);
+        status.setCellStyle(style);
+        status.setCellType(XSSFCell.CELL_TYPE_STRING);
+        status.setCellValue("状态");
+
+        //表头创建完成
+        for (int i = 0; i < list.size(); i++) {
+            MemberListVo vo = list.get(i);
+            Row row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(i + 1);
+            row.createCell(1).setCellValue(vo.getAccount());
+            row.createCell(2).setCellValue(vo.getAgent());
+            row.createCell(3).setCellValue(vo.getLevel());
+            row.createCell(4).setCellValue(vo.getBalance());
+            row.createCell(5).setCellValue(vo.getReturnWaterName());
+            row.createCell(6).setCellValue(vo.getRegisterTime());
+            row.createCell(7).setCellValue(vo.getLastLoginTime());
+            row.createCell(8).setCellValue(vo.getShowStatus());
+        }
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        workbook.write(os);
+        byte[] bytes = os.toByteArray();
+        return bytes;
+    }
+
     /**
-     * @Doc 组装在线会员列表导出数据
      * @param list
      * @param filename
      * @return
+     * @Doc 组装在线会员列表导出数据
      */
     public static byte[] onLineMemberListExport(List<OnLineMemberVo> list, String filename) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
-        try{
+        try {
             //创建Excel工作薄
             XSSFWorkbook workbook = new XSSFWorkbook();
             //创建工作表，可指定工作表名称
@@ -408,21 +478,21 @@ public class ExcelUtil {
 //            info.setCellValue("备注");
 
             //表头创建完成
-            for(int i=0 ;i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++) {
                 OnLineMemberVo vo = list.get(i);
                 Row row = sheet.createRow(i + 1);
                 row.createCell(0).setCellValue(i + 1);
                 row.createCell(1).setCellValue(vo.getAccount());
-                if(vo.getLoginTime() != null){
+                if (vo.getLoginTime() != null) {
                     row.createCell(2).setCellValue(vo.getLoginTime());
                 }
-                if(vo.getLoginIp() != null){
+                if (vo.getLoginIp() != null) {
                     row.createCell(3).setCellValue(vo.getLoginIp());
                 }
-                if(vo.getRegisterTime() != null){
+                if (vo.getRegisterTime() != null) {
                     row.createCell(4).setCellValue(vo.getRegisterTime());
                 }
-                if(vo.getRegisterIp() != null){
+                if (vo.getRegisterIp() != null) {
                     row.createCell(5).setCellValue(vo.getRegisterIp());
                 }
 
@@ -431,21 +501,21 @@ public class ExcelUtil {
             workbook.write(os);
             byte[] bytes = os.toByteArray();
             return bytes;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("生成会员列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
             return null;
         }
     }
 
     /**
-     * @Doc 组装会员层级列表导出数据
      * @param list
      * @param filename
      * @return
+     * @Doc 组装会员层级列表导出数据
      */
     public static byte[] memberLevelListExport(List<MemberLevelListVo> list, String filename) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
-        try{
+        try {
             //创建Excel工作薄
             XSSFWorkbook workbook = new XSSFWorkbook();
             //创建工作表，可指定工作表名称
@@ -502,7 +572,7 @@ public class ExcelUtil {
             discountName.setCellType(XSSFCell.CELL_TYPE_STRING);
             discountName.setCellValue("出入款优惠方案");
             //表头创建完成
-            for(int i=0 ;i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++) {
                 MemberLevelListVo vo = list.get(i);
                 Row row = sheet.createRow(i + 1);
                 row.createCell(0).setCellValue(i + 1);
@@ -521,20 +591,21 @@ public class ExcelUtil {
             workbook.write(os);
             byte[] bytes = os.toByteArray();
             return bytes;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("生成会员列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
             return null;
         }
     }
+
     /**
-     * @Doc 组装资料修改记录列表导出数据
      * @param list
      * @param filename
      * @return
+     * @Doc 组装资料修改记录列表导出数据
      */
     public static byte[] modifyListExport(List<AccountModifyListVo> list, String filename) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
-        try{
+        try {
             //创建Excel工作薄
             XSSFWorkbook workbook = new XSSFWorkbook();
             //创建工作表，可指定工作表名称
@@ -579,7 +650,7 @@ public class ExcelUtil {
             operaTime.setCellType(XSSFCell.CELL_TYPE_STRING);
             operaTime.setCellValue("操作时间");
             //表头创建完成
-            for(int i=0 ;i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++) {
                 AccountModifyListVo vo = list.get(i);
                 Row row = sheet.createRow(i + 1);
                 row.createCell(0).setCellValue(i + 1);
@@ -595,21 +666,21 @@ public class ExcelUtil {
             workbook.write(os);
             byte[] bytes = os.toByteArray();
             return bytes;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("资料修改记录列表失败！data size:".concat(String.valueOf(10)).concat(",fileName:").concat(filename), e);
             return null;
         }
     }
 
     /**
-     * @Doc 组装子账号列表导出数据
      * @param list
      * @param filename
      * @return
+     * @Doc 组装子账号列表导出数据
      */
     public static byte[] workerListExport(List<WorkerVo> list, String filename) {
         ApiLogger.info("开始生成Excel!fileName:".concat(filename));
-        try{
+        try {
             //创建Excel工作薄
             XSSFWorkbook workbook = new XSSFWorkbook();
             //创建工作表，可指定工作表名称
@@ -650,7 +721,7 @@ public class ExcelUtil {
             lastLoginTime.setCellType(XSSFCell.CELL_TYPE_STRING);
             lastLoginTime.setCellValue("最后登录时间");
             //表头创建完成
-            for(int i=0 ;i < list.size(); i++){
+            for (int i = 0; i < list.size(); i++) {
                 WorkerVo vo = list.get(i);
                 Row row = sheet.createRow(i + 1);
                 row.createCell(0).setCellValue(i + 1);
@@ -665,7 +736,7 @@ public class ExcelUtil {
             workbook.write(os);
             byte[] bytes = os.toByteArray();
             return bytes;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error("子账号列表导出失败！data size:".concat(String.valueOf(list.size())).concat(",fileName:").concat(filename), e);
             return null;
         }
