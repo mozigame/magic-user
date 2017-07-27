@@ -199,11 +199,12 @@ public class MemberCondition {
                     memberCondition.setLevelList(levelList);
                 }
             }
-
+            return memberCondition;
         } catch (JSONException e) {
             ApiLogger.error(String.format("parse conditon to membercondition object error. condition: %s, msg: %s", condition, e.getMessage()));
+            return EMPTY_MEMBER_CONDITION;
         }
-        return EMPTY_MEMBER_CONDITION;
+
     }
 
     public List<Account> getAccountList() {
@@ -223,10 +224,15 @@ public class MemberCondition {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("accountList = " + accountList);
         return stringBuilder.toString();
     }
 
+    public static void main(String[] args) {
+        String s = "{\"currencyType\":\"1\",\"status\":\"\",\"register\":{\"start\":\"\",\"end\":\"\"},\"account\":{\"type\":\"5\",\"name\":\"fdf66\"},\"depositNumber\":{\"min\":\"\",\"max\":\"\"},\"withdrawNumber\":{\"min\":\"\",\"max\":\"\"},\"depositMoney\":{\"min\":\"\",\"max\":\"\"},\"withdrawMoney\":{\"min\":\"\",\"max\":\"\"}}";
+        MemberCondition s1 = valueOf(s);
+        System.out.printf("1");
+    }
 }
