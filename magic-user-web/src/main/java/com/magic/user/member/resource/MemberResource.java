@@ -519,7 +519,7 @@ public class MemberResource {
     ) throws IOException {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
-        DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition, downloadSource);
+        DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition, 0);
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
