@@ -528,12 +528,12 @@ public class MemberResourceServiceImpl {
      * @param id 会员ID
      * @return
      */
-    public String memberDetailsNoCapital(RequestContext rc, long id) {
+    public String memberDetailsNoCapital(RequestContext rc, long userId) {
         User user = userService.get(rc.getUid());
         if (user == null) {
             throw UserException.ILLEGAL_USER;
         }
-        Member member = memberService.getMemberById(id);
+        Member member = memberService.getMemberById(userId);
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
