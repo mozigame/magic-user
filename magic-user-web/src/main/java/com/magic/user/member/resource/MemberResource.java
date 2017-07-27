@@ -409,6 +409,7 @@ public class MemberResource {
     /**
      * @param id    会员ID
      * @param level 层级ID
+     * @param permanentLock 是否永久锁定 0 否 1 是
      * @return
      * @Doc 会员层级修改, 前端直接进行页面跳转
      */
@@ -418,10 +419,11 @@ public class MemberResource {
     @ResponseBody
     public String levelUpdate(
             @RequestParam(name = "id", required = true) Long id,
-            @RequestParam(name = "level", required = true) Long level
+            @RequestParam(name = "level", required = true) Long level,
+            @RequestParam(name="permanentLock",required = false,defaultValue = "0") Long permanentLock
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.updateLevel(rc, id, level);
+        return memberServiceResource.updateLevel(rc, id, level,permanentLock);
     }
 
     /**

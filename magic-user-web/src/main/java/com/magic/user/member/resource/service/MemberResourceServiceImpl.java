@@ -810,7 +810,7 @@ public class MemberResourceServiceImpl {
      * @param level
      * @return
      */
-    public String updateLevel(RequestContext rc, Long memberId, Long level) {
+    public String updateLevel(RequestContext rc, Long memberId, Long level,Long permanentLock) {
         if (!Optional.ofNullable(memberId).filter(id -> id > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
@@ -821,7 +821,7 @@ public class MemberResourceServiceImpl {
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
-        boolean result = thriftOutAssembleService.setMemberLevel(member, level);
+        boolean result = thriftOutAssembleService.setMemberLevel(member, level,permanentLock);
         if (result) {
             result = memberMongoService.updateLevel(member, level);
         }
