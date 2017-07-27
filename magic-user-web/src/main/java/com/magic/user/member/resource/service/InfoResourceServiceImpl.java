@@ -287,6 +287,7 @@ public class InfoResourceServiceImpl {
         Map<String, Object> oldMap = new HashMap<>();//修改前数据
         Map<String, Object> userMap = new HashedMap();  //修改的用户数据
         AccountType accountType = AccountType.parse(type);
+        boolean result=false;
         if (accountType == AccountType.member) {//账号
             Member member = memberService.getMemberById(id);
             if (member == null) {
@@ -294,7 +295,14 @@ public class InfoResourceServiceImpl {
             }
             newMap.put("ownerId",member.getOwnerId());
             newMap.put("userId", member.getMemberId());
-            boolean result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
+            
+            userMap.put("userId", member.getMemberId());
+            userMap.put("username", member.getUsername());
+            userMap.put("ownerId", member.getOwnerId());
+            userMap.put("ownerName", member.getOwnerUsername());
+            userMap.put("type", type);
+            userMap.put("operTime", System.currentTimeMillis());
+            result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
                 if (StringUtils.isNotEmpty(realname) && !realname.trim().equals(member.getRealname())) {
                     newMap.put("realname", realname);
@@ -320,18 +328,13 @@ public class InfoResourceServiceImpl {
                     newMap.put("bankDeposit", bankDeposit);
                     oldMap.put("bankDeposit", member.getBankDeposit());
                 }
-                userMap.put("userId", member.getMemberId());
-                userMap.put("username", member.getUsername());
-                userMap.put("ownerId", member.getOwnerId());
-                userMap.put("ownerName", member.getOwnerUsername());
-                userMap.put("type", type);
-                userMap.put("operTime", System.currentTimeMillis());
             }
             if (StringUtils.isNotEmpty(loginPassword)) {
                 newMap.put("loginPassword", loginPassword);
                 oldMap.put("loginPassword", "******");
                 thriftOutAssembleService.passwordReset(assembleLoginPwdBody(member.getMemberId(),member.getUsername(),
                         loginPassword,rc.getIp()), "account");
+                result=true;
             }
             if(StringUtils.isNotEmpty(paymentPassword)){
                 newMap.put("paymentPassword",paymentPassword);
@@ -343,8 +346,15 @@ public class InfoResourceServiceImpl {
             if (user == null) {
                 throw UserException.ILLEGAL_USER;
             }
+            userMap.put("userId", user.getUserId());
+            userMap.put("username", user.getUsername());
+            userMap.put("ownerId", user.getOwnerId());
+            userMap.put("ownerName", user.getOwnerName());
+            userMap.put("type", type);
+            userMap.put("operTime", System.currentTimeMillis());
+            userMap.put("paymentPassword",paymentPassword);
             //用户数据更新
-            boolean result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
+            result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
                 if (StringUtils.isNoneEmpty(realname) && !realname.trim().equals(user.getRealname())) {
                     newMap.put("realname", realname);
@@ -362,13 +372,6 @@ public class InfoResourceServiceImpl {
                     newMap.put("bankCardNo", bankCardNo);
                     oldMap.put("bankCardNo", user.getBankCardNo());
                 }
-                userMap.put("userId", user.getUserId());
-                userMap.put("username", user.getUsername());
-                userMap.put("ownerId", user.getOwnerId());
-                userMap.put("ownerName", user.getOwnerName());
-                userMap.put("type", type);
-                userMap.put("operTime", System.currentTimeMillis());
-                userMap.put("paymentPassword",paymentPassword);
             }
             if (StringUtils.isNoneEmpty(loginPassword)) {
                 String pwd = PasswordCapture.getSaltPwd(loginPassword);
@@ -380,7 +383,7 @@ public class InfoResourceServiceImpl {
             }
 
         }
-        if (newMap.size() > 0) {
+        if (result) {
             JSONObject object = new JSONObject();
             object.put("after", newMap);
             object.put("before", oldMap);
@@ -554,6 +557,94 @@ public class InfoResourceServiceImpl {
         }
         return result;
     }
+    /**
+     * 组装数据
+     *
+     * @param list
+     * @return
+     */
+    private List<AccountModifyListVo> assembleModifyListToString(List<AccountOperHistory> list) {
+        List<AccountModifyListVo> result = new ArrayList<>();
+        Iterator<AccountOperHistory> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            AccountOperHistory next = iterator.next();
+            if (next != null) {
+                AccountModifyListVo accountModifyListVo = new AccountModifyListVo();
+                accountModifyListVo.setAccount(next.getUsername());
+                accountModifyListVo.setAccountId(next.getUserId());
+                AccountType type = next.getType();
+                accountModifyListVo.setType(type.value());
+                accountModifyListVo.setShowType(AccountType.getDesc(type));
+                accountModifyListVo.setOwnerId(next.getOwnerId());
+                accountModifyListVo.setOwnerName(next.getOwnerName());
+                if(next.getBeforeInfo() != null && !"".equals(next.getBeforeInfo())){
+                    StringBuilder before = new StringBuilder();
+                    JSONObject beforeJson = JSONObject.parseObject(next.getBeforeInfo());
+                    if(null != beforeJson.getString("loginPassword") && !"".equals(beforeJson.getString("loginPassword").trim())){
+                        before.append(" 登录密码:"+beforeJson.getString("loginPassword"));
+                    }
+                    if(null != beforeJson.getString("email") && !"".equals(beforeJson.getString("email").trim())){
+                        before.append(" 电子邮箱:"+beforeJson.getString("email"));
+                    }
+                    if(null != beforeJson.getString("realname") && !"".equals(beforeJson.getString("realname").trim())){
+                        before.append(" 姓名:"+beforeJson.getString("realname"));
+                    }
+                    if(null != beforeJson.getString("bankCardNo") && !"".equals(beforeJson.getString("bankCardNo").trim())){
+                        before.append(" 银行卡号:"+beforeJson.getString("bankCardNo"));
+                    }
+                    if(null != beforeJson.getString("bank") && !"".equals(beforeJson.getString("bank").trim())){
+                        before.append(" 银行名称:"+beforeJson.getString("bank"));
+                    }
+                    if(null != beforeJson.getString("bankDeposit") && !"".equals(beforeJson.getString("bankDeposit").trim())){
+                        before.append(" 开户行地址:"+beforeJson.getString("bankDeposit"));
+                    }
+                    if(null != beforeJson.getString("telephone") && !"".equals(beforeJson.getString("telephone").trim())){
+                        before.append(" 手机号码:"+beforeJson.getString("telephone"));
+                    }
+                    if(null != beforeJson.getString("paymentPassword") && !"".equals(beforeJson.getString("paymentPassword").trim())){
+                        before.append(" 支付密码:"+beforeJson.getString("paymentPassword"));
+                    }
+                    accountModifyListVo.setBeforeString(before.toString());
+                }
+                if(null != next.getAfterInfo() && !"".equals(next.getAfterInfo())){
+                    StringBuilder after = new StringBuilder();
+                    JSONObject afterJson = JSONObject.parseObject(next.getAfterInfo());
+                    if(afterJson.getString("loginPassword") != null && !"".equals(afterJson.getString("loginPassword").trim())){
+                        after.append(" 登录密码:"+afterJson.getString("loginPassword"));
+                    }
+                    if(afterJson.getString("email") != null && !"".equals(afterJson.getString("email").trim())){
+                        after.append(" 电子邮箱:"+afterJson.getString("email"));
+                    }
+                    if(afterJson.getString("realname") != null && !"".equals(afterJson.getString("realname").trim())){
+                        after.append(" 姓名:"+afterJson.getString("realname"));
+                    }
+                    if(afterJson.getString("bankCardNo") != null && !"".equals(afterJson.getString("bankCardNo").trim())){
+                        after.append(" 银行卡号:"+afterJson.getString("bankCardNo"));
+                    }
+                    if(afterJson.getString("bank") != null && !"".equals(afterJson.getString("bank").trim())){
+                        after.append(" 银行名称:"+afterJson.getString("bank"));
+                    }
+                    if(afterJson.getString("bankDeposit") != null && !"".equals(afterJson.getString("bankDeposit").trim())){
+                        after.append(" 开户行地址:"+afterJson.getString("bankDeposit"));
+                    }
+                    if(afterJson.getString("telephone") != null && !"".equals(afterJson.getString("telephone").trim())){
+                        after.append(" 手机号码:"+afterJson.getString("telephone"));
+                    }
+                    if(afterJson.getString("paymentPassword") != null && !"".equals(afterJson.getString("paymentPassword").trim())){
+                        after.append(" 支付密码:"+afterJson.getString("paymentPassword"));
+                    }
+                    accountModifyListVo.setAfterString(after.toString());
+                }
+                accountModifyListVo.setBefore(JSONObject.parseObject(next.getBeforeInfo()));
+                accountModifyListVo.setAfter(JSONObject.parseObject(next.getAfterInfo()));
+                accountModifyListVo.setOperatorId(next.getProcUserId());
+                accountModifyListVo.setOperatorName(next.getProcUsername());
+                accountModifyListVo.setOperatorTime(LocalDateTimeUtil.toAmerica(next.getCreateTime()));
+                result.add(accountModifyListVo);
+            }
+        }
+        return result;
+    }
 
     /**
      * 组装翻页数据
@@ -588,7 +679,7 @@ public class InfoResourceServiceImpl {
         }
         long uid = rc.getUid();
         List<AccountOperHistory> list = accountOperHistoryService.getList(type, account, uid, operaUser.getOwnerId(), null, null);
-        List<AccountModifyListVo> modifyListVos = assembleModifyList(list);
+        List<AccountModifyListVo> modifyListVos = assembleModifyListToString(list);
 
         String filename = assembleFileName(rc.getUid(), ExcelUtil.MODIFY_LIST);
         DownLoadFile downLoadFile = new DownLoadFile();
