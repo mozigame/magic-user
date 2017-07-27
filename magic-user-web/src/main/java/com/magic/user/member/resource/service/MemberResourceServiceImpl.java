@@ -466,7 +466,7 @@ public class MemberResourceServiceImpl {
 
 
     private void checkDownloadSource(int downloadSource) {
-        if (downloadSource != 0 || downloadSource != 1) {
+        if (downloadSource != 0 && downloadSource != 1) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
     }
