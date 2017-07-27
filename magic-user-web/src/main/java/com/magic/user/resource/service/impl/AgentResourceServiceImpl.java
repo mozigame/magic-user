@@ -382,8 +382,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             ApiLogger.error(String.format("add ownerAccountUser failed,ownerId:%d,account:%d,agentId:%d", holderUser.getOwnerId(), account, userId));
             throw UserException.REGISTER_FAIL;
         }
+        ApiLogger.info("----add agent-info1 userId="+userId+" ownerId="+holder+"/"+holderUser.getOwnerId()+" ownerName="+holderUser.getOwnerName());
         //2、添加代理基础信息
         User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, account, telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo, bank, bankDeposit);
+        ApiLogger.info("----add agent-info2 userId="+userId+" userName="+agentUser.getUsername()+"/"+agentUser.getOwnerId()+" ownerName="+agentUser.getOwnerName());
         if (!userService.addAgent(agentUser)) {
             ApiLogger.error("add agent info failed,userId:" + userId);
             throw UserException.REGISTER_FAIL;
