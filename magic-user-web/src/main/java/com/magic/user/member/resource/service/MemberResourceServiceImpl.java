@@ -522,6 +522,27 @@ public class MemberResourceServiceImpl {
     }
 
     /**
+     * 会员详情
+     *
+     * @param rc RequestContext
+     * @param id 会员ID
+     * @return
+     */
+    public String memberDetailsNoCapital(RequestContext rc, long userId) {
+        User user = userService.get(rc.getUid());
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        Member member = memberService.getMemberById(userId);
+        if (member == null) {
+            throw UserException.ILLEGAL_MEMBER;
+        }
+        member.setEmail("");
+        member.setTelephone("");
+        return JSON.toJSONString(member);
+    }
+
+    /**
      * 组装会员详情
      *
      * @return
@@ -810,7 +831,7 @@ public class MemberResourceServiceImpl {
      * @param level
      * @return
      */
-    public String updateLevel(RequestContext rc, Long memberId, Long level) {
+    public String updateLevel(RequestContext rc, Long memberId, Long level,Long permanentLock) {
         if (!Optional.ofNullable(memberId).filter(id -> id > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
@@ -821,7 +842,7 @@ public class MemberResourceServiceImpl {
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
-        boolean result = thriftOutAssembleService.setMemberLevel(member, level);
+        boolean result = thriftOutAssembleService.setMemberLevel(member, level,permanentLock);
         if (result) {
             result = memberMongoService.updateLevel(member, level);
         }

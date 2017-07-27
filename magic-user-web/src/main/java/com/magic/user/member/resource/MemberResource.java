@@ -333,6 +333,20 @@ public class MemberResource {
         return memberServiceResource.memberDetails(rc, id);
     }
 
+    /**
+     * 单独获取会员信息，没有资金等数据
+     * @return
+     */
+    @Access(type = Access.AccessType.RESOURCE)
+    @RequestMapping(value = "/detail/nocapital", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String detailNoCapital(
+            @RequestParam(name = "userId", required = true) long userId
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.memberDetailsNoCapital(rc, userId);
+    }
+
 
     /**
      * @param id 会员id
@@ -409,6 +423,7 @@ public class MemberResource {
     /**
      * @param id    会员ID
      * @param level 层级ID
+     * @param permanentLock 是否永久锁定 0 否 1 是
      * @return
      * @Doc 会员层级修改, 前端直接进行页面跳转
      */
@@ -418,10 +433,11 @@ public class MemberResource {
     @ResponseBody
     public String levelUpdate(
             @RequestParam(name = "id", required = true) Long id,
-            @RequestParam(name = "level", required = true) Long level
+            @RequestParam(name = "level", required = true) Long level,
+            @RequestParam(name="permanentLock",required = false,defaultValue = "0") Long permanentLock
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.updateLevel(rc, id, level);
+        return memberServiceResource.updateLevel(rc, id, level,permanentLock);
     }
 
     /**

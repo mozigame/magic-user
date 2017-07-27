@@ -452,9 +452,9 @@ public class ThriftOutAssembleServiceImpl {
      * @param level
      * @return
      */
-    public boolean setMemberLevel(Member member, Long level){
+    public boolean setMemberLevel(Member member, Long level,Long permanentLock){
         try {
-            String body = assembleBody(member, level);
+            String body = assembleBody(member, level,permanentLock);
             EGResp call = thriftFactory.call(CmdType.CONFIG, 0x50002d, body, UserContants.CALLER);
             return Optional.ofNullable(call).filter(code -> code.getCode() == 0).isPresent();
         }catch (Exception e){
@@ -475,6 +475,22 @@ public class ThriftOutAssembleServiceImpl {
         body.put("OwnerId", member.getOwnerId());
         body.put("UserLevelId", level);
         body.put("members", new String[]{member.getUsername()});
+        return body.toJSONString();
+    }
+
+    /**
+     * 组装请求数据
+     *
+     * @param member
+     * @param level
+     * @return
+     */
+    private String assembleBody(Member member, Long level,Long permanentLock) {
+        JSONObject body = new JSONObject();
+        body.put("OwnerId", member.getOwnerId());
+        body.put("UserLevelId", level);
+        body.put("members", new String[]{member.getUsername()});
+        body.put("isLocked",permanentLock);
         return body.toJSONString();
     }
 
