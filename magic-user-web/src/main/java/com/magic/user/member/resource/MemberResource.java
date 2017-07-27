@@ -268,6 +268,10 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition, downloadSource);
+        addContentToResponse(response, downLoadFile);
+    }
+
+    private void addContentToResponse(HttpServletResponse response, DownLoadFile downLoadFile) throws IOException {
         response.setCharacterEncoding("UTF-8");
         if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
             String contnetDisposition = "attachment;filename=";
@@ -453,24 +457,7 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.memberLevelListExport(rc, lock);
-        response.setCharacterEncoding("UTF-8");
-        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
-            String contnetDisposition = "attachment;filename=";
-            if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
-                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
-            }
-            response.setHeader("Content-Disposition", contnetDisposition);
-            ServletOutputStream outputStream = response.getOutputStream();
-            try {
-                outputStream.write(downLoadFile.getContent());
-            } catch (Exception e) {
-                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
-            } finally {
-                outputStream.flush();
-                outputStream.close();
-            }
-        }
+        addContentToResponse(response, downLoadFile);
     }
 
     /**
@@ -520,24 +507,7 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.memberListExport(rc, condition, 0);
-        response.setCharacterEncoding("UTF-8");
-        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
-            String contnetDisposition = "attachment;filename=";
-            if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
-                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
-            }
-            response.setHeader("Content-Disposition", contnetDisposition);
-            ServletOutputStream outputStream = response.getOutputStream();
-            try {
-                outputStream.write(downLoadFile.getContent());
-            } catch (Exception e) {
-                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
-            } finally {
-                outputStream.flush();
-                outputStream.close();
-            }
-        }
+        addContentToResponse(response, downLoadFile);
     }
 
     /**
