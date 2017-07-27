@@ -48,6 +48,7 @@ import com.magic.user.util.AuthConst;
 import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -382,13 +383,7 @@ public class MemberResourceServiceImpl {
             return false;
         }
         Account account = condition.getAccount();
-        List<Account> accountList = condition.getAccountList();
-        //如果有accountList，则以accountList为准（兼容）
-        if (accountList == null) {
-            accountList = new LinkedList<>();
-            accountList.add(account);
-        }
-        if (checkAccountList(accountList)) {
+        if (checkAccount(account)) {
             return false;
         }
         RegionNumber region = condition.getDepositNumber();
@@ -410,15 +405,6 @@ public class MemberResourceServiceImpl {
         return true;
     }
 
-    private boolean checkAccountList(List<Account> accountList) {
-        //有一个数据不正确就失败
-        for (Account account : accountList) {
-            if (!checkAccount(account)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * 检测account查询条件是否合法
@@ -428,7 +414,7 @@ public class MemberResourceServiceImpl {
      */
     private boolean checkAccount(Account account) {
         if (account != null) {
-            if (StringUtils.isNotBlank(account.getName()) || account.getId() > 0) {
+            if (StringUtils.isNotBlank(account.getName()) || CollectionUtils.isNotEmpty(account.getNameList())) {
                 Integer type = account.getType();
                 if (type == null || AccountType.parse(type) == null && (type != AccountType.agent.value() || type != AccountType.member.value())) {
                     return true;
@@ -519,7 +505,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_MEMBER;
         }
         // 权限检查
-            authOfSearchResources(user.getUserId(), user.getOwnerId(), member);
+        authOfSearchResources(user.getUserId(), user.getOwnerId(), member);
 
         MemberDetailVo detail = assembleMemberDetail(member);
         return JSON.toJSONString(detail);
@@ -1644,10 +1630,10 @@ public class MemberResourceServiceImpl {
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, page, count);
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
-                if(null != member.getLoginIp() && !"".equals(member.getLoginIp())){
-                    member.setCity(getAddressByIP(member.getLoginIp(),this.URL));
+                if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
+                    member.setCity(getAddressByIP(member.getLoginIp(), this.URL));
                 }
-                
+
             }
         }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
@@ -2234,13 +2220,13 @@ public class MemberResourceServiceImpl {
             reader.close();
             JSONObject object = JSONObject.parseObject(result.toString());
             if (object.size() > 0) {
-                if(object.getString("city") != null && !object.getString("city").equals("")){
+                if (object.getString("city") != null && !object.getString("city").equals("")) {
                     return object.getString("city");
                 }
-                if(object.getString("province") != null && !object.getString("province").equals("")){
+                if (object.getString("province") != null && !object.getString("province").equals("")) {
                     return object.getString("province");
                 }
-                if(object.getString("country") != null && !object.getString("country").equals("")){
+                if (object.getString("country") != null && !object.getString("country").equals("")) {
                     return object.getString("country");
                 }
             }

@@ -172,6 +172,17 @@ public class MemberCondition {
         this.ownerId = ownerId;
     }
 
+    public List<Integer> getLevelList() {
+        return levelList;
+    }
+
+    public void setLevelList(List<Integer> levelList) {
+        this.levelList = levelList;
+    }
+
+
+
+
     /**
      * 反序列化
      *
@@ -188,7 +199,7 @@ public class MemberCondition {
             return memberCondition;
         } catch (JSONException e) {
             ApiLogger.error(String.format("parse conditon to membercondition object error. condition: %s, msg: %s", condition, e.getMessage()));
-            return EMPTY_MEMBER_CONDITION;
+            return MemberCondition.EMPTY_MEMBER_CONDITION;
         }
 
     }
@@ -224,16 +235,10 @@ public class MemberCondition {
                     }
                     account.setNameList(nameList);
                 }
+            }else {
+
             }
         }
-    }
-
-    public List<Integer> getLevelList() {
-        return levelList;
-    }
-
-    public void setLevelList(List<Integer> levelList) {
-        this.levelList = levelList;
     }
 
 
