@@ -206,6 +206,9 @@ public class MemberResourceServiceImpl {
         return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
     }
 
+
+    private static final int INTERVAL = 500;
+
     /**
      * 组装会员列表
      *
@@ -216,10 +219,24 @@ public class MemberResourceServiceImpl {
         Set<Long> memberIds = memberConditionVos.stream().map(MemberConditionVo::getMemberId).collect(Collectors.toSet());
         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
+
+        for (int i = 0; i < memberConditionVos.size(); i = i + INTERVAL) {
+            int fromIndex = i;
+            int endIndex = i + INTERVAL;
+            if (i + INTERVAL > memberConditionVos.size()) {
+                endIndex = memberConditionVos.size();
+            }
+            List<MemberConditionVo> subList = memberConditionVos.subList(fromIndex, endIndex);
+            disposeSubList(subList, memberIds, memberListVos);
+        }
+        return memberListVos;
+    }
+
+    private void disposeSubList(List<MemberConditionVo> memberConditionVos, Set<Long> memberIds, List<MemberListVo> memberListVos) {
         Map<Long, Member> members = memberService.findMemberByIds(memberIds);
         ApiLogger.info(String.format("get members. ids: %s, result: %s", JSON.toJSONString(memberIds), JSON.toJSONString(members)));
         if (!Optional.ofNullable(members).filter(size -> size.size() > 0).isPresent()) {
-            return memberListVos;
+            return;
         }
         //2、获取会员最近登录信息
         Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(memberIds);
@@ -264,7 +281,6 @@ public class MemberResourceServiceImpl {
 
             memberListVos.add(memberListVo);
         }
-        return memberListVos;
     }
 
     /**
@@ -831,7 +847,7 @@ public class MemberResourceServiceImpl {
      * @param level
      * @return
      */
-    public String updateLevel(RequestContext rc, Long memberId, Long level,Long permanentLock) {
+    public String updateLevel(RequestContext rc, Long memberId, Long level, Long permanentLock) {
         if (!Optional.ofNullable(memberId).filter(id -> id > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
@@ -842,7 +858,7 @@ public class MemberResourceServiceImpl {
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
-        boolean result = thriftOutAssembleService.setMemberLevel(member, level,permanentLock);
+        boolean result = thriftOutAssembleService.setMemberLevel(member, level, permanentLock);
         if (result) {
             result = memberMongoService.updateLevel(member, level);
         }
@@ -2230,5 +2246,5 @@ public class MemberResourceServiceImpl {
         }
         return false;
     }
-    
+
 }
