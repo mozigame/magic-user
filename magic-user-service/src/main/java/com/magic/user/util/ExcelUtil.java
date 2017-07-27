@@ -586,8 +586,8 @@ public class ExcelUtil {
                 row.createCell(1).setCellValue(vo.getOwnerName());
                 row.createCell(2).setCellValue(vo.getShowType());
                 row.createCell(3).setCellValue(vo.getAccount());
-                row.createCell(4).setCellValue(vo.getBefore().toJSONString());
-                row.createCell(5).setCellValue(vo.getAfter().toJSONString());
+                row.createCell(4).setCellValue(vo.getBeforeString());
+                row.createCell(5).setCellValue(vo.getAfterString());
                 row.createCell(6).setCellValue(vo.getOperatorName());
                 row.createCell(7).setCellValue(vo.getOperatorTime());
             }
