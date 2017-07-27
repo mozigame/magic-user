@@ -61,7 +61,7 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         if (memberCondition != null) {
             Query query = assembleQuery(memberCondition);
             ApiLogger.debug("memberCondition = " + memberCondition
-             + ", query = " + query);
+                    + ", query = " + query);
             if (page != null && count != null) {
                 query.skip((page - 1) * count);
                 query.limit(count);
@@ -201,53 +201,30 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
     }
 
     private void disposeAccount(MemberCondition memberCondition, Query query) {
-        //优先list
-        if (CollectionUtils.isNotEmpty(memberCondition.getAccountList())) {
-            List<String> agentNameList = new LinkedList<>();
-            List<String> memberNameList = new LinkedList<>();
-            List<Number> memberIdList = new LinkedList<>();
-            List<Number> agentIdList = new LinkedList<>();
-            for (Account account : memberCondition.getAccountList()) {
-                if (account != null) {
-                    if (StringUtils.isNotBlank(account.getName())) {
-                        if (AccountType.parse(account.getType()) == AccountType.agent) {
-                            agentNameList.add(account.getName());
-                        } else if (AccountType.parse(account.getType()) == AccountType.member) {
-                            memberNameList.add(account.getName());
-                        }
-                    }
-                    if (account.getId() != null) {
-                        if (AccountType.parse(account.getType()) == AccountType.agent) {
-                            agentIdList.add(account.getId());
-                        } else if (AccountType.parse(account.getType()) == AccountType.member) {
-                            memberIdList.add(account.getId());
-                        }
-                    }
-                }
-            }
-            if (CollectionUtils.isNotEmpty(agentNameList)){
-                query.addCriteria(new Criteria("agentName").in(agentNameList));
-            }
-            if (CollectionUtils.isNotEmpty(memberNameList)){
-                query.addCriteria(new Criteria("memberName").in(memberNameList));
-            }
-            if (CollectionUtils.isNotEmpty(memberIdList)){
-                query.addCriteria(new Criteria("memberId").in(memberIdList));
-            }
-            if (CollectionUtils.isNotEmpty(agentIdList)){
-                query.addCriteria(new Criteria("agentId").in(agentIdList));
-            }
-        } else {
-            Account account = memberCondition.getAccount();
-            if (account != null && StringUtils.isNotBlank(account.getName())) {
+
+        Account account = memberCondition.getAccount();
+        if (account != null) {
+            //优先list
+            if (CollectionUtils.isNotEmpty(account.getNameList())){
                 if (AccountType.parse(account.getType()) == AccountType.agent) {
-                    query.addCriteria(new Criteria("agentName").is(account.getName()));
+                    query.addCriteria(new Criteria("agentName").in(account.getNameList()));
                 }
                 if (AccountType.parse(account.getType()) == AccountType.member) {
-                    query.addCriteria(new Criteria("memberName").is(account.getName()));
+                    query.addCriteria(new Criteria("memberName").in(account.getNameList()));
+                }
+            }else {
+                if (StringUtils.isNotBlank(account.getName())) {
+                    if (AccountType.parse(account.getType()) == AccountType.agent) {
+                        query.addCriteria(new Criteria("agentName").is(account.getName()));
+                    }
+                    if (AccountType.parse(account.getType()) == AccountType.member) {
+                        query.addCriteria(new Criteria("memberName").is(account.getName()));
+                    }
                 }
             }
+
         }
+
     }
 
     public boolean updateLevel(long memberId, long level) {

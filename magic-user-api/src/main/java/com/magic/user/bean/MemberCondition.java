@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.magic.api.commons.ApiLogger;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,11 +35,6 @@ public class MemberCondition {
      * 账号
      */
     private Account account;
-
-    /**
-     * 账号列表
-     */
-    private List<Account> accountList;
 
     /**
      * 账号状态
@@ -185,20 +182,9 @@ public class MemberCondition {
         try {
             MemberCondition memberCondition = JSON.parseObject(condition, MemberCondition.class);
             //希望后续判断采用list
-            if (CollectionUtils.isEmpty(memberCondition.getAccountList())) {
-                if (memberCondition.getAccount() != null) {
-                    List<Account> accountList = new LinkedList<>();
-                    accountList.add(memberCondition.getAccount());
-                    memberCondition.setAccountList(accountList);
-                }
-            }
-            if (CollectionUtils.isEmpty(memberCondition.getLevelList())) {
-                if (memberCondition.getLevel() != null) {
-                    List<Integer> levelList = new LinkedList<>();
-                    levelList.add(memberCondition.getLevel());
-                    memberCondition.setLevelList(levelList);
-                }
-            }
+            parseAccount(memberCondition);
+
+            parseLevelList(memberCondition);
             return memberCondition;
         } catch (JSONException e) {
             ApiLogger.error(String.format("parse conditon to membercondition object error. condition: %s, msg: %s", condition, e.getMessage()));
@@ -207,12 +193,39 @@ public class MemberCondition {
 
     }
 
-    public List<Account> getAccountList() {
-        return accountList;
+    /**
+     * 解析 levelList
+     * @param memberCondition
+     */
+    private static void parseLevelList(MemberCondition memberCondition) {
+        if (CollectionUtils.isEmpty(memberCondition.getLevelList())) {
+            if (memberCondition.getLevel() != null) {
+                List<Integer> levelList = new LinkedList<>();
+                levelList.add(memberCondition.getLevel());
+                memberCondition.setLevelList(levelList);
+            }
+        }
     }
 
-    public void setAccountList(List<Account> accountList) {
-        this.accountList = accountList;
+    /**
+     * 解析account
+     * @param memberCondition
+     */
+    private static void parseAccount(MemberCondition memberCondition) {
+        Account account = memberCondition.getAccount();
+        if (account != null) {
+            String name = account.getName();
+            if (StringUtils.isNotBlank(name)) {
+                String[] names = name.split(",");
+                if (names != null && names.length > 0) {
+                    List<String> nameList = new ArrayList<>(names.length);
+                    for (String nameEle :names){
+                        nameList.add(nameEle);
+                    }
+                    account.setNameList(nameList);
+                }
+            }
+        }
     }
 
     public List<Integer> getLevelList() {
@@ -223,12 +236,6 @@ public class MemberCondition {
         this.levelList = levelList;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("accountList = " + accountList);
-        return stringBuilder.toString();
-    }
 
     public static void main(String[] args) {
         String s = "{\"currencyType\":\"1\",\"status\":\"\",\"register\":{\"start\":\"\",\"end\":\"\"},\"account\":{\"type\":\"5\",\"name\":\"fdf66\"},\"depositNumber\":{\"min\":\"\",\"max\":\"\"},\"withdrawNumber\":{\"min\":\"\",\"max\":\"\"},\"depositMoney\":{\"min\":\"\",\"max\":\"\"},\"withdrawMoney\":{\"min\":\"\",\"max\":\"\"}}";

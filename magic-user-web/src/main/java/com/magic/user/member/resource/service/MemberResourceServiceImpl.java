@@ -185,9 +185,6 @@ public class MemberResourceServiceImpl {
         }
         memberCondition.setOwnerId(operaUser.getOwnerId());
         if (!checkCondition(memberCondition)) {
-//            if (ApiLogger.isDebugEnabled()) {
-//                ApiLogger.debug("checkCondition is false::condition = " + condition);
-//            }
             return JSON.toJSONString(assemblePageBean(page, count, 0L, null));
         }
         if (operaUser.getType() == AccountType.agent) {
