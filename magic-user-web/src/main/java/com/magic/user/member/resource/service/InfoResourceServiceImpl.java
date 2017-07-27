@@ -287,6 +287,7 @@ public class InfoResourceServiceImpl {
         Map<String, Object> oldMap = new HashMap<>();//修改前数据
         Map<String, Object> userMap = new HashedMap();  //修改的用户数据
         AccountType accountType = AccountType.parse(type);
+        boolean result=false;
         if (accountType == AccountType.member) {//账号
             Member member = memberService.getMemberById(id);
             if (member == null) {
@@ -294,7 +295,14 @@ public class InfoResourceServiceImpl {
             }
             newMap.put("ownerId",member.getOwnerId());
             newMap.put("userId", member.getMemberId());
-            boolean result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
+            
+            userMap.put("userId", member.getMemberId());
+            userMap.put("username", member.getUsername());
+            userMap.put("ownerId", member.getOwnerId());
+            userMap.put("ownerName", member.getOwnerUsername());
+            userMap.put("type", type);
+            userMap.put("operTime", System.currentTimeMillis());
+            result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
                 if (StringUtils.isNotEmpty(realname) && !realname.trim().equals(member.getRealname())) {
                     newMap.put("realname", realname);
@@ -320,18 +328,13 @@ public class InfoResourceServiceImpl {
                     newMap.put("bankDeposit", bankDeposit);
                     oldMap.put("bankDeposit", member.getBankDeposit());
                 }
-                userMap.put("userId", member.getMemberId());
-                userMap.put("username", member.getUsername());
-                userMap.put("ownerId", member.getOwnerId());
-                userMap.put("ownerName", member.getOwnerUsername());
-                userMap.put("type", type);
-                userMap.put("operTime", System.currentTimeMillis());
             }
             if (StringUtils.isNotEmpty(loginPassword)) {
                 newMap.put("loginPassword", loginPassword);
                 oldMap.put("loginPassword", "******");
                 thriftOutAssembleService.passwordReset(assembleLoginPwdBody(member.getMemberId(),member.getUsername(),
                         loginPassword,rc.getIp()), "account");
+                result=true;
             }
             if(StringUtils.isNotEmpty(paymentPassword)){
                 newMap.put("paymentPassword",paymentPassword);
@@ -343,8 +346,15 @@ public class InfoResourceServiceImpl {
             if (user == null) {
                 throw UserException.ILLEGAL_USER;
             }
+            userMap.put("userId", user.getUserId());
+            userMap.put("username", user.getUsername());
+            userMap.put("ownerId", user.getOwnerId());
+            userMap.put("ownerName", user.getOwnerName());
+            userMap.put("type", type);
+            userMap.put("operTime", System.currentTimeMillis());
+            userMap.put("paymentPassword",paymentPassword);
             //用户数据更新
-            boolean result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
+            result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
             if (result) {
                 if (StringUtils.isNoneEmpty(realname) && !realname.trim().equals(user.getRealname())) {
                     newMap.put("realname", realname);
@@ -362,13 +372,6 @@ public class InfoResourceServiceImpl {
                     newMap.put("bankCardNo", bankCardNo);
                     oldMap.put("bankCardNo", user.getBankCardNo());
                 }
-                userMap.put("userId", user.getUserId());
-                userMap.put("username", user.getUsername());
-                userMap.put("ownerId", user.getOwnerId());
-                userMap.put("ownerName", user.getOwnerName());
-                userMap.put("type", type);
-                userMap.put("operTime", System.currentTimeMillis());
-                userMap.put("paymentPassword",paymentPassword);
             }
             if (StringUtils.isNoneEmpty(loginPassword)) {
                 String pwd = PasswordCapture.getSaltPwd(loginPassword);
@@ -380,7 +383,7 @@ public class InfoResourceServiceImpl {
             }
 
         }
-        if (newMap.size() > 0) {
+        if (result) {
             JSONObject object = new JSONObject();
             object.put("after", newMap);
             object.put("before", oldMap);
