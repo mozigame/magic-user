@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.magic.analysis.utils.HttpUtils;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
@@ -1632,7 +1633,7 @@ public class MemberResourceServiceImpl {
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
                 if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
-                    member.setCity(getAddressByIP(member.getLoginIp(), this.URL));
+                    member.setCity(HttpUtils.getAddressByIP(member.getLoginIp()));
                 }
 
             }
@@ -2200,41 +2201,5 @@ public class MemberResourceServiceImpl {
         }
         return false;
     }
-
-    /**
-     * 根据ip获取城市名
-     *
-     * @param ip
-     * @param URL
-     * @return
-     */
-    public String getAddressByIP(String ip, String URL) {
-        try {
-            java.net.URL url = new URL(URL + ip);
-            URLConnection conn = url.openConnection();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "GBK"));
-            String line = null;
-            StringBuffer result = new StringBuffer();
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
-            reader.close();
-            JSONObject object = JSONObject.parseObject(result.toString());
-            if (object.size() > 0) {
-                if (object.getString("city") != null && !object.getString("city").equals("")) {
-                    return object.getString("city");
-                }
-                if (object.getString("province") != null && !object.getString("province").equals("")) {
-                    return object.getString("province");
-                }
-                if (object.getString("country") != null && !object.getString("country").equals("")) {
-                    return object.getString("country");
-                }
-            }
-        } catch (IOException e) {
-            return "读取失败";
-        }
-        return "未知城市";
-    }
-
+    
 }
