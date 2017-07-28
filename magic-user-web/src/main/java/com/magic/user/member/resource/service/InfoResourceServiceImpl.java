@@ -382,7 +382,7 @@ public class InfoResourceServiceImpl {
             }
 
         }
-        if (StringUtils.isNotBlank(paymentPassword)) {
+        if (result||StringUtils.isNotBlank(paymentPassword)) {
             JSONObject object = new JSONObject();
             object.put("after", newMap);
             object.put("before", oldMap);
