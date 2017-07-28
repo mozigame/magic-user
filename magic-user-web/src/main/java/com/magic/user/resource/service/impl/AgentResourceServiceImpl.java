@@ -77,6 +77,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     @Resource
     private MemberMongoService memberMongoService;
 
+    @Resource
+    private AgentMongoService agentMongoService;
+
+
     /**
      * {@inheritDoc}
      *
@@ -132,15 +136,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 listm = new HashMap<>();
             }
             //根据代理ID列表查询代理的会员数量信息
-            List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds, AccountType.agent);
-
-            Map<Long, OwnerStockAgentMember> osamMap = new HashMap<>();
-
-            if (OwnerStockAgentMemberList != null) {
-                for (OwnerStockAgentMember osam : OwnerStockAgentMemberList) {
-                    osamMap.put(osam.getAgentId(), osam);
-                }
-            }
+            Map<Long, OwnerStockAgentMember> osamMap = getOwnerStockMapByAgentIds(agentIds);
 
             List<AgentInfoVo> users = userService.findAgents(agentIds);
             if (users == null) {
@@ -1474,6 +1470,58 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.USERNAME_EXIST;
         }
         return UserContants.EMPTY_STRING;
+    }
+
+    /**
+     * 可以修复任何agent数据,后期建议添加操作白名单
+     *
+     * @param requestContext
+     * @param agentIdList
+     * @return
+     */
+    @Override
+    public String repairMemberNumber(RequestContext requestContext, String agentIdList) {
+        List<Long> agentIds = getAgentIds(agentIdList);
+        //根据代理ID列表查询代理的会员数量信息
+        Map<Long, OwnerStockAgentMember> osamMap = getOwnerStockMapByAgentIds(agentIds);
+        //repair
+        JSONObject jsonObject = new JSONObject();
+        for (Long agentId : agentIds) {
+            OwnerStockAgentMember ownerStockAgentMember = osamMap.get(agentId);
+            if (ownerStockAgentMember == null) {
+                jsonObject.put(String.valueOf(agentId), "ownerStockAgentMember is null");
+            } else {
+                Number memberNumber = ownerStockAgentMember.getMemNumber();
+                boolean opResult = agentMongoService.updateAgentMemberNumber(agentId, memberNumber);
+                jsonObject.put(String.valueOf(agentId), opResult);
+            }
+        }
+        return jsonObject.toJSONString();
+    }
+
+    private Map<Long, OwnerStockAgentMember> getOwnerStockMapByAgentIds(List<Long> agentIds) {
+        List<OwnerStockAgentMember> OwnerStockAgentMemberList = ownerStockAgentService.countMembersByIds(agentIds, AccountType.agent);
+        Map<Long, OwnerStockAgentMember> osamMap = new HashMap<>();
+
+        if (OwnerStockAgentMemberList != null) {
+            for (OwnerStockAgentMember osam : OwnerStockAgentMemberList) {
+                osamMap.put(osam.getAgentId(), osam);
+            }
+        }
+        return osamMap;
+    }
+
+    private List<Long> getAgentIds(String agentIdList) {
+        String[] agentIdArray = agentIdList.split(",");
+        //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
+        List<Long> agentIds = Lists.newArrayList();
+        for (String agentId : agentIdArray) {
+            agentIds.add(Long.parseLong(agentId));
+        }
+        if (agentIds.size() > 200) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        return agentIds;
     }
 
     /**

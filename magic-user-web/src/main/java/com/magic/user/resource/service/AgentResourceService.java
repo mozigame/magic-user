@@ -1,9 +1,7 @@
 package com.magic.user.resource.service;
 
 import com.magic.api.commons.core.context.RequestContext;
-import com.magic.user.bean.AgentCondition;
 import com.magic.user.po.DownLoadFile;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -236,4 +234,12 @@ public interface AgentResourceService {
      * @return
      */
     String checkUsernameIsExists(RequestContext requestContext, String username);
+
+    /**
+     * 用于修复memberNumber的一致性
+     * @param requestContext
+     * @param agentIdList
+     * @return
+     */
+    String repairMemberNumber(RequestContext requestContext, String agentIdList);
 }

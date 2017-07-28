@@ -69,7 +69,7 @@ public class MemberRegisterSucessMongoConsumer implements Consumer {
                     return false;
                 }
             }
-            //累加代理的会员数（members）
+            //累加代理的会员数（members） -并发会有问题
             AgentConditionVo agentConditionVo = agentMongoService.get(member.getAgentId());
             if (agentConditionVo != null) {
                 agentConditionVo.setMembers(agentConditionVo.getMembers() + 1);
