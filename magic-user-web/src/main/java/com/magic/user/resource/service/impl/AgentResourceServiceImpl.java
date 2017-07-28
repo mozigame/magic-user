@@ -91,6 +91,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
         }
+
         AgentCondition userCondition = AgentCondition.valueOf(condition);
         if (userCondition == null) {
             userCondition = new AgentCondition();
@@ -113,8 +114,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
 
             //3、条件查询mongo中的代理，组装id
             List<AgentConditionVo> agentConditionVoList = agentMongoService.queryByPage(userCondition, page, count);
-            if (agentConditionVoList == null) return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
-
+            if (agentConditionVoList == null) {
+                return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+            }
             //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
             List<Long> agentIds = Lists.newArrayList();
 
@@ -141,7 +143,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
 
             List<AgentInfoVo> users = userService.findAgents(agentIds);
-            if (users == null) return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+            if (users == null) {
+                return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+            }
             List<AgentInfoVo> list = assembleAgentList(users, map, osamMap, listm);
             if (list != null && list.size() > 0) {
                 return JSON.toJSONString(assemblePageBean(count, page, totalCount, list));
@@ -151,7 +155,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     }
 
     private String disposeAgent(int page, int count, User operaUser) {
-        long totalCount;
+        long totalCount = 0L;
         AgentConditionVo ac = agentMongoService.get(operaUser.getUserId());
         Long v = memberMongoService.getDepositMembers(operaUser.getUserId());
         if (ac == null) {
@@ -163,7 +167,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         OwnerStockAgentMember osa = ownerStockAgentService.countMembersById(operaUser.getUserId(), AccountType.agent);
 
         AgentInfoVo av = userService.getAgentDetail(operaUser.getUserId());
-        if (av == null) return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+        if (av == null) {
+            return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
+        }
         List<AgentInfoVo> list = new ArrayList<>();
 
         av.setDepositTotalMoney(ac.getDepositMoney() == null ? 0L : NumberUtil.fenToYuan(ac.getDepositMoney()).longValue());
