@@ -159,7 +159,6 @@ public class InfoResourceServiceImpl {
         return UserContants.EMPTY_STRING;
     }
 
-
     /**
      * 获取modifyinfo
      *
@@ -274,8 +273,8 @@ public class InfoResourceServiceImpl {
      * @param paymentPassword 支付密码
      * @return
      */
-    public String modifyInfo(RequestContext rc, Long id, Integer type, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String loginPassword, String paymentPassword) {
-        if (!checkParams(id, type, realname, telephone, email, bankCardNo, bank, bankDeposit, loginPassword, paymentPassword)) {
+    public String modifyInfo(RequestContext rc, Long id, Integer type, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String loginPassword, String paymentPassword,String bankCode) {
+        if (!checkParams(id, type, realname, telephone, email, bankCardNo, bank, bankDeposit, loginPassword, paymentPassword,bankCode)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         long uid = rc.getUid();
@@ -302,7 +301,7 @@ public class InfoResourceServiceImpl {
             userMap.put("ownerName", member.getOwnerUsername());
             userMap.put("type", type);
             userMap.put("operTime", System.currentTimeMillis());
-            result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
+            result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit,bankCode));
             if (result) {
                 if (StringUtils.isNotEmpty(realname) && !realname.trim().equals(member.getRealname())) {
                     newMap.put("realname", realname);
@@ -453,7 +452,7 @@ public class InfoResourceServiceImpl {
      * @param bankDeposit
      * @return
      */
-    private Member assembleModifyMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
+    private Member assembleModifyMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit,String bankCode) {
         Member member = new Member();
         member.setMemberId(id);
         member.setRealname(realname);
@@ -462,6 +461,7 @@ public class InfoResourceServiceImpl {
         member.setBankCardNo(bankCardNo);
         member.setBank(bank);
         member.setBankDeposit(bankDeposit);
+        member.setBankCode(bankCode);
         return member;
     }
     /**
@@ -479,7 +479,7 @@ public class InfoResourceServiceImpl {
      * @param paymentPassword
      * @return
      */
-    private boolean checkParams(Long id, Integer type, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String loginPassword, String paymentPassword) {
+    private boolean checkParams(Long id, Integer type, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String loginPassword, String paymentPassword,String bankCode) {
         if (id == null || id <= 0) {
             return false;
         }
@@ -494,7 +494,7 @@ public class InfoResourceServiceImpl {
             return false;
         }
         if (realname.length() == 0 && telephone.length() == 0 && email.length() == 0 && bankCardNo.length() == 0
-                && bank.length() == 0 && bankDeposit.length() == 0 && loginPassword.length() == 0 && paymentPassword.length() == 0) {
+                && bank.length() == 0 && bankDeposit.length() == 0 && loginPassword.length() == 0 && paymentPassword.length() == 0 && bankCode.length()==0) {
             return false;
         }
         return true;
