@@ -923,7 +923,7 @@ public class MemberResourceServiceImpl {
                 LevelCondition llc = new LevelCondition();
                 llc.setDepositNumbers(condition.getInteger("depositTimes"));
                 llc.setDepositTotalMoney(String.valueOf(condition.getLong("despositTotalAmount")/100));
-                llc.setMaxDepositMoney(String.valueOf(condition.getLong("despositTotalAmount")/100));
+                llc.setMaxDepositMoney(String.valueOf(condition.getLong("despositMaxAmount")/100));
                 llc.setWithdrawNumbers(condition.getInteger("withdrawalTimes"));
                 llc.setWithdrawTotalMoney(String.valueOf(condition.getLong("withdrawTotalAmount")/100));
 
