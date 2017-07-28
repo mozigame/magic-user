@@ -76,11 +76,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private OwnerStockAgentService ownerStockAgentService;
     @Resource
     private MemberMongoService memberMongoService;
-
-    @Resource
-    private AgentMongoService agentMongoService;
-
-
+    
     /**
      * {@inheritDoc}
      *
