@@ -126,7 +126,7 @@ public class AgentMongoServiceImpl implements AgentMongoService {
         try {
             return agentMongoDao.updateAgentMemberNumber(agentId,memberNumber);
         }catch (Exception e){
-            ApiLogger.error(String.format("update agent  error.agentConditionVo:%d", agentConditionVo), e);
+            ApiLogger.error(String.format("update agent  error.agentId:%d", agentId), e);
         }
         return false;
     }
