@@ -180,4 +180,11 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
         update.set("members", agentConditionVo.getMembers());
         return super.update(query, update) != null;
     }
+
+    public boolean updateAgentMemberNumber(Number agentId, Number memberNumber) {
+        Query query = new Query(new Criteria("agentId").is(agentId));
+        Update update = new Update();
+        update.set("members", memberNumber);
+        return super.update(query, update) != null;
+    }
 }

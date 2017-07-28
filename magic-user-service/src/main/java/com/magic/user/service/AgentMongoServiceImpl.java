@@ -4,15 +4,10 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.user.bean.AgentCondition;
 import com.magic.user.dao.AgentMongoDaoImpl;
 import com.magic.user.vo.AgentConditionVo;
-import com.magic.user.vo.AgentInfoVo;
-import com.magic.user.vo.MemberConditionVo;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.management.Query;
 import java.util.List;
-import java.util.Map;
 
 /**
  * User: joey
@@ -117,6 +112,21 @@ public class AgentMongoServiceImpl implements AgentMongoService {
             return agentMongoDao.updateAgent(agentConditionVo);
         }catch (Exception e){
             ApiLogger.error(String.format("update agent  error.agentConditionVo:%d", agentConditionVo), e);
+        }
+        return false;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * @return
+     */
+    @Override
+    public boolean updateAgentMemberNumber(Number agentId, Number memberNumber) {
+        try {
+            return agentMongoDao.updateAgentMemberNumber(agentId,memberNumber);
+        }catch (Exception e){
+            ApiLogger.error(String.format("update agent  error.agentId:%d", agentId), e);
         }
         return false;
     }

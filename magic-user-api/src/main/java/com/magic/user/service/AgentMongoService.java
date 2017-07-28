@@ -58,4 +58,12 @@ public interface AgentMongoService {
      * @param agentConditionVo
      */
     boolean updateAgent(AgentConditionVo agentConditionVo);
+
+    /**
+     * 根据代理ID更新代理的会员数量信息
+     * @param agentId
+     * @param memberNumber
+     * @return
+     */
+    boolean updateAgentMemberNumber(Number agentId, Number memberNumber);
 }
