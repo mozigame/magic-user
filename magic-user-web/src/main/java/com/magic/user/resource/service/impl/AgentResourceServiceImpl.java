@@ -101,7 +101,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         long totalCount = 0;
         if (ApiLogger.isDebugEnabled()) {
-            ApiLogger.debug("AgentResourceServiceImpl::findByPage::operaUser = " + operaUser);
+            ApiLogger.debug("AgentResourceServiceImpl::findByPage::operaUser = " + operaUser.getType());
         }
         if (operaUser.getType() == AccountType.agent) {
             return disposeAgent(page, count, operaUser);
