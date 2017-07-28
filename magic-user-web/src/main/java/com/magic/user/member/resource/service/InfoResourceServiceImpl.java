@@ -2,7 +2,6 @@ package com.magic.user.member.resource.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
@@ -342,6 +341,47 @@ public class InfoResourceServiceImpl {
                 oldMap.put("paymentPassword", "******");
             }
 
+        } else {//代理或股东
+            User user = userService.getUserById(id);
+            if (user == null) {
+                throw UserException.ILLEGAL_USER;
+            }
+            userMap.put("userId", user.getUserId());
+            userMap.put("username", user.getUsername());
+            userMap.put("ownerId", user.getOwnerId());
+            userMap.put("ownerName", user.getOwnerName());
+            userMap.put("type", type);
+            userMap.put("operTime", System.currentTimeMillis());
+            userMap.put("paymentPassword",paymentPassword);
+            //用户数据更新
+            result = userService.update(assembleModifyUser(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
+            if (result) {
+                if (StringUtils.isNoneEmpty(realname) && !realname.trim().equals(user.getRealname())) {
+                    newMap.put("realname", realname);
+                    oldMap.put("realname", user.getRealname());
+                }
+                if (StringUtils.isNoneEmpty(telephone) && !telephone.trim().equals(user.getTelephone())) {
+                    newMap.put("telephone", telephone);
+                    oldMap.put("telephone", user.getTelephone());
+                }
+                if (StringUtils.isNoneEmpty(email) && !email.trim().equals(user.getEmail())) {
+                    newMap.put("email", email);
+                    oldMap.put("email", user.getEmail());
+                }
+                if (StringUtils.isNoneEmpty(bankCardNo) && !bankCardNo.trim().equals(user.getBankCardNo())) {
+                    newMap.put("bankCardNo", bankCardNo);
+                    oldMap.put("bankCardNo", user.getBankCardNo());
+                }
+            }
+            if (StringUtils.isNoneEmpty(loginPassword)) {
+                String pwd = PasswordCapture.getSaltPwd(loginPassword);
+                result = loginService.resetPassword(id,pwd);
+                if (result) {
+                    newMap.put("loginPassword", pwd);
+                    oldMap.put("loginPassword", "******");
+                }
+            }
+
         }
         if (result) {
             JSONObject object = new JSONObject();
@@ -349,14 +389,7 @@ public class InfoResourceServiceImpl {
             object.put("before", oldMap);
             object.put("operator", operator);
             object.put("user", userMap);
-            ApiLogger.info("update paypassword  send message to MQ");
-            try {
-
-
-                producer.send(Topic.USER_INFO_MODIFY_SUCCESS, String.valueOf(uid), object.toJSONString());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            producer.send(Topic.USER_INFO_MODIFY_SUCCESS, String.valueOf(uid), object.toJSONString());
         }
         return UserContants.EMPTY_STRING;
     }
