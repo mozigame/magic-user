@@ -48,6 +48,7 @@ public class AgentResource {
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
 
+        ApiLogger.info(condition);
         String result = agentResourceService.findByPage(RequestContext.getRequestContext(), condition, page, count);
         return result;
     }

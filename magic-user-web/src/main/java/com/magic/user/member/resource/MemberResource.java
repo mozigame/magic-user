@@ -165,7 +165,7 @@ public class MemberResource {
      * @return
      */
 
-    @Access(type = Access.AccessType.COOKIE)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/inner/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String login(
