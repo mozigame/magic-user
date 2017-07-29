@@ -8,6 +8,7 @@ import com.magic.api.commons.mq.api.Topic;
 import com.magic.api.commons.tools.IPUtil;
 import com.magic.api.commons.tools.LocalDateTimeUtil;
 import com.magic.api.commons.tools.NumberUtil;
+import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.vo.PrePaySchemeVo;
 import com.magic.config.vo.OwnerInfo;
 import com.magic.user.constants.UserContants;
@@ -100,8 +101,8 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
         if (!loginInfo.getPassword().equals(PasswordCapture.getSaltPwd(password))) {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
-
-        int ip = IPUtil.ipToInt(rc.getIp());
+        String ips[] = rc.getIp().split(",");
+        int ip = IPUtil.ipToInt(StringUtils.isNotBlank(ips[0]) ? "0" : ips[0]);
         sendLoginHistory(loginUser, System.currentTimeMillis(), ip, LoginType.login, agent);
         String token = MauthUtil.createOld(userId, System.currentTimeMillis());
         LoginResultVo result = new LoginResultVo();
