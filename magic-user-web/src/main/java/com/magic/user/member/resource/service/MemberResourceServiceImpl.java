@@ -1678,9 +1678,13 @@ public class MemberResourceServiceImpl {
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
                 if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
-                    member.setCity(HttpUtils.getAddressByIP(member.getLoginIp()));
+                    String loginIp = member.getLoginIp();
+                    member.setLoginIp(loginIp+"/"+HttpUtils.getAddressByIP(member.getLoginIp()));
                 }
-
+                if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
+                    String registerIp = member.getRegisterIp();
+                    member.setRegisterIp(registerIp+"/"+HttpUtils.getAddressByIP(member.getRegisterIp()));
+                }
             }
         }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
@@ -1716,6 +1720,18 @@ public class MemberResourceServiceImpl {
 //        memberCondition.setRegisterStartTime(registerStartTime);
 //        memberCondition.setRegisterEndTime(registerEndTime);
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, null, null);
+        if (list != null && list.size() > 0) {
+            for (OnLineMember member : list) {
+                if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
+                    String loginIp = member.getLoginIp();
+                    member.setLoginIp(loginIp+"/"+HttpUtils.getAddressByIP(member.getLoginIp()));
+                }
+                if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
+                    String registerIp = member.getRegisterIp();
+                    member.setRegisterIp(registerIp+"/"+HttpUtils.getAddressByIP(member.getRegisterIp()));
+                }
+            }
+        }
         List<OnLineMemberVo> members = (List<OnLineMemberVo>) assembleOnlineMemberVo(list);
         //查询表数据，生成excel的zip，并返回zip byte[]
         content = ExcelUtil.onLineMemberListExport(members, filename);
