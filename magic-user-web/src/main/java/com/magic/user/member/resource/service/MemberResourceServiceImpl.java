@@ -922,10 +922,10 @@ public class MemberResourceServiceImpl {
                 JSONObject condition = js.getJSONObject("condition");
                 LevelCondition llc = new LevelCondition();
                 llc.setDepositNumbers(condition.getInteger("depositTimes"));
-                llc.setDepositTotalMoney(condition.getString("despositTotalAmount"));
-                llc.setMaxDepositMoney(condition.getString("withdrawTotalAmount"));
+                llc.setDepositTotalMoney(String.valueOf(condition.getLong("despositTotalAmount")/100));
+                llc.setMaxDepositMoney(String.valueOf(condition.getLong("despositMaxAmount")/100));
                 llc.setWithdrawNumbers(condition.getInteger("withdrawalTimes"));
-                llc.setWithdrawTotalMoney(condition.getString("withdrawTotalAmount"));
+                llc.setWithdrawTotalMoney(String.valueOf(condition.getLong("withdrawTotalAmount")/100));
 
                 memberLevelListVo.setCondition(llc);
                 memberLevelListVos.add(memberLevelListVo);
