@@ -222,7 +222,7 @@ public class MemberResourceServiceImpl {
         for (int i = 0; i < memberConditionVos.size(); i = i + INTERVAL) {
             int fromIndex = i;
             int endIndex = i + INTERVAL;
-            if (i + INTERVAL > memberConditionVos.size()) {
+            if (endIndex > memberConditionVos.size()) {
                 endIndex = memberConditionVos.size();
             }
             List<MemberConditionVo> subList = memberConditionVos.subList(fromIndex, endIndex);
