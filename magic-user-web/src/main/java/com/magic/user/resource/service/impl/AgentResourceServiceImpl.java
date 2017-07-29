@@ -133,7 +133,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
             //根据代理ID列表查询代理的会员数量信息
             Map<Long, OwnerStockAgentMember> osamMap = getOwnerStockMapByAgentIds(agentIds);
-`
+
             List<AgentInfoVo> users = userService.findAgents(agentIds);
             if (users == null) {
                 return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
