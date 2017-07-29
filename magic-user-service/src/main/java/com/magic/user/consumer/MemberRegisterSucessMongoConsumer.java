@@ -24,12 +24,13 @@ import java.util.Optional;
 /**
  * MemberRegisterSucessMongoConsumer
  * 注册成功，保存会员记录
+ *
  * @author zj
  * @date 2017/4/14
  */
 @Component("memberRegisterSucessMongoConsumer")
-@ConsumerConfig(consumerName = "v1memberRegisterSucessMongoConsumer", topic =  Topic.MEMBER_REGISTER_SUCCESS)
-public class MemberRegisterSucessMongoConsumer implements Consumer{
+@ConsumerConfig(consumerName = "v1memberRegisterSucessMongoConsumer", topic = Topic.MEMBER_REGISTER_SUCCESS)
+public class MemberRegisterSucessMongoConsumer implements Consumer {
 
     @Resource
     private MemberMongoService memberMongoService;
@@ -45,40 +46,42 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
             Member member = JSONObject.parseObject(msg, Member.class);
             boolean result;
             OnLineMember onlineMember = memberMongoService.getOnlineMember(member.getMemberId());
-            if (!Optional.ofNullable(onlineMember).isPresent()){
+            if (!Optional.ofNullable(onlineMember).isPresent()) {
                 OnLineMember lineMember = parseOnlineMember(member);
                 result = memberMongoService.saveOnlieMember(lineMember);
-                if (!result){
+                if (!result) {
                     return false;
                 }
             }
             MemberConditionVo conditionVo = memberMongoService.get(member.getMemberId());
-            if (!Optional.ofNullable(conditionVo).isPresent()){
+            if (!Optional.ofNullable(conditionVo).isPresent()) {
                 MemberConditionVo vo = parseMemberConditionVo(member);
                 long level = thriftOutAssembleService.settingLevel(member);
-                if (level <= 0){
+                if (level <= 0) {
                     level = thriftOutAssembleService.getMemberLevel(member.getMemberId());
                 }
-                if (level <= 0){
+                if (level <= 0) {
                     return false;
                 }
                 vo.setLevel(level);
                 result = memberMongoService.saveMemberInfo(vo);
-                if (!result){
+                if (!result) {
                     return false;
                 }
             }
-            //累加代理的会员数（members）
+            //累加代理的会员数（members） -并发会有问题
             AgentConditionVo agentConditionVo = agentMongoService.get(member.getAgentId());
-            if (!Optional.ofNullable(agentConditionVo).isPresent()){
-                agentConditionVo.setMembers(agentConditionVo.getMembers()+1);
+            if (agentConditionVo != null) {
+                agentConditionVo.setMembers(agentConditionVo.getMembers() + 1);
                 result = agentMongoService.updateAgent(agentConditionVo);
-                if (!result){
+                if (!result) {
+                    ApiLogger.error(String.format("mongoUpdate member result = " + result)
+                            + ", key =  + " + key + ", member = " + (member!=null?member.getAgentId():null));
                     return false;
                 }
             }
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("member register sucess mq consumer error. key:%s, msg:%s", key, msg), e);
         }
         return true;
@@ -86,6 +89,7 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
 
     /**
      * 组装在线会员对象
+     *
      * @param member
      * @return
      */
@@ -103,12 +107,12 @@ public class MemberRegisterSucessMongoConsumer implements Consumer{
     }
 
     /**
-     * @Doc 组装会员存储mongo的数据
      * @param member
      * @return
+     * @Doc 组装会员存储mongo的数据
      */
     private MemberConditionVo parseMemberConditionVo(Member member) {
-        MemberConditionVo vo=new MemberConditionVo();
+        MemberConditionVo vo = new MemberConditionVo();
         vo.setMemberId(member.getMemberId());
         vo.setMemberName(member.getUsername());
         vo.setAgentId(member.getAgentId());

@@ -2,6 +2,7 @@ package com.magic.user.member.resource.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
@@ -159,7 +160,6 @@ public class InfoResourceServiceImpl {
         return UserContants.EMPTY_STRING;
     }
 
-
     /**
      * 获取modifyinfo
      *
@@ -274,8 +274,8 @@ public class InfoResourceServiceImpl {
      * @param paymentPassword 支付密码
      * @return
      */
-    public String modifyInfo(RequestContext rc, Long id, Integer type, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String loginPassword, String paymentPassword) {
-        if (!checkParams(id, type, realname, telephone, email, bankCardNo, bank, bankDeposit, loginPassword, paymentPassword)) {
+    public String modifyInfo(RequestContext rc, Long id, Integer type, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String loginPassword, String paymentPassword,String bankCode) {
+        if (!checkParams(id, type, realname, telephone, email, bankCardNo, bank, bankDeposit, loginPassword, paymentPassword,bankCode)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         long uid = rc.getUid();
@@ -288,6 +288,7 @@ public class InfoResourceServiceImpl {
         Map<String, Object> userMap = new HashedMap();  //修改的用户数据
         AccountType accountType = AccountType.parse(type);
         boolean result=false;
+        ApiLogger.error("modifyInfo::accountType = " + accountType);
         if (accountType == AccountType.member) {//账号
             Member member = memberService.getMemberById(id);
             if (member == null) {
@@ -302,7 +303,8 @@ public class InfoResourceServiceImpl {
             userMap.put("ownerName", member.getOwnerUsername());
             userMap.put("type", type);
             userMap.put("operTime", System.currentTimeMillis());
-            result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
+            result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit,bankCode));
+            ApiLogger.error("modifyInfo::result = " + result);
             if (result) {
                 if (StringUtils.isNotEmpty(realname) && !realname.trim().equals(member.getRealname())) {
                     newMap.put("realname", realname);
@@ -383,7 +385,7 @@ public class InfoResourceServiceImpl {
             }
 
         }
-        if (result) {
+        if (result||StringUtils.isNotBlank(paymentPassword)) {
             JSONObject object = new JSONObject();
             object.put("after", newMap);
             object.put("before", oldMap);
@@ -453,7 +455,7 @@ public class InfoResourceServiceImpl {
      * @param bankDeposit
      * @return
      */
-    private Member assembleModifyMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit) {
+    private Member assembleModifyMember(Long id, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit,String bankCode) {
         Member member = new Member();
         member.setMemberId(id);
         member.setRealname(realname);
@@ -462,6 +464,7 @@ public class InfoResourceServiceImpl {
         member.setBankCardNo(bankCardNo);
         member.setBank(bank);
         member.setBankDeposit(bankDeposit);
+        member.setBankCode(bankCode);
         return member;
     }
     /**
@@ -479,7 +482,7 @@ public class InfoResourceServiceImpl {
      * @param paymentPassword
      * @return
      */
-    private boolean checkParams(Long id, Integer type, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String loginPassword, String paymentPassword) {
+    private boolean checkParams(Long id, Integer type, String realname, String telephone, String email, String bankCardNo, String bank, String bankDeposit, String loginPassword, String paymentPassword,String bankCode) {
         if (id == null || id <= 0) {
             return false;
         }
@@ -494,11 +497,33 @@ public class InfoResourceServiceImpl {
             return false;
         }
         if (realname.length() == 0 && telephone.length() == 0 && email.length() == 0 && bankCardNo.length() == 0
-                && bank.length() == 0 && bankDeposit.length() == 0 && loginPassword.length() == 0 && paymentPassword.length() == 0) {
+                && bank.length() == 0 && bankDeposit.length() == 0 && loginPassword.length() == 0 && paymentPassword.length() == 0 && bankCode.length()==0) {
             return false;
         }
+        checkBankCardNo(bankCardNo);
         return true;
 
+    }
+
+    /**最小*/
+    private static final int MIN_BANK_CARD_NO_LEN = 15;
+    /**最da*/
+    private static final int MAX_BANK_CARD_NO_LEN = 19;
+
+
+
+    /**
+     * 检测cardNo
+     * @param bankCardNo
+     */
+    private static void checkBankCardNo(String bankCardNo) {
+        if (StringUtils.isBlank(bankCardNo)){
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        int len = bankCardNo.length();
+        if (len < MIN_BANK_CARD_NO_LEN || len > MAX_BANK_CARD_NO_LEN){
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
     }
 
 

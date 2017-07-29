@@ -165,7 +165,7 @@ public class MemberResource {
      * @return
      */
 
-    @Access(type = Access.AccessType.COOKIE)
+    @Access(type = Access.AccessType.PUBLIC)
     @RequestMapping(value = "/inner/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String login(
@@ -583,28 +583,7 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.onlineListExport(rc, condition /*loginStartTime,loginEndTime,registerStartTime,registerEndTime*/);
-        response.setCharacterEncoding("UTF-8");
-        if (downLoadFile != null && downLoadFile.getContent() != null && downLoadFile.getContent().length > 0) {
-            String contnetDisposition = "attachment;filename=";
-            if (downLoadFile.getFilename() != null) {
-                contnetDisposition += URLEncoder.encode(downLoadFile.getFilename(), "utf-8");
-                response.setHeader("Location", URLEncoder.encode(downLoadFile.getFilename(), "utf-8"));
-            }
-            response.setHeader("Content-Disposition", contnetDisposition);
-            ServletOutputStream outputStream = response.getOutputStream();
-            try {
-                outputStream.write(downLoadFile.getContent());
-            } catch (Exception e) {
-                ApiLogger.error(String.format("export excel error. file: %s", downLoadFile.getContent()), e);
-            } finally {
-                try {
-                    outputStream.flush();
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        addContentToResponse(response, downLoadFile);
     }
 
     /**

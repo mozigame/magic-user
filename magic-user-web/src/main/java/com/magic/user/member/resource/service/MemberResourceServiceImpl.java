@@ -206,6 +206,9 @@ public class MemberResourceServiceImpl {
         return JSON.toJSONString(assemblePageBean(page, count, total, memberVos));
     }
 
+
+    private static final int INTERVAL = 500;
+
     /**
      * 组装会员列表
      *
@@ -213,13 +216,27 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
-        Set<Long> memberIds = memberConditionVos.stream().map(MemberConditionVo::getMemberId).collect(Collectors.toSet());
-        List<MemberListVo> memberListVos = Lists.newArrayList();
+         List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
+
+        for (int i = 0; i < memberConditionVos.size(); i = i + INTERVAL) {
+            int fromIndex = i;
+            int endIndex = i + INTERVAL;
+            if (endIndex > memberConditionVos.size()) {
+                endIndex = memberConditionVos.size();
+            }
+            List<MemberConditionVo> subList = memberConditionVos.subList(fromIndex, endIndex);
+            disposeSubList(subList, memberListVos);
+        }
+        return memberListVos;
+    }
+
+    private void disposeSubList(List<MemberConditionVo> memberConditionVos, List<MemberListVo> memberListVos) {
+        Set<Long> memberIds = memberConditionVos.stream().map(MemberConditionVo::getMemberId).collect(Collectors.toSet());
         Map<Long, Member> members = memberService.findMemberByIds(memberIds);
         ApiLogger.info(String.format("get members. ids: %s, result: %s", JSON.toJSONString(memberIds), JSON.toJSONString(members)));
         if (!Optional.ofNullable(members).filter(size -> size.size() > 0).isPresent()) {
-            return memberListVos;
+            return;
         }
         //2、获取会员最近登录信息
         Map<Long, SubAccount> subLogins = dubboOutAssembleService.getSubLogins(memberIds);
@@ -264,7 +281,6 @@ public class MemberResourceServiceImpl {
 
             memberListVos.add(memberListVo);
         }
-        return memberListVos;
     }
 
     /**
@@ -466,7 +482,7 @@ public class MemberResourceServiceImpl {
 
 
     private void checkDownloadSource(int downloadSource) {
-        if (downloadSource != 0 || downloadSource != 1) {
+        if (downloadSource != 0 && downloadSource != 1) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
     }
@@ -831,7 +847,7 @@ public class MemberResourceServiceImpl {
      * @param level
      * @return
      */
-    public String updateLevel(RequestContext rc, Long memberId, Long level,Long permanentLock) {
+    public String updateLevel(RequestContext rc, Long memberId, Long level, Long permanentLock) {
         if (!Optional.ofNullable(memberId).filter(id -> id > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
@@ -842,7 +858,7 @@ public class MemberResourceServiceImpl {
         if (member == null) {
             throw UserException.ILLEGAL_MEMBER;
         }
-        boolean result = thriftOutAssembleService.setMemberLevel(member, level,permanentLock);
+        boolean result = thriftOutAssembleService.setMemberLevel(member, level, permanentLock);
         if (result) {
             result = memberMongoService.updateLevel(member, level);
         }
@@ -906,10 +922,10 @@ public class MemberResourceServiceImpl {
                 JSONObject condition = js.getJSONObject("condition");
                 LevelCondition llc = new LevelCondition();
                 llc.setDepositNumbers(condition.getInteger("depositTimes"));
-                llc.setDepositTotalMoney(condition.getString("despositTotalAmount"));
-                llc.setMaxDepositMoney(condition.getString("withdrawTotalAmount"));
+                llc.setDepositTotalMoney(String.valueOf(condition.getLong("despositTotalAmount")/100));
+                llc.setMaxDepositMoney(String.valueOf(condition.getLong("despositMaxAmount")/100));
                 llc.setWithdrawNumbers(condition.getInteger("withdrawalTimes"));
-                llc.setWithdrawTotalMoney(condition.getString("withdrawTotalAmount"));
+                llc.setWithdrawTotalMoney(String.valueOf(condition.getLong("withdrawTotalAmount")/100));
 
                 memberLevelListVo.setCondition(llc);
                 memberLevelListVos.add(memberLevelListVo);
@@ -1662,9 +1678,13 @@ public class MemberResourceServiceImpl {
         if (list != null && list.size() > 0) {
             for (OnLineMember member : list) {
                 if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
-                    member.setCity(HttpUtils.getAddressByIP(member.getLoginIp()));
+                    String loginIp = member.getLoginIp();
+                    member.setLoginIp(loginIp+"/"+HttpUtils.getAddressByIP(member.getLoginIp()));
                 }
-
+                /*if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
+                    String registerIp = member.getRegisterIp();
+                    member.setRegisterIp(registerIp+"/"+HttpUtils.getAddressByIP(member.getRegisterIp()));
+                }*/
             }
         }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
@@ -1700,6 +1720,18 @@ public class MemberResourceServiceImpl {
 //        memberCondition.setRegisterStartTime(registerStartTime);
 //        memberCondition.setRegisterEndTime(registerEndTime);
         List<OnLineMember> list = memberMongoService.getOnlineMembers(memberCondition, null, null);
+        if (list != null && list.size() > 0) {
+            for (OnLineMember member : list) {
+                if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
+                    String loginIp = member.getLoginIp();
+                    member.setLoginIp(loginIp+"/"+HttpUtils.getAddressByIP(member.getLoginIp()));
+                }
+                /*if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
+                    String registerIp = member.getRegisterIp();
+                    member.setRegisterIp(registerIp+"/"+HttpUtils.getAddressByIP(member.getRegisterIp()));
+                }*/
+            }
+        }
         List<OnLineMemberVo> members = (List<OnLineMemberVo>) assembleOnlineMemberVo(list);
         //查询表数据，生成excel的zip，并返回zip byte[]
         content = ExcelUtil.onLineMemberListExport(members, filename);
@@ -2230,5 +2262,5 @@ public class MemberResourceServiceImpl {
         }
         return false;
     }
-    
+
 }

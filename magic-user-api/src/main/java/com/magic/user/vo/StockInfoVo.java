@@ -23,6 +23,7 @@ public class StockInfoVo {
     private String registerIp; //注册ip
     private String lastLoginIp;    //最近登录ip
     private Integer members;    //会员数量
+    private String bank;//银行名
 
     public Long getId() {
         return id;
@@ -142,5 +143,13 @@ public class StockInfoVo {
 
     public void setLastLoginIp(String lastLoginIp) {
         this.lastLoginIp = lastLoginIp;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
     }
 }

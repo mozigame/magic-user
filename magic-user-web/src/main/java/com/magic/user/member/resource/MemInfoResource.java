@@ -103,13 +103,14 @@ public class MemInfoResource {
             @RequestParam(name = "telephone", required = false, defaultValue = "") String telephone,
             @RequestParam(name = "email", required = false, defaultValue = "") String email,
             @RequestParam(name = "bankCardNo", required = false, defaultValue = "") String bankCardNo,
+            @RequestParam(name = "bankCode", required = false, defaultValue = "") String bankCode,
             @RequestParam(name = "bank", required = false, defaultValue = "") String bank,
             @RequestParam(name = "bankDeposit", required = false, defaultValue = "") String bankDeposit,
             @RequestParam(name = "loginPassword", required = false, defaultValue = "") String loginPassword,
             @RequestParam(name = "paymentPassword", required = false, defaultValue = "") String paymentPassword
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return infoResourceService.modifyInfo(rc, id, type, realname, telephone, email, bankCardNo, bank, bankDeposit, loginPassword, paymentPassword);
+        return infoResourceService.modifyInfo(rc, id, type, realname, telephone, email, bankCardNo, bank, bankDeposit, loginPassword, paymentPassword,bankCode);
     }
 
     /**

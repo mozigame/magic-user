@@ -48,6 +48,7 @@ public class AgentResource {
             @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
 
+        ApiLogger.info(condition);
         String result = agentResourceService.findByPage(RequestContext.getRequestContext(), condition, page, count);
         return result;
     }
@@ -125,10 +126,10 @@ public class AgentResource {
             @RequestParam(name = "domain", required = false) String domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost,
-            @RequestParam(name = "userLevel",required = false,defaultValue = "-1")Long userLevel  //新增用户层级id
+            @RequestParam(name = "userLevel", required = false, defaultValue = "-1") Long userLevel  //新增用户层级id
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost,userLevel);
+        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel);
     }
 
     /**
@@ -409,11 +410,11 @@ public class AgentResource {
             @RequestParam(name = "domain", required = false) String domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost,
-            @RequestParam(name = "userLevel",required = false,defaultValue = "-1")Long userLevel  //新增用户层级id
+            @RequestParam(name = "userLevel", required = false, defaultValue = "-1") Long userLevel  //新增用户层级id
 
     ) {
         //TODO 所有涉及审核的信息增加开户行信息、银行名称
-        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost,userLevel);
+        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel);
     }
 
 
@@ -491,5 +492,19 @@ public class AgentResource {
     @ResponseBody
     public String getAgentRegisterMustParam() {
         return agentResourceService.getAgentRegisterMustParam(RequestContext.getRequestContext());
+    }
+
+
+    /**
+     * @Doc 修复mongo agent member数据数据，内部使用接口
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/repair/member_number", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String repairMemberNumber(
+            @RequestParam(name = "agentIdList", required = true) String agentIdList
+    ) {
+        String result = agentResourceService.repairMemberNumber(RequestContext.getRequestContext(), agentIdList);
+        return result;
     }
 }

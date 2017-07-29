@@ -338,21 +338,35 @@ public class ExcelUtil {
             MemberListVo vo = list.get(i);
             Row row = sheet.createRow(i + 1);
             row.createCell(0).setCellValue(i + 1);
-            row.createCell(1).setCellValue(vo.getAccount());
-            row.createCell(2).setCellValue(vo.getAgent());
-            row.createCell(3).setCellValue(vo.getLevel());
-            row.createCell(4).setCellValue(vo.getDepositCount());
-            row.createCell(5).setCellValue(vo.getDepositMoney());
-            row.createCell(6).setCellValue(vo.getMaxDepositMoney());
-            row.createCell(7).setCellValue(vo.getWithdrawCount());
-            row.createCell(8).setCellValue(vo.getWithdrawMoney());
-            row.createCell(9).setCellValue(vo.getBalance());
-            row.createCell(10).setCellValue(vo.getLastLoginTime());
+            row.createCell(1).setCellValue(formatCellValue(vo.getAccount()));
+            row.createCell(2).setCellValue(formatCellValue(vo.getAgent()));
+            row.createCell(3).setCellValue(formatCellValue(vo.getLevel()));
+            row.createCell(4).setCellValue(formatCellValue(vo.getDepositCount()));
+            row.createCell(5).setCellValue(formatCellValue(vo.getDepositMoney()));
+            row.createCell(6).setCellValue(formatCellValue(vo.getMaxDepositMoney()));
+            row.createCell(7).setCellValue(formatCellValue(vo.getWithdrawCount()));
+            row.createCell(8).setCellValue(formatCellValue(vo.getWithdrawMoney()));
+            row.createCell(9).setCellValue(formatCellValue(vo.getBalance()));
+            row.createCell(10).setCellValue(formatCellValue(vo.getLastLoginTime()));
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         workbook.write(os);
         byte[] bytes = os.toByteArray();
         return bytes;
+    }
+
+    private static String formatCellValue(Number data) {
+        if (data==null){
+            return "-";
+        };
+        return String.valueOf(data);
+    }
+
+    private static String formatCellValue(String account) {
+        if (account==null){
+            return "-";
+        };
+        return account;
     }
 
     private static void formatFirstRow(Row head, CellStyle style, String[] elementForSource) {
