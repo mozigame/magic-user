@@ -1681,10 +1681,10 @@ public class MemberResourceServiceImpl {
                     String loginIp = member.getLoginIp();
                     member.setLoginIp(loginIp+"/"+HttpUtils.getAddressByIP(member.getLoginIp()));
                 }
-                if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
+                /*if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
                     String registerIp = member.getRegisterIp();
                     member.setRegisterIp(registerIp+"/"+HttpUtils.getAddressByIP(member.getRegisterIp()));
-                }
+                }*/
             }
         }
         return JSON.toJSONString(assemblePage(page, count, total, assembleOnlineMemberVo(list)));
@@ -1726,10 +1726,10 @@ public class MemberResourceServiceImpl {
                     String loginIp = member.getLoginIp();
                     member.setLoginIp(loginIp+"/"+HttpUtils.getAddressByIP(member.getLoginIp()));
                 }
-                if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
+                /*if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
                     String registerIp = member.getRegisterIp();
                     member.setRegisterIp(registerIp+"/"+HttpUtils.getAddressByIP(member.getRegisterIp()));
-                }
+                }*/
             }
         }
         List<OnLineMemberVo> members = (List<OnLineMemberVo>) assembleOnlineMemberVo(list);
