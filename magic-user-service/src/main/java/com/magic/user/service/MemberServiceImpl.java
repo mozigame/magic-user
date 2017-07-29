@@ -51,6 +51,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public boolean updateMember(Member member) {
+        ApiLogger.error("modifyInfo::member = " + member.getBankCode());
         return memberDbService.update(member) > 0;
     }
 

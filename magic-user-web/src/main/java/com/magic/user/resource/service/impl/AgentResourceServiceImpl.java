@@ -76,7 +76,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     private OwnerStockAgentService ownerStockAgentService;
     @Resource
     private MemberMongoService memberMongoService;
-    
+
     /**
      * {@inheritDoc}
      *
@@ -86,7 +86,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String findByPage(RequestContext rc, String condition, int page, int count) {
+    public String  findByPage(RequestContext rc, String condition, int page, int count) {
         User operaUser = userService.get(rc.getUid());
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
@@ -133,7 +133,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
             //根据代理ID列表查询代理的会员数量信息
             Map<Long, OwnerStockAgentMember> osamMap = getOwnerStockMapByAgentIds(agentIds);
-
+`
             List<AgentInfoVo> users = userService.findAgents(agentIds);
             if (users == null) {
                 return JSON.toJSONString(assemblePageBean(count, page, 0L, null));

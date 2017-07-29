@@ -2,6 +2,7 @@ package com.magic.user.member.resource.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.mq.Producer;
@@ -288,6 +289,7 @@ public class InfoResourceServiceImpl {
         Map<String, Object> userMap = new HashedMap();  //修改的用户数据
         AccountType accountType = AccountType.parse(type);
         boolean result=false;
+        ApiLogger.error("modifyInfo::accountType = " + accountType);
         if (accountType == AccountType.member) {//账号
             Member member = memberService.getMemberById(id);
             if (member == null) {
@@ -303,6 +305,7 @@ public class InfoResourceServiceImpl {
             userMap.put("type", type);
             userMap.put("operTime", System.currentTimeMillis());
             result = memberService.updateMember(assembleModifyMember(id, realname, telephone, email, bankCardNo, bank, bankDeposit));
+            ApiLogger.error("modifyInfo::result = " + result);
             if (result) {
                 if (StringUtils.isNotEmpty(realname) && !realname.trim().equals(member.getRealname())) {
                     newMap.put("realname", realname);
