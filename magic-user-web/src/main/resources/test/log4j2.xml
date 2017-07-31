@@ -3,7 +3,7 @@
     <properties>
         <property name="app_name">magic-user</property>
         <property name="log_home">/apps/tomcat-custom-instance/magic-user</property>
-        <property name="default_pattern">[%C]%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %p - %msg%n</property>
+        <property name="default_pattern">%C :: %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %p - %msg%n</property>
     </properties>
 
 
