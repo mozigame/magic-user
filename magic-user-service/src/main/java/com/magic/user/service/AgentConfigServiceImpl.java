@@ -62,7 +62,7 @@ public class AgentConfigServiceImpl implements AgentConfigService {
      * @return List<Map>
      */
     @Override
-    public List<Map<String,Integer>> getAgentDomain(List<String> domain){
+    public List<Map<String,Integer>> getAgentByDomain(List<String> domain){
         return  (List<Map<String,Integer>> )agentConfigDbService.get("findAgentByDomain", new String[]{"domainList"},domain);
     }
 }

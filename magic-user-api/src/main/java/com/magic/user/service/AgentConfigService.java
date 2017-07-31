@@ -53,5 +53,5 @@ public interface AgentConfigService {
      * @param domain
      * @return List<Map>
      */
-    List<Map<String,Integer>> getAgentDomain(List<String> domain);
+    List<Map<String,Integer>> getAgentByDomain(List<String> domain);
 }
