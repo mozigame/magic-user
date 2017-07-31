@@ -5,6 +5,7 @@ import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.AgentResourceService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 /**
  * User: joey
  * Date: 2017/5/3
@@ -28,9 +33,11 @@ import java.net.URLEncoder;
 @RequestMapping(value = "/v1/agent")
 public class AgentResource {
 
-
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
+
+    @Value("app_dir")
+    private String appDir;
 
     /**
      * @param condition 检索条件
@@ -66,6 +73,7 @@ public class AgentResource {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
+        ApiLogger.error("####roach###appDir= " + appDir);
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
