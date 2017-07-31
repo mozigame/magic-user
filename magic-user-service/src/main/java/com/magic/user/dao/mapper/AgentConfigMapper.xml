@@ -89,6 +89,18 @@
             </foreach>
         </if>
     </select>
-
+    <!--获取域名下的代理信息-->
+    <select id="getAgentConfigByDomain" resultType="AgentConfig" parameterType="java.lang.String">
+        SELECT
+        agent_id,
+        return_scheme_id,
+        admin_cost_id,
+        fee_id,
+        discount,
+        cost,
+        domain
+        FROM t_agent_config_info
+        WHERE domain=#{domain}
+    </select>
 
 </mapper>
