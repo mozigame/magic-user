@@ -56,4 +56,22 @@ public class AgentConfigServiceImpl implements AgentConfigService {
         }
         return null;
     }
+    /**
+     * 获取域名下的代理数量
+     * @param domain
+     * @return List<Map>
+     */
+    @Override
+    public List<Map<String,Integer>> getAgentByDomain(List<String> domain){
+        return  (List<Map<String,Integer>> )agentConfigDbService.get("getAgentByDomain", new String[]{"domainList"},domain);
+    }
+
+    /**
+     * 获取域名下的代理信息
+     * @param domain
+     * @return List<Map>
+     */
+    public List<AgentConfig> getAgentConfigByDomain(String domain){
+        return  (List<AgentConfig> )agentConfigDbService.get("getAgentConfigByDomain", new String[]{"domain"},domain);
+    }
 }

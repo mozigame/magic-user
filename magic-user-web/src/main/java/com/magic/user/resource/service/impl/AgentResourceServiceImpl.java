@@ -408,12 +408,20 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //mq 处理 4、添加代理配置
-        AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel);
+        //mq 处理 4、添加代理配置
+        List<AgentConfig> agentConfigs = new ArrayList<>();
+        for(String domainTemp : domain.split(",")) {
+            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domainTemp, discount, cost, userLevel);
+            agentConfigs.add(agentConfig);
+        }
         //mq 处理 5、添加业主股东代理id映射信息
         OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
         //mq 处理 6、将代理基础信息放入mongo
         AgentConditionVo agentConditionVo = assembleAgentConfigVo(userId, account, generalizeCode, holder, agentUser.getOwnerId());
-        sendAgentAddSuccessMq(agentConfig, ownerStockAgentMember, agentConditionVo);
+        //循环放放mq
+        for(AgentConfig config : agentConfigs){
+            sendAgentAddSuccessMq(config, ownerStockAgentMember, agentConditionVo);
+        }
         /*用户添加成功发送mq*/
         sendAddUserSuccess(agentUser);
         JSONObject result = new JSONObject();
@@ -1560,6 +1568,18 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 .filter(request -> request.getUsername() != null && req.getUsername().length() >= 4 && req.getUsername().length() <= 15)
                 .filter(request -> request.getPassword() != null && request.getPassword().length() == 32)
                 .isPresent();
+    }
+
+    /**
+     * @param rc
+     * @return
+     * @Doc 获取域名下的代理信息
+     */
+    public String getAgentConfigByDomain(RequestContext rc, String domain){
+        List<AgentConfig> configs =  agentConfigService.getAgentConfigByDomain(domain);
+        JSONObject result = new JSONObject();
+        result.put("configs", configs);
+        return result.toJSONString();
     }
 
 }
