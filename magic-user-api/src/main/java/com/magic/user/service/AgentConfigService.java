@@ -53,5 +53,11 @@ public interface AgentConfigService {
      * @param domain
      * @return List<Map>
      */
-    List<Map<String,Integer>> getAgentDomain(List<String> domain);
+    List<Map<String,Integer>> getAgentByDomain(List<String> domain);
+    /**
+     * 获取域名下的代理信息
+     * @param domain
+     * @return List<Map>
+     */
+    List<AgentConfig> getAgentConfigByDomain(String domain);
 }

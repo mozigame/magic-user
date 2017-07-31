@@ -17,6 +17,6 @@ public class AgentConfigDubboServiceImpl implements AgentConfigDubboService{
     private AgentConfigService agentConfigService;
     @Override
     public List<Map<String, Integer>> getProxysByAgentConfig(List<String> domains) {
-        return agentConfigService.getAgentDomain(domains);
+        return agentConfigService.getAgentByDomain(domains);
     }
 }
