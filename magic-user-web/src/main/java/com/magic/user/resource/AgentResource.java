@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 @RequestMapping(value = "/v1/agent")
 public class AgentResource {
 
-    private static final Logger aLogger = LogManager.getLogger(AgentResource.class);
+    private static final Logger aLogger = LogManager.getLogger("ssssss");
 
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
