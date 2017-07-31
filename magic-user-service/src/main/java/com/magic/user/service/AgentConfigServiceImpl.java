@@ -72,6 +72,6 @@ public class AgentConfigServiceImpl implements AgentConfigService {
      * @return List<Map>
      */
     public List<AgentConfig> getAgentConfigByDomain(String domain){
-        return  (List<AgentConfig> )agentConfigDbService.get("getAgentConfigByDomain", new String[]{"domainList"},domain);
+        return  (List<AgentConfig> )agentConfigDbService.get("getAgentConfigByDomain", new String[]{"domain"},domain);
     }
 }
