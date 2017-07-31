@@ -36,7 +36,7 @@ public class AgentResource {
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
 
-    @Value("app_dir")
+    @Value("${app_dir}")
     private String appDir;
 
     /**
