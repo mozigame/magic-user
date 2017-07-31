@@ -33,6 +33,8 @@ import org.apache.logging.log4j.Logger;
 @RequestMapping(value = "/v1/agent")
 public class AgentResource {
 
+    private static final Logger aLogger = LogManager.getLogger(AgentResource.class);
+
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
 
@@ -70,7 +72,7 @@ public class AgentResource {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
-        ApiLogger.error("####roach###appDir=11111");
+        aLogger.error("####roach###appDir=11111" + aLogger.getName());
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
