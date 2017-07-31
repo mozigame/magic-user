@@ -36,9 +36,6 @@ public class AgentResource {
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
 
-    @Value("${app_dir}")
-    private String appDir;
-
     /**
      * @param condition 检索条件
      * @param page      当前页
@@ -73,7 +70,7 @@ public class AgentResource {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
-        ApiLogger.error("####roach###appDir= " + appDir);
+        ApiLogger.error("####roach###appDir=11111");
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
