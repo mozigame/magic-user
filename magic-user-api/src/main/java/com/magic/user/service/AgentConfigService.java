@@ -47,4 +47,11 @@ public interface AgentConfigService {
      * @return
      */
     List<String> getAgentDomain(Long agentId);
+
+    /**
+     * 获取域名下的代理数量
+     * @param domain
+     * @return List<Map>
+     */
+    List<Map<String,Integer>> getAgentDomain(List<String> domain);
 }
