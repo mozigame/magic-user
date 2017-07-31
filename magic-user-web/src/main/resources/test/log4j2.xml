@@ -12,7 +12,7 @@
         </Console>
 
         <RollingFile name="root" fileName="${log_home}/logs/${app_name}_root.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_root-%d{yyyy-MM-dd}.gz">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
+            <PatternLayout pattern="%C : %d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
@@ -69,7 +69,7 @@
     </Appenders>
 
     <Loggers>
-        <Root level="info">
+        <Root level="debug">
             <AppenderRef ref="root"/>
         </Root>
         <logger name="debug" level="debug" additivity="false">
