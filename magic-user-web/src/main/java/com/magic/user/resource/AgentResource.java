@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 @RequestMapping(value = "/v1/agent")
 public class AgentResource {
 
-    private static final Logger aLogger = LogManager.getLogger("ssssss");
+    private static final Logger aLogger = LogManager.getLogger("error");
 
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
@@ -73,7 +73,6 @@ public class AgentResource {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
-        aLogger.error("####roach###appDir=11111" + aLogger.getName());
         RequestContext rc = RequestContext.getRequestContext();
         test();
         rc.setUid(userId);
@@ -99,6 +98,7 @@ public class AgentResource {
     }
 
     private void test() {
+        aLogger.error("####roach###appDir=11111" + aLogger.getName());
         aLogger.error("roach#$$##LogManager.getContext() = " + JSONObject.toJSONString(LogManager.getContext()));
     }
 
