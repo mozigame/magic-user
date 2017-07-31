@@ -8,7 +8,7 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %p - %msg%n" />
+            <PatternLayout pattern="%C : %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %p - %msg%n" />
         </Console>
 
         <RollingFile name="root" fileName="${log_home}/logs/${app_name}_root.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_root-%d{yyyy-MM-dd}.gz">
