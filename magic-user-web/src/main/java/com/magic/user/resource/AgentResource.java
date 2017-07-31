@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 @RequestMapping(value = "/v1/agent")
 public class AgentResource {
 
-    private static final Logger aLogger = LogManager.getLogger(AgentResource.class);
+    private static final Logger logger = LogManager.getLogger(AgentResource.class);
 
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
@@ -73,8 +73,10 @@ public class AgentResource {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("listExport::userId = " + userId + ",condition = " + condition);
+        }
         RequestContext rc = RequestContext.getRequestContext();
-        test();
         rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
@@ -97,10 +99,6 @@ public class AgentResource {
         }
     }
 
-    private void test() {
-        aLogger.error("####roach###appDir=11111" + aLogger.getName());
-        ApiLogger.error("roach#$$##LogManager.getContext() = " + JSONObject.toJSONString(LogManager.getContext()));
-    }
 
     /**
      * @param holder       所属股东ID
