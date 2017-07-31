@@ -84,6 +84,7 @@ public class MemberResource {
         //获取域名
         String url = rc.getOrigin();
         RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, bankCode, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
+        ApiLogger.info("register request info is:"+JSONObject.toJSONString(req));
         return memberServiceResource.memberRegister(rc, url, req, code);
     }
 
