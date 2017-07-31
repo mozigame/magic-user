@@ -408,12 +408,20 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
 
         //mq 处理 4、添加代理配置
-        AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel);
+        //mq 处理 4、添加代理配置
+        List<AgentConfig> agentConfigs = new ArrayList<>();
+        for(String domainTemp : domain.split(",")) {
+            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domainTemp, discount, cost, userLevel);
+            agentConfigs.add(agentConfig);
+        }
         //mq 处理 5、添加业主股东代理id映射信息
         OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
         //mq 处理 6、将代理基础信息放入mongo
         AgentConditionVo agentConditionVo = assembleAgentConfigVo(userId, account, generalizeCode, holder, agentUser.getOwnerId());
-        sendAgentAddSuccessMq(agentConfig, ownerStockAgentMember, agentConditionVo);
+        //循环放放mq
+        for(AgentConfig config : agentConfigs){
+            sendAgentAddSuccessMq(config, ownerStockAgentMember, agentConditionVo);
+        }
         /*用户添加成功发送mq*/
         sendAddUserSuccess(agentUser);
         JSONObject result = new JSONObject();
