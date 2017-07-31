@@ -80,7 +80,7 @@
     </select>
     <!--获取域名下的代理数量-->
     <select id="getAgentByDomain" resultType="java.util.HashMap" parameterType="java.util.List">
-        select count(id),domain from t_agent_config_info GROUP BY domain where domain in()
+        select count(id),domain from t_agent_config_info GROUP BY domain where 1=1
         <if test="gameTypeList != null and gameTypeList.size() > 0">
             and  domain in
             <foreach collection="domainList" item="domain" index="index"
