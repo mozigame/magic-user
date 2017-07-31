@@ -1,5 +1,6 @@
 package com.magic.user.resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
@@ -74,6 +75,7 @@ public class AgentResource {
     ) throws IOException {
         aLogger.error("####roach###appDir=11111" + aLogger.getName());
         RequestContext rc = RequestContext.getRequestContext();
+        test();
         rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
         response.setCharacterEncoding("UTF-8");
@@ -94,6 +96,10 @@ public class AgentResource {
                 outputStream.close();
             }
         }
+    }
+
+    private void test() {
+        aLogger.error("roach#$$##LogManager.getContext() = " + JSONObject.toJSONString(LogManager.getContext()));
     }
 
     /**
