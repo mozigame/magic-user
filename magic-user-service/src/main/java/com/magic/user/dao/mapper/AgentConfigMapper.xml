@@ -79,7 +79,7 @@
           WHERE agent_id=#{agentId}
     </select>
     <!--获取域名下的代理数量-->
-    <select id="findByAgentId" resultType="com.magic.user.vo.AgentConfigVo" parameterType="java.util.List">
+    <select id="getAgentByDomain" resultType="java.util.HashMap" parameterType="java.util.List">
         select count(id),domain from t_agent_config_info GROUP BY domain where domain in()
         <if test="gameTypeList != null and gameTypeList.size() > 0">
             and  domain in
