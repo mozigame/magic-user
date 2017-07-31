@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 @RequestMapping(value = "/v1/agent")
 public class AgentResource {
 
-    private static final Logger aLogger = LogManager.getLogger("error");
+    private static final Logger aLogger = LogManager.getLogger(AgentResource.class);
 
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
@@ -99,7 +99,7 @@ public class AgentResource {
 
     private void test() {
         aLogger.error("####roach###appDir=11111" + aLogger.getName());
-        aLogger.error("roach#$$##LogManager.getContext() = " + JSONObject.toJSONString(LogManager.getContext()));
+        ApiLogger.error("roach#$$##LogManager.getContext() = " + JSONObject.toJSONString(LogManager.getContext()));
     }
 
     /**
