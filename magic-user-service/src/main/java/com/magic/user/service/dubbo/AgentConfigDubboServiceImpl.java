@@ -5,6 +5,7 @@ import com.magic.user.service.AgentConfigService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 /**
@@ -19,6 +20,14 @@ public class AgentConfigDubboServiceImpl implements AgentConfigDubboService{
     private AgentConfigService agentConfigService;
     @Override
     public List<Map<String, Integer>> getProxysByAgentConfig(List<String> domains) {
-        return agentConfigService.getAgentByDomain(domains);
+        if(domains == null || domains.size() <=0){
+            return new ArrayList<>();
+        }
+        try {
+            return agentConfigService.getAgentByDomain(domains);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 }
