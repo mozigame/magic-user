@@ -22,9 +22,8 @@
             <PatternLayout pattern="${default_pattern}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="${default_file_size}"/>
-                <DefaultRolloverStrategy>${default_file_count}</DefaultRolloverStrategy>
             </Policies>
+            <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
 
         <RollingFile name="debug"
@@ -33,9 +32,8 @@
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="${default_file_size}"/>
-                <DefaultRolloverStrategy>${default_file_count}</DefaultRolloverStrategy>
             </Policies>
+            <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
 
         <RollingFile name="warn"
@@ -44,9 +42,8 @@
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="${default_file_size}"/>
-                <DefaultRolloverStrategy>${default_file_count}</DefaultRolloverStrategy>
             </Policies>
+            <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
 
         <RollingFile name="info"
@@ -56,8 +53,8 @@
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
                 <SizeBasedTriggeringPolicy size="500k"/>
-                <DefaultRolloverStrategy>${default_file_count}</DefaultRolloverStrategy>
             </Policies>
+            <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
 
         <RollingFile name="error"
@@ -66,9 +63,8 @@
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="${default_file_size}"/>
-                <DefaultRolloverStrategy>${default_file_count}</DefaultRolloverStrategy>
             </Policies>
+            <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
 
         <RollingFile name="request"
@@ -77,9 +73,8 @@
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="${default_file_size}"/>
-                <DefaultRolloverStrategy>${default_file_count}</DefaultRolloverStrategy>
             </Policies>
+            <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
 
         <RollingFile name="db_info"
@@ -88,9 +83,8 @@
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="${default_file_size}"/>
-                <DefaultRolloverStrategy>${default_file_count}</DefaultRolloverStrategy>
             </Policies>
+            <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
 
         <RollingFile name="review_info"
@@ -99,9 +93,8 @@
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="${default_file_size}"/>
-                <DefaultRolloverStrategy>${default_file_count}</DefaultRolloverStrategy>
             </Policies>
+            <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
     </Appenders>
 
