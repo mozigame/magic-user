@@ -12,56 +12,72 @@
             <PatternLayout pattern="${default_pattern}"/>
         </Console>
 
-        <RollingFile name="root" fileName="${log_home}/logs/${app_name}_root.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_root-%d{yyyy-MM-dd}.gz">
+        <RollingFile name="root"
+                     fileName="${log_home}/logs/${app_name}_root.log"
+                     filePattern="${log_home}/logsBackup/$${date:yyyy-MM}/${app_name}_root-%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="${default_pattern}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
 
-        <RollingFile name="debug" fileName="${log_home}/logs/${app_name}_debug.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_debug-%d{yyyy-MM-dd}.gz">
+        <RollingFile name="debug"
+                     fileName="${log_home}/logs/${app_name}_debug.log"
+                     filePattern="${log_home}/logsBackup/$${date:yyyy-MM}/${app_name}_debug-%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
 
-        <RollingFile name="warn" fileName="${log_home}/logs/${app_name}_warn.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_warn-%d{yyyy-MM-dd}.gz">
+        <RollingFile name="warn"
+                     fileName="${log_home}/logs/${app_name}_warn.log"
+                     filePattern="${log_home}/logsBackup/$${date:yyyy-MM}/${app_name}_warn-%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
 
-        <RollingFile name="info" fileName="${log_home}/logs/${app_name}_info.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_info-%d{yyyy-MM-dd}.gz">
+        <RollingFile name="info"
+                     fileName="${log_home}/logs/${app_name}_info.log"
+                     filePattern="${log_home}/logsBackup/$${date:yyyy-MM}/${app_name}_info-%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="${default_pattern}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
 
-        <RollingFile name="error" fileName="${log_home}/logs/${app_name}_error.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_error-%d{yyyy-MM-dd}.gz">
+        <RollingFile name="error"
+                     fileName="${log_home}/logs/${app_name}_error.log"
+                     filePattern="${log_home}/logsBackup/$${date:yyyy-MM}/${app_name}_error-%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
 
-        <RollingFile name="request" fileName="${log_home}/logs/${app_name}_request.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_request-%d{yyyy-MM-dd}.gz">
+        <RollingFile name="request"
+                     fileName="${log_home}/logs/${app_name}_request.log"
+                     filePattern="${log_home}/logsBackup/$${date:yyyy-MM}/${app_name}_request-%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
 
-        <RollingFile name="db_info" fileName="${app_dir}/logs/${app_name}_db_info.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_db_info-%d{yyyy-MM-dd}.gz">
+        <RollingFile name="db_info"
+                     fileName="${log_home}/logs/${app_name}_db_info.log"
+                     filePattern="${log_home}/logsBackup/$${date:yyyy-MM}/${app_name}_db_info-%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
         </RollingFile>
 
-        <RollingFile name="review_info" fileName="${app_dir}/logs/${app_name}_review_info.log" filePattern="logsBakup/$${date:yyyy-MM}/${app_name}_review_info-%d{yyyy-MM-dd}.gz">
+        <RollingFile name="review_info"
+                     fileName="${log_home}/logs/${app_name}_review_info.log"
+                     filePattern="${log_home}/logsBackup/$${date:yyyy-MM}/${app_name}_review_info-%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss SSS} [%t] %p - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
