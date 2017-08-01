@@ -47,13 +47,6 @@
             <artifactId>engine-gw</artifactId>
         </dependency>
 
-        <!-- log -->
-        <dependency>
-            <groupId>com.magic.commons</groupId>
-            <artifactId>log</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
-        </dependency>
-
         <dependency>
             <groupId>com.magic</groupId>
             <artifactId>oceanus-api</artifactId>
