@@ -58,12 +58,12 @@ public class AgentConfigServiceImpl implements AgentConfigService {
     }
     /**
      * 获取域名下的代理数量
-     * @param domain
+     * @param domainList
      * @return List<Map>
      */
     @Override
-    public List<Map<String,Integer>> getAgentByDomain(List<String> domain){
-        return  (List<Map<String,Integer>> )agentConfigDbService.get("getAgentByDomain", new String[]{"domainList"},domain);
+    public List<Map<String,Integer>> getAgentByDomain(List<String> domainList){
+        return  (List)agentConfigDbService.find("getAgentByDomain", new String[]{"domainList"},domainList);
     }
 
     /**
@@ -72,6 +72,6 @@ public class AgentConfigServiceImpl implements AgentConfigService {
      * @return List<Map>
      */
     public List<AgentConfig> getAgentConfigByDomain(String domain){
-        return  (List<AgentConfig> )agentConfigDbService.get("getAgentConfigByDomain", new String[]{"domainList"},domain);
+        return  (List<AgentConfig> )agentConfigDbService.find("getAgentConfigByDomain", new String[]{"domain"},domain);
     }
 }

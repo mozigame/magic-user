@@ -80,25 +80,26 @@
     </select>
     <!--获取域名下的代理数量-->
     <select id="getAgentByDomain" resultType="java.util.HashMap" parameterType="java.util.List">
-        select count(id),domain from t_agent_config_info GROUP BY domain where 1=1
-        <if test="gameTypeList != null and gameTypeList.size() > 0">
+        select count(id),domain from t_agent_config_info where 1=1
+        <if test="domainList != null and domainList.size() > 0">
             and  domain in
             <foreach collection="domainList" item="domain" index="index"
                      open="(" close=")" separator=",">
                 #{domain}
             </foreach>
         </if>
+        GROUP BY domain
     </select>
     <!--获取域名下的代理信息-->
-    <select id="getAgentConfigByDomain" resultType="AgentConfig" parameterType="java.lang.String">
-        SELECT
+    <select id="getAgentConfigByDomain" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT id,
         agent_id,
         return_scheme_id,
         admin_cost_id,
         fee_id,
         discount,
         cost,
-        domain
+        domain,temp1,temp2,temp3
         FROM t_agent_config_info
         WHERE domain=#{domain}
     </select>
