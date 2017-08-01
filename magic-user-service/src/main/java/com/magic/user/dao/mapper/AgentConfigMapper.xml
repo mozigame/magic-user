@@ -90,15 +90,15 @@
         </if>
     </select>
     <!--获取域名下的代理信息-->
-    <select id="getAgentConfigByDomain" resultType="AgentConfig" parameterType="java.lang.String">
-        SELECT
+    <select id="getAgentConfigByDomain" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT id,
         agent_id,
         return_scheme_id,
         admin_cost_id,
         fee_id,
         discount,
         cost,
-        domain
+        domain,temp1,temp2,temp3
         FROM t_agent_config_info
         WHERE domain=#{domain}
     </select>
