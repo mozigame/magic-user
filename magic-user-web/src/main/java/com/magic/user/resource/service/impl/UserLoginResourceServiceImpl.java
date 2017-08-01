@@ -152,7 +152,7 @@ public class UserLoginResourceServiceImpl implements UserLoginResourceService {
      */
     @Override
     public String logout(RequestContext rc, String agent, String username) {
-        if (username == null || username.length() < 6 || username.length() > 16) {
+        if (username == null || username.length() < 4 || username.length() > 16) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         User user = userService.get(rc.getUid());
