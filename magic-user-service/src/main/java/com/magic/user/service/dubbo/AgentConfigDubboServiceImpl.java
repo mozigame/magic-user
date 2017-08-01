@@ -1,5 +1,6 @@
 package com.magic.user.service.dubbo;
 
+import com.magic.api.commons.ApiLogger;
 import com.magic.user.dao.AgentConfigDao;
 import com.magic.user.service.AgentConfigService;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class AgentConfigDubboServiceImpl implements AgentConfigDubboService{
         if(domains == null || domains.size() <=0){
             return new ArrayList<>();
         }
+        ApiLogger.info("#####getProxysByAgentConfig method params is "+domains +"#####");
         try {
             return agentConfigService.getAgentByDomain(domains);
         } catch (Exception e) {
