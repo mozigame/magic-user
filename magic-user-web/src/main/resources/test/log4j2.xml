@@ -52,7 +52,7 @@
             <PatternLayout pattern="${default_pattern}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="${default_time_interval}" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="500k"/>
+                <SizeBasedTriggeringPolicy size="100k"/>
             </Policies>
             <DefaultRolloverStrategy max="${default_file_count}"/>
         </RollingFile>
