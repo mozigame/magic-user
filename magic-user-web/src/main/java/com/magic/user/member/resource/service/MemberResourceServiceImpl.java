@@ -1286,7 +1286,7 @@ public class MemberResourceServiceImpl {
             failNum = Integer.parseInt(jedis.get(userKey).toString());
         }
         ApiLogger.info(String.format("用户登录信息,username=%s,password=%s,vcode=%s,redisKey=%s,failNum=%d", username, password, code, userKey, failNum));
-        if (failNum > 3) {
+        if (failNum >= 3) {
             throw UserException.MEMBER_LOGIN_LOCKED;
         }
         failNum++;
