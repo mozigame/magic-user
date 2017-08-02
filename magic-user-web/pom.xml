@@ -44,10 +44,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-<<<<<<< HEAD
-=======
 
->>>>>>> f02be6bcfee249eabf5fbece89adcae121c688c6
     </dependencies>
 
     <build>
