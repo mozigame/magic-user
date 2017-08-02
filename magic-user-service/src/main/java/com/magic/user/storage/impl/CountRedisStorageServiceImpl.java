@@ -257,7 +257,8 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
         try {
             String key = RedisConstants.assembleCheckRegisterIp(ip);
             String result = jedisFactory.getInstance().get(key);
-            if (com.magic.api.commons.utils.StringUtils.isNotBlank(result)) {
+            ApiLogger.info("getRegisterIpCount resut : " +result);
+            if (StringUtils.isNotBlank(result)) {
                 return Long.parseLong(result);
             }
         } catch (NumberFormatException e) {
