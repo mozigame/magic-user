@@ -448,17 +448,17 @@ public class DubboOutAssembleServiceImpl {
         return false;
     }
 
-    /**
-     * 根据域名查询业主下所有的域名
-     * @param ownerId
-     * @return
-     */
-    public List<OwnerDomainVo> queryDomainListByDomain(Long ownerId,String domain) {
-        try {
-            return domainDubboService.queryDomainListByDomain(ownerId,domain);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    /**
+//     * 根据域名查询业主下所有的域名
+//     * @param ownerId
+//     * @return
+//     */
+//    public List<OwnerDomainVo> queryDomainListByDomain(Long ownerId,String domain) {
+//        try {
+//            return domainDubboService.queryDomainListByDomain(ownerId,domain);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 }
