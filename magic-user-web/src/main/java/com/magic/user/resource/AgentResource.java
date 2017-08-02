@@ -518,4 +518,26 @@ public class AgentResource {
         String result = agentResourceService.repairMemberNumber(RequestContext.getRequestContext(), agentIdList);
         return result;
     }
+
+    /**
+     * @param domain
+     * @return
+     * @Doc 获取代理下的域名
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/getAgentByDomain", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getAgentByDomain(@RequestParam(name = "domain") String domain) {
+        return agentResourceService.getAgentConfigByDomain(RequestContext.getRequestContext(), domain);
+    }
+    /**
+     * @return
+     * @Doc 查询域名
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/queryDomainInfoByDomain", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String queryDomain(String domain) {
+        return agentResourceService.queryDomainInfoByDomain(RequestContext.getRequestContext(),domain);
+    }
 }

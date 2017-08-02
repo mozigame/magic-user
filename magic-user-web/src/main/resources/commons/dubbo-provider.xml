@@ -19,4 +19,7 @@
     <dubbo:service interface="com.magic.user.service.dubbo.StatisticsDubboService" ref="statisticsDubboService">
         <dubbo:method name="statisActiveMembers" timeout="3000"/>
     </dubbo:service>
+    <dubbo:service interface="com.magic.user.service.dubbo.AgentConfigDubboService" ref="agentConfigDubboService">
+        <dubbo:method name="getProxysByAgentConfig" timeout="3000"/>
+    </dubbo:service>
 </beans>

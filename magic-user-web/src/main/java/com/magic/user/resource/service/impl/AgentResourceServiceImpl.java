@@ -39,7 +39,6 @@ import com.magic.user.util.PasswordCapture;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -363,7 +362,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
                       String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
                       Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost, Long userLevel) {
-        String generalizeCode = UUIDUtil.getCode();
+        String generalizeCode = UUIDUtil.getSpreadCode();
         RegisterReq req = assembleRegister(account, password);
         if (!checkRegisterAgentParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
@@ -1568,6 +1567,42 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 .filter(request -> request.getUsername() != null && req.getUsername().length() >= 4 && req.getUsername().length() <= 15)
                 .filter(request -> request.getPassword() != null && request.getPassword().length() == 32)
                 .isPresent();
+    }
+
+    /**
+     * @param rc
+     * @return
+     * @Doc 获取域名下的代理信息
+     */
+    public String getAgentConfigByDomain(RequestContext rc, String domain){
+        List<AgentConfig> configs = null;
+        try {
+            configs = (List<AgentConfig>)agentConfigService.getAgentConfigByDomain(domain);
+        } catch (Exception e) {
+            ApiLogger.info(e.getMessage());
+        }
+        JSONObject result = new JSONObject();
+        result.put("configs", configs);
+        return result.toJSONString();
+    }
+
+    /**
+     * @param rc
+     * @return
+     * @Doc 模糊查询域名
+     */
+    @Override
+    public String queryDomainInfoByDomain(RequestContext rc, String domain){
+        User user = userService.get(rc.getUid());
+        List<OwnerDomainVo> domains = null;
+        try {
+            domains = dubboOutAssembleService.queryDomainListByDomain(user.getOwnerId(),domain);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JSONObject result = new JSONObject();
+        result.put("domains", domains);
+        return result.toJSONString();
     }
 
 }

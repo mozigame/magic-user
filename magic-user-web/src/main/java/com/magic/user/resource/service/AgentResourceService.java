@@ -1,9 +1,12 @@
 package com.magic.user.resource.service;
 
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.user.entity.AgentConfig;
 import com.magic.user.po.DownLoadFile;
+import com.magic.user.vo.AgentConfigVo;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * User: joey
@@ -242,4 +245,17 @@ public interface AgentResourceService {
      * @return
      */
     String repairMemberNumber(RequestContext requestContext, String agentIdList);
+
+    /**
+     * @param rc
+     * @return
+     * @Doc 获取域名下的代理信息
+     */
+    String getAgentConfigByDomain(RequestContext rc, String domain);
+    /**
+     * @param rc
+     * @return
+     * @Doc 模糊查询域名
+     */
+    String queryDomainInfoByDomain(RequestContext rc, String domain);
 }
