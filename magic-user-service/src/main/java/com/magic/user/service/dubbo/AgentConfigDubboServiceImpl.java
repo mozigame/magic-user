@@ -38,8 +38,8 @@ public class AgentConfigDubboServiceImpl implements AgentConfigDubboService {
                     for (String key : map.keySet()) {
                         if ("domain".equals(key)) {
                             domain = map.get(key) == null ? null : map.get(key).toString();
-                        } else {
-                            proxyNum = Integer.valueOf(map.get(key) == null ? "1" : map.get(key).toString());
+                        } else if("proxyNum".equals(key)){
+                            proxyNum = Integer.valueOf(map.get(key) == null ? "0" : map.get(key).toString());
                         }
                     }
                     result.put(domain, proxyNum);
