@@ -39,7 +39,6 @@ import com.magic.user.util.PasswordCapture;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -1584,6 +1583,25 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         JSONObject result = new JSONObject();
         result.put("configs", configs);
+        return result.toJSONString();
+    }
+
+    /**
+     * @param rc
+     * @return
+     * @Doc 模糊查询域名
+     */
+    @Override
+    public String queryDomainInfoByDomain(RequestContext rc, String domain){
+        User user = userService.get(rc.getUid());
+        List<OwnerDomainVo> domains = null;
+        try {
+            domains = dubboOutAssembleService.queryDomainListByDomain(user.getOwnerId(),domain);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JSONObject result = new JSONObject();
+        result.put("domains", domains);
         return result.toJSONString();
     }
 

@@ -252,4 +252,10 @@ public interface AgentResourceService {
      * @Doc 获取域名下的代理信息
      */
     String getAgentConfigByDomain(RequestContext rc, String domain);
+    /**
+     * @param rc
+     * @return
+     * @Doc 模糊查询域名
+     */
+    String queryDomainInfoByDomain(RequestContext rc, String domain);
 }
