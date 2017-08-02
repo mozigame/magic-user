@@ -1,10 +1,12 @@
 package com.magic.user.resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.AgentResourceService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 /**
  * User: joey
  * Date: 2017/5/3
@@ -28,6 +34,7 @@ import java.net.URLEncoder;
 @RequestMapping(value = "/v1/agent")
 public class AgentResource {
 
+    private static final Logger logger = LogManager.getLogger(AgentResource.class);
 
     @Resource(name = "agentResourceService")
     private AgentResourceService agentResourceService;
@@ -66,6 +73,9 @@ public class AgentResource {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "condition", required = false, defaultValue = "{}") String condition
     ) throws IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("listExport::userId = " + userId + ",condition = " + condition);
+        }
         RequestContext rc = RequestContext.getRequestContext();
         rc.setUid(userId);
         DownLoadFile downLoadFile = agentResourceService.agentListExport(rc, condition);
@@ -88,6 +98,7 @@ public class AgentResource {
             }
         }
     }
+
 
     /**
      * @param holder       所属股东ID
