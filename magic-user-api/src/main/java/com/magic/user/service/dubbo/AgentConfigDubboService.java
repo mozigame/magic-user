@@ -9,5 +9,5 @@ import java.util.Map;
  * @date 2017/7/31
  */
 public interface AgentConfigDubboService {
-    List<Map<String,Integer>> getProxysByAgentConfig(List<String> domains);
+    Map<String, Integer> getProxysByAgentConfig(List<String> domains);
 }
