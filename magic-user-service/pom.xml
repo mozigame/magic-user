@@ -47,10 +47,6 @@
             <artifactId>engine-gw</artifactId>
         </dependency>
 
-<<<<<<< HEAD
-
-=======
->>>>>>> f02be6bcfee249eabf5fbece89adcae121c688c6
         <dependency>
             <groupId>com.magic</groupId>
             <artifactId>oceanus-api</artifactId>
