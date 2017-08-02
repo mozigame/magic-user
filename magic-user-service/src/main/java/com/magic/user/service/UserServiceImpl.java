@@ -138,6 +138,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean addAgent(User user) {
+        ApiLogger.info("register agent generalizeCode : "+ user.getGeneralizeCode());
         Long result = agentDbService.insert(user);
         if (Optional.ofNullable(result).filter(resultValue -> resultValue > 0).isPresent()){//添加成功，redis计数
             countRedisStorageService.incrAgent(user.getOwnerId());
