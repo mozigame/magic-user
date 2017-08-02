@@ -1570,4 +1570,21 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 .isPresent();
     }
 
+    /**
+     * @param rc
+     * @return
+     * @Doc 获取域名下的代理信息
+     */
+    public String getAgentConfigByDomain(RequestContext rc, String domain){
+        List<AgentConfig> configs = null;
+        try {
+            configs = (List<AgentConfig>)agentConfigService.getAgentConfigByDomain(domain);
+        } catch (Exception e) {
+            ApiLogger.info(e.getMessage());
+        }
+        JSONObject result = new JSONObject();
+        result.put("configs", configs);
+        return result.toJSONString();
+    }
+
 }

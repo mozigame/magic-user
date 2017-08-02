@@ -230,4 +230,10 @@ public class UserException extends ExceptionFactor {
     public static final CommonException OLD_NEWPASSWORD_SAME = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 33, HttpServletResponse.SC_OK, "oldpassword is same with newpassword!", "新密码不能和原密码相同.");
 
+    /**
+     * 密码非法
+     */
+    public static final CommonException MEMBER_LOGIN_LOCKED = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 34, HttpServletResponse.SC_OK, "member info is locked!", "输入错误次数过多，账号已被锁定，请15分钟后再试.");
+
 }

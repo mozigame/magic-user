@@ -78,6 +78,30 @@
          from t_agent_config_info
           WHERE agent_id=#{agentId}
     </select>
-
+    <!--获取域名下的代理数量-->
+    <select id="getAgentByDomain" resultType="java.util.HashMap" parameterType="java.util.List">
+        select count(id) as proxyNum,domain from t_agent_config_info where 1=1
+        <if test="domainList != null and domainList.size() > 0">
+            and  domain in
+            <foreach collection="domainList" item="domain" index="index"
+                     open="(" close=")" separator=",">
+                #{domain}
+            </foreach>
+        </if>
+        GROUP BY domain
+    </select>
+    <!--获取域名下的代理信息-->
+    <select id="getAgentConfigByDomain" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT id,
+        agent_id,
+        return_scheme_id,
+        admin_cost_id,
+        fee_id,
+        discount,
+        cost,
+        domain,temp1,temp2,temp3
+        FROM t_agent_config_info
+        WHERE domain=#{domain}
+    </select>
 
 </mapper>

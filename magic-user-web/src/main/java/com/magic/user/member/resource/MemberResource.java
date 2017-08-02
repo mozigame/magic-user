@@ -81,6 +81,7 @@ public class MemberResource {
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
+        ApiLogger.info("register request info username=" + username + " clientId=" + rc.getRequest().getHeader(UserContants.X_VERIFY_CODE));
         //获取域名
         String url = rc.getOrigin();
         RegisterReq req = assembleRegister(proCode, username, password, paymentPassword, telephone, email, bank, bankCode, realname, bankCardNo, bankDeposit, province, city, weixin, qq);
@@ -148,11 +149,10 @@ public class MemberResource {
 
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        //获取浏览器、操作系统名称等数据
-        String agent = request.getHeader(HeaderUtil.USER_AGENT);
+
         //获取域名
         String url = rc.getOrigin();
-        return memberServiceResource.memberLogin(rc, agent, url, username, password, code);
+        return memberServiceResource.memberLogin(rc, request, url, username, password, code);
     }
 
     /**
@@ -335,6 +335,7 @@ public class MemberResource {
 
     /**
      * 单独获取会员信息，没有资金等数据
+     *
      * @return
      */
     @Access(type = Access.AccessType.RESOURCE)
@@ -421,8 +422,8 @@ public class MemberResource {
     }
 
     /**
-     * @param id    会员ID
-     * @param level 层级ID
+     * @param id            会员ID
+     * @param level         层级ID
      * @param permanentLock 是否永久锁定 0 否 1 是
      * @return
      * @Doc 会员层级修改, 前端直接进行页面跳转
@@ -434,10 +435,10 @@ public class MemberResource {
     public String levelUpdate(
             @RequestParam(name = "id", required = true) Long id,
             @RequestParam(name = "level", required = true) Long level,
-            @RequestParam(name="permanentLock",required = false,defaultValue = "0") Long permanentLock
+            @RequestParam(name = "permanentLock", required = false, defaultValue = "0") Long permanentLock
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.updateLevel(rc, id, level,permanentLock);
+        return memberServiceResource.updateLevel(rc, id, level, permanentLock);
     }
 
     /**
