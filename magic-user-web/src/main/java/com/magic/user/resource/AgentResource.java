@@ -534,10 +534,10 @@ public class AgentResource {
      * @return
      * @Doc 查询域名
      */
-    @Access(type = Access.AccessType.COMMON)
+    /*@Access(type = Access.AccessType.COMMON)
     @RequestMapping(value = "/queryDomainInfoByDomain", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String queryDomain(String domain) {
         return agentResourceService.queryDomainInfoByDomain(RequestContext.getRequestContext(),domain);
-    }
+    }*/
 }

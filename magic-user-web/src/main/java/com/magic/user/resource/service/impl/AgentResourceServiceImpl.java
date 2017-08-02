@@ -1591,7 +1591,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 模糊查询域名
      */
-    @Override
+   /* @Override
     public String queryDomainInfoByDomain(RequestContext rc, String domain){
         User user = userService.get(rc.getUid());
         List<OwnerDomainVo> domains = null;
@@ -1603,6 +1603,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         JSONObject result = new JSONObject();
         result.put("domains", domains);
         return result.toJSONString();
-    }
+    }*/
 
 }
