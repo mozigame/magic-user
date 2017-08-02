@@ -89,7 +89,7 @@ public class MasterAddOwnerSuccessConsumer implements Consumer {
             /*代理*/
             long agentId = dubboOutAssembleService.assignUid();
             String agentName = ownerName + "_dl";
-            String generalizeCode = UUIDUtil.getCode();
+            String generalizeCode = UUIDUtil.getSpreadCode();
             OwnerAccountUser agentAccountUser = assembleOwnerAccountUser(ownerId, agentName, agentId);
             if (accountIdMappingService.add(agentAccountUser) <= 0) {
                 if (accountIdMappingService.getUid(agentId, agentName) <= 0) {

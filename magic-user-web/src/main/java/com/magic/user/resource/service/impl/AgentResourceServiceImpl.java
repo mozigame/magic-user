@@ -362,7 +362,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
                       String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
                       Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost, Long userLevel) {
-        String generalizeCode = UUIDUtil.getCode();
+        String generalizeCode = UUIDUtil.getSpreadCode();
         RegisterReq req = assembleRegister(account, password);
         if (!checkRegisterAgentParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
