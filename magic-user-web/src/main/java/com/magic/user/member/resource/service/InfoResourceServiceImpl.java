@@ -515,11 +515,10 @@ public class InfoResourceServiceImpl {
      */
     private static void checkBankCardNo(String bankCardNo) {
         if (StringUtils.isBlank(bankCardNo)){
-            throw UserException.ILLEGAL_PARAMETERS;
-        }
-        int len = bankCardNo.length();
-        if (len < MIN_BANK_CARD_NO_LEN || len > MAX_BANK_CARD_NO_LEN){
-            throw UserException.ILLEGAL_PARAMETERS;
+            int len = bankCardNo.length();
+            if (len < MIN_BANK_CARD_NO_LEN || len > MAX_BANK_CARD_NO_LEN){
+                throw UserException.ILLEGAL_PARAMETERS;
+            }
         }
     }
 
