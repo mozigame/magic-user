@@ -8,6 +8,7 @@ import com.magic.user.entity.Member;
 import com.magic.user.storage.CountRedisStorageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 
 import javax.annotation.Resource;
@@ -239,5 +240,29 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
             }
         }
         return num;
+    }
+
+    @Override
+    public void addRegisterIpCount(String ip) {
+        String key = RedisConstants.assembleCheckRegisterIp(ip);
+        Jedis jedis = jedisFactory.getInstance();
+        Long incr = jedis.incr(key);
+        if (incr != null && incr < 2) {
+            jedis.expire(key, 86400);
+        }
+    }
+
+    @Override
+    public long getRegisterIpCount(String ip) {
+        try {
+            String key = RedisConstants.assembleCheckRegisterIp(ip);
+            String result = jedisFactory.getInstance().get(key);
+            if (com.magic.api.commons.utils.StringUtils.isNotBlank(result)) {
+                return Long.parseLong(result);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return 0L;
     }
 }

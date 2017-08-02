@@ -87,4 +87,14 @@ public class MemberServiceImpl implements MemberService {
         return result;
     }
 
+    @Override
+    public void addRegisterIpCount(String ip) {
+        countRedisStorageService.addRegisterIpCount(ip);
+    }
+
+    @Override
+    public long getRegisterIpCount(String ip) {
+        return countRedisStorageService.getRegisterIpCount(ip);
+    }
+
 }

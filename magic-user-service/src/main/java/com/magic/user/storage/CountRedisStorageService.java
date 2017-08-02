@@ -114,4 +114,13 @@ public interface CountRedisStorageService {
      * @return
      */
     long getCounts(String key);
+
+    /**
+     * 检查1天内超过10次注册的ip
+     * @param ip
+     * @return
+     */
+    void addRegisterIpCount(String ip);
+
+    long getRegisterIpCount(String ip);
 }

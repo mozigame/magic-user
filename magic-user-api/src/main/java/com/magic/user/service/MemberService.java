@@ -61,4 +61,13 @@ public interface MemberService {
      * @return
      */
     String getVerifyCode(String clientId);
+
+    /**
+     * 检查1天内超过10次注册的ip
+     * @param ip
+     * @return
+     */
+    void addRegisterIpCount(String ip);
+
+    long getRegisterIpCount(String ip);
 }

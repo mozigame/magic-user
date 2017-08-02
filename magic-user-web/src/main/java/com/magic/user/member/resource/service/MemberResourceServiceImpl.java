@@ -1061,6 +1061,9 @@ public class MemberResourceServiceImpl {
 
         //验证码校验
         verifyCode(rc, verifyCode);
+        if (memberService.getRegisterIpCount(rc.getIp()) > 5) {
+            throw UserException.REGISTER_TOO_FAST;
+        }
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
 
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
@@ -1129,6 +1132,7 @@ public class MemberResourceServiceImpl {
             throw UserException.REGISTER_FAIL;
         }
         sendRegisterMessage(member);
+        memberService.addRegisterIpCount(rc.getIp());
         return "{\"token\":" + "\"" + token + "\"" + "}";
     }
 

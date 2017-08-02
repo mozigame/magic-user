@@ -162,6 +162,12 @@ public class RedisConstants {
         return assemble(LOGIN_VERIFY_CODE, clientId);
     }
 
+
+    private static final String CHECK_REGISTER_IP="reg_suc_ip_";
+
+    public static String assembleCheckRegisterIp(String ip) {
+        return CHECK_REGISTER_IP + ip;
+    }
     /**
      * 组装key
      *
@@ -174,4 +180,6 @@ public class RedisConstants {
         key.append(last);
         return key.toString();
     }
+
+
 }

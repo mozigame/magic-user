@@ -236,4 +236,12 @@ public class UserException extends ExceptionFactor {
     public static final CommonException MEMBER_LOGIN_LOCKED = new CommonException(
             CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 34, HttpServletResponse.SC_OK, "member info is locked!", "输入错误次数过多，账号已被锁定，请15分钟后再试.");
 
+    /**
+     * 注册次数过多
+     */
+    public static final CommonException REGISTER_TOO_FAST = new CommonException(
+            CommonException.ERROR_LEVEL_SERVICE, SystemCode, 0, 35, HttpServletResponse.SC_OK, "member register too fast!", "注册次数太多，请稍后再试!");
+
+
+
 }
