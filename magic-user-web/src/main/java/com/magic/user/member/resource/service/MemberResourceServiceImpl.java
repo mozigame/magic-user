@@ -6,7 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.magic.analysis.utils.HttpUtils;
 import com.magic.api.commons.ApiLogger;
+import com.magic.api.commons.codis.JedisFactory;
 import com.magic.api.commons.core.context.RequestContext;
+import com.magic.api.commons.core.tools.HeaderUtil;
 import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
@@ -27,6 +29,7 @@ import com.magic.user.bean.Account;
 import com.magic.user.bean.MemberCondition;
 import com.magic.user.bean.RegionNumber;
 import com.magic.user.bean.Register;
+import com.magic.user.constants.RedisConstants;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
@@ -51,8 +54,10 @@ import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -94,6 +99,9 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
+
+    @Resource(name = "permJedisFactory")
+    private JedisFactory jedisFactory;
 
     /**
      * 组装翻页数据
@@ -216,7 +224,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private List<MemberListVo> assembleMemberVos(List<MemberConditionVo> memberConditionVos) {
-         List<MemberListVo> memberListVos = Lists.newArrayList();
+        List<MemberListVo> memberListVos = Lists.newArrayList();
         //1、获取会员基础信息
 
         for (int i = 0; i < memberConditionVos.size(); i = i + INTERVAL) {
@@ -540,8 +548,8 @@ public class MemberResourceServiceImpl {
     /**
      * 会员详情
      *
-     * @param rc RequestContext
-     * @param id 会员ID
+     * @param rc     RequestContext
+     * @param userId 会员ID
      * @return
      */
     public String memberDetailsNoCapital(RequestContext rc, long userId) {
@@ -922,10 +930,10 @@ public class MemberResourceServiceImpl {
                 JSONObject condition = js.getJSONObject("condition");
                 LevelCondition llc = new LevelCondition();
                 llc.setDepositNumbers(condition.getInteger("depositTimes"));
-                llc.setDepositTotalMoney(String.valueOf(condition.getLong("despositTotalAmount")/100));
-                llc.setMaxDepositMoney(String.valueOf(condition.getLong("despositMaxAmount")/100));
+                llc.setDepositTotalMoney(String.valueOf(condition.getLong("despositTotalAmount") / 100));
+                llc.setMaxDepositMoney(String.valueOf(condition.getLong("despositMaxAmount") / 100));
                 llc.setWithdrawNumbers(condition.getInteger("withdrawalTimes"));
-                llc.setWithdrawTotalMoney(String.valueOf(condition.getLong("withdrawTotalAmount")/100));
+                llc.setWithdrawTotalMoney(String.valueOf(condition.getLong("withdrawTotalAmount") / 100));
 
                 memberLevelListVo.setCondition(llc);
                 memberLevelListVos.add(memberLevelListVo);
@@ -1248,14 +1256,17 @@ public class MemberResourceServiceImpl {
      * 会员登陆
      *
      * @param rc       RequestContext
-     * @param agent    浏览器数据
+     * @param request  浏览器数据
      * @param url      url
      * @param username 用户名
      * @param password 密码
      * @param code     验证码
      * @return
      */
-    public String memberLogin(RequestContext rc, String agent, String url, String username, String password, String code) {
+    public String memberLogin(RequestContext rc, HttpServletRequest request, String url, String username, String password, String code) {
+
+        //获取浏览器、操作系统名称等数据
+        String agent = request.getHeader(HeaderUtil.USER_AGENT);
         if (!checkLoginReq(username, password)) {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
@@ -1265,6 +1276,22 @@ public class MemberResourceServiceImpl {
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
+
+        // 登录之后对用户请求登录信息进行记录
+        String userKey = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(ownerInfo.getOwnerId()) + "_" + username + "_" + request.getRemoteAddr();
+        Jedis jedis = jedisFactory.getInstance();
+        int failNum = 0; // 失败次数
+        // 如果连续失败登录信息大于等于3次，则冻结用户账户15分钟
+        if (jedis.get(userKey) != null) {
+            failNum = Integer.parseInt(jedis.get(userKey).toString());
+        }
+        ApiLogger.info(String.format("用户登录信息,username=%s,password=%s,vcode=%s,redisKey=%s,failNum=%d", username, password, code, userKey, failNum));
+        if (failNum >= 3) {
+            throw UserException.MEMBER_LOGIN_LOCKED;
+        }
+        failNum++;
+        // 设置生命周期，15分钟
+        jedis.setex(userKey, 15 * 60, String.valueOf(failNum));
         String body = assembleLoginBody(rc, ownerInfo.getOwnerId(), username, password, agent, url);
         EGResp resp = thriftOutAssembleService.memberLogin(body, "account");
         if (resp == null || resp.getCode() == 0x1011) {
@@ -1295,6 +1322,9 @@ public class MemberResourceServiceImpl {
         String token = object.getString("token");
         String result = assembleLoginResult(uid, member.getUsername(), token);
         sendLoginMessage(member, rc);
+
+        //删除redis里面的登录错误次数信息
+        jedis.del(userKey);
 
         return result;
     }
@@ -1380,9 +1410,9 @@ public class MemberResourceServiceImpl {
      */
     private void checkVerifyCode(String verifyCodeAndExpireTime, String code) {
         //TODO 待删除
-        if (StringUtils.isNoneEmpty(code) && code.equals("000000")) {
-            return;
-        }
+//        if (StringUtils.isNoneEmpty(code) && code.equals("000000")) {
+//            return;
+//        }
         if (StringUtils.isEmpty(verifyCodeAndExpireTime)) {
             throw UserException.VERIFY_CODE_INVALID;
         }
@@ -1679,7 +1709,7 @@ public class MemberResourceServiceImpl {
             for (OnLineMember member : list) {
                 if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
                     String loginIp = member.getLoginIp();
-                    member.setLoginIp(loginIp+"/"+HttpUtils.getAddressByIP(member.getLoginIp()));
+                    member.setLoginIp(loginIp + "/" + HttpUtils.getAddressByIP(member.getLoginIp()));
                 }
                 /*if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
                     String registerIp = member.getRegisterIp();
@@ -1724,7 +1754,7 @@ public class MemberResourceServiceImpl {
             for (OnLineMember member : list) {
                 if (null != member.getLoginIp() && !"".equals(member.getLoginIp())) {
                     String loginIp = member.getLoginIp();
-                    member.setLoginIp(loginIp+"/"+HttpUtils.getAddressByIP(member.getLoginIp()));
+                    member.setLoginIp(loginIp + "/" + HttpUtils.getAddressByIP(member.getLoginIp()));
                 }
                 /*if(null != member.getRegisterIp() && !"".equals(member.getRegisterIp())){
                     String registerIp = member.getRegisterIp();

@@ -53,7 +53,7 @@ public interface AgentConfigService {
      * @param domain
      * @return List<Map>
      */
-    List<Map<String,Integer>> getAgentByDomain(List<String> domain);
+    List<Map<String,Object>> getAgentByDomain(List<String> domain);
     /**
      * 获取域名下的代理信息
      * @param domain
