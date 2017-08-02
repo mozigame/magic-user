@@ -257,5 +257,5 @@ public interface AgentResourceService {
      * @return
      * @Doc 模糊查询域名
      */
-    String queryDomainInfoByDomain(RequestContext rc, String domain);
+   /* String queryDomainInfoByDomain(RequestContext rc, String domain);*/
 }
