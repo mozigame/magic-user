@@ -363,6 +363,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                       String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
                       Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost, Long userLevel) {
         String generalizeCode = UUIDUtil.getSpreadCode();
+        ApiLogger.info("register agent generalizeCode : "+ generalizeCode);
         RegisterReq req = assembleRegister(account, password);
         if (!checkRegisterAgentParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
@@ -1248,7 +1249,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 throw UserException.REGISTER_FAIL;
             }
             //3、添加代理基础信息
-            String generalizeCode = UUIDUtil.getCode();
+            String generalizeCode = UUIDUtil.getSpreadCode();
+            ApiLogger.info("registe agent generalizeCode :"+generalizeCode);
             User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, agentApply.getUsername(), telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo, bank, bankDeposit);
             if (!userService.addAgent(agentUser)) {
                 ApiLogger.error("add agent info failed,userId:" + userId);
