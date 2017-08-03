@@ -167,6 +167,11 @@ public class UserServiceImpl implements UserService {
         return (list != null && list.size() > 0) ? list.get(0) : null;
     }
 
+    /**
+     * 这个api是left join了3张表,慎用
+     * @param id
+     * @return
+     */
     @Override
     public AgentInfoVo getAgentDetail(Long id) {
         return (AgentInfoVo) userDbService.get("agentDetail", new String[]{"userId"}, id);
