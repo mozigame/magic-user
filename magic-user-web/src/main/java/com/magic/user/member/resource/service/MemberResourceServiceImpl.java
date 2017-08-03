@@ -57,13 +57,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.tools.ant.util.regexp.Regexp;
 import org.apache.tools.ant.util.regexp.RegexpUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.Jedis;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLConnection;
@@ -2381,11 +2380,19 @@ public class MemberResourceServiceImpl {
         Map<Long, Member> id2MemberMapping = getId2MemberMapping(memberIds);
         //repair
         JSONObject jsonObject = new JSONObject();
+        repairMemberConditionVo(memberIds, id2MemberMapping, jsonObject);
+        return jsonObject.toJSONString();
+    }
+
+    private void repairMemberConditionVo(List<Long> memberIds, Map<Long, Member> id2MemberMapping, JSONObject jsonObject) {
         for (Long memberId : memberIds) {
             try {
                 Member member = id2MemberMapping.get(memberId);
                 if (member == null) {
-                    jsonObject.put(String.valueOf(memberId), "member is null");
+                    if (jsonObject != null) {
+                        jsonObject.put(String.valueOf(memberId), "member is null");
+                    }
+
                 } else {
                     Map<String, Object> updateMap = new HashMap<>();
 
@@ -2399,15 +2406,18 @@ public class MemberResourceServiceImpl {
                                 member.getBankCardNo());
                     }
                     boolean opResult = memberMongoService.updateMemberInfo(memberId, updateMap);
-                    jsonObject.put(String.valueOf(memberId), opResult);
+                    if (jsonObject != null) {
+                        jsonObject.put(String.valueOf(memberId), opResult);
+                    }
                 }
             } catch (Exception e) {
                 ApiLogger.error("repairMemberConditionVo::memberId = " + memberId, e);
-                jsonObject.put(String.valueOf(memberId), "error - " + e.getMessage());
+                if (jsonObject != null) {
+                    jsonObject.put(String.valueOf(memberId), "error - " + e.getMessage());
+                }
             }
 
         }
-        return jsonObject.toJSONString();
     }
 
     private Map<Long, Member> getId2MemberMapping(List<Long> memberIds) {
@@ -2425,5 +2435,38 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         return ids;
+    }
+
+    /**
+     * 传id麻烦，直接扔文件
+     *
+     * @param requestContext
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public String repairMemberConditionVoByFile(RequestContext requestContext, MultipartFile file) throws IOException {
+        //文件大于1M
+        if (file.getSize() > 1024 * 1024) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        byte[] bytes = file.getBytes();
+        InputStream in = new ByteArrayInputStream(bytes);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String line = null;
+        List<Long> memberList = new LinkedList<>();
+        while ((line = reader.readLine()) != null) {
+            Long memberId = Long.parseLong(line);
+            memberList.add(memberId);
+            if (memberList.size() == 200) {
+                Map<Long, Member> id2MemberMapping = getId2MemberMapping(memberList);
+                repairMemberConditionVo(memberList, id2MemberMapping, null);
+                if (ApiLogger.isDebugEnabled()) {
+                    ApiLogger.debug("repairMemberConditionVoByFile::repair::memberList = " + memberList);
+                }
+                memberList.clear();
+            }
+        }
+        return null;
     }
 }
