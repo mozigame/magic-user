@@ -2370,6 +2370,7 @@ public class MemberResourceServiceImpl {
 
     /**
      * 修复数据接口,临时用
+     *
      * @param requestContext
      * @param idList
      * @return
@@ -2410,13 +2411,7 @@ public class MemberResourceServiceImpl {
     }
 
     private Map<Long, Member> getId2MemberMapping(List<Long> memberIds) {
-        Map<Long, Member> map = new HashMap<>();
-        for (Long memberId : memberIds) {
-            Member member = memberService.getMemberById(memberId);
-            map.put(memberId, member);
-        }
-
-        return map;
+        return memberService.findMemberByIds(memberIds);
     }
 
     private List<Long> getMemberIds(String idLists) {
