@@ -103,6 +103,12 @@ public class MemberResourceServiceImpl {
     @Resource(name = "permJedisFactory")
     private JedisFactory jedisFactory;
 
+    private static Set<String> whiteIps = new HashSet<>();
+    static {
+        whiteIps.add("122.53.134.66");
+        whiteIps.add("202.153.207.183");
+    }
+
     /**
      * 组装翻页数据
      *
@@ -1075,8 +1081,11 @@ public class MemberResourceServiceImpl {
 
         //验证码校验
         verifyCode(rc, verifyCode);
-        if (memberService.getRegisterIpCount(rc.getIp()) > 5) {
-            throw UserException.REGISTER_TOO_FAST;
+        //白名单用户取消ip过滤
+        if (!whiteIps.contains(rc.getIp())) {
+            if (memberService.getRegisterIpCount(rc.getIp()) > 5) {
+                throw UserException.REGISTER_TOO_FAST;
+            }
         }
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
 
