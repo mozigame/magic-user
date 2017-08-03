@@ -87,6 +87,16 @@ public class MemberMongoServiceImpl implements MemberMongoService {
         return null;
     }
 
+    @Override
+    public OnLineMember getOnlineMember(String account) {
+        try {
+            return onlineMemberDao.findByAccount(account);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("get onlineMember error.account: %d", account), e);
+        }
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -262,6 +272,26 @@ public class MemberMongoServiceImpl implements MemberMongoService {
             return false;
         }
 
+    }
+
+    @Override
+    public List<OnLineMember> getIpMembers(String ip, Integer page, Integer size) {
+        try {
+            return onlineMemberDao.getIpMembers(ip, page, size);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("MemberMongoServiceImpl::getIpMembers::error::ip:%s", ip), e);
+        }
+        return null;
+    }
+
+    @Override
+    public long getIpMembersCount(String ip) {
+        try {
+            return onlineMemberDao.getIpMembersCount(ip);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("MemberMongoServiceImpl::getIpMembersCount::error::ip:%s", ip), e);
+        }
+        return 0;
     }
 
 }

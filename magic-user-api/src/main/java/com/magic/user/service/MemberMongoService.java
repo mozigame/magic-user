@@ -48,6 +48,14 @@ public interface MemberMongoService {
     OnLineMember getOnlineMember(Long memberId);
 
     /**
+     * 查询在线会员
+     *
+     * @param account
+     * @return
+     */
+    OnLineMember getOnlineMember(String account);
+
+    /**
      * 修改在线会员状态，ip，登录时间
      * @param memberId
      * @param ip
@@ -146,4 +154,18 @@ public interface MemberMongoService {
      * @return
      */
     boolean updateMemberInfo(Number memberId, Map<String, Object> updateMap);
+
+    /**
+     * 获取某ip下的登录会员列表
+     * @param ip
+     * @return
+     */
+    List<OnLineMember> getIpMembers(String ip, Integer page, Integer size);
+
+    /**
+     * 获取某ip下的登录会员列表
+     * @param ip
+     * @return
+     */
+    long getIpMembersCount(String ip);
 }

@@ -24,7 +24,7 @@ public class AgentConfig {
 
     private String temp1;  //存放用户层级id
 
-    private String temp2;
+    private String temp2;  //存放会员注册优惠方案
 
     private String temp3;
 

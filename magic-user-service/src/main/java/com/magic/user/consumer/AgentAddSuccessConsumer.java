@@ -97,6 +97,7 @@ public class AgentAddSuccessConsumer implements Consumer {
         object.put("discount", config.getDiscount());
         object.put("cost", config.getCost());
         object.put("levelId",Long.valueOf(config.getTemp1()));
+        object.put("registerOfferId",Long.valueOf(config.getTemp2()));
         return object.toJSONString();
     }
 

@@ -59,6 +59,16 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
     }
 
     /**
+     * 根据会员ID查询会员在线记录
+     *
+     * @param account
+     * @return
+     */
+    public OnLineMember findByAccount(String account) {
+        return super.findOne(new Query(new Criteria("account").is(account)));
+    }
+
+    /**
      * 翻页查询
      *
      * @param condition
@@ -137,5 +147,27 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
             }
         }
         return query;
+    }
+
+    /**
+     * 获取同一登录ip下的所有会员
+     * @param ip
+     * @return
+     */
+    public List<OnLineMember> getIpMembers(String ip, Integer page, Integer size) {
+        Query query = new Query(new Criteria("loginIp").is(ip));
+        if(page != null && page > 0){
+            query.skip((page-1) * size).limit(size);
+        }
+        return super.find(query);
+    }
+    /**
+     * 获取同一登录ip下的会员数量
+     * @param ip
+     * @return
+     */
+    public long getIpMembersCount(String ip) {
+        Query query = new Query(new Criteria("loginIp").is(ip));
+        return super.count(query);
     }
 }
