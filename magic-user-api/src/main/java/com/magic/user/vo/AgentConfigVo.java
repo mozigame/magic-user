@@ -18,6 +18,9 @@ public class AgentConfigVo {
     private Integer cost;   //返水成本
     private String userLevelName;//层级名称
 
+    private Long registerOfferId;//会员注册优惠方案ID
+    private String registerOfferName;//会员注册优惠方案名称
+
     public String getUserLevelName() {
         return userLevelName;
     }
@@ -96,5 +99,21 @@ public class AgentConfigVo {
 
     public void setCost(Integer cost) {
         this.cost = cost;
+    }
+
+    public Long getRegisterOfferId() {
+        return registerOfferId;
+    }
+
+    public void setRegisterOfferId(Long registerOfferId) {
+        this.registerOfferId = registerOfferId;
+    }
+
+    public String getRegisterOfferName() {
+        return registerOfferName;
+    }
+
+    public void setRegisterOfferName(String registerOfferName) {
+        this.registerOfferName = registerOfferName;
     }
 }

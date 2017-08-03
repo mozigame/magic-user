@@ -51,7 +51,7 @@ public interface AgentResourceService {
      */
     String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
                String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
-               Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost,Long userLevel);
+               Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost,Long userLevel,Long registerOfferId);
 
     /**
      * @param id
@@ -99,7 +99,7 @@ public interface AgentResourceService {
      * @return
      * @Doc 修改代理配置信息
      */
-    String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme,Integer discount,Integer cost, String domain);
+    String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme,Integer discount,Integer cost, String domain,Long registerOfferId);
 
     /**
      * @param rc
@@ -181,7 +181,7 @@ public interface AgentResourceService {
      */
     String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone,
                        String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
-                       Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost,Long userLevel);
+                       Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost,Long userLevel,Long registerOfferId);
 
     /**
      * @param rc

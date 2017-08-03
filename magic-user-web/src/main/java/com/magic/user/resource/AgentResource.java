@@ -114,6 +114,7 @@ public class AgentResource {
      * @param domain       域名设置
      * @param discount     优惠扣除  默认1 1不选 2勾选
      * @param cost         反水成本  默认1 1不选 2勾选
+     * @param registerOfferId    会员注册优惠
      * @return
      * @Doc 手动添加代理
      */
@@ -137,10 +138,11 @@ public class AgentResource {
             @RequestParam(name = "domain", required = false) String domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost,
-            @RequestParam(name = "userLevel", required = false, defaultValue = "-1") Long userLevel  //新增用户层级id
+            @RequestParam(name = "userLevel", required = false, defaultValue = "-1") Long userLevel,  //新增用户层级id
+            @RequestParam(name = "registerOfferId", required = false, defaultValue = "-1") Long registerOfferId  //会员注册优惠方案
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel);
+        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel,registerOfferId);
     }
 
     /**
@@ -251,10 +253,11 @@ public class AgentResource {
             @RequestParam(name = "feeScheme", required = false, defaultValue = "-1") Integer feeScheme,
             @RequestParam(name = "discount", required = false, defaultValue = "-1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "-1") Integer cost,
-            @RequestParam(name = "domains", required = false, defaultValue = "") String domains
+            @RequestParam(name = "domains", required = false, defaultValue = "") String domains,
+            @RequestParam(name = "registerOfferId", required = false, defaultValue = "-1") Long registerOfferId
 
     ) {
-        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domains);
+        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domains,registerOfferId);
     }
 
     /**
@@ -421,11 +424,12 @@ public class AgentResource {
             @RequestParam(name = "domain", required = false) String domain,
             @RequestParam(name = "discount", required = false, defaultValue = "1") Integer discount,
             @RequestParam(name = "cost", required = false, defaultValue = "1") Integer cost,
-            @RequestParam(name = "userLevel", required = false, defaultValue = "-1") Long userLevel  //新增用户层级id
+            @RequestParam(name = "userLevel", required = false, defaultValue = "-1") Long userLevel,  //新增用户层级id
+            @RequestParam(name = "registerScheme", required = false, defaultValue = "-1") Long registerScheme
 
     ) {
         //TODO 所有涉及审核的信息增加开户行信息、银行名称
-        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel);
+        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel,registerScheme);
     }
 
 
