@@ -712,6 +712,26 @@ public class MemberResource {
     }
 
     /**
+     * 更新联系方式
+     *
+     * @param qq
+     * @param weixin
+     * @param email
+     * @return
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/contactInfo/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String addContactInfo(
+            @RequestParam(name = "qq", required = true) String qq,
+            @RequestParam(name = "weixin", required = true) String weixin,
+            @RequestParam(name = "email", required = true) String email
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.addContactInfo(rc, qq, weixin, email);
+    }
+
+    /**
      * @return
      * @Doc 获取会员当前余额
      */
