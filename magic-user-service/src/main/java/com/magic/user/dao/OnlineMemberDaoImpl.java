@@ -155,7 +155,7 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
      * @return
      */
     public List<OnLineMember> getIpMembers(String ip, Integer page, Integer size) {
-        Query query = new Query(new Criteria("ip").is(ip));
+        Query query = new Query(new Criteria("loginIp").is(ip));
         if(page != null && page > 0){
             query.skip((page-1) * size).limit(size);
         }
@@ -167,7 +167,7 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
      * @return
      */
     public long getIpMembersCount(String ip) {
-        Query query = new Query(new Criteria("ip").is(ip));
+        Query query = new Query(new Criteria("loginIp").is(ip));
         return super.count(query);
     }
 }
