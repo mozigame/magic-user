@@ -309,7 +309,7 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
             Query query = new Query(new Criteria("memberId").is(memberId));
             Update update = new Update();
             for (Map.Entry<String, Object> entry : updateMap.entrySet()) {
-                update.addToSet(entry.getKey(), entry.getValue());
+                update.set(entry.getKey(), entry.getValue());
             }
             if (ApiLogger.isDebugEnabled()){
                 ApiLogger.debug("MemberMongoDaoImpl::updateMemberInfo::update = " + update);
