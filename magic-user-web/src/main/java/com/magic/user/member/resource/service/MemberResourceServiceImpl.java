@@ -2463,6 +2463,13 @@ public class MemberResourceServiceImpl {
                     memberList.clear();
                 }
             }
+            if (CollectionUtils.isNotEmpty(memberList)){
+                Map<Long, Member> id2MemberMapping = getId2MemberMapping(memberList);
+                repairMemberConditionVo(memberList, id2MemberMapping, null);
+                if (ApiLogger.isDebugEnabled()) {
+                    ApiLogger.debug("repairMemberConditionVoByFile::repair::memberList = " + memberList);
+                }
+            }
         } catch (Exception e) {
             ApiLogger.error("repairMemberConditionVoByFile::error", e);
         }
