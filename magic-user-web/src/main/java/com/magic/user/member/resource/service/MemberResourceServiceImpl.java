@@ -2426,7 +2426,7 @@ public class MemberResourceServiceImpl {
         long total = 0;
         List<OnLineMember> onLineMembers = null;
         try {
-            Member member = memberService.getMemberById(rc.getUid());
+            User member = userService.get(rc.getUid());
             if (member == null) {
                 return UserContants.EMPTY_LIST;
             }
