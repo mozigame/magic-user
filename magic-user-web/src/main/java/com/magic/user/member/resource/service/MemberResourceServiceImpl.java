@@ -2432,7 +2432,10 @@ public class MemberResourceServiceImpl {
             }
             Long memberId = accountIdMappingService.getUid(member.getOwnerId(), account);
             OnLineMember onLineMember = memberMongoService.getOnlineMember(memberId);
-            ApiLogger.info("get onlineMember memberId : " + memberId);
+            ApiLogger.info("get onlineMember by memberId, memberId :"+ member+", account : " + JSON.toJSONString(onLineMember));
+            if (StringUtils.isBlank(onLineMember.getLoginIp())) {
+                return UserContants.EMPTY_LIST;
+            }
             total = memberMongoService.getIpMembersCount(onLineMember.getLoginIp());
             ApiLogger.info("get onlineMember loginIp : " + onLineMember.getLoginIp() +" , total :"+total);
             if (total <= 0) {
