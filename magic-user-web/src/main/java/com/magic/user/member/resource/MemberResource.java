@@ -798,4 +798,17 @@ public class MemberResource {
         return result;
     }
 
+    /**
+     * @Doc 修复 memberConditionVo
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/ip/same/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String findSameIpUsers(
+            @RequestParam(name = "account") String account,
+            @RequestParam(name = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(name = "count", required = false, defaultValue = "10") int count
+    ) {
+        return memberServiceResource.findSameIpUsers(RequestContext.getRequestContext(), account, page, count);
+    }
 }

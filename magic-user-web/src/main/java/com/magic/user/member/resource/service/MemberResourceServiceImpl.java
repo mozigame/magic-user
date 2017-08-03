@@ -13,10 +13,7 @@ import com.magic.api.commons.model.PageBean;
 import com.magic.api.commons.model.SimpleListResult;
 import com.magic.api.commons.mq.Producer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.IPUtil;
-import com.magic.api.commons.tools.LocalDateTimeUtil;
-import com.magic.api.commons.tools.NumberUtil;
-import com.magic.api.commons.tools.UUIDUtil;
+import com.magic.api.commons.tools.*;
 import com.magic.api.commons.utils.StringUtils;
 import com.magic.bc.query.vo.UserLevelVo;
 import com.magic.config.thrift.base.EGResp;
@@ -31,10 +28,7 @@ import com.magic.user.bean.RegionNumber;
 import com.magic.user.bean.Register;
 import com.magic.user.constants.RedisConstants;
 import com.magic.user.constants.UserContants;
-import com.magic.user.entity.Member;
-import com.magic.user.entity.OnlineMemberConditon;
-import com.magic.user.entity.OwnerStockAgentMember;
-import com.magic.user.entity.User;
+import com.magic.user.entity.*;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
 import com.magic.user.enums.CurrencyType;
@@ -54,6 +48,7 @@ import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.tools.ant.util.regexp.Regexp;
 import org.apache.tools.ant.util.regexp.RegexpUtil;
 import org.springframework.stereotype.Service;
@@ -2426,4 +2421,53 @@ public class MemberResourceServiceImpl {
         }
         return ids;
     }
+
+    public String findSameIpUsers(RequestContext rc, String account, Integer page, Integer count) {
+        Member member = memberService.getMemberById(rc.getUid());
+        if (member == null) {
+            return UserContants.EMPTY_LIST;
+        }
+        Long memberId = accountIdMappingService.getUid(member.getOwnerId(), account);
+        OnLineMember onLineMember = memberMongoService.getOnlineMember(memberId);
+        long total = memberMongoService.getIpMembersCount(onLineMember.getLoginIp());
+        if (total <= 0) {
+            return UserContants.EMPTY_LIST;
+        }
+        List<OnLineMember> onLineMembers = memberMongoService.getIpMembers(onLineMember.getLoginIp(), page, count);
+        return JSON.toJSONString(assemblePageBeanList(page, count, total, assembleLoginMember(onLineMembers)));
+
+    }
+
+    private List<OnLineMemberVo> assembleLoginMember(List<OnLineMember> lineMembers) {
+        List<OnLineMemberVo> list = new ArrayList<>();
+        for (OnLineMember member : lineMembers) {
+            OnLineMemberVo vo = new OnLineMemberVo();
+            vo.setMemberId(member.getMemberId());
+            vo.setAccount(member.getAccount());
+            vo.setLoginIp(member.getLoginIp());
+            vo.setLoginTime(LocalDateTimeUtil.toAmerica(member.getLoginTime()));
+            list.add(vo);
+        }
+        return list;
+    }
+
+    /**
+     * 组装翻页数据
+     *
+     * @param page  页码
+     * @param count 当页条数
+     * @param total 总条数
+     * @param list  详细列表数据
+     * @return
+     */
+    private static PageBean<OnLineMemberVo> assemblePageBeanList(Integer page, Integer count, long total, List<OnLineMemberVo> list) {
+        PageBean<OnLineMemberVo> result = new PageBean<>();
+        result.setPage(page);
+        result.setCount(count);
+        result.setTotal(total);
+        result.setList(list);
+        return result;
+    }
+
+
 }

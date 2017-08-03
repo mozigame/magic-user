@@ -138,4 +138,26 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
         }
         return query;
     }
+
+    /**
+     * 获取同一登录ip下的所有会员
+     * @param ip
+     * @return
+     */
+    public List<OnLineMember> getIpMembers(String ip, Integer page, Integer size) {
+        Query query = new Query(new Criteria("ip").is(ip));
+        if(page != null && page > 0){
+            query.skip((page-1) * size).limit(size);
+        }
+        return super.find(query);
+    }
+    /**
+     * 获取同一登录ip下的会员数量
+     * @param ip
+     * @return
+     */
+    public long getIpMembersCount(String ip) {
+        Query query = new Query(new Criteria("ip").is(ip));
+        return super.count(query);
+    }
 }

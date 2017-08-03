@@ -264,4 +264,24 @@ public class MemberMongoServiceImpl implements MemberMongoService {
 
     }
 
+    @Override
+    public List<OnLineMember> getIpMembers(String ip, Integer page, Integer size) {
+        try {
+            return onlineMemberDao.getIpMembers(ip, page, size);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("MemberMongoServiceImpl::getIpMembers::error::ip:%s", ip), e);
+        }
+        return null;
+    }
+
+    @Override
+    public long getIpMembersCount(String ip) {
+        try {
+            return onlineMemberDao.getIpMembersCount(ip);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("MemberMongoServiceImpl::getIpMembersCount::error::ip:%s", ip), e);
+        }
+        return 0;
+    }
+
 }
