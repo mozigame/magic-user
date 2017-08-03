@@ -311,6 +311,9 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
             for (Map.Entry<String, Object> entry : updateMap.entrySet()) {
                 update.addToSet(entry.getKey(), entry.getValue());
             }
+            if (ApiLogger.isDebugEnabled()){
+                ApiLogger.debug("MemberMongoDaoImpl::updateMemberInfo::update = " + update);
+            }
             return update(query, update) != null;
         }
         return false;
