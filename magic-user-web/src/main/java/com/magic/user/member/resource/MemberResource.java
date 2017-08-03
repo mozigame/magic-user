@@ -564,6 +564,19 @@ public class MemberResource {
     }
 
     /**
+     * @return
+     * @Doc 某层级下会员列表
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/online/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String online(
+    ) {
+        RequestContext rc = RequestContext.getRequestContext();
+        return memberServiceResource.onlineCount(rc);
+    }
+
+    /**
      * @param request
      * @param response
      * @throws IOException
@@ -585,19 +598,6 @@ public class MemberResource {
         rc.setUid(userId);
         DownLoadFile downLoadFile = memberServiceResource.onlineListExport(rc, condition /*loginStartTime,loginEndTime,registerStartTime,registerEndTime*/);
         addContentToResponse(response, downLoadFile);
-    }
-
-    /**
-     * @return
-     * @Doc 某层级下会员列表
-     */
-    @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/online/count", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public String online(
-    ) {
-        RequestContext rc = RequestContext.getRequestContext();
-        return memberServiceResource.onlineCount(rc);
     }
 
     /**

@@ -75,6 +75,12 @@ public class MemberCondition {
      */
     private RegionNumber withdrawMoney;
 
+    /** 电话 */
+    private String telephone;
+
+    /** 银行卡号 */
+    private String bankCardNo;
+
     /**
      * 空对象
      */
@@ -246,5 +252,35 @@ public class MemberCondition {
         String s = "{\"currencyType\":\"1\",\"status\":\"\",\"register\":{\"start\":\"\",\"end\":\"\"},\"account\":{\"type\":\"5\",\"name\":\"fdf66\"},\"depositNumber\":{\"min\":\"\",\"max\":\"\"},\"withdrawNumber\":{\"min\":\"\",\"max\":\"\"},\"depositMoney\":{\"min\":\"\",\"max\":\"\"},\"withdrawMoney\":{\"min\":\"\",\"max\":\"\"}}";
         MemberCondition s1 = valueOf(s);
         System.out.printf("1");
+    }
+
+    /**
+     * getter for telephone
+     */
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    /**
+     * setter for telephone
+     */
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    /**
+     * getter for bankCardNo
+     */
+
+    public String getBankCardNo() {
+        return bankCardNo;
+    }
+
+    /**
+     * setter for bankCardNo
+     */
+    public void setBankCardNo(String bankCardNo) {
+        this.bankCardNo = bankCardNo;
     }
 }

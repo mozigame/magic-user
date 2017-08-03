@@ -43,6 +43,19 @@ import java.util.*;
 @Service("infoResourceService")
 public class InfoResourceServiceImpl {
 
+
+    /**
+     * 最小
+     */
+    public static final int MIN_BANK_CARD_NO_LEN = 15;
+    /**
+     * 最da
+     */
+    public static final int MAX_BANK_CARD_NO_LEN = 19;
+
+    /** MAX_TELEPHONE_SIZE */
+    public static final int MAX_TELEPHONE_SIZE = 11;
+
     @Resource
     private MemberService memberService;
 
@@ -612,15 +625,6 @@ public class InfoResourceServiceImpl {
         return true;
 
     }
-
-    /**
-     * 最小
-     */
-    private static final int MIN_BANK_CARD_NO_LEN = 15;
-    /**
-     * 最da
-     */
-    private static final int MAX_BANK_CARD_NO_LEN = 19;
 
 
     /**

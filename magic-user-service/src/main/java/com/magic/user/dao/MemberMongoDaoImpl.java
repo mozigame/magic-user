@@ -117,6 +117,20 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
             disposeWithdrawCount(memberCondition, query);
 
             disposeAccount(memberCondition, query);
+            disposeTelephone(memberCondition,query);
+            disposeBankCardNo(memberCondition,query);
+        }
+    }
+
+    private void disposeBankCardNo(MemberCondition memberCondition, Query query) {
+        if (StringUtils.isNotBlank(memberCondition.getBankCardNo())){
+            query.addCriteria(new Criteria(MemberConditionVo.bankCardNoString).regex(memberCondition.getBankCardNo()));
+        }
+    }
+
+    private void disposeTelephone(MemberCondition memberCondition, Query query) {
+        if (StringUtils.isNotBlank(memberCondition.getTelephone())){
+            query.addCriteria(new Criteria(MemberConditionVo.telephoneString).regex(memberCondition.getTelephone()));
         }
     }
 

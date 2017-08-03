@@ -80,6 +80,7 @@ import java.util.stream.Collectors;
 @Service("memberServiceResource")
 public class MemberResourceServiceImpl {
 
+
     //根据ip获取城市的接口地址
     private static final String URL = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=";
     @Resource
@@ -430,6 +431,20 @@ public class MemberResourceServiceImpl {
         if (status != null && AccountStatus.parse(status) == null) {
             return false;
         }
+        //
+        if (StringUtils.isNotBlank(condition.getTelephone())) {
+            if (condition.getTelephone().length() > InfoResourceServiceImpl.MAX_TELEPHONE_SIZE) {
+                return false;
+            }
+        }
+
+        //
+        if (StringUtils.isNotBlank(condition.getBankCardNo())) {
+            if (condition.getBankCardNo().length() > InfoResourceServiceImpl.MAX_BANK_CARD_NO_LEN) {
+                return false;
+            }
+        }
+
         return true;
     }
 
