@@ -2423,17 +2423,26 @@ public class MemberResourceServiceImpl {
     }
 
     public String findSameIpUsers(RequestContext rc, String account, Integer page, Integer count) {
-        Member member = memberService.getMemberById(rc.getUid());
-        if (member == null) {
-            return UserContants.EMPTY_LIST;
+        long total = 0;
+        List<OnLineMember> onLineMembers = null;
+        try {
+            Member member = memberService.getMemberById(rc.getUid());
+            if (member == null) {
+                return UserContants.EMPTY_LIST;
+            }
+            Long memberId = accountIdMappingService.getUid(member.getOwnerId(), account);
+            OnLineMember onLineMember = memberMongoService.getOnlineMember(memberId);
+            ApiLogger.info("get onlineMember memberId : " + memberId);
+            total = memberMongoService.getIpMembersCount(onLineMember.getLoginIp());
+            ApiLogger.info("get onlineMember loginIp : " + onLineMember.getLoginIp() +" , total :"+total);
+            if (total <= 0) {
+                return UserContants.EMPTY_LIST;
+            }
+            onLineMembers = memberMongoService.getIpMembers(onLineMember.getLoginIp(), page, count);
+            ApiLogger.info("get onlineMembers: " + JSON.toJSONString(onLineMembers));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Long memberId = accountIdMappingService.getUid(member.getOwnerId(), account);
-        OnLineMember onLineMember = memberMongoService.getOnlineMember(memberId);
-        long total = memberMongoService.getIpMembersCount(onLineMember.getLoginIp());
-        if (total <= 0) {
-            return UserContants.EMPTY_LIST;
-        }
-        List<OnLineMember> onLineMembers = memberMongoService.getIpMembers(onLineMember.getLoginIp(), page, count);
         return JSON.toJSONString(assemblePageBeanList(page, count, total, assembleLoginMember(onLineMembers)));
 
     }
