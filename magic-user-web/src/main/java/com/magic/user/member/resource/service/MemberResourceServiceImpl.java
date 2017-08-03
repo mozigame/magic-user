@@ -2426,14 +2426,13 @@ public class MemberResourceServiceImpl {
         long total = 0;
         List<OnLineMember> onLineMembers = null;
         try {
-            User member = userService.get(rc.getUid());
-            if (member == null) {
+            User user = userService.get(rc.getUid());
+            if (user == null) {
                 return UserContants.EMPTY_LIST;
             }
-            Long memberId = accountIdMappingService.getUid(member.getOwnerId(), account);
-            OnLineMember onLineMember = memberMongoService.getOnlineMember(memberId);
-            ApiLogger.info("get onlineMember by memberId, memberId :"+ member+", account : " + JSON.toJSONString(onLineMember));
-            if (StringUtils.isBlank(onLineMember.getLoginIp())) {
+            OnLineMember onLineMember = memberMongoService.getOnlineMember(account);
+            ApiLogger.info("get onlineMember by account, onLineMember :"+ JSON.toJSONString(onLineMember));
+            if (onLineMember == null || StringUtils.isBlank(onLineMember.getLoginIp())) {
                 return UserContants.EMPTY_LIST;
             }
             total = memberMongoService.getIpMembersCount(onLineMember.getLoginIp());

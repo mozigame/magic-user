@@ -59,6 +59,16 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
     }
 
     /**
+     * 根据会员ID查询会员在线记录
+     *
+     * @param account
+     * @return
+     */
+    public OnLineMember findByAccount(String account) {
+        return super.findOne(new Query(new Criteria("account").is(account)));
+    }
+
+    /**
      * 翻页查询
      *
      * @param condition

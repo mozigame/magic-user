@@ -87,6 +87,16 @@ public class MemberMongoServiceImpl implements MemberMongoService {
         return null;
     }
 
+    @Override
+    public OnLineMember getOnlineMember(String account) {
+        try {
+            return onlineMemberDao.findByAccount(account);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("get onlineMember error.account: %d", account), e);
+        }
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */

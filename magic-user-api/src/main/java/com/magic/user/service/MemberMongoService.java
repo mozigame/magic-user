@@ -47,6 +47,13 @@ public interface MemberMongoService {
      */
     OnLineMember getOnlineMember(Long memberId);
 
+    /**
+     * 查询在线会员
+     *
+     * @param account
+     * @return
+     */
+    OnLineMember getOnlineMember(String account);
 
     /**
      * 修改在线会员状态，ip，登录时间
