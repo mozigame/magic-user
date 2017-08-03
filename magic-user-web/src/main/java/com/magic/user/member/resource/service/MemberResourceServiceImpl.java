@@ -2219,7 +2219,7 @@ public class MemberResourceServiceImpl {
         if (qq.trim().length() > 0 && !qq.matches(regexQq)) {
             return false;
         }
-        if (weixin.trim().length() > 20) {
+        if (weixin.trim().length() > 64) {
             return false;
         }
         String regexEmail = "\\w+@\\w+\\.[a-z]+(\\.[a-z]+)?";
