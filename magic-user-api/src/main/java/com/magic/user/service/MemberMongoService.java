@@ -4,7 +4,6 @@ import com.magic.user.bean.MemberCondition;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.po.OnLineMember;
-import com.magic.user.vo.AgentConditionVo;
 import com.magic.user.vo.MemberConditionVo;
 
 import java.util.Collection;
@@ -138,4 +137,13 @@ public interface MemberMongoService {
      * @return
      */
     List<MemberConditionVo> batchQuery(Collection<String> accounts, Long ownerId);
+
+    /**
+     * 更新mongo数据
+     *
+     * @param memberId
+     * @param updateMap
+     * @return
+     */
+    boolean updateMemberInfo(Number memberId, Map<String, Object> updateMap);
 }

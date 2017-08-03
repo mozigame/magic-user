@@ -9,6 +9,7 @@ import com.magic.user.enums.AccountType;
 import com.magic.user.vo.AgentDepositMember;
 import com.magic.user.vo.MemberConditionVo;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -205,14 +206,14 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         Account account = memberCondition.getAccount();
         if (account != null) {
             //优先list
-            if (CollectionUtils.isNotEmpty(account.getNameList())){
+            if (CollectionUtils.isNotEmpty(account.getNameList())) {
                 if (AccountType.parse(account.getType()) == AccountType.agent) {
                     query.addCriteria(new Criteria("agentName").in(account.getNameList()));
                 }
                 if (AccountType.parse(account.getType()) == AccountType.member) {
                     query.addCriteria(new Criteria("memberName").in(account.getNameList()));
                 }
-            }else {
+            } else {
                 if (StringUtils.isNotBlank(account.getName())) {
                     if (AccountType.parse(account.getType()) == AccountType.agent) {
                         query.addCriteria(new Criteria("agentName").is(account.getName()));
@@ -295,5 +296,23 @@ public class MemberMongoDaoImpl extends BaseMongoDAOImpl<MemberConditionVo> {
         query.addCriteria(new Criteria("ownerId").is(ownerId));
         query.addCriteria(new Criteria("memberName").in(accounts));
         return super.find(query);
+    }
+
+    /**
+     * 更新map里面的数据
+     * @param memberId
+     * @param updateMap
+     * @return
+     */
+    public boolean updateMemberInfo(Number memberId, Map<String, Object> updateMap) {
+        if (MapUtils.isNotEmpty(updateMap)) {
+            Query query = new Query(new Criteria("memberId").is(memberId));
+            Update update = new Update();
+            for (Map.Entry<String, Object> entry : updateMap.entrySet()) {
+                update.addToSet(entry.getKey(), entry.getValue());
+            }
+            return update(query, update) != null;
+        }
+        return false;
     }
 }

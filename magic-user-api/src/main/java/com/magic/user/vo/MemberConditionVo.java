@@ -30,6 +30,18 @@ public class MemberConditionVo {
     private Long maxDepositMoney;   //最大存款额 1
     private Long maxWithdrawMoney;   //最大取款额
 
+    /** 电话 */
+    private String telephone;
+
+    public static final String telephoneString = "telephone";
+
+
+    /** 银行卡号 */
+    private String bankCardNo;
+
+    public static final String bankCardNoString = "bankCardNo";
+
+
     public String getId() {
         return id;
     }
@@ -188,5 +200,36 @@ public class MemberConditionVo {
 
     public void setMaxWithdrawMoney(Long maxWithdrawMoney) {
         this.maxWithdrawMoney = maxWithdrawMoney;
+    }
+
+    /**
+     * getter for bankCardNo
+     */
+
+    public String getBankCardNo() {
+        return bankCardNo;
+    }
+
+    /**
+     * setter for bankCardNo
+     */
+    public void setBankCardNo(String bankCardNo) {
+        this.bankCardNo = bankCardNo;
+    }
+
+
+    /**
+     * getter for telephone
+     */
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    /**
+     * setter for telephone
+     */
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 }

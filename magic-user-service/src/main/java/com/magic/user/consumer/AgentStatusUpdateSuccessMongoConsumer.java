@@ -7,7 +7,6 @@ import com.magic.api.commons.mq.annotation.ConsumerConfig;
 import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
 import com.magic.user.service.AgentMongoService;
-import com.magic.user.service.MemberMongoService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

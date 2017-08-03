@@ -131,6 +131,8 @@ public class MemberRegisterSucessMongoConsumer implements Consumer {
         vo.setCurrencyType(CurrencyType.CNY.value());
         vo.setOwnerId(member.getOwnerId());
         vo.setStockId(member.getStockId());
+        vo.setTelephone(member.getTelephone());
+        vo.setBankCardNo(member.getBankCardNo());
         return vo;
     }
 }

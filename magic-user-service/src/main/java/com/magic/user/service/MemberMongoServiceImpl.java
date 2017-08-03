@@ -10,6 +10,10 @@ import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.vo.MemberConditionVo;
+import org.apache.commons.collections.MapUtils;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -78,7 +82,7 @@ public class MemberMongoServiceImpl implements MemberMongoService {
         try {
             return onlineMemberDao.findById(memberId);
         } catch (Exception e) {
-            ApiLogger.error(String.format("get onlineMember error.memberId: %d",memberId), e);
+            ApiLogger.error(String.format("get onlineMember error.memberId: %d", memberId), e);
         }
         return null;
     }
@@ -111,6 +115,7 @@ public class MemberMongoServiceImpl implements MemberMongoService {
 
     /**
      * {@inheritDoc}
+     *
      * @param memberConditionVo
      * @return
      */
@@ -126,6 +131,7 @@ public class MemberMongoServiceImpl implements MemberMongoService {
 
     /**
      * {@inheritDoc}
+     *
      * @param memberId
      * @param status
      * @return
@@ -133,15 +139,16 @@ public class MemberMongoServiceImpl implements MemberMongoService {
     @Override
     public boolean updateMemberStatus(Long memberId, Integer status) {
         try {
-            return memberMongoDao.updateMemberStatus(memberId,status);
+            return memberMongoDao.updateMemberStatus(memberId, status);
         } catch (Exception e) {
-            ApiLogger.error(String.format("update memberConditionVo error.memberId:%d, status:%d",memberId,status), e);
+            ApiLogger.error(String.format("update memberConditionVo error.memberId:%d, status:%d", memberId, status), e);
         }
         return false;
     }
 
     /**
      * {@inheritDoc}
+     *
      * @param memberId
      * @return
      */
@@ -150,13 +157,14 @@ public class MemberMongoServiceImpl implements MemberMongoService {
         try {
             return memberMongoDao.get(memberId);
         } catch (Exception e) {
-            ApiLogger.error(String.format("get memberConditionVo error.memberId:%d ",memberId), e);
+            ApiLogger.error(String.format("get memberConditionVo error.memberId:%d ", memberId), e);
         }
         return null;
     }
 
     /**
      * {@inheritDoc}
+     *
      * @param memberCondition
      * @param page
      * @param count
@@ -165,7 +173,7 @@ public class MemberMongoServiceImpl implements MemberMongoService {
     @Override
     public List<MemberConditionVo> queryByPage(MemberCondition memberCondition, Integer page, Integer count) {
         try {
-            return memberMongoDao.queryByPage(memberCondition,page,count);
+            return memberMongoDao.queryByPage(memberCondition, page, count);
         } catch (Exception e) {
             ApiLogger.error(String.format("queryPage memberConditionVo error.condition:%d ", JSONObject.toJSONString(memberCondition)), e);
         }
@@ -174,6 +182,7 @@ public class MemberMongoServiceImpl implements MemberMongoService {
 
     /**
      * {@inheritDoc}
+     *
      * @param memberCondition
      * @return
      */
@@ -194,8 +203,8 @@ public class MemberMongoServiceImpl implements MemberMongoService {
     public boolean updateLevel(Member member, long level) {
         try {
             return memberMongoDao.updateLevel(member.getMemberId(), level);
-        }catch (Exception e){
-            ApiLogger.error(String.format("update member level failed memberId:%d, level:%d ", member.getMemberId(),level), e);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("update member level failed memberId:%d, level:%d ", member.getMemberId(), level), e);
         }
         return false;
     }
@@ -204,7 +213,7 @@ public class MemberMongoServiceImpl implements MemberMongoService {
     public long getDepositMembers(Long agentId) {
         try {
             return memberMongoDao.getDepositMembers(agentId);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("get memberConditionVo count agentId:%d ", agentId), e);
         }
         return 0L;
@@ -214,7 +223,7 @@ public class MemberMongoServiceImpl implements MemberMongoService {
     public Map<Long, Integer> countDepositMembers(List<Long> agentIds) {
         try {
             return memberMongoDao.batchGetDepositMembers(agentIds);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("get memberConditionVo count deposit members, agentIds:%d ", agentIds), e);
         }
         return null;
@@ -235,10 +244,24 @@ public class MemberMongoServiceImpl implements MemberMongoService {
     public List<MemberConditionVo> batchQuery(Collection<String> accounts, Long ownerId) {
         try {
             return memberMongoDao.batchGetMembers(accounts, ownerId);
-        }catch (Exception e){
+        } catch (Exception e) {
             ApiLogger.error(String.format("batch get members from mongo error. accounts: %s, ownerId: %d", accounts, ownerId), e);
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean updateMemberInfo(Number memberId, Map<String, Object> updateMap) {
+        try {
+            return memberMongoDao.updateMemberInfo(memberId, updateMap);
+        } catch (Exception e) {
+            ApiLogger.error(String.format("MemberMongoServiceImpl::updateMemberInfo::error::memberId:%d, updateMap:%d ", memberId, updateMap), e);
+            return false;
+        }
+
     }
 
 }
