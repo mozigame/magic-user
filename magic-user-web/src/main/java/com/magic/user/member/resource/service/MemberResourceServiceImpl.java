@@ -53,6 +53,8 @@ import com.magic.user.util.ExcelUtil;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.tools.ant.util.regexp.Regexp;
+import org.apache.tools.ant.util.regexp.RegexpUtil;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
@@ -66,6 +68,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -2108,6 +2111,31 @@ public class MemberResourceServiceImpl {
     }
 
     /**
+     * 客端更新个人联系方式信息
+     *
+     * @param rc
+     * @param qq
+     * @param weixin
+     * @param email
+     * @return
+     */
+    public String addContactInfo(RequestContext rc, String qq, String weixin, String email) {
+        Member member = memberService.getMemberById(rc.getUid());
+        if (member == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        if (!checkContactInfo(qq, weixin, email)) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+
+        member.setQq(qq.trim());
+        member.setWeixin(weixin.trim());
+        member.setEmail(email.trim());
+        memberService.updateMember(member);
+        return JSON.toJSONString(member);
+    }
+
+    /**
      * 组装会员银行卡信息
      *
      * @param member
@@ -2155,6 +2183,30 @@ public class MemberResourceServiceImpl {
         if (bankAddress.trim().length() < 1) {
             return false;
         }
+        return true;
+    }
+
+    /**
+     * 校验添加个人联系方式信息参数
+     *
+     * @param qq
+     * @param weixin
+     * @param email
+     * @return
+     */
+    private boolean checkContactInfo(String qq, String weixin, String email) {
+        if (qq.trim().length() > 11) {
+            return false;
+        }
+        if (weixin.trim().length() > 15) {
+            return false;
+        }
+        String regex = "\\w+@\\w+\\.[a-z]+(\\.[a-z]+)?";
+
+        if (qq.trim().length() > 0 && !Pattern.matches(regex, email)) {
+            return false;
+        }
+
         return true;
     }
 
