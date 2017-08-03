@@ -784,4 +784,18 @@ public class MemberResource {
         RequestContext rc = RequestContext.getRequestContext();
         return memberServiceResource.memberListSearchByAccounts(rc, accounts);
     }
+
+    /**
+     * @Doc 修复 memberConditionVo
+     */
+    @Access(type = Access.AccessType.COMMON)
+    @RequestMapping(value = "/repair/memberConditionVo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String repairMemberConditionVo(
+            @RequestParam(name = "idList", required = true) String idList
+    ) {
+        String result = memberServiceResource.repairMemberConditionVo(RequestContext.getRequestContext(), idList);
+        return result;
+    }
+
 }

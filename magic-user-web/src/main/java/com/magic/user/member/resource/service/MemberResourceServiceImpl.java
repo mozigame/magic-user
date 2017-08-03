@@ -33,6 +33,7 @@ import com.magic.user.constants.RedisConstants;
 import com.magic.user.constants.UserContants;
 import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
+import com.magic.user.entity.OwnerStockAgentMember;
 import com.magic.user.entity.User;
 import com.magic.user.enums.AccountStatus;
 import com.magic.user.enums.AccountType;
@@ -2366,4 +2367,68 @@ public class MemberResourceServiceImpl {
         return false;
     }
 
+
+    /**
+     * 修复数据接口,临时用
+     * @param requestContext
+     * @param idList
+     * @return
+     */
+    public String repairMemberConditionVo(RequestContext requestContext, String idList) {
+        List<Long> memberIds = getMemberIds(idList);
+        //根据代理ID列表查询代理的会员数量信息
+        Map<Long, Member> id2MemberMapping = getId2MemberMapping(memberIds);
+        //repair
+        JSONObject jsonObject = new JSONObject();
+        for (Long memberId : memberIds) {
+            try {
+                Member member = id2MemberMapping.get(memberId);
+                if (member == null) {
+                    jsonObject.put(String.valueOf(memberId), "member is null");
+                } else {
+                    Map<String, Object> updateMap = new HashMap<>();
+
+                    if (StringUtils.isNotBlank(member.getTelephone())) {
+                        updateMap.put(MemberConditionVo.telephoneString,
+                                member.getTelephone());
+                    }
+
+                    if (StringUtils.isNotBlank(member.getBankCardNo())) {
+                        updateMap.put(MemberConditionVo.bankCardNoString,
+                                member.getBankCardNo());
+                    }
+                    boolean opResult = memberMongoService.updateMemberInfo(memberId, updateMap);
+                    jsonObject.put(String.valueOf(memberId), opResult);
+                }
+            } catch (Exception e) {
+                ApiLogger.error("repairMemberConditionVo::memberId = " + memberId, e);
+                jsonObject.put(String.valueOf(memberId), "error - " + e.getMessage());
+            }
+
+        }
+        return jsonObject.toJSONString();
+    }
+
+    private Map<Long, Member> getId2MemberMapping(List<Long> memberIds) {
+        Map<Long, Member> map = new HashMap<>();
+        for (Long memberId : memberIds) {
+            Member member = memberService.getMemberById(memberId);
+            map.put(memberId, member);
+        }
+
+        return map;
+    }
+
+    private List<Long> getMemberIds(String idLists) {
+        String[] IdArray = idLists.split(",");
+        //将mongo中查询到的代理列表组装一下，调用其他系统获取代理列表
+        List<Long> ids = Lists.newArrayList();
+        for (String id : IdArray) {
+            ids.add(Long.parseLong(id));
+        }
+        if (ids.size() > 200) {
+            throw UserException.ILLEGAL_PARAMETERS;
+        }
+        return ids;
+    }
 }
