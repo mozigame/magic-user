@@ -802,7 +802,7 @@ public class MemberResource {
      * @Doc 修复 memberConditionVo
      */
     @Access(type = Access.AccessType.COMMON)
-    @RequestMapping(value = "/ip/same/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/ip/same/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String findSameIpUsers(
             @RequestParam(name = "account") String account,
