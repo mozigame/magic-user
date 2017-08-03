@@ -2195,15 +2195,17 @@ public class MemberResourceServiceImpl {
      * @return
      */
     private boolean checkContactInfo(String qq, String weixin, String email) {
-        if (qq.trim().length() > 11) {
-            return false;
-        }
-        if (weixin.trim().length() > 15) {
-            return false;
-        }
-        String regex = "\\w+@\\w+\\.[a-z]+(\\.[a-z]+)?";
 
-        if (qq.trim().length() > 0 && !Pattern.matches(regex, email)) {
+        String regexQq = "[1-9][0-9]{4,14}";
+        if (qq.trim().length() > 0 && !qq.matches(regexQq)) {
+            return false;
+        }
+        if (weixin.trim().length() > 20) {
+            return false;
+        }
+        String regexEmail = "\\w+@\\w+\\.[a-z]+(\\.[a-z]+)?";
+
+        if (email.trim().length() > 0 && !email.matches(regexEmail)) {
             return false;
         }
 
