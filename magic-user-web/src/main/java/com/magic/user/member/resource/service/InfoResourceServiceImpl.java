@@ -459,6 +459,10 @@ public class InfoResourceServiceImpl {
 
     private void updateMemberToMongo(Member oldMember, Member newMemberInfo) {
         try {
+            if (ApiLogger.isDebugEnabled()) {
+                ApiLogger.debug("updateMemberToMongo::oldMember = " + (oldMember == null ? null : JSONObject.toJSONString(oldMember)
+                        + ", newMemberInfo = " + (newMemberInfo == null ? null : JSONObject.toJSONString(newMemberInfo))));
+            }
             Map<String, Object> updateMap = new HashMap<>();
             if (null != oldMember && null != newMemberInfo) {
                 //Telephone
@@ -477,8 +481,8 @@ public class InfoResourceServiceImpl {
                 }
             }
             if (MapUtils.isNotEmpty(updateMap)) {
-                boolean updateResult = memberMongoService.updateMemberInfo(newMemberInfo.getMemberId(),updateMap);
-                if (!updateResult){
+                boolean updateResult = memberMongoService.updateMemberInfo(newMemberInfo.getMemberId(), updateMap);
+                if (!updateResult) {
                     StringBuilder msg = new StringBuilder();
                     msg.append("updateMemberToMongo::error")
                             .append(", oldMember = ").append((oldMember == null ? null : oldMember.getMemberId()))
