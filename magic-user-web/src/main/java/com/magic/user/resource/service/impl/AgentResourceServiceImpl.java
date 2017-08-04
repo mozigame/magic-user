@@ -104,7 +104,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             ApiLogger.debug("AgentResourceServiceImpl::findByPage::operaUser = " + operaUser.getType());
         }
         if (operaUser.getType() == AccountType.agent) {
-            return disposeAgent(page, count, operaUser);
+            return disposeAgent(page, count, operaUser, userCondition.getAccount());
         } else {
             totalCount = agentMongoService.getCount(userCondition);
             if (totalCount <= 0) {
@@ -145,11 +145,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return JSON.toJSONString(assemblePageBean(count, page, totalCount, null));
     }
 
-    private String disposeAgent(int page, int count, User operaUser) {
+    private String disposeAgent(int page, int count, User operaUser, String account) {
         long totalCount = 0L;
         AgentConditionVo ac = agentMongoService.get(operaUser.getUserId());
         Long v = memberMongoService.getDepositMembers(operaUser.getUserId());
-        if (ac == null) {
+        if (ac == null||!ac.getAgentName().equals(account)) {
             return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
         }
 
