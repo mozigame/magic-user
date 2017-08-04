@@ -3,6 +3,7 @@ package com.magic.user.resource.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.magic.analysis.utils.CommUtils;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
@@ -163,8 +164,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         List<AgentInfoVo> list = new ArrayList<>();
 
-        av.setDepositTotalMoney(ac.getDepositMoney() == null ? 0L : NumberUtil.fenToYuan(ac.getDepositMoney()).longValue());
-        av.setWithdrawTotalMoney(ac.getWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(ac.getWithdrawMoney()).longValue());
+        av.setDepositTotalMoney((Long) CommUtils.nvl(ac.getDepositMoney(),0l));
+        av.setWithdrawTotalMoney((Long) CommUtils.nvl(ac.getWithdrawMoney(),0l));
         av.setShowStatus(AccountStatus.parse(ac.getStatus()).desc());
 
         if (osa != null) {
