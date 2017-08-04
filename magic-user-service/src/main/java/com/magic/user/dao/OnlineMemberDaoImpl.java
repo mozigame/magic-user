@@ -47,6 +47,10 @@ public class OnlineMemberDaoImpl extends BaseMongoDAOImpl<OnLineMember>{
         }
         return super.update(query, update) != null;
     }
+    
+    public OnLineMember findByMemberId(long memberId) {
+        return super.findOne(new Query(new Criteria("memberId").is(memberId)));
+    }
 
     /**
      * 根据会员ID查询会员在线记录

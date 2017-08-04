@@ -1415,20 +1415,33 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (!Optional.ofNullable(id).filter(value -> value > 0).isPresent()) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
-        String fundProfile = "{\n" +
-                "    \"syncTime\": \"2017-04-18 09:29:33\",\n" +
-                "    \"info\": {\n" +
-                "        \"members\": 550,\n" +
-                "        \"depositMembers\": 420,\n" +
-                "        \"depositTotalMoney\": \"290065901\",\n" +
-                "        \"withdrawTotalMoney\": \"245001201\",\n" +
-                "        \"betTotalMoney\": \"209000671\",\n" +
-                "        \"betEffMoney\": \"190076891\",\n" +
-                "        \"gains\": \"49087633\"\n" +
-                "    }\n" +
-                "}";
-        JSONObject object = JSONObject.parseObject(fundProfile);
-        return JSON.toJSONString(object);
+        User user = userService.get(id);
+        if (user == null) {
+            throw UserException.ILLEGAL_USER;
+        }
+        ProxyCurrentOperaton p = dubboOutAssembleService.getProxyOperation(id, user.getOwnerId());
+        FundProfile<AgentFundInfo> profile = new FundProfile<>();
+        profile.setSyncTime(LocalDateTimeUtil.toAmerica(System.currentTimeMillis()));
+        AgentFundInfo info = assembleFundProfile(p);
+        long depositMembers = memberMongoService.getDepositMembers(id);
+        AgentConditionVo detail = agentMongoService.get(id);
+        if (detail != null) {
+            if (detail.getWithdrawMoney() != null) {
+                info.setWithdrawTotalMoney(NumberUtil.fenToYuan(detail.getWithdrawMoney()).toString());
+            }
+            if (detail.getDepositMoney() != null) {
+                info.setDepositTotalMoney(NumberUtil.fenToYuan(detail.getDepositMoney()).toString());
+            }
+        }
+        info.setDepositMembers((int) depositMembers);
+        OwnerStockAgentMember osam = ownerStockAgentService.countMembersById(id, AccountType.agent);
+        if (osam != null) {
+            info.setMembers(osam.getMemNumber());
+        } else {
+            info.setMembers(0);
+        }
+        profile.setInfo(info);
+        return JSON.toJSONString(profile);
     }
 
     @Override
