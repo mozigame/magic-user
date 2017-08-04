@@ -1,5 +1,13 @@
 package com.magic.user.service;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
@@ -10,16 +18,6 @@ import com.magic.user.entity.Member;
 import com.magic.user.entity.OnlineMemberConditon;
 import com.magic.user.po.OnLineMember;
 import com.magic.user.vo.MemberConditionVo;
-import org.apache.commons.collections.MapUtils;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * MemberMongoServiceImpl
@@ -72,6 +70,15 @@ public class MemberMongoServiceImpl implements MemberMongoService {
             ApiLogger.error(String.format("save online member error. member: %s", JSON.toJSONString(member)), e);
         }
         return false;
+    }
+    
+    public OnLineMember findByMemberId(long memberId) {
+    	 try {
+             return onlineMemberDao.findByMemberId(memberId);
+         } catch (Exception e) {
+             ApiLogger.error(String.format("get findByMemberId error.memberId: %d", memberId), e);
+         }
+         return null;
     }
 
     /**

@@ -38,6 +38,8 @@ public interface MemberMongoService {
      * @return
      */
     boolean saveOnlieMember(OnLineMember lineMember);
+    
+    public OnLineMember findByMemberId(long memberId);
 
     /**
      * 查询在线会员数
