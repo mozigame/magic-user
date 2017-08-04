@@ -204,7 +204,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 } else {
                     vo.setMembers(0);
                 }
-                ;
+                ApiLogger.info("DepositTotalMoney:"+av.getDepositMoney());
+                ApiLogger.info("WithdrawTotalMoney:"+av.getWithdrawMoney());
                 vo.setDepositTotalMoney(av.getDepositMoney() == null ? 0L : av.getDepositMoney());
                 vo.setWithdrawTotalMoney(av.getWithdrawMoney() == null ? 0L : av.getWithdrawMoney());
             } else {
