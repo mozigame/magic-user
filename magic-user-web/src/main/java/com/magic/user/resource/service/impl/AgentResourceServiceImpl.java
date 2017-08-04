@@ -205,8 +205,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                     vo.setMembers(0);
                 }
                 ;
-                vo.setDepositTotalMoney(av.getDepositMoney() == null ? 0L : NumberUtil.fenToYuan(av.getDepositMoney()).longValue());
-                vo.setWithdrawTotalMoney(av.getWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(av.getWithdrawMoney()).longValue());
+                vo.setDepositTotalMoney(av.getDepositMoney() == null ? 0L : av.getDepositMoney());
+                vo.setWithdrawTotalMoney(av.getWithdrawMoney() == null ? 0L : av.getWithdrawMoney());
             } else {
                 vo.setShowStatus("");
                 // 会员数量，存款金额，取款金额
