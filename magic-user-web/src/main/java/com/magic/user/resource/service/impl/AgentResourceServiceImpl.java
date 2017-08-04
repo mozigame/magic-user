@@ -149,7 +149,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         long totalCount = 0L;
         AgentConditionVo ac = agentMongoService.get(operaUser.getUserId());
         Long v = memberMongoService.getDepositMembers(operaUser.getUserId());
-        if (ac == null||!ac.getAgentName().equals(account)) {
+        if (ac == null||StringUtils.isNotEmpty(account) && !account.equals(ac.getAgentName())) {
             return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
         }
 
