@@ -1,6 +1,12 @@
 
 package com.magic.user.consumer;
 
+import java.util.Optional;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSONObject;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.mq.annotation.ConsumerConfig;
@@ -16,10 +22,6 @@ import com.magic.user.service.MemberMongoService;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
 import com.magic.user.vo.AgentConditionVo;
 import com.magic.user.vo.MemberConditionVo;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * MemberRegisterSucessMongoConsumer
@@ -45,7 +47,7 @@ public class MemberRegisterSucessMongoConsumer implements Consumer {
         try {
             Member member = JSONObject.parseObject(msg, Member.class);
             boolean result;
-            OnLineMember onlineMember = memberMongoService.getOnlineMember(member.getMemberId());
+            OnLineMember onlineMember = memberMongoService.findByMemberId(member.getMemberId());
             if (!Optional.ofNullable(onlineMember).isPresent()) {
                 OnLineMember lineMember = parseOnlineMember(member);
                 result = memberMongoService.saveOnlieMember(lineMember);
