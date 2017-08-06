@@ -1,6 +1,7 @@
 package com.magic.user.test;
 
 import com.alibaba.fastjson.JSONObject;
+import com.magic.api.commons.tools.NumberUtil;
 import com.magic.user.entity.AgentReview;
 import com.magic.user.enums.ReviewStatus;
 import org.junit.Test;
@@ -58,5 +59,9 @@ public class MyTest {
         System.out.println(object.toJSONString());
 
         System.out.println(JSONObject.parseObject(object.toJSONString()));
+    }
+
+    public static void main(String args[]){
+        System.out.println(NumberUtil.fenToYuan(370384874)) ;
     }
 }

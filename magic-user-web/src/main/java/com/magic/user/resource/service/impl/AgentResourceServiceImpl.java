@@ -3,6 +3,7 @@ package com.magic.user.resource.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.magic.analysis.utils.CommUtils;
 import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.api.commons.model.PageBean;
@@ -104,7 +105,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             ApiLogger.debug("AgentResourceServiceImpl::findByPage::operaUser = " + operaUser.getType());
         }
         if (operaUser.getType() == AccountType.agent) {
-            return disposeAgent(page, count, operaUser);
+            return disposeAgent(page, count, operaUser, userCondition.getAccount());
         } else {
             totalCount = agentMongoService.getCount(userCondition);
             if (totalCount <= 0) {
@@ -145,11 +146,11 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return JSON.toJSONString(assemblePageBean(count, page, totalCount, null));
     }
 
-    private String disposeAgent(int page, int count, User operaUser) {
+    private String disposeAgent(int page, int count, User operaUser, String account) {
         long totalCount = 0L;
         AgentConditionVo ac = agentMongoService.get(operaUser.getUserId());
         Long v = memberMongoService.getDepositMembers(operaUser.getUserId());
-        if (ac == null) {
+        if (ac == null||StringUtils.isNotEmpty(account) && !account.equals(ac.getAgentName())) {
             return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
         }
 
@@ -163,8 +164,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         List<AgentInfoVo> list = new ArrayList<>();
 
-        av.setDepositTotalMoney(ac.getDepositMoney() == null ? 0L : NumberUtil.fenToYuan(ac.getDepositMoney()).longValue());
-        av.setWithdrawTotalMoney(ac.getWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(ac.getWithdrawMoney()).longValue());
+        av.setDepositTotalMoney((Long) CommUtils.nvl(ac.getDepositMoney(),0l));
+        av.setWithdrawTotalMoney((Long) CommUtils.nvl(ac.getWithdrawMoney(),0l));
         av.setShowStatus(AccountStatus.parse(ac.getStatus()).desc());
 
         if (osa != null) {
@@ -204,9 +205,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 } else {
                     vo.setMembers(0);
                 }
-                ;
-                vo.setDepositTotalMoney(av.getDepositMoney() == null ? 0L : NumberUtil.fenToYuan(av.getDepositMoney()).longValue());
-                vo.setWithdrawTotalMoney(av.getWithdrawMoney() == null ? 0L : NumberUtil.fenToYuan(av.getWithdrawMoney()).longValue());
+                ApiLogger.info("DepositTotalMoney:"+av.getDepositMoney());
+                ApiLogger.info("WithdrawTotalMoney:"+av.getWithdrawMoney());
+                vo.setDepositTotalMoney(av.getDepositMoney() == null ? 0L : av.getDepositMoney());
+                vo.setWithdrawTotalMoney(av.getWithdrawMoney() == null ? 0L : av.getWithdrawMoney());
             } else {
                 vo.setShowStatus("");
                 // 会员数量，存款金额，取款金额

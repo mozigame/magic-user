@@ -70,6 +70,7 @@ public class AgentMongoDaoImpl extends BaseMongoDAOImpl<AgentConditionVo> {
                 query.with(new Sort(Sort.Direction.DESC, "registerTime"));
             }
             List<AgentConditionVo> result = super.find(query);
+            ApiLogger.info("----agent queryByPage size="+result.size()+" query="+query.toString());
             return result;
         }
         return null;
