@@ -17,10 +17,10 @@
 // * @author zj
 // * @date 2017/6/15
 // */
-//public class CodeImageUtilBak {
+//public class CodeImageUtilBak4 {
 //
 //    //使用到Algerian字体，系统里没有的话需要安装字体，字体只显示大写
-//    public static final String VERIFY_CODES = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//    public static final String VERIFY_CODES = "abcdefghjkmnpqrstuvwxyz123456789";
 //    private static Random random = new Random();
 //
 //    /**
@@ -107,7 +107,7 @@
 //        }
 //
 //        // 添加噪点
-//        float yawpRate = 0.05f;// 噪声率
+//        float yawpRate = 0.00f;// 噪声率
 //        int area = (int) (yawpRate * w * h);
 //        for (int i = 0; i < area; i++) {
 //            int x = random.nextInt(w);
@@ -118,16 +118,16 @@
 //
 //        shear(g2, w, h, c);// 使图片扭曲
 //
-//        g2.setColor(getRandColor(100, 160));
-//        int fontSize = h-4;
-//        Font font = new Font("Algerian", Font.ITALIC, fontSize);
+//        g2.setColor(new Color(255, 0, 0));//255,96,0
+//        int fontSize = h-14;
+//        Font font = new Font("TimesRoman", Font.BOLD, fontSize);
 //        g2.setFont(font);
 //        char[] chars = code.toCharArray();
 //        for(int i = 0; i < verifySize; i++){
 //            AffineTransform affine = new AffineTransform();
 //            affine.setToRotation(Math.PI / 4 * rand.nextDouble() * (rand.nextBoolean() ? 1 : -1), (w / verifySize) * i + fontSize/2, h/2);
 //            g2.setTransform(affine);
-//            g2.drawChars(chars, i, 1, ((w-10) / verifySize) * i + 5, h/2 + fontSize/2 - 10);
+//            g2.drawChars(chars, i, 1, ((w-10) / verifySize) * i + 10, h/2 + fontSize/2 - 3);
 //        }
 //
 //        g2.dispose();
