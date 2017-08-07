@@ -1,7 +1,6 @@
 package com.magic.user.util;
 
 import org.apache.commons.codec.binary.Base64;
-import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -21,7 +20,7 @@ import java.util.Random;
 public class CodeImageUtil {
 
     //使用到Algerian字体，系统里没有的话需要安装字体，字体只显示大写
-    public static final String VERIFY_CODES = "abcdefghjkmnpqrstuvwxyz123456789";
+    public static final String VERIFY_CODES = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static Random random = new Random();
 
     /**
@@ -108,7 +107,7 @@ public class CodeImageUtil {
         }
 
         // 添加噪点
-        float yawpRate = 0.00f;// 噪声率
+        float yawpRate = 0.5f;// 噪声率
         int area = (int) (yawpRate * w * h);
         for (int i = 0; i < area; i++) {
             int x = random.nextInt(w);
@@ -117,20 +116,25 @@ public class CodeImageUtil {
             image.setRGB(x, y, rgb);
         }
 
+        //干扰线
+        for(int i = 0; i < verifySize; i++){
+            g2.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+            //画线
+            g2.drawLine(random.nextInt(60), random.nextInt(30), random.nextInt(60), random.nextInt(30));
+        }
         shear(g2, w, h, c);// 使图片扭曲
+        g2.setColor(getRandColor(100, 160));
 
-        g2.setColor(new Color(255, 0, 0));//255,96,0
-        int fontSize = h-14;
-        Font font = new Font("TimesRoman", Font.BOLD, fontSize);
+        int fontSize = h-4;
+        Font font = new Font("Algerian", Font.CENTER_BASELINE + Font.ITALIC, fontSize);
         g2.setFont(font);
         char[] chars = code.toCharArray();
         for(int i = 0; i < verifySize; i++){
             AffineTransform affine = new AffineTransform();
             affine.setToRotation(Math.PI / 4 * rand.nextDouble() * (rand.nextBoolean() ? 1 : -1), (w / verifySize) * i + fontSize/2, h/2);
             g2.setTransform(affine);
-            g2.drawChars(chars, i, 1, ((w-10) / verifySize) * i + 10, h/2 + fontSize/2 - 3);
+            g2.drawChars(chars, i, 1, ((w - 10) / verifySize) * i + 5, h / 2 + fontSize / 2 - 10);
         }
-
         g2.dispose();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ImageIO.write(image, "jpg", out);
@@ -177,7 +181,7 @@ public class CodeImageUtil {
         int period = random.nextInt(2);
 
         boolean borderGap = true;
-        int frames = 1;
+        int frames = 10;
         int phase = random.nextInt(2);
 
         for (int i = 0; i < h1; i++) {
@@ -218,6 +222,11 @@ public class CodeImageUtil {
     }
 
     public static void main(String[] args) {
-
+        try {
+            String s=CodeImageUtil.outputImage(112, 37, "ab01");
+            System.out.println(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
