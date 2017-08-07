@@ -87,7 +87,6 @@ public class MemberResource {
             @RequestParam(name = "code", required = true) String code
 
     ) {
-        logger.info("####roach!!!!!");
         RequestContext rc = RequestContext.getRequestContext();
         ApiLogger.info("register request info username=" + username + " clientId=" + rc.getRequest().getHeader(UserContants.X_VERIFY_CODE));
         //获取域名
