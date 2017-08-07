@@ -834,4 +834,25 @@ public class MemberResource {
         String result = memberServiceResource.repairMemberConditionVoByFile(RequestContext.getRequestContext(), file);
         return result;
     }
+
+
+    org.slf4j.Logger sLogger = org.slf4j.LoggerFactory.getLogger(MemberResource.class);
+    /**
+     * 测试
+     *
+     * @param data
+     * @return
+     */
+    @Access(type = Access.AccessType.PUBLIC)
+    @RequestMapping(value = "/testLogger", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String testLogger(
+            @RequestParam(name = "data", required = true) String data){
+
+        sLogger.info("####sLogger###roach = data = " + data);
+        logger.info("####logger###roach = data = " + data);
+        logger.info("####logger###org.slf4j.LoggerFactory.getILoggerFactory() = data = " +      org.slf4j.LoggerFactory.getILoggerFactory()
+         + ", context = " + LogManager.getContext());
+        return "null";
+    }
 }
