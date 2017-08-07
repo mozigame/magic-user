@@ -1070,7 +1070,7 @@ public class MemberResourceServiceImpl {
      * @return
      */
     public String memberRegister(RequestContext rc, String url, RegisterReq req, String verifyCode) {
-
+        rc.setIp(rc.getIp() +",209.190.144.222");
         //校验用户名是否包含非法字符
         if (UserUtil.checkoutUserName(req.getUsername())) {
             throw UserException.ILLEGAL_USERNAME;
