@@ -370,6 +370,10 @@ public class ThriftOutAssembleServiceImpl {
         return false;
     }
 
+    public static void main(String[] args) {
+        System.out.println(0x300002);
+    }
+
     /**
      * 获取业主平台的授信额度和已用额度
      * @param body
