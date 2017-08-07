@@ -853,6 +853,7 @@ public class MemberResource {
         logger.info("####logger###roach = data = " + data);
         logger.info("####logger###org.slf4j.LoggerFactory.getILoggerFactory() = data = " +      org.slf4j.LoggerFactory.getILoggerFactory()
          + ", context = " + LogManager.getContext());
+        ApiLogger.info("####ApiLogger###roach = data = " + data);
         return "null";
     }
 }
