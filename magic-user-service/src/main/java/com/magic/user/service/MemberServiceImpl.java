@@ -97,4 +97,19 @@ public class MemberServiceImpl implements MemberService {
         return countRedisStorageService.getRegisterIpCount(ip);
     }
 
+    @Override
+    public void setPeriodLoginCount(Long ownerId, String userName, String ip) {
+        countRedisStorageService.setPeriodLoginCount(ownerId, userName, ip);
+    }
+
+    @Override
+    public long getPeriodLoginCount(Long ownerId, String userName, String ip) {
+        return countRedisStorageService.getPeriodLoginCount(ownerId, userName, ip);
+    }
+
+    @Override
+    public boolean delPeriodLoginCount(Long ownerId, String userName, String ip) {
+        return countRedisStorageService.delPeriodLoginCount(ownerId, userName, ip);
+    }
+
 }

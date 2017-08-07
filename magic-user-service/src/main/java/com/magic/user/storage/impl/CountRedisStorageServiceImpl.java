@@ -266,4 +266,41 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
         }
         return 0L;
     }
+
+    @Override
+    public void setPeriodLoginCount(Long ownerId, String userName, String ip) {
+        String key = RedisConstants.assembleLoginCount(ownerId, userName, ip);
+        Jedis jedis = jedisFactory.getInstance();
+        Long incr = jedis.incr(key);
+        if (incr != null && incr < 2) {
+            jedis.expire(key, 900);
+        }
+    }
+
+    @Override
+    public long getPeriodLoginCount(Long ownerId, String userName, String ip) {
+        try {
+            String key = RedisConstants.assembleLoginCount(ownerId, userName, ip);
+            String result = jedisFactory.getInstance().get(key);
+            ApiLogger.info("getPeriodLoginCount result : " +result);
+            if (StringUtils.isNotBlank(result)) {
+                return Long.parseLong(result);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return 0L;
+    }
+
+    @Override
+    public boolean delPeriodLoginCount(Long ownerId, String userName, String ip) {
+        try {
+            String key = RedisConstants.assembleLoginCount(ownerId, userName, ip);
+            Long result = jedisFactory.getInstance().del(key);
+            return result != null && result > 0;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

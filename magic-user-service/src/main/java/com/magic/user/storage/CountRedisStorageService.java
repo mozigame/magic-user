@@ -123,4 +123,10 @@ public interface CountRedisStorageService {
     void addRegisterIpCount(String ip);
 
     long getRegisterIpCount(String ip);
+
+    void setPeriodLoginCount(Long ownerId, String userName, String ip);
+
+    long getPeriodLoginCount(Long ownerId, String userName, String ip);
+
+    boolean delPeriodLoginCount(Long ownerId, String userName, String ip);
 }
