@@ -99,8 +99,6 @@ public class MemberResourceServiceImpl {
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
 
-    @Resource(name = "permJedisFactory")
-    private JedisFactory jedisFactory;
 
     private static Set<String> whiteIps = new HashSet<>();
     static {
@@ -1304,20 +1302,11 @@ public class MemberResourceServiceImpl {
         }
 
         // 登录之后对用户请求登录信息进行记录
-        String userKey = RedisConstants.USER_PREFIX.USER_BASE_INFO.key(ownerInfo.getOwnerId()) + "_" + username + "_" + request.getRemoteAddr();
-        Jedis jedis = jedisFactory.getInstance();
-        int failNum = 0; // 失败次数
-        // 如果连续失败登录信息大于等于3次，则冻结用户账户15分钟
-        if (jedis.get(userKey) != null) {
-            failNum = Integer.parseInt(jedis.get(userKey).toString());
-        }
-        ApiLogger.info(String.format("用户登录信息,username=%s,password=%s,vcode=%s,redisKey=%s,failNum=%d", username, password, code, userKey, failNum));
-        if (failNum >= 3) {
+        if (memberService.getPeriodLoginCount(ownerInfo.getOwnerId(), username, rc.getIp()) >= 3) {
             throw UserException.MEMBER_LOGIN_LOCKED;
+        } else {
+            memberService.setPeriodLoginCount(ownerInfo.getOwnerId(), username, rc.getIp());
         }
-        failNum++;
-        // 设置生命周期，15分钟
-        jedis.setex(userKey, 15 * 60, String.valueOf(failNum));
         String body = assembleLoginBody(rc, ownerInfo.getOwnerId(), username, password, agent, url);
         EGResp resp = thriftOutAssembleService.memberLogin(body, "account");
         if (resp == null || resp.getCode() == 0x1011) {
@@ -1350,7 +1339,7 @@ public class MemberResourceServiceImpl {
         sendLoginMessage(member, rc);
 
         //删除redis里面的登录错误次数信息
-        jedis.del(userKey);
+        memberService.delPeriodLoginCount(ownerInfo.getOwnerId(), username, rc.getIp());
 
         return result;
     }

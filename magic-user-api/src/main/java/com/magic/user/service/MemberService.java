@@ -69,5 +69,34 @@ public interface MemberService {
      */
     void addRegisterIpCount(String ip);
 
+    /**
+     * 获取1天内IP的注册次数
+     * @param ip
+     * @return
+     */
     long getRegisterIpCount(String ip);
+
+    /**
+     * 统一ip三次登录错误处理
+     * @param ownerId
+     * @param userName
+     * @param ip
+     */
+    void setPeriodLoginCount(Long ownerId, String userName, String ip);
+    
+    /**
+     * 统一ip三次登录错误处理
+     * @param ownerId
+     * @param userName
+     * @param ip
+     */
+    long getPeriodLoginCount(Long ownerId, String userName, String ip);
+
+    /**
+     * 统一ip三次登录错误处理
+     * @param ownerId
+     * @param userName
+     * @param ip
+     */
+    boolean delPeriodLoginCount(Long ownerId, String userName, String ip);
 }
