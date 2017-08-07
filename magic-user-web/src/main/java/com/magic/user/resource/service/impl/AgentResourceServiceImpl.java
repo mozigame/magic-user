@@ -40,6 +40,7 @@ import com.magic.user.util.PasswordCapture;
 import com.magic.user.util.UserUtil;
 import com.magic.user.vo.*;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -86,7 +87,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String  findByPage(RequestContext rc, String condition, int page, int count) {
+    public String findByPage(RequestContext rc, String condition, int page, int count) {
         User operaUser = userService.get(rc.getUid());
         if (operaUser == null) {
             throw UserException.ILLEGAL_USER;
@@ -150,7 +151,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         long totalCount = 0L;
         AgentConditionVo ac = agentMongoService.get(operaUser.getUserId());
         Long v = memberMongoService.getDepositMembers(operaUser.getUserId());
-        if (ac == null||StringUtils.isNotEmpty(account) && !account.equals(ac.getAgentName())) {
+        if (ac == null || StringUtils.isNotEmpty(account) && !account.equals(ac.getAgentName())) {
             return JSON.toJSONString(assemblePageBean(count, page, 0L, null));
         }
 
@@ -164,8 +165,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         }
         List<AgentInfoVo> list = new ArrayList<>();
 
-        av.setDepositTotalMoney((Long) CommUtils.nvl(ac.getDepositMoney(),0l));
-        av.setWithdrawTotalMoney((Long) CommUtils.nvl(ac.getWithdrawMoney(),0l));
+        av.setDepositTotalMoney((Long) CommUtils.nvl(ac.getDepositMoney(), 0l));
+        av.setWithdrawTotalMoney((Long) CommUtils.nvl(ac.getWithdrawMoney(), 0l));
         av.setShowStatus(AccountStatus.parse(ac.getStatus()).desc());
 
         if (osa != null) {
@@ -205,8 +206,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 } else {
                     vo.setMembers(0);
                 }
-                ApiLogger.info("DepositTotalMoney:"+av.getDepositMoney());
-                ApiLogger.info("WithdrawTotalMoney:"+av.getWithdrawMoney());
+                ApiLogger.info("DepositTotalMoney:" + av.getDepositMoney());
+                ApiLogger.info("WithdrawTotalMoney:" + av.getWithdrawMoney());
                 vo.setDepositTotalMoney(av.getDepositMoney() == null ? 0L : av.getDepositMoney());
                 vo.setWithdrawTotalMoney(av.getWithdrawMoney() == null ? 0L : av.getWithdrawMoney());
             } else {
@@ -363,9 +364,9 @@ public class AgentResourceServiceImpl implements AgentResourceService {
     @Override
     public String add(RequestContext rc, HttpServletRequest request, Long holder, String account, String password, String realname, String telephone,
                       String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme,
-                      Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost, Long userLevel,Long registerOfferId) {
+                      Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost, Long userLevel, Long registerOfferId) {
         String generalizeCode = UUIDUtil.getSpreadCode();
-        ApiLogger.info("register agent generalizeCode : "+ generalizeCode);
+        ApiLogger.info("register agent generalizeCode : " + generalizeCode);
         RegisterReq req = assembleRegister(account, password);
         if (!checkRegisterAgentParam(req)) {
             throw UserException.ILLEGAL_PARAMETERS;
@@ -412,8 +413,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         //mq 处理 4、添加代理配置
         //mq 处理 4、添加代理配置
         List<AgentConfig> agentConfigs = new ArrayList<>();
-        for(String domainTemp : domain.split(",")) {
-            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domainTemp, discount, cost, userLevel,registerOfferId);
+        for (String domainTemp : domain.split(",")) {
+            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domainTemp, discount, cost, userLevel, registerOfferId);
             agentConfigs.add(agentConfig);
         }
         //mq 处理 5、添加业主股东代理id映射信息
@@ -421,7 +422,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         //mq 处理 6、将代理基础信息放入mongo
         AgentConditionVo agentConditionVo = assembleAgentConfigVo(userId, account, generalizeCode, holder, agentUser.getOwnerId());
         //循环放放mq
-        for(AgentConfig config : agentConfigs){
+        for (AgentConfig config : agentConfigs) {
             sendAgentAddSuccessMq(config, ownerStockAgentMember, agentConditionVo);
         }
         /*用户添加成功发送mq*/
@@ -529,7 +530,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 组装添加的代理配置对象
      */
-    private AgentConfig assembleAgentConfig(long ownerId, Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain, Integer discount, Integer cost, Long userLevel,Long registerOfferId) {
+    private AgentConfig assembleAgentConfig(long ownerId, Long agentId, Integer returnSchemeId, Integer adminCostId, Integer feeId, String domain, Integer discount, Integer cost, Long userLevel, Long registerOfferId) {
         AgentConfig agentConfig = new AgentConfig();
         agentConfig.setOwnerId(ownerId);
         agentConfig.setAgentId(agentId);
@@ -844,8 +845,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain,Long registerOfferId) {
-        if (!checkUpdateAgentConfig(returnScheme, adminCost, feeScheme, discount, cost, domain,registerOfferId)) {
+    public String updateAgentConfig(RequestContext rc, Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain, Long registerOfferId) {
+        if (!checkUpdateAgentConfig(returnScheme, adminCost, feeScheme, discount, cost, domain, registerOfferId)) {
             throw UserException.ILLEGAL_PARAMETERS;
         }
         User agentUser = userService.get(agentId);
@@ -853,12 +854,12 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             throw UserException.ILLEGAL_USER;
         }
 
-        AgentConfig agentConfig = assembleUpdateAgentConfig(agentId, returnScheme, adminCost, feeScheme, discount, cost, domain,registerOfferId);
+        AgentConfig agentConfig = assembleUpdateAgentConfig(agentId, returnScheme, adminCost, feeScheme, discount, cost, domain, registerOfferId);
         if (StringUtils.isNotEmpty(domain) && !agentConfigService.update(agentConfig)) {
             throw UserException.AGENT_CONFIG_UPDATE_FAIL;
         }
-        if (!(returnScheme < 0 && adminCost < 0 && feeScheme < 0 && discount < 0 && cost < 0&&registerOfferId<0)) {
-            EGResp resp = thriftOutAssembleService.updateAgentConfig(assembleConfigUpdBody(agentId, returnScheme, adminCost, feeScheme, discount, cost,registerOfferId), "account");
+        if (!(returnScheme < 0 && adminCost < 0 && feeScheme < 0 && discount < 0 && cost < 0 && registerOfferId < 0)) {
+            EGResp resp = thriftOutAssembleService.updateAgentConfig(assembleConfigUpdBody(agentId, returnScheme, adminCost, feeScheme, discount, cost, registerOfferId), "account");
             if (resp == null || resp.getCode() != 0) {
                 throw UserException.AGENT_CONFIG_UPDATE_FAIL;
             }
@@ -866,8 +867,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         return UserContants.EMPTY_STRING;
     }
 
-    private boolean checkUpdateAgentConfig(Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain,Long registerOfferId) {
-        if (returnScheme < 0 && adminCost < 0 && feeScheme < 0 && discount < 0 && cost < 0 && StringUtils.isBlank(domain)&&registerOfferId<0) {
+    private boolean checkUpdateAgentConfig(Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain, Long registerOfferId) {
+        if (returnScheme < 0 && adminCost < 0 && feeScheme < 0 && discount < 0 && cost < 0 && StringUtils.isBlank(domain) && registerOfferId < 0) {
             return false;
         }
         return true;
@@ -885,7 +886,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @param domain
      * @return
      */
-    private AgentConfig assembleUpdateAgentConfig(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain,Long registerOfferId) {
+    private AgentConfig assembleUpdateAgentConfig(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, String domain, Long registerOfferId) {
         AgentConfig config = new AgentConfig();
         config.setAgentId(agentId);
         config.setReturnSchemeId(returnScheme);
@@ -909,7 +910,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @param cost
      * @return
      */
-    private String assembleConfigUpdBody(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost,Long registerOfferId) {
+    private String assembleConfigUpdBody(Long agentId, Integer returnScheme, Integer adminCost, Integer feeScheme, Integer discount, Integer cost, Long registerOfferId) {
         JSONObject object = new JSONObject();
         object.put("agentId", agentId);
         if (returnScheme > 0) {
@@ -927,8 +928,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         if (cost > 0) {
             object.put("cost", cost);
         }
-        if(registerOfferId>0){
-            object.put("registerOfferId",registerOfferId);
+        if (registerOfferId > 0) {
+            object.put("registerOfferId", registerOfferId);
         }
         return object.toJSONString();
     }
@@ -1129,6 +1130,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         for (AgentApplyVo vo : list) {
             vo.setShowStatus(ReviewStatus.parse(vo.getStatus()).desc());
             vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
+            vo.setHolderName(vo.getHolderName() == null || vo.getHolderName().trim().equals("") ? "-" : vo.getHolderName());
+            vo.setOperatorTime(vo.getOperatorTime() == null || vo.getOperatorTime().trim().equals("") ? "-" : vo.getOperatorTime());
             if (vo.getOperatorTime() != null) {
                 vo.setOperatorTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime())));
             }
@@ -1196,7 +1199,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      */
     @Override
-    public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost, Long userLevel,Long registerOfferId) {
+    public String agentReview(RequestContext rc, Long id, Integer reviewStatus, Long holder, String realname, String telephone, String bankCardNo, String bank, String bankDeposit, String email, Integer returnScheme, Integer adminCost, Integer feeScheme, String domain, Integer discount, Integer cost, Long userLevel, Long registerOfferId) {
         User opera = userService.get(rc.getUid());
         if (opera == null) {
             throw UserException.ILLEGAL_USER;
@@ -1259,14 +1262,14 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             }
             //3、添加代理基础信息
             String generalizeCode = UUIDUtil.getSpreadCode();
-            ApiLogger.info("registe agent generalizeCode :"+generalizeCode);
+            ApiLogger.info("registe agent generalizeCode :" + generalizeCode);
             User agentUser = assembleAgent(userId, holderUser.getOwnerId(), holderUser.getOwnerName(), realname, agentApply.getUsername(), telephone, email, AccountType.agent, System.currentTimeMillis(), IPUtil.ipToInt(rc.getIp()), generalizeCode, AccountStatus.enable, bankCardNo, bank, bankDeposit);
             if (!userService.addAgent(agentUser)) {
                 ApiLogger.error("add agent info failed,userId:" + userId);
                 throw UserException.REGISTER_FAIL;
             }
             //mq 处理 4、添加代理配置
-            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel,registerOfferId);
+            AgentConfig agentConfig = assembleAgentConfig(opera.getOwnerId(), userId, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel, registerOfferId);
             //mq 处理 5、添加业主股东代理id映射信息
             OwnerStockAgentMember ownerStockAgentMember = assembleOwnerStockAgent(holderUser.getOwnerId(), holder, userId);
             //mq 处理 6、将代理基础信息放入mongo
@@ -1598,10 +1601,10 @@ public class AgentResourceServiceImpl implements AgentResourceService {
      * @return
      * @Doc 获取域名下的代理信息
      */
-    public String getAgentConfigByDomain(RequestContext rc, String domain){
+    public String getAgentConfigByDomain(RequestContext rc, String domain) {
         List<AgentConfig> configs = null;
         try {
-            configs = (List<AgentConfig>)agentConfigService.getAgentConfigByDomain(domain);
+            configs = (List<AgentConfig>) agentConfigService.getAgentConfigByDomain(domain);
         } catch (Exception e) {
             ApiLogger.info(e.getMessage());
         }
