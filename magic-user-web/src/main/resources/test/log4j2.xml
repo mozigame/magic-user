@@ -3,11 +3,11 @@
     <properties>
         <property name="app_name">magic-user</property>
         <property name="log_home">/apps/tomcat-custom-instance/magic-user/logs</property>
-        <property name="log_backup_home">${log_home}/logBackup</property>
+        <property name="log_backup_home">${log_home}</property>
         <property name="default_pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t][%l] %p - %msg%n</property>
         <property name="default_file_size">300MB</property>
         <property name="default_file_count">10</property>
-        <property name="default_time_interval">24</property>
+        <property name="default_time_interval">1</property>
     </properties>
 
 
