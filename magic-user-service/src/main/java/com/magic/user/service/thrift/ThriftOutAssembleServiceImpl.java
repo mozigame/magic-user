@@ -362,11 +362,19 @@ public class ThriftOutAssembleServiceImpl {
         EGReq req = assembleEGReq(CmdType.SETTLE, 0x300002, body);
         try {
             EGResp call = thriftFactory.call(req, UserContants.CALLER);
+<<<<<<< HEAD
+=======
+            //30001 已经注册过
+>>>>>>> develop
             return Optional.ofNullable(call).filter(code -> call.getCode() == 0 || call.getCode() == 30001).isPresent();
         }catch (Exception e){
             ApiLogger.error(String.format("register payment account error. req: %s", JSON.toJSONString(req)), e);
         }
         return false;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(0x300002);
     }
 
     /**

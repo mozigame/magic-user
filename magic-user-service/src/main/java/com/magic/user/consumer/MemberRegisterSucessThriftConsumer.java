@@ -6,14 +6,8 @@ import com.magic.api.commons.ApiLogger;
 import com.magic.api.commons.mq.annotation.ConsumerConfig;
 import com.magic.api.commons.mq.api.Consumer;
 import com.magic.api.commons.mq.api.Topic;
-import com.magic.api.commons.tools.IPUtil;
 import com.magic.user.entity.Member;
-import com.magic.user.enums.AccountStatus;
-import com.magic.user.enums.CurrencyType;
-import com.magic.user.po.OnLineMember;
-import com.magic.user.service.MemberMongoService;
 import com.magic.user.service.thrift.ThriftOutAssembleServiceImpl;
-import com.magic.user.vo.MemberConditionVo;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,7 +15,7 @@ import java.util.Optional;
 
 /**
  * MemberRegisterSucessThriftConsumer
- * 注册成功，创建游戏账户
+ * 注册成功，创建支付账户
  * @author zj
  * @date 2017/6/21
  */

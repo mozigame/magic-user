@@ -162,11 +162,27 @@ public class RedisConstants {
         return assemble(LOGIN_VERIFY_CODE, clientId);
     }
 
-
+    /**
+     * 检查同一ip下注册次数
+     * @param ip
+     * @return
+     */
     private static final String CHECK_REGISTER_IP="reg_suc_ip_";
 
+    /**
+     * 检查同一ip下注册次数
+     * @param ip
+     * @return
+     */
     public static String assembleCheckRegisterIp(String ip) {
         return CHECK_REGISTER_IP + ip;
+    }
+
+
+    private static final String SAME_IP_LOGIN="s_ip_l_";
+
+    public static String assembleLoginCount(Long ownerId,String username,String ip) {
+        return SAME_IP_LOGIN + ownerId + "_" + username + "_" + ip;
     }
     /**
      * 组装key
