@@ -850,9 +850,9 @@ public class MemberResource {
             @RequestParam(name = "data", required = true) String data){
 
         sLogger.info("####sLogger###roach = data = " + data);
-        logger.info("####logger###roach = data = " + data);
+        logger.info("####logger###roach = data = " + data + ", sLogger = " + sLogger);
         logger.info("####logger###org.slf4j.LoggerFactory.getILoggerFactory() = data = " +      org.slf4j.LoggerFactory.getILoggerFactory()
-         + ", context = " + LogManager.getContext());
+         + ", context = " + LogManager.getContext().getExternalContext().toString());
         return "null";
     }
 }
