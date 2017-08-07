@@ -5,12 +5,6 @@ import com.magic.api.commons.core.auth.Access;
 import com.magic.api.commons.core.context.RequestContext;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.resource.service.AgentResourceService;
-import java.io.IOException;
-import java.net.URLEncoder;
-import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
@@ -19,6 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 
 
 /**
@@ -97,20 +98,20 @@ public class AgentResource {
 
 
     /**
-     * @param holder       所属股东ID
-     * @param account      代理账号
-     * @param password     登录密码
-     * @param realname     真实姓名
-     * @param telephone    手机号码
-     * @param bankCardNo   银行卡号
-     * @param email        电子邮箱
-     * @param returnScheme 返佣方案
-     * @param adminCost    行政成本
-     * @param feeScheme    手续费
-     * @param domain       域名设置
-     * @param discount     优惠扣除  默认1 1不选 2勾选
-     * @param cost         反水成本  默认1 1不选 2勾选
-     * @param registerOfferId    会员注册优惠
+     * @param holder          所属股东ID
+     * @param account         代理账号
+     * @param password        登录密码
+     * @param realname        真实姓名
+     * @param telephone       手机号码
+     * @param bankCardNo      银行卡号
+     * @param email           电子邮箱
+     * @param returnScheme    返佣方案
+     * @param adminCost       行政成本
+     * @param feeScheme       手续费
+     * @param domain          域名设置
+     * @param discount        优惠扣除  默认1 1不选 2勾选
+     * @param cost            反水成本  默认1 1不选 2勾选
+     * @param registerOfferId 会员注册优惠
      * @return
      * @Doc 手动添加代理
      */
@@ -138,7 +139,7 @@ public class AgentResource {
             @RequestParam(name = "registerOfferId", required = false, defaultValue = "-1") Long registerOfferId  //会员注册优惠方案
     ) {
         RequestContext rc = RequestContext.getRequestContext();
-        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel,registerOfferId);
+        return agentResourceService.add(rc, request, holder, account, password, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel, registerOfferId);
     }
 
     /**
@@ -253,7 +254,7 @@ public class AgentResource {
             @RequestParam(name = "registerOfferId", required = false, defaultValue = "-1") Long registerOfferId
 
     ) {
-        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domains,registerOfferId);
+        return agentResourceService.updateAgentConfig(RequestContext.getRequestContext(), id, returnScheme, adminCost, feeScheme, discount, cost, domains, registerOfferId);
     }
 
     /**
@@ -326,9 +327,6 @@ public class AgentResource {
 
         return agentResourceService.agentApplyList(RequestContext.getRequestContext(), account, status, page, count);
     }
-//    public static void main(String[] args){
-//        System.out.println(MD5Util.md5Digest("123456".getBytes()));
-//    }
 
     /**
      * @param account 账号
@@ -425,7 +423,7 @@ public class AgentResource {
 
     ) {
         //TODO 所有涉及审核的信息增加开户行信息、银行名称
-        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel,registerOfferId);
+        return agentResourceService.agentReview(RequestContext.getRequestContext(), id, reviewStatus, holder, realname, telephone, bankCardNo, bank, bankDeposit, email, returnScheme, adminCost, feeScheme, domain, discount, cost, userLevel, registerOfferId);
     }
 
 

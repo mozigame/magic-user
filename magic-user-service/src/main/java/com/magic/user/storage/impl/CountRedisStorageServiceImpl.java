@@ -244,11 +244,12 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
 
     @Override
     public void addRegisterIpCount(String ip) {
+        int expire = 172800;    //过期时间， 60 * 60 * 24 *2 两天
         String key = RedisConstants.assembleCheckRegisterIp(ip);
         Jedis jedis = jedisFactory.getInstance();
         Long incr = jedis.incr(key);
         if (incr != null && incr < 2) {
-            jedis.expire(key, 86400);
+            jedis.expire(key, expire);
         }
     }
 
@@ -269,11 +270,12 @@ public class CountRedisStorageServiceImpl implements CountRedisStorageService{
 
     @Override
     public void setPeriodLoginCount(Long ownerId, String userName, String ip) {
+        int expire = 900; //过期时间15分钟
         String key = RedisConstants.assembleLoginCount(ownerId, userName, ip);
         Jedis jedis = jedisFactory.getInstance();
         Long incr = jedis.incr(key);
         if (incr != null && incr < 2) {
-            jedis.expire(key, 900);
+            jedis.expire(key, expire);
         }
     }
 
