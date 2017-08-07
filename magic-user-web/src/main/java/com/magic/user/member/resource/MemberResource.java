@@ -10,6 +10,8 @@ import com.magic.user.member.resource.service.MemberResourceServiceImpl;
 import com.magic.user.po.DownLoadFile;
 import com.magic.user.po.RegisterReq;
 import com.magic.user.util.CodeImageUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +36,9 @@ import java.net.URLEncoder;
 @Controller
 @RequestMapping("/v1/member")
 public class MemberResource {
+
+    public static final Logger logger = LoggerFactory.getLogger(MemberResource.class);
+
 
     @Resource
     private MemberResourceServiceImpl memberServiceResource;
@@ -82,6 +87,7 @@ public class MemberResource {
             @RequestParam(name = "code", required = true) String code
 
     ) {
+        logger.info("####roach!!!!!");
         RequestContext rc = RequestContext.getRequestContext();
         ApiLogger.info("register request info username=" + username + " clientId=" + rc.getRequest().getHeader(UserContants.X_VERIFY_CODE));
         //获取域名
