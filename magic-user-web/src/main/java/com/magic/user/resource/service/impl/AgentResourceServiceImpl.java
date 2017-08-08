@@ -1133,7 +1133,7 @@ public class AgentResourceServiceImpl implements AgentResourceService {
             vo.setHolderName(vo.getHolderName() == null || vo.getHolderName().trim().equals("") ? "-" : vo.getHolderName());
             vo.setOperatorTime(vo.getOperatorTime() == null || vo.getOperatorTime().trim().equals("") ? "-" : vo.getOperatorTime());
             if (vo.getOperatorTime() != null) {
-                vo.setOperatorTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime())));
+                vo.setOperatorTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime() == null ? "0" : vo.getOperatorTime())));
             }
         }
     }
