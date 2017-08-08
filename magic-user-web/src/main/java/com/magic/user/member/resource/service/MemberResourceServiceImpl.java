@@ -1075,13 +1075,10 @@ public class MemberResourceServiceImpl {
         if (UserUtil.checkoutUserName(req.getUsername())) {
             throw UserException.ILLEGAL_USERNAME;
         }
-        //如果是白名单，不需要验证码
+        //白名单用户取消ip过滤，如果是白名单，不需要验证码
         if (!whiteIps.contains(rc.getIp())) {
             //验证码校验
             verifyCode(rc, verifyCode);
-        }
-        //白名单用户取消ip过滤
-        if (!whiteIps.contains(rc.getIp())) {
             if (memberService.getRegisterIpCount(rc.getIp()) > 5) {
                 throw UserException.REGISTER_TOO_FAST;
             }
