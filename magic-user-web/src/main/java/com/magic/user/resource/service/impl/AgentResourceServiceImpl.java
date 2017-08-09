@@ -1130,11 +1130,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         for (AgentApplyVo vo : list) {
             vo.setShowStatus(ReviewStatus.parse(vo.getStatus()).desc());
             vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
-            vo.setHolderName(vo.getHolderName() == null || vo.getHolderName().trim().equals("") ? "-" : vo.getHolderName());
-            vo.setOperatorTime(vo.getOperatorTime() == null || vo.getOperatorTime().trim().equals("") ? "-" : vo.getOperatorTime());
-            if (vo.getOperatorTime() != null) {
-                vo.setOperatorTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime() == null ? "0" : vo.getOperatorTime())));
-            }
+            vo.setHolderName(StringUtils.isBlank(vo.getHolderName()) ? "-" : vo.getHolderName());
+            vo.setOperatorTime(StringUtils.isBlank(vo.getOperatorTime()) ? "-" : LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime())));
         }
     }
 

@@ -1303,7 +1303,7 @@ public class MemberResourceServiceImpl {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
 
-        // 登录之后对用户请求登录信息进行记录
+        // 登录之后对用户登录次数进行验证
         if (memberService.getPeriodLoginCount(ownerInfo.getOwnerId(), username, rc.getIp()) >= 3) {
             throw UserException.MEMBER_LOGIN_LOCKED;
         } else {

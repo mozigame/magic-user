@@ -1,5 +1,7 @@
 package com.magic.user.storage;
 
+import com.magic.user.entity.Member;
+
 /**
  * User: jack
  * Date: 2017/6/13
@@ -23,4 +25,25 @@ public interface MemberRedisStorageService{
      * @return
      */
     String getVerifyCode(String clientId);
+
+    /**
+     * 获取会员信息
+     * @param memberId
+     * @return
+     */
+    Member getMember(Long memberId);
+
+    /**
+     * 查询会员详情
+     * @param member
+     * @return
+     */
+    boolean setMember(Member member);
+
+    /**
+     * 删除会员详情
+     * @param member
+     * @return
+     */
+    boolean delsetMember(Long memberId);
 }
