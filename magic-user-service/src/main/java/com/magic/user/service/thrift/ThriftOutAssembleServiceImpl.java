@@ -425,7 +425,7 @@ public class ThriftOutAssembleServiceImpl {
             if (Optional.ofNullable(call).filter(code -> call.getCode() == 0).isPresent()){
                 JSONObject object = JSONObject.parseObject(call.getData());
                 if (Optional.ofNullable(object).filter(level -> object.getLong("levelId") != null).isPresent()) {
-                    return object.getLongValue("lelve");
+                    return object.getLong("levelId");
                 }
             }
         }catch (Exception e){
