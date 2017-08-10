@@ -1154,15 +1154,17 @@ public class MemberResourceServiceImpl {
             throw UserException.REGISTER_FAIL;
         }
         Member member = assembleMember(rc, req, userId, ownerInfo.getOwnerId(), ownerInfo.getOwnerName(), holder, agent, url);
-        boolean result = memberService.saveMember(member);
-        if (!result) {
-            throw UserException.REGISTER_FAIL;
-        }
+
         //注册支付账号
         boolean payAccount  = thriftOutAssembleService.registerPaymentAcccount(assembleBodyPayAccount(member));
         if (!payAccount) {
             ApiLogger.warn("thrift register payment Account failed, memberId:" + member.getMemberId());
-            retryRegisterPayAccount(member);
+            throw UserException.REGISTER_FAIL;
+        }
+        //注册账号
+        boolean result = memberService.saveMember(member);
+        if (!result) {
+            throw UserException.REGISTER_FAIL;
         }
         //设置mongo，设置层级
         boolean addMongo = addMongo(member);
@@ -1174,33 +1176,6 @@ public class MemberResourceServiceImpl {
         sendRegisterMessage(member);
         memberService.addRegisterIpCount(rc.getIp());
         return "{\"token\":" + "\"" + token + "\"" + "}";
-    }
-
-    /**
-     * 支付账号注册失败重试
-     * @param member
-     */
-    private void retryRegisterPayAccount(Member member) {
-        EXECUTOR_USER.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    int count = 0;
-                    while (count <= 3) {
-                        boolean payAccount  = thriftOutAssembleService.registerPaymentAcccount(assembleBodyPayAccount(member));
-                        if (!payAccount) {
-                            count++;
-                            ApiLogger.warn(String.format("thrift retry register payment Account failed, memberId: %d, count: %d", member.getMemberId(), count));
-                        } else {
-                            ApiLogger.info(String.format("thrift retry register payment Account success, memberId: %d, count: %d", member.getMemberId(), count));
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    ApiLogger.error("thrift retry register payment Account error,", e);
-                }
-            }
-        });
     }
 
     /**
