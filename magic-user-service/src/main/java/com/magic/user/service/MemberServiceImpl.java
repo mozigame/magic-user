@@ -36,8 +36,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member getMemberById(Long id) {
-
-        return memberDbService.get(id);
+        Member member = memberRedisStorageService.getMember(id);
+        if (member == null) {
+            member = memberDbService.get(id);
+            if (member != null) {
+                memberRedisStorageService.setMember(member);
+            }
+        }
+        return member;
     }
 
     @Override
@@ -51,11 +57,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public boolean updateMember(Member member) {
+        if (!memberRedisStorageService.delsetMember(member.getMemberId())) {
+            ApiLogger.warn("delete redis member failed, memberId : "+member.getMemberId());
+            memberRedisStorageService.delsetMember(member.getMemberId());
+        }
         return memberDbService.update(member) > 0;
     }
 
     @Override
     public boolean updateStatus(Member member) {
+        if (!memberRedisStorageService.delsetMember(member.getMemberId())) {
+            ApiLogger.warn("delete redis member failed, memberId : "+member.getMemberId());
+            memberRedisStorageService.delsetMember(member.getMemberId());
+        }
         return memberDbService.update("updateStatus", new String[]{"status", "memberId"}, new Object[]{member.getStatus().value(), member.getMemberId()}) > 0;
     }
 

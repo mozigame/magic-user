@@ -8,6 +8,8 @@ package com.magic.user.constants;
  */
 public class RedisConstants {
 
+    public static final int THREE_DAY_EXPIRE = 259200;  //3天
+
     /**
      * @doc 组装业主平台用户的redis key
      */
@@ -178,12 +180,28 @@ public class RedisConstants {
         return CHECK_REGISTER_IP + ip;
     }
 
-
+    /**
+     * 统一ip下同一用户登录的次数
+     */
     private static final String SAME_IP_LOGIN="s_ip_l_";
-
+    /**
+     * 统一ip下同一用户登录的次数
+     */
     public static String assembleLoginCount(Long ownerId,String username,String ip) {
         return SAME_IP_LOGIN + ownerId + "_" + username + "_" + ip;
     }
+
+    /**
+     * 会员详情
+     */
+    private static final String MEMBER_INFO = "mem_info_";
+    /**
+     * 会员详情
+     */
+    public static String assembleMemberInfo(Long memberId) {
+        return MEMBER_INFO + memberId;
+    }
+
     /**
      * 组装key
      *

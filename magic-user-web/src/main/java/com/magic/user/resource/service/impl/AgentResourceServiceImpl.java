@@ -206,8 +206,6 @@ public class AgentResourceServiceImpl implements AgentResourceService {
                 } else {
                     vo.setMembers(0);
                 }
-                ApiLogger.info("DepositTotalMoney:" + av.getDepositMoney());
-                ApiLogger.info("WithdrawTotalMoney:" + av.getWithdrawMoney());
                 vo.setDepositTotalMoney(av.getDepositMoney() == null ? 0L : av.getDepositMoney());
                 vo.setWithdrawTotalMoney(av.getWithdrawMoney() == null ? 0L : av.getWithdrawMoney());
             } else {
@@ -1130,11 +1128,8 @@ public class AgentResourceServiceImpl implements AgentResourceService {
         for (AgentApplyVo vo : list) {
             vo.setShowStatus(ReviewStatus.parse(vo.getStatus()).desc());
             vo.setRegisterIp(IPUtil.intToIp(Integer.parseInt(vo.getRegisterIp())));
-            vo.setHolderName(vo.getHolderName() == null || vo.getHolderName().trim().equals("") ? "-" : vo.getHolderName());
-            vo.setOperatorTime(vo.getOperatorTime() == null || vo.getOperatorTime().trim().equals("") ? "-" : vo.getOperatorTime());
-            if (vo.getOperatorTime() != null) {
-                vo.setOperatorTime(LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime())));
-            }
+            vo.setHolderName(StringUtils.isBlank(vo.getHolderName()) ? "-" : vo.getHolderName());
+            vo.setOperatorTime(StringUtils.isBlank(vo.getOperatorTime()) ? "-" : LocalDateTimeUtil.toAmerica(Long.parseLong(vo.getOperatorTime())));
         }
     }
 

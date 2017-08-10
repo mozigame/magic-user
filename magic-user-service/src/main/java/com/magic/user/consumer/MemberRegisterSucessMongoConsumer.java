@@ -55,22 +55,7 @@ public class MemberRegisterSucessMongoConsumer implements Consumer {
                     return false;
                 }
             }
-            MemberConditionVo conditionVo = memberMongoService.get(member.getMemberId());
-            if (!Optional.ofNullable(conditionVo).isPresent()) {
-                MemberConditionVo vo = parseMemberConditionVo(member);
-                long level = thriftOutAssembleService.settingLevel(member);
-                if (level <= 0) {
-                    level = thriftOutAssembleService.getMemberLevel(member.getMemberId());
-                }
-                if (level <= 0) {
-                    return false;
-                }
-                vo.setLevel(level);
-                result = memberMongoService.saveMemberInfo(vo);
-                if (!result) {
-                    return false;
-                }
-            }
+
             //累加代理的会员数（members） -并发会有问题
             AgentConditionVo agentConditionVo = agentMongoService.get(member.getAgentId());
             if (agentConditionVo != null) {
@@ -108,33 +93,5 @@ public class MemberRegisterSucessMongoConsumer implements Consumer {
         return lineMember;
     }
 
-    /**
-     * @param member
-     * @return
-     * @Doc 组装会员存储mongo的数据
-     */
-    private MemberConditionVo parseMemberConditionVo(Member member) {
-        MemberConditionVo vo = new MemberConditionVo();
-        vo.setMemberId(member.getMemberId());
-        vo.setMemberName(member.getUsername());
-        vo.setAgentId(member.getAgentId());
-        vo.setAgentName(member.getAgentUsername());
-        vo.setRegisterTime(member.getRegisterTime());
-        vo.setUpdateTime(member.getRegisterTime());
-        vo.setStatus(AccountStatus.enable.value());
-        vo.setDepositCount(0);
-        vo.setWithdrawCount(0);
-        vo.setWithdrawMoney(0L);
-        vo.setDepositMoney(0L);
-        vo.setLastDepositMoney(0L);
-        vo.setLastWithdrawMoney(0L);
-        vo.setMaxDepositMoney(0L);
-        vo.setMaxWithdrawMoney(0L);
-        vo.setCurrencyType(CurrencyType.CNY.value());
-        vo.setOwnerId(member.getOwnerId());
-        vo.setStockId(member.getStockId());
-        vo.setTelephone(member.getTelephone());
-        vo.setBankCardNo(member.getBankCardNo());
-        return vo;
-    }
+
 }

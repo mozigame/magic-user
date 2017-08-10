@@ -63,6 +63,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -98,6 +102,9 @@ public class MemberResourceServiceImpl {
 
     @Resource
     private DubboOutAssembleServiceImpl dubboOutAssembleService;
+
+    private static ExecutorService EXECUTOR_USER = new ThreadPoolExecutor(3, 10, 10, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<>(100), new ThreadPoolExecutor.CallerRunsPolicy());
 
 
     private static Set<String> whiteIps = new HashSet<>();
@@ -1074,11 +1081,10 @@ public class MemberResourceServiceImpl {
         if (UserUtil.checkoutUserName(req.getUsername())) {
             throw UserException.ILLEGAL_USERNAME;
         }
-
-        //验证码校验
-        verifyCode(rc, verifyCode);
-        //白名单用户取消ip过滤
+        //白名单用户取消ip过滤，如果是白名单，不需要验证码
         if (!whiteIps.contains(rc.getIp())) {
+            //验证码校验
+            verifyCode(rc, verifyCode);
             if (memberService.getRegisterIpCount(rc.getIp()) > 5) {
                 throw UserException.REGISTER_TOO_FAST;
             }
@@ -1133,7 +1139,8 @@ public class MemberResourceServiceImpl {
         if (code != 0x1111) {
             throw UserException.REGISTER_FAIL;
         }
-        long userId = 0l;
+
+        long userId = 0L;
         String token = null;
         try {
             JSONObject object = JSONObject.parseObject(resp.getData());
@@ -1146,13 +1153,127 @@ public class MemberResourceServiceImpl {
             throw UserException.REGISTER_FAIL;
         }
         Member member = assembleMember(rc, req, userId, ownerInfo.getOwnerId(), ownerInfo.getOwnerName(), holder, agent, url);
+
+        //注册支付账号
+        boolean payAccount  = thriftOutAssembleService.registerPaymentAcccount(assembleBodyPayAccount(member));
+        if (!payAccount) {
+            ApiLogger.warn("thrift register payment Account failed, memberId:" + member.getMemberId());
+            throw UserException.REGISTER_FAIL;
+        }
+        //注册账号
         boolean result = memberService.saveMember(member);
         if (!result) {
             throw UserException.REGISTER_FAIL;
         }
+        //设置mongo，设置层级
+        boolean addMongo = addMongo(member);
+        if (!addMongo) {
+            ApiLogger.warn("thrift add level failed, memberId:" + member.getMemberId());
+            retrySetLevel(member);
+        }
+
         sendRegisterMessage(member);
         memberService.addRegisterIpCount(rc.getIp());
         return "{\"token\":" + "\"" + token + "\"" + "}";
+    }
+
+    /**
+     * 组装注册支付账号body数据
+     *
+     * @param member
+     * @return
+     */
+    private String assembleBodyPayAccount(Member member) {
+        JSONObject body = new JSONObject();
+        body.put("UserId", member.getMemberId());
+        body.put("UserName", member.getUsername());
+        body.put("AgentId", member.getAgentId());
+        body.put("AgentName", member.getAgentUsername());
+        body.put("OwnerId", member.getOwnerId());
+        body.put("OwnerName", member.getOwnerUsername());
+        body.put("BankCode", member.getBank() == null ? "" : member.getBank());
+        body.put("BankCardNum", member.getBankCardNo() == null ? "" : member.getBankCardNo());
+        body.put("BankCardHolder", member.getBankDeposit() == null ? "" : member.getBankDeposit());
+        return body.toJSONString();
+    }
+
+    /**
+     * 录入mongo，设置用户层级
+     * @param member
+     * @return
+     */
+    private boolean addMongo(Member member) {
+        MemberConditionVo conditionVo = memberMongoService.get(member.getMemberId());
+        if (!Optional.ofNullable(conditionVo).isPresent()) {
+            MemberConditionVo vo = parseMemberConditionVo(member);
+            long level = thriftOutAssembleService.settingLevel(member);
+            if (level <= 0) {
+                level = thriftOutAssembleService.getMemberLevel(member.getMemberId());
+            }
+            if (level <= 0) {
+                return false;
+            }
+            vo.setLevel(level);
+            return memberMongoService.saveMemberInfo(vo);
+        }
+        return true;
+    }
+
+    /**
+     * 重试设置层级
+     * @param member
+     */
+    private void retrySetLevel(Member member) {
+        EXECUTOR_USER.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    int count = 0;
+                    while (count <= 3) {
+                        boolean setLevel  = addMongo(member);
+                        if (!setLevel) {
+                            count++;
+                            ApiLogger.warn(String.format("thrift retry add level failed, memberId: %d, count: %d", member.getMemberId(), count));
+                        } else {
+                            ApiLogger.info(String.format("thrift retry add level success, memberId: %d, count: %d", member.getMemberId(), count));
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    ApiLogger.error("thrift retry add level error,", e);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param member
+     * @return
+     * @Doc 组装会员存储mongo的数据
+     */
+    private MemberConditionVo parseMemberConditionVo(Member member) {
+        MemberConditionVo vo = new MemberConditionVo();
+        vo.setMemberId(member.getMemberId());
+        vo.setMemberName(member.getUsername());
+        vo.setAgentId(member.getAgentId());
+        vo.setAgentName(member.getAgentUsername());
+        vo.setRegisterTime(member.getRegisterTime());
+        vo.setUpdateTime(member.getRegisterTime());
+        vo.setStatus(AccountStatus.enable.value());
+        vo.setDepositCount(0);
+        vo.setWithdrawCount(0);
+        vo.setWithdrawMoney(0L);
+        vo.setDepositMoney(0L);
+        vo.setLastDepositMoney(0L);
+        vo.setLastWithdrawMoney(0L);
+        vo.setMaxDepositMoney(0L);
+        vo.setMaxWithdrawMoney(0L);
+        vo.setCurrencyType(CurrencyType.CNY.value());
+        vo.setOwnerId(member.getOwnerId());
+        vo.setStockId(member.getStockId());
+        vo.setTelephone(member.getTelephone());
+        vo.setBankCardNo(member.getBankCardNo());
+        return vo;
     }
 
     /**
@@ -1293,14 +1414,17 @@ public class MemberResourceServiceImpl {
         if (!checkLoginReq(username, password)) {
             throw UserException.ILLEDGE_USERNAME_PASSWORD;
         }
-        verifyCode(rc, code);
+        //如果是白名单用户即内部测试用户取消验证码认证
+        if (!whiteIps.contains(rc.getIp())) {
+            verifyCode(rc, code);
+        }
         //根据url获取业主ID
         OwnerInfo ownerInfo = dubboOutAssembleService.getOwnerInfoByDomain(url);
         if (ownerInfo == null || ownerInfo.getOwnerId() < 0) {
             throw UserException.ILLEGAL_SOURCE_URL;
         }
 
-        // 登录之后对用户请求登录信息进行记录
+        // 登录之后对用户登录次数进行验证
         if (memberService.getPeriodLoginCount(ownerInfo.getOwnerId(), username, rc.getIp()) >= 3) {
             throw UserException.MEMBER_LOGIN_LOCKED;
         } else {

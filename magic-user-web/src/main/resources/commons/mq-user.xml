@@ -30,7 +30,7 @@
                 <ref bean="agentStatusUpdateSuccessMongoConsumer"></ref>
                 <ref bean="masterAddOwnerSuccessConsumer"></ref>
                 <ref bean="memberLoginRedisCountConsumer"/>
-                <ref bean="memberRegisterSucessThriftConsumer"/>
+                <!--<ref bean="memberRegisterSucessThriftConsumer"/>-->
                 <ref bean="userLoginLogSuccessConsumer"/>
                 <ref bean="userModifyPaymentPasswordConsumer"/>
                 <ref bean="memberRegisterSucessPaymentPasswordConsumer"/>
